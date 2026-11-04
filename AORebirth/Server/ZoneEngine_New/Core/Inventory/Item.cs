@@ -129,10 +129,15 @@ namespace ZoneEngine_New.Core.Inventory
         {
             const int baselinePacketFlags = 0x00A1;
             const int visibilityNibble = 0x00A0;
+            // In the slot field 0x02 means "bound to an instance announced under its own identity" (PlayerInventory
+            // adds it for announced hand weapons). The template's ModifiedDescription bit has the same value and must
+            // not leak in: the client then runs its temporary-item test on the slot (Gamecode.dll 0x1002ac44 gate,
+            // TimeExist check at 0x1004cbd2) and refuses the bag move ("Temporary items can't be moved into a bag!").
+            const int announcedInstanceSlotFlag = 0x0002;
 
             // A worn item its PlayShiftRequirements hold off is shown disabled.
             int disabled = PlayshiftSuppressed ? (int)AORebirth.Enums.ItemFlags.Disabled : 0;
-            int flags = Flags & 0xFFFF;
+            int flags = Flags & 0xFFFF & ~announcedInstanceSlotFlag;
             if ((flags & visibilityNibble) == 0)
                 return unchecked((short)(baselinePacketFlags | disabled));
 

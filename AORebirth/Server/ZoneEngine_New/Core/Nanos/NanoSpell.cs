@@ -21,6 +21,7 @@ namespace ZoneEngine_New.Core.Nanos
             : base(template)
         {
             NanoStrain = ReadStat(CharacterStat.MetaType);
+            _stackingLines = ReadStackingLines();
             StackingOrder = ReadStat(CharacterStat.StackingOrder);
             NcuCost = Math.Max(0, ReadStat(CharacterStat.Level));
             NanoPointCost = Math.Max(0, ReadStat(CharacterStat.NanoPoints));
@@ -53,6 +54,39 @@ namespace ZoneEngine_New.Core.Nanos
         }
 
         readonly bool _userIsRecipient;
+
+        /// <summary>The lines a nano can carry beyond its strain (stats 546-550).</summary>
+        static readonly CharacterStat[] ExtraStackingLineStats =
+        [
+            CharacterStat.StackingLine2,
+            CharacterStat.StackingLine3,
+            CharacterStat.StackingLine4,
+            CharacterStat.StackingLine5,
+            CharacterStat.StackingLine6,
+        ];
+
+        readonly int[] _stackingLines;
+
+        /// <summary>
+        /// The strain plus every StackingLine2-6, without 0 or repeats. Composite Teachings 220331 is strain 165 and
+        /// lines 167, 159, 161, 157, 163: it holds each single Teachings line (MM 151767 is 157) as well as its own.
+        /// </summary>
+        int[] ReadStackingLines()
+        {
+            int count = NanoStrain > 0 ? 1 : 0;
+            Span<int> lines = stackalloc int[1 + ExtraStackingLineStats.Length];
+            if (count == 1)
+                lines[0] = NanoStrain;
+
+            for (int i = 0; i < ExtraStackingLineStats.Length; i++)
+            {
+                int line = ReadStat(ExtraStackingLineStats[i]);
+                if (line > 0 && lines[..count].IndexOf(line) < 0)
+                    lines[count++] = line;
+            }
+
+            return count == 0 ? [] : lines[..count].ToArray();
+        }
 
         /// <summary>
         /// Every function names the User or Wearer: the nano acts on whoever runs it. One that a perk or another nano
@@ -102,6 +136,22 @@ namespace ZoneEngine_New.Core.Nanos
 
         /// <summary>Nano strain; nanos of one strain never stack. 0 means strainless.</summary>
         public int NanoStrain { get; }
+
+        /// <summary>Every nano line this nano occupies: <see cref="NanoStrain"/> first, then StackingLine2-6. Empty when strainless.</summary>
+        public IReadOnlyList<int> StackingLines => _stackingLines;
+
+        /// <summary>True when this nano and <paramref name="other"/> hold a nano line in common, so they cannot both run.</summary>
+        public bool SharesStackingLine(NanoSpell other)
+        {
+            ArgumentNullException.ThrowIfNull(other);
+            for (int i = 0; i < _stackingLines.Length; i++)
+            {
+                if (Array.IndexOf(other._stackingLines, _stackingLines[i]) >= 0)
+                    return true;
+            }
+
+            return false;
+        }
 
         /// <summary>Higher wins within a strain.</summary>
         public int StackingOrder { get; }

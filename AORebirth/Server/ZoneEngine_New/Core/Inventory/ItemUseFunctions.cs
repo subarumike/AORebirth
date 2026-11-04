@@ -84,6 +84,9 @@ namespace ZoneEngine_New.Core.Inventory
                 case FunctionType.SaveChar:
                     // Insurance terminal (ICC Cell Structure Scanner 300813 and the like): fee, save point, XP saved.
                     return (source as Player ?? target as Player) is Player saver && saver.InsuranceSave();
+                case FunctionType.SaveHere:
+                    // Free save on the spot (Redeemed Tree of Life 227385 OnTargetInVicinity): no fee.
+                    return (target as Player ?? source as Player) is Player herePlayer && herePlayer.SaveHere();
                 case FunctionType.LockSkill:
                     return LockSkill(target, source, spell);
                 case FunctionType.TimedEffect:

@@ -95,7 +95,13 @@ namespace ZoneEngine_New.Core.Entities
             // Requirement folds use Stats.Get. Unset is not 0, so a missing opponent count
             // reads as "in combat".
             Stats.Set(CharacterStat.NumberOfFightingOpponents, 0, StatDetail.Base);
+            // Everyone's crit chance before gear and buffs. Runtime-only, so it is never stored; a monster template
+            // that sets Critical Increase replaces it.
+            Stats.Set(CharacterStat.CriticalIncrease, BaseCriticalIncrease, StatDetail.Base);
         }
+
+        /// <summary>Critical Increase (crit chance, percent) every character starts with before gear and buffs.</summary>
+        public const int BaseCriticalIncrease = 3;
 
         /// <summary>
         /// The body radius the client's range checks subtract: CharRadius * Scale / 100, Scale at least 1
@@ -3154,15 +3160,15 @@ namespace ZoneEngine_New.Core.Entities
 
         /// <summary>
         /// Runs the strain / stacking / NCU gate and lands <paramref name="spell"/> when it passes.
-        /// <paramref name="replaced"/> is the entry this buff pushed out, which the caller still
-        /// has to announce as removed.
+        /// <paramref name="replaced"/> lists the entries this buff pushed out (several when it covers more than one
+        /// nano line), which the caller still has to announce as removed.
         /// </summary>
         public BuffApplyDecision TryApplyBuff(
             NanoSpell spell,
             Identity source,
             DateTime nowUtc,
             out Buff? applied,
-            out Buff? replaced)
+            out IReadOnlyList<Buff> replaced)
         {
             ArgumentNullException.ThrowIfNull(spell);
 
@@ -3171,10 +3177,10 @@ namespace ZoneEngine_New.Core.Entities
             if (decision != BuffApplyDecision.Apply && decision != BuffApplyDecision.Replace)
                 return decision;
 
-            if (replaced != null)
+            for (int i = 0; i < replaced.Count; i++)
             {
-                _buffs.Remove(replaced);
-                RevokeAbsorbs(replaced);
+                _buffs.Remove(replaced[i]);
+                RevokeAbsorbs(replaced[i]);
             }
 
             applied = Buff.Create(spell, source, ++_nextNanoInstance, nowUtc);

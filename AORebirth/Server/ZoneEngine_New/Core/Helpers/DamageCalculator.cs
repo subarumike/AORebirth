@@ -156,6 +156,7 @@ namespace ZoneEngine_New.Core.Helpers
 
             HitType hitType = HitType.Normal;
             bool isBurst = specialAttackStat == CharacterStat.Burst;
+            // Critical Increase is the crit percent: Character.BaseCriticalIncrease plus gear, buffs and perks.
             double critChance = NormalizeStat(attacker.Stats.GetOrZero(CharacterStat.CriticalIncrease));
             // PvP rules (Gameplay.json pvp.critChancePercent) scale the chance against a player.
             critChance = attacker.Playfield?.GetService<Configuration.GameplaySettings>()?.Pvp

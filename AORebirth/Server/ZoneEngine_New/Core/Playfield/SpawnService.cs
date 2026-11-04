@@ -1100,6 +1100,15 @@ namespace ZoneEngine_New.Core.Playfield
             if (player.OwnedPets.Count > 0)
                 _playfield.GetRequiredService<Pets.PetService>().AnnounceOwnedPets(player);
 
+            TryRestoreJournal(player);
+        }
+
+        /// <summary>
+        /// Puts the active quests, authored missions and mission key names back in the client. Every playfield load
+        /// on the client drops its quest journal, so this runs after zone entry and after an in-zone reload.
+        /// </summary>
+        void TryRestoreJournal(Player player)
+        {
             try
             {
                 _playfieldManager.AuthoredQuests.Restore(player);
@@ -1387,6 +1396,8 @@ namespace ZoneEngine_New.Core.Playfield
 
             TryEnsureMissionChests();
             locality.ActivatePlayerVisibility(player);
+            // The teleport reloads the playfield on the client, which clears its quest journal.
+            TryRestoreJournal(player);
             return true;
         }
 

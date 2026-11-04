@@ -584,7 +584,7 @@ namespace ZoneEngine_New.Core.Nanos
                 source.Identity,
                 nowUtc,
                 out Buff? applied,
-                out Buff? replaced);
+                out IReadOnlyList<Buff> replaced);
 
             if (applied == null)
             {
@@ -593,8 +593,7 @@ namespace ZoneEngine_New.Core.Nanos
                 return false;
             }
 
-            if (replaced != null && replaced.Id != spell.Id)
-                AnnounceBuffRemoved(target, replaced);
+            AnnounceReplaced(target, replaced, spell);
 
             SendNanoDuration(source, target, applied);
             ExecuteOnUseEffects(source, target, spell, skipPassiveModifiers: true, inventory, items);
@@ -775,7 +774,7 @@ namespace ZoneEngine_New.Core.Nanos
                 caster.Identity,
                 nowUtc,
                 out Buff? applied,
-                out Buff? replaced);
+                out IReadOnlyList<Buff> replaced);
 
             // Cast already finished and spent nano. Apply refusal (e.g. NCU) does not interrupt it.
             if (applied == null)
@@ -801,9 +800,8 @@ namespace ZoneEngine_New.Core.Nanos
             }
 
             // Player casts use SetNanoDuration for NCU display (legacy never Buff-adds on land).
-            // Buff remove is only for a different nano leaving the same strain.
-            if (replaced != null && replaced.Id != spell.Id)
-                AnnounceBuffRemoved(recipient, replaced);
+            // Buff remove is only for a different nano leaving a shared nano line.
+            AnnounceReplaced(recipient, replaced, spell);
 
             ClientFeedback.Send(caster, ClientFeedback.NanoExecutedSuccessfully);
             SendNanoDuration(caster, recipient, applied);
@@ -954,6 +952,16 @@ namespace ZoneEngine_New.Core.Nanos
                 npc.Brain?.AddThreatFrom(caster, Ai.NpcAiRules.ProximityHate);
         }
 
+        /// <summary>Tells the client each buff a landing pushed out; a recast of the same nano is not a removal.</summary>
+        static void AnnounceReplaced(Character owner, IReadOnlyList<Buff> replaced, NanoSpell landed)
+        {
+            for (int i = 0; i < replaced.Count; i++)
+            {
+                if (replaced[i].Id != landed.Id)
+                    AnnounceBuffRemoved(owner, replaced[i]);
+            }
+        }
+
         static bool TargetCanHoldBuff(NanoSpell spell, Character? recipient)
         {
             if (recipient == null || !spell.IsBuff || !spell.ConsumesNcu)
@@ -971,7 +979,7 @@ namespace ZoneEngine_New.Core.Nanos
         /// <summary>The landing's stacking rule, asked up front: a stronger nano of the strain already runs on the target.</summary>
         static bool TargetRunsBetterNano(NanoSpell spell, Character? recipient)
         {
-            if (recipient == null || !spell.IsBuff || spell.NanoStrain <= 0)
+            if (recipient == null || !spell.IsBuff || spell.StackingLines.Count == 0)
                 return false;
 
             return BuffApplyRules.Evaluate(spell, recipient.Buffs, recipient.BuffNcuCapacity, out _)

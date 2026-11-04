@@ -95,6 +95,11 @@ namespace ChatEngine.CoreServer
         /// </summary>
         internal ChatEngineBotRouter BotRouter;
 
+        /// <summary>
+        /// Wire id of the Global channel (type General). Distinct from every Side value.
+        /// </summary>
+        internal const uint GlobalChannelId = 100;
+
         #endregion
 
         #region Constructors and Destructors
@@ -103,8 +108,9 @@ namespace ChatEngine.CoreServer
         /// </summary>
         public ChatServer()
         {
-            // Global channel
-            this.Channels.Add(new GlobalChannel(ChannelFlags.None, ChannelType.General, 1, "Global"));
+            // Global channel. Its id must stay outside the Side range (0-7): the sided
+            // General channels below are keyed (General, (uint)Side), so id 1 collided with Clan.
+            this.Channels.Add(new GlobalChannel(ChannelFlags.None, ChannelType.General, GlobalChannelId, "Global"));
 
             // Shopping channels (at the moment just level restricted, no sides)
             this.Channels.Add(new LevelRestrictedChannel(1, 1, 50));

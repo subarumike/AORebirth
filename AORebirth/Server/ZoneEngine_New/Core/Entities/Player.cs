@@ -1976,6 +1976,26 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         /// <summary>
+        /// A free save where the character stands (SaveHere), as the Redeemed Tree of Life 227385 does: "This ancient
+        /// tree will work as a Cell Structure Scanner", so the save point and the XP a death cannot take are both stored,
+        /// but nothing is charged. The template's own SystemText row says "Character saved".
+        /// </summary>
+        public bool SaveHere()
+        {
+            if (Playfield == null)
+                return false;
+
+            StoreSavePoint();
+            int xp = Stats.GetOrZero(CharacterStat.XP, StatDetail.Base);
+            Stats.Set(CharacterStat.SavedXP, xp, StatDetail.Base, dirty: true);
+            FlushDirtyStats();
+            SaveState.MarkDirty();
+            Logger.Info(string.Format(CultureInfo.InvariantCulture,
+                "Free save character={0} xp={1}", Identity.Instance, xp));
+            return true;
+        }
+
+        /// <summary>
         /// The XP a death cannot take: the last insurance save, or the start of the current level if later. A save above
         /// the current XP cannot be real (a save stores the XP of the moment, and a death never goes below it), so it counts
         /// as no save: one such stale value (2076225398 on a level 21 character) made every death free.
@@ -3029,6 +3049,8 @@ namespace ZoneEngine_New.Core.Entities
             CharacterStat._1hEdged,
             CharacterStat._1hBlunt,
             CharacterStat.MartialArts,
+            // The skill window's Critical Increase: the base every character has (Character.BaseCriticalIncrease).
+            CharacterStat.CriticalIncrease,
             CharacterStat.MetaType,
             CharacterStat.TitleLevel,
             CharacterStat.GmLevel,
