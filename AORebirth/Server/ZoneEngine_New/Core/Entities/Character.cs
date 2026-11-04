@@ -95,7 +95,13 @@ namespace ZoneEngine_New.Core.Entities
             // Requirement folds use Stats.Get. Unset is not 0, so a missing opponent count
             // reads as "in combat".
             Stats.Set(CharacterStat.NumberOfFightingOpponents, 0, StatDetail.Base);
+            // Everyone's crit chance before gear and buffs. Runtime-only, so it is never stored; a monster template
+            // that sets Critical Increase replaces it.
+            Stats.Set(CharacterStat.CriticalIncrease, BaseCriticalIncrease, StatDetail.Base);
         }
+
+        /// <summary>Critical Increase (crit chance, percent) every character starts with before gear and buffs.</summary>
+        public const int BaseCriticalIncrease = 3;
 
         /// <summary>
         /// The body radius the client's range checks subtract: CharRadius * Scale / 100, Scale at least 1

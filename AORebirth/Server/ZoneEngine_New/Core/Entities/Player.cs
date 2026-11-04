@@ -3049,6 +3049,8 @@ namespace ZoneEngine_New.Core.Entities
             CharacterStat._1hEdged,
             CharacterStat._1hBlunt,
             CharacterStat.MartialArts,
+            // The skill window's Critical Increase: the base every character has (Character.BaseCriticalIncrease).
+            CharacterStat.CriticalIncrease,
             CharacterStat.MetaType,
             CharacterStat.TitleLevel,
             CharacterStat.GmLevel,
