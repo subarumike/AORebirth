@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
@@ -19,6 +20,15 @@ namespace Cell.Core
         private bool disposed;
         private uint bytesReceived;
         private uint bytesSent;
+        private readonly object _sendSync = new object();
+        private readonly Queue<PendingSend> _sendQueue = new Queue<PendingSend>();
+        private PendingSend _activeSend;
+        private SocketAsyncEventArgs _sendArgs;
+        private bool _sendPending;
+        private bool _sendDriving;
+        private bool _sendStopped;
+        private bool _disconnectRequested;
+        private Exception _sendFailure;
 
         protected Socket _tcpSock = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
         protected ServerBase _server;
@@ -125,50 +135,171 @@ namespace Cell.Core
 
         public void Send(BufferSegment segment, int length)
         {
-            Send(segment.Buffer.Array, segment.Offset, length);
+            if (segment == null)
+                throw new ArgumentNullException(nameof(segment));
+            if (length < 0 || length > segment.Length)
+                throw new ArgumentOutOfRangeException(nameof(length));
+
+            // A queued write must outlive the caller's lease on this pooled segment.
+            byte[] copy = new byte[length];
+            System.Buffer.BlockCopy(segment.Buffer.Array, segment.Offset, copy, 0, length);
+            Send(copy, 0, length);
         }
 
         public virtual void Send(byte[] packet, int offset, int length)
         {
-            if (!IsConnected)
-            {
+            if (packet == null)
+                throw new ArgumentNullException(nameof(packet));
+            if (offset < 0 || offset > packet.Length)
+                throw new ArgumentOutOfRangeException(nameof(offset));
+            if (length < 0 || length > packet.Length - offset)
+                throw new ArgumentOutOfRangeException(nameof(length));
+            if (length == 0)
                 return;
-            }
 
-            SocketAsyncEventArgs args = SocketHelpers.AcquireSocketArg();
-            if (args == null)
+            Exception failure;
+            lock (_sendSync)
             {
-                log.Error("Client {0}'s SocketArgs are null", this);
-                return;
+                if (disposed || _sendStopped || !IsConnected)
+                    return;
+
+                _sendQueue.Enqueue(new PendingSend(packet, offset, length));
+                PumpSendLocked();
+                failure = TakeSendFailureLocked();
             }
+            DisconnectAfterSocketFailure(failure, false);
+        }
 
-            args.Completed += SendAsyncComplete;
-            args.SetBuffer(packet, offset, length);
-            args.UserToken = this;
+        private void PumpSendLocked()
+        {
+            if (_sendDriving)
+                return;
 
-            bool willRaiseEvent;
+            _sendDriving = true;
             try
             {
-                willRaiseEvent = _tcpSock.SendAsync(args);
+                while (!_sendStopped && !_sendPending)
+                {
+                    if (_activeSend == null)
+                    {
+                        if (_sendQueue.Count == 0)
+                            return;
+                        _activeSend = _sendQueue.Dequeue();
+                    }
+
+                    try
+                    {
+                        if (_sendArgs == null)
+                        {
+                            _sendArgs = SocketHelpers.AcquireSocketArg();
+                            if (_sendArgs == null)
+                                throw new InvalidOperationException("Socket send arguments are unavailable.");
+                            _sendArgs.Completed += SendAsyncComplete;
+                            _sendArgs.UserToken = this;
+                        }
+                        _sendArgs.SetBuffer(_activeSend.Buffer, _activeSend.Offset, _activeSend.Remaining);
+                        _sendPending = true;
+                        if (SendAsync(_sendArgs))
+                        {
+                            if (_sendPending)
+                                return;
+                        }
+                        else if (_sendPending)
+                        {
+                            _sendPending = false;
+                            CompleteSendLocked(_sendArgs);
+                        }
+                    }
+                    catch (Exception exception)
+                    {
+                        _sendPending = false;
+                        FailSendLocked(exception);
+                    }
+                }
             }
-            catch
+            finally
             {
-                args.Completed -= SendAsyncComplete;
-                SocketHelpers.ReleaseSocketArg(args);
-                throw;
+                _sendDriving = false;
+                if (!_sendPending && (_sendStopped || (_activeSend == null && _sendQueue.Count == 0)))
+                    ReleaseSendArgsLocked();
+            }
+        }
+
+        private void CompleteSendLocked(SocketAsyncEventArgs args)
+        {
+            int transferred = args.BytesTransferred;
+            if (args.SocketError == SocketError.Success && transferred > 0 && _activeSend != null
+                && transferred <= _activeSend.Remaining)
+            {
+                unchecked { bytesSent += (uint)transferred; }
+                Interlocked.Add(ref totalBytesSent, transferred);
+                _activeSend.Offset += transferred;
+                _activeSend.Remaining -= transferred;
+                if (_activeSend.Remaining == 0)
+                    _activeSend = null;
+            }
+            else if (!_sendStopped)
+            {
+                FailSendLocked(args.SocketError != SocketError.Success
+                    ? (Exception)new SocketException((int)args.SocketError)
+                    : new InvalidOperationException("Socket send completed without a valid positive byte count."));
             }
 
-            unchecked
-            {
-                bytesSent += (uint)length;
-            }
+            if (_sendStopped)
+                _activeSend = null;
+        }
 
-            Interlocked.Add(ref totalBytesSent, length);
-
-            if (!willRaiseEvent)
+        private void FailSendLocked(Exception failure)
+        {
+            if (!_sendStopped)
             {
-                SendAsyncComplete(this, args);
+                _sendStopped = true;
+                _sendFailure = failure;
             }
+            _sendQueue.Clear();
+            if (!_sendPending)
+                _activeSend = null;
+        }
+
+        private Exception TakeSendFailureLocked()
+        {
+            // A completion can run before SendAsync returns. Its outer pump owns reporting after the gate is free.
+            if (_sendDriving)
+                return null;
+            Exception failure = _sendFailure;
+            _sendFailure = null;
+            return failure;
+        }
+
+        private void ReleaseSendArgsLocked()
+        {
+            if (_sendPending || _sendDriving || _sendArgs == null)
+                return;
+            SocketAsyncEventArgs args = _sendArgs;
+            _sendArgs = null;
+            args.Completed -= SendAsyncComplete;
+            args.UserToken = null;
+            args.SetBuffer(null, 0, 0);
+            SocketHelpers.ReleaseSocketArg(args);
+        }
+
+        private sealed class PendingSend
+        {
+            public readonly byte[] Buffer;
+            public int Offset;
+            public int Remaining;
+
+            public PendingSend(byte[] buffer, int offset, int remaining)
+            {
+                Buffer = buffer;
+                Offset = offset;
+                Remaining = remaining;
+            }
+        }
+
+        protected virtual bool SendAsync(SocketAsyncEventArgs args)
+        {
+            return _tcpSock.SendAsync(args);
         }
 
         public void Connect(string host, int port)
@@ -224,26 +355,31 @@ namespace Cell.Core
 
         protected virtual void Dispose(bool disposing)
         {
-            if (disposed)
+            BufferSegment segment;
+            Socket socket;
+            lock (_sendSync)
             {
-                return;
+                if (disposed)
+                    return;
+                disposed = true;
+                _sendStopped = true;
+                _sendQueue.Clear();
+                if (!_sendPending)
+                {
+                    _activeSend = null;
+                    ReleaseSendArgsLocked();
+                }
+
+                segment = _bufferSegment;
+                _bufferSegment = null;
+                socket = _tcpSock;
+                _tcpSock = null;
             }
 
-            disposed = true;
-
-            BufferSegment segment = _bufferSegment;
-            _bufferSegment = null;
-            if (segment != null && segment.Uses > 0)
-            {
+            if (segment != null)
                 segment.DecrementUsage();
-            }
-
-            Socket socket = _tcpSock;
-            _tcpSock = null;
             if (socket != null)
-            {
                 CloseSocket(socket);
-            }
         }
 
         ~ClientBase()
@@ -251,36 +387,88 @@ namespace Cell.Core
             Dispose(false);
         }
 
-        private static void SendAsyncComplete(object sender, SocketAsyncEventArgs args)
+        private void SendAsyncComplete(object sender, SocketAsyncEventArgs args)
         {
-            args.Completed -= SendAsyncComplete;
-            SocketHelpers.ReleaseSocketArg(args);
+            Exception failure;
+            lock (_sendSync)
+            {
+                if (!ReferenceEquals(args, _sendArgs) || !_sendPending)
+                    return;
+                _sendPending = false;
+                CompleteSendLocked(args);
+                PumpSendLocked();
+                failure = TakeSendFailureLocked();
+            }
+            DisconnectAfterSocketFailure(failure, false);
+        }
+
+        private void DisconnectAfterSocketFailure(Exception failure, bool disconnected)
+        {
+            if (failure == null && !disconnected)
+                return;
+            lock (_sendSync)
+            {
+                if (disposed || _disconnectRequested)
+                    return;
+                _disconnectRequested = true;
+            }
+
+            // Disconnect notifications can send to other clients; never run them under the I/O ownership gate.
+            try
+            {
+                if (failure != null && _server != null)
+                    _server.Warning(this, failure);
+            }
+            catch (Exception)
+            {
+                // A logging failure must not prevent closing the failed connection.
+            }
+            try
+            {
+                if (_server != null)
+                    _server.DisconnectClient(this, true);
+            }
+            finally
+            {
+                Dispose();
+            }
         }
 
         private void ResumeReceive()
         {
-            if (!IsConnected || _bufferSegment == null)
+            BufferSegment operationSegment;
+            Socket socket;
+            int offset;
+            lock (_sendSync)
             {
-                return;
+                if (disposed || !IsConnected || _bufferSegment == null)
+                    return;
+                operationSegment = _bufferSegment;
+                operationSegment.IncrementUsage();
+                socket = _tcpSock;
+                offset = _offset + _remainingLength;
             }
 
-            SocketAsyncEventArgs socketArgs = SocketHelpers.AcquireSocketArg();
-            int offset = _offset + _remainingLength;
-
-            socketArgs.SetBuffer(_bufferSegment.Buffer.Array, _bufferSegment.Offset + offset, BufferSize - offset);
-            socketArgs.UserToken = this;
-            socketArgs.Completed += ReceiveAsyncComplete;
-
+            SocketAsyncEventArgs socketArgs = null;
             bool willRaiseEvent;
             try
             {
-                willRaiseEvent = _tcpSock.ReceiveAsync(socketArgs);
+                socketArgs = SocketHelpers.AcquireSocketArg();
+                if (socketArgs == null)
+                    throw new InvalidOperationException("Socket receive arguments are unavailable.");
+                socketArgs.UserToken = operationSegment;
+                socketArgs.SetBuffer(operationSegment.Buffer.Array, operationSegment.Offset + offset, BufferSize - offset);
+                socketArgs.Completed += ReceiveAsyncComplete;
+                willRaiseEvent = socket.ReceiveAsync(socketArgs);
             }
-            catch
+            catch (Exception exception)
             {
-                socketArgs.Completed -= ReceiveAsyncComplete;
-                SocketHelpers.ReleaseSocketArg(socketArgs);
-                throw;
+                if (socketArgs == null)
+                    operationSegment.DecrementUsage();
+                else
+                    ReleaseReceiveArgs(socketArgs);
+                DisconnectAfterSocketFailure(exception, true);
+                return;
             }
 
             if (!willRaiseEvent)
@@ -298,49 +486,73 @@ namespace Cell.Core
         {
             try
             {
-                int received = args.BytesTransferred;
-                if (received == 0 || args.SocketError != SocketError.Success)
+                BufferSegment operationSegment = args.UserToken as BufferSegment;
+                int received;
+                SocketError socketError;
+                lock (_sendSync)
                 {
-                    _server.DisconnectClient(this, true);
+                    if (disposed || operationSegment == null || _bufferSegment == null
+                        || !ReferenceEquals(operationSegment, _bufferSegment))
+                        return;
+                    received = args.BytesTransferred;
+                    socketError = args.SocketError;
+                    if (received > 0 && socketError == SocketError.Success)
+                    {
+                        unchecked { bytesReceived += (uint)received; }
+                        Interlocked.Add(ref totalBytesReceived, received);
+                        _remainingLength += received;
+                    }
+                }
+                if (received == 0 || socketError != SocketError.Success)
+                {
+                    DisconnectAfterSocketFailure(socketError == SocketError.Success
+                        ? null : new SocketException((int)socketError), true);
                     return;
                 }
 
-                unchecked
+                bool consumed = OnReceive(operationSegment);
+                lock (_sendSync)
                 {
-                    bytesReceived += (uint)received;
-                }
-
-                Interlocked.Add(ref totalBytesReceived, received);
-                _remainingLength += received;
-
-                if (OnReceive(_bufferSegment))
-                {
-                    _offset = 0;
-                    _remainingLength = 0;
-                    _bufferSegment.DecrementUsage();
-                    _bufferSegment = Buffers.CheckOut();
-                }
-                else
-                {
-                    EnsureBuffer();
+                    if (disposed || _bufferSegment == null || !ReferenceEquals(operationSegment, _bufferSegment))
+                        return;
+                    if (consumed)
+                    {
+                        _offset = 0;
+                        _remainingLength = 0;
+                        _bufferSegment.DecrementUsage();
+                        _bufferSegment = Buffers.CheckOut();
+                    }
+                    else
+                    {
+                        EnsureBuffer();
+                    }
                 }
 
                 ResumeReceive();
             }
             catch (ObjectDisposedException)
             {
-                _server.DisconnectClient(this, true);
+                DisconnectAfterSocketFailure(null, true);
             }
             catch (Exception e)
             {
-                _server.Warning(this, e);
-                _server.DisconnectClient(this, true);
+                DisconnectAfterSocketFailure(e, true);
             }
             finally
             {
-                args.Completed -= ReceiveAsyncComplete;
-                SocketHelpers.ReleaseSocketArg(args);
+                ReleaseReceiveArgs(args);
             }
+        }
+
+        private void ReleaseReceiveArgs(SocketAsyncEventArgs args)
+        {
+            BufferSegment operationSegment = args.UserToken as BufferSegment;
+            args.Completed -= ReceiveAsyncComplete;
+            args.UserToken = null;
+            args.SetBuffer(null, 0, 0);
+            if (operationSegment != null)
+                operationSegment.DecrementUsage();
+            SocketHelpers.ReleaseSocketArg(args);
         }
 
         private static void CloseSocket(Socket socket)

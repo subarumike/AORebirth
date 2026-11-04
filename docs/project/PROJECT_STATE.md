@@ -1,5 +1,16 @@
 # AORebirth Project State
 
+PROVEN FOCUSED TESTS, CLIENT/LIVE UNVERIFIED (2026-11-04, ChatEngine framing):
+commit `50bf8097bd5970bc9aff85216bddc04569a6281c` assembles native frames across
+TCP chunks, preserves coalesced frames and rejects incomplete string fields.
+Shared sends preserve FIFO order and retry partial completions; operation leases
+protect pooled buffers through disposal. All 40 focused cases pass, including
+the committed rerun; ChatEngine and LoginEngine compile with zero errors. HTML,
+UTF8 replacement and flood policy remain unchanged. No GameData, production,
+service, database or website changes occurred. Live log access remains unverified
+and the reported incident time is unknown. See
+[the repair report](../reports/CHATENGINE_STREAM_FRAMING_REPAIR.md).
+
 PROVEN SERVER TESTS, CLIENT UNVERIFIED (2026-11-03, static doors/switches): the
 trigger executor preserves static context, ordered state transitions and authored
 timers, using editable private compatibility policies for unrecovered server
