@@ -1,5 +1,17 @@
 # AORebirth Project State
 
+PROVEN SCOPED DEVELOPMENT VALIDATION, CLIENT/PRODUCTION UNVERIFIED
+(2026-11-04, initial bug repairs): the repair branch addresses only reports
+152, 96, 92 and 73/95. Homogeneous team-side projection passes 22 focused cases;
+the full team cohort records 85 passes and 13 unchanged public-baseline failures.
+Committed ring, starter and chest checks pass 11, 65 and 11 cases respectively;
+ring coverage includes initial-loot preservation. Four engines compile with zero
+errors. Account and inventory checks retain three and two further assertions
+reproduced on exact starting source. Original canonical content is preserved;
+separate data candidates require governed review. No production, database,
+service, client-control or website-status change occurred in this repair run.
+See [the scoped repair report](../reports/NOV04_INITIAL_BUG_REPAIRS.md).
+
 PROVEN SERVER TESTS, CLIENT UNVERIFIED (2026-11-03, static doors/switches): the
 trigger executor preserves static context, ordered state transitions and authored
 timers, using editable private compatibility policies for unrecovered server

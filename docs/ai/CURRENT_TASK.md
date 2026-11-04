@@ -1,5 +1,22 @@
 # Current Task
 
+IMPLEMENTED AND TESTED (2026-11-04): repair only website reports 152, 96, 92 and 73/95 on
+`codex/nov04-bug-repairs`, starting from authoritative public master
+`831d28ec8b325112769d73b7b4c2b29e3be4029a`. Mike authorized focused regression
+tests, builds and separate repair-branch commits. Production source/GameData
+parity and original-client behavior remain UNVERIFIED. No database, service,
+deployment, client-control or website-status action is included.
+
+Committed focused checks pass: ring 11, starter selection 65, team side 22 and
+chests 11. The ring candidate also preserves initial loot quality. Broader checks
+retain 18 assertions reproduced on the exact starting source: team 13, account
+three and inventory two. All four engines compile with zero errors. Original
+canonical content and unrelated work remain unchanged; content candidates need
+governed reconciliation. No merge, release acceptance or deployment occurred. See
+[the scoped repair report](../reports/NOV04_INITIAL_BUG_REPAIRS.md).
+
+## Retained prior task history
+
 ACTIVE (2026-11-03): implement the static locked-door/switch repair on
 `codex/crypt-door-triggers`, based on freshly fetched public master
 `b091d32d9fdef66ca3e080674ee606643031bdf9`. Use the completed native trigger
