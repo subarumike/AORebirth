@@ -2,6 +2,7 @@ namespace ZoneEngine_New.Core.Knubot;
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using AORebirth.Enums;
 using AORebirth.Modules.Events;
@@ -16,12 +17,14 @@ using ZoneEngine_New.Core.Quests;
 using ZoneEngine_New.Core.Trade;
 
 /// <summary>Services a line's effects are applied through.</summary>
-public sealed class KnubotEffectServices(QuestService quests, HashItemMinter minter, InventoryFlushService flush, TradeService trades)
+public sealed class KnubotEffectServices(QuestService quests, HashItemMinter minter, InventoryFlushService flush, TradeService trades,
+    InventoryActionService inventoryActions)
 {
     public QuestService Quests { get; } = quests;
     public HashItemMinter Minter { get; } = minter;
     public InventoryFlushService Flush { get; } = flush;
     public TradeService Trades { get; } = trades;
+    public InventoryActionService InventoryActions { get; } = inventoryActions;
 }
 
 /// <summary>What a line's effects would do, built before anything is applied.</summary>
@@ -147,6 +150,49 @@ public sealed record KnubotSpawnItem(string Hash, int? Quality, int Count) : Knu
             }
 
             KnubotItems.Give(context.Player, item, services.Flush);
+        }
+    }
+}
+
+/// <summary>
+/// <c>{take ITEMHASH [count]}</c>: takes carried main-inventory items minted from the hash, any QL (Windcaller Karrec's
+/// "Give it to me!" takes the Bronto Burger and Maddy's Credit Card without a Give Item window). The line fails up
+/// front when the player does not carry enough.
+/// </summary>
+public sealed record KnubotTakeItem(HashSet<int> TemplateIds, int Count) : KnubotEffect
+{
+    public override bool Check(KnubotContext context, KnubotPlan plan, KnubotEffectServices services)
+        => KnubotItems.CountCarried(context.Player, TemplateIds) >= Count;
+
+    public override void Apply(KnubotContext context, KnubotEffectServices services)
+    {
+        Player player = context.Player;
+        Container page = player.Inventory.Inventory;
+        int remaining = Count;
+        foreach (var (placement, item) in page.Content.ToArray())
+        {
+            if (remaining <= 0)
+                break;
+            if (item == null || item.Locked || (!TemplateIds.Contains(item.LowId) && !TemplateIds.Contains(item.HighId)))
+                continue;
+
+            int stack = Math.Max(1, item.StackCount);
+            if (stack > remaining)
+            {
+                if (item.TakeFromStack(player, page, placement, remaining))
+                    remaining = 0;
+                continue;
+            }
+
+            var slot = new Identity { Type = page.Identity.Type, Instance = placement };
+            if (!services.InventoryActions.TryDelete(player, slot, item.InstanceId))
+                continue;
+
+            remaining -= stack;
+            player.Session?.Send(new CharacterActionMessage
+            {
+                Identity = player.Identity, Action = CharacterActionType.DeleteItem, Target = slot
+            });
         }
     }
 }
