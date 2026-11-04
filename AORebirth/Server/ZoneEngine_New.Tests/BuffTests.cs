@@ -97,11 +97,11 @@ namespace ZoneEngine_New.Tests
                 Caster,
                 DateTime.UtcNow,
                 out Buff? applied,
-                out Buff? replaced);
+                out IReadOnlyList<Buff> replaced);
 
             Assert.AreEqual(BuffApplyDecision.Apply, decision);
             Assert.IsNotNull(applied);
-            Assert.IsNull(replaced);
+            Assert.AreEqual(0, replaced.Count);
             Assert.AreEqual(25, player.UsedNcu);
             Assert.AreEqual(25, player.Stats.GetOrZero(CharacterStat.CurrentNCU));
             Assert.AreEqual(40, player.Stats.GetOrZero(CharacterStat.Strength, StatDetail.Bonus));
