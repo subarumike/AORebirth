@@ -37,7 +37,8 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 
         /// <summary>
         /// Server→client: member left the team. Capture 20260727-065826 Action=0x20.
-        /// Parameter1 = team instance; Parameter2 = -1; Target = leaving character.
+        /// Parameter1 = team instance; Target = leaving character.
+        /// Parameter2 = old raid subgroup index (0-5), or -1 for an ordinary team, per the original client receiver.
         /// </summary>
         TeamMemberLeft = 0x00000020,
 
