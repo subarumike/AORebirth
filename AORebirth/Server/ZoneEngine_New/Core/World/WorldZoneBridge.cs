@@ -74,7 +74,7 @@ namespace ZoneEngine_New.Core.World
             hasVitals &= player.Stats.TryGetValue(CharacterStat.MaxNanoEnergy, out int nano)
                 && nano >= 0 && !StatCollection.IsUnset(nano);
             double sideXp = player.Playfield?.GetService<ZoneEngine_New.Core.Configuration.GameplaySettings>()?.Xp.SideBonusPercent ?? 0;
-            return new PlayerCard
+            var card = new PlayerCard
             {
                 CharacterId = player.Identity.Instance,
                 Name = player.Name ?? player.FirstName ?? string.Empty,
@@ -92,6 +92,12 @@ namespace ZoneEngine_New.Core.World
                 KilledByInvaders = player.Stats.GetOrZero(CharacterStat.KilledByInvaders),
                 AiLevel = player.Stats.GetOrZero(CharacterStat.AlienLevel)
             };
+            if (player.Stats.TryGetValue(CharacterStat.Side, out int side)
+                && side >= (int)Side.Neutral && side <= (int)Side.Omni)
+            {
+                card.Side = side;
+            }
+            return card;
         }
 
         public Task<ReleaseOutcome> ReleaseCharacterAsync(int characterId)

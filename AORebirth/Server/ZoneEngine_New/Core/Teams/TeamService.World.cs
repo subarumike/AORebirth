@@ -335,7 +335,8 @@ namespace ZoneEngine_New.Core.Teams
                 if (member.RaidTeam >= 0) team.RaidTeamIndex[id] = member.RaidTeam;
                 if (!_players.ContainsKey(id) && member.Card != null)
                     _remoteData[id] = new MemberData(member.Card.Name, member.Card.Level, member.Card.Profession,
-                        member.Card.MaxHealth, member.Card.MaxNano, member.Card.HasVitals);
+                        member.Card.MaxHealth, member.Card.MaxNano, member.Card.HasVitals,
+                        member.Card.HasSide ? ValidSide(member.Card.Side) : null);
                 _membership[id] = team;
             }
 

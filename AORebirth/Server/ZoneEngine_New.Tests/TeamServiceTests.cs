@@ -9,7 +9,7 @@ namespace ZoneEngine_New.Tests
     using System.Runtime.CompilerServices;
     using System.Threading.Tasks;
     using System.Text.Json.Nodes;
-    using AORebirth.Communication.Messages;
+    using Google.Protobuf;
     using AORebirth.Core.GameData;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -24,7 +24,12 @@ namespace ZoneEngine_New.Tests
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Teams;
+    using ZoneEngine_New.Core.World;
     using Vector3 = AORebirth.Core.Vector.Vector3;
+    using WorldPlayerCard = AORebirth.World.Contracts.V1.PlayerCard;
+    using WorldTeamMember = AORebirth.World.Contracts.V1.TeamMember;
+    using WorldTeamState = AORebirth.World.Contracts.V1.TeamState;
+    using WorldTeamUpdate = AORebirth.World.Contracts.V1.TeamUpdate;
 
     [TestClass]
     public sealed class TeamServiceTests
@@ -48,6 +53,193 @@ namespace ZoneEngine_New.Tests
             CollectionAssert.AreEqual(new[] { 1, 2 }, team.MemberIds.ToArray());
             Assert.IsTrue(f.Teams.AreTeammates(a, b));
         }
+
+        [TestMethod]
+        [TestCategory("TeamSideRepair")]
+        [DataRow(Side.Neutral)]
+        [DataRow(Side.Clan)]
+        [DataRow(Side.Omni)]
+        public void HomogeneousTeamProjectsItsMembersSide(Side side)
+        {
+            var f = new Fixture();
+            Player a = f.Player(1, side: side), b = f.Player(2, side: side);
+            f.Invite(a, b);
+            f.Clear();
+
+            f.Accept(b, a);
+
+            CollectionAssert.AreEqual(new[] { 1, 2 }, f.Teams.GetTeam(a)!.MemberIds.ToArray());
+            foreach (Player viewer in new[] { a, b })
+            {
+                Assert.AreEqual((int)side, viewer.Stats.GetOrZero(CharacterStat.TeamSide));
+                uint[] projected = f.Session(viewer).Bodies.OfType<StatMessage>()
+                    .SelectMany(message => message.Stats)
+                    .Where(stat => stat.Value1 == CharacterStat.TeamSide)
+                    .Select(stat => stat.Value2).ToArray();
+                Assert.IsTrue(projected.Length > 0);
+                Assert.IsTrue(projected.All(value => value == (uint)side));
+            }
+        }
+
+        [TestMethod]
+        [TestCategory("TeamSideRepair")]
+        [DataRow(-1, -1)]
+        [DataRow(0, -1)]
+        [DataRow(0, 1)]
+        [DataRow(1, 2)]
+        [DataRow(7, 7)]
+        public void MixedOrUnresolvedTeamsPreserveTheirExistingProjection(int firstSide, int secondSide)
+        {
+            var f = new Fixture();
+            Player a = f.Player(1, side: firstSide < 0 ? null : (Side)firstSide);
+            Player b = f.Player(2, side: secondSide < 0 ? null : (Side)secondSide);
+            f.Invite(a, b);
+            f.Clear();
+
+            f.Accept(b, a);
+
+            AssertSideProjection(f, a, (int)Side.Omni);
+            AssertSideProjection(f, b, (int)Side.Omni);
+            CollectionAssert.AreEqual(new[] { 1, 2 }, f.Teams.GetTeam(a)!.MemberIds.ToArray());
+        }
+
+        [TestMethod]
+        [TestCategory("TeamSideRepair")]
+        public void SideChangesUseTheOwnerQueueWithoutReplayingMembershipRows()
+        {
+            var pending = new ProjectionQueue();
+            var f = new Fixture(pending.Dispatch);
+            Player a = f.Player(1, side: Side.Neutral), b = f.Player(2, side: Side.Neutral);
+            f.Join(a, b);
+            int teamId = f.Teams.GetTeam(a)!.TeamId;
+            f.Clear();
+            pending.Deferred = true;
+
+            a.Stats.Set(CharacterStat.Side, (int)Side.Clan);
+            b.Stats.Set(CharacterStat.Side, (int)Side.Clan);
+
+            Assert.AreEqual((int)Side.Neutral, a.Stats.GetOrZero(CharacterStat.TeamSide));
+            Assert.AreEqual((int)Side.Neutral, b.Stats.GetOrZero(CharacterStat.TeamSide));
+            Assert.AreEqual(0, f.AllBodies.Count());
+            pending.Drain();
+            AssertSideProjection(f, a, (int)Side.Clan);
+            AssertSideProjection(f, b, (int)Side.Clan);
+            Assert.IsFalse(f.AllBodies.OfType<TeamMemberMessage>().Any());
+            Assert.AreEqual(teamId, f.Teams.GetTeam(a)!.TeamId);
+            CollectionAssert.AreEqual(new[] { 1, 2 }, f.Teams.GetTeam(a)!.MemberIds.ToArray());
+        }
+
+        [TestMethod]
+        [TestCategory("TeamSideRepair")]
+        [DataRow(false)]
+        [DataRow(true)]
+        public void KnownTeamSideSurvivesReconnectAndZoningAndClearsOnLeave(bool preserveRoster)
+        {
+            var f = new Fixture();
+            Player a = f.Player(1, side: Side.Clan), b = f.Player(2, side: Side.Clan);
+            f.Join(a, b);
+            int teamId = f.Teams.GetTeam(a)!.TeamId;
+            f.BeginZoning(b);
+            f.ReplaceSession(b);
+            f.Clear();
+
+            f.Teams.RefreshPlayer(b, preserveRoster);
+
+            Assert.AreEqual((int)Side.Clan, a.Stats.GetOrZero(CharacterStat.TeamSide));
+            Assert.AreEqual((int)Side.Clan, b.Stats.GetOrZero(CharacterStat.TeamSide));
+            Assert.AreEqual(teamId, f.Teams.GetTeam(b)!.TeamId);
+            CollectionAssert.AreEqual(new[] { 1, 2 }, f.Teams.GetTeam(b)!.MemberIds.ToArray());
+            Assert.IsTrue(f.Session(b).Bodies.OfType<StatMessage>().SelectMany(message => message.Stats)
+                .Where(stat => stat.Value1 == CharacterStat.TeamSide).All(stat => stat.Value2 == (uint)Side.Clan));
+
+            f.Action(b, CharacterActionType.LeaveTeam);
+
+            Assert.IsNull(f.Teams.GetTeam(a));
+            Assert.IsNull(f.Teams.GetTeam(b));
+            Assert.AreEqual(0, a.Stats.GetOrZero(CharacterStat.TeamSide));
+            Assert.AreEqual(0, b.Stats.GetOrZero(CharacterStat.TeamSide));
+        }
+
+        [TestMethod]
+        [TestCategory("TeamSideRepair")]
+        [DataRow(-1, false)]
+        [DataRow(0, true)]
+        [DataRow(1, true)]
+        [DataRow(2, true)]
+        [DataRow(7, false)]
+        public void PresenceCardsDistinguishNeutralFromUnresolvedSide(int side, bool expectedPresence)
+        {
+            var f = new Fixture();
+            Player player = f.Player(1, side: side < 0 ? null : (Side)side);
+            WorldPlayerCard card = (WorldPlayerCard)typeof(WorldZoneBridge)
+                .GetMethod("Card", BindingFlags.Static | BindingFlags.NonPublic)!.Invoke(null, new object[] { player })!;
+
+            WorldPlayerCard roundTrip = WorldPlayerCard.Parser.ParseFrom(card.ToByteArray());
+
+            Assert.AreEqual(expectedPresence, roundTrip.HasSide);
+            if (expectedPresence)
+            {
+                Assert.AreEqual(side, roundTrip.Side);
+            }
+        }
+
+        [TestMethod]
+        [TestCategory("TeamSideRepair")]
+        [DataRow(0, 0, 0)]
+        [DataRow(1, 1, 1)]
+        [DataRow(2, 2, 2)]
+        [DataRow(0, -1, 2)]
+        [DataRow(0, 1, 2)]
+        [DataRow(0, 7, 2)]
+        public void RemoteTeamSnapshotsPreserveKnownSideAndUnresolvedFallback(int localSide, int remoteSide, int expected)
+        {
+            var f = new Fixture();
+            Player local = f.Player(1, side: (Side)localSide);
+            var remote = new WorldPlayerCard { CharacterId = 2, Name = "Remote", Level = 60, Profession = 3 };
+            if (remoteSide >= 0)
+            {
+                remote.Side = remoteSide;
+            }
+            var state = new WorldTeamState { TeamId = 0x02800100, Leader = 1 };
+            state.Members.Add(new WorldTeamMember { CharacterId = 1 });
+            state.Members.Add(new WorldTeamMember { CharacterId = 2, Card = remote });
+            f.Clear();
+
+            ApplyRemoteTeam(f.Teams, state);
+
+            AssertSideProjection(f, local, expected);
+            WorldTeamState handoff = f.Teams.SnapshotTeamState(local)!;
+            WorldPlayerCard localCard = handoff.Members.Single(member => member.CharacterId == 1).Card;
+            Assert.IsTrue(localCard.HasSide);
+            Assert.AreEqual(localSide, localCard.Side);
+            WorldPlayerCard remoteCard = handoff.Members.Single(member => member.CharacterId == 2).Card;
+            Assert.AreEqual(remoteSide is >= 0 and <= 2, remoteCard.HasSide);
+            if (remoteCard.HasSide)
+            {
+                Assert.AreEqual(remoteSide, remoteCard.Side);
+            }
+
+            var destination = new Fixture();
+            Player arriving = destination.Player(1, side: (Side)localSide);
+            destination.Clear();
+            ApplyRemoteTeam(destination.Teams, WorldTeamState.Parser.ParseFrom(handoff.ToByteArray()));
+            AssertSideProjection(destination, arriving, expected);
+            CollectionAssert.AreEqual(new[] { 1, 2 }, destination.Teams.GetTeam(arriving)!.MemberIds.ToArray());
+        }
+
+        private static void AssertSideProjection(Fixture fixture, Player viewer, int expected)
+        {
+            Assert.AreEqual(expected, viewer.Stats.GetOrZero(CharacterStat.TeamSide));
+            uint[] projected = fixture.Session(viewer).Bodies.OfType<StatMessage>()
+                .SelectMany(message => message.Stats)
+                .Where(stat => stat.Value1 == CharacterStat.TeamSide).Select(stat => stat.Value2).ToArray();
+            Assert.IsTrue(projected.Length > 0);
+            Assert.IsTrue(projected.All(value => value == (uint)expected));
+        }
+
+        private static void ApplyRemoteTeam(TeamService teams, WorldTeamState state)
+            => typeof(TeamService).GetMethod("ApplyUpdate", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .Invoke(teams, new object[] { new WorldTeamUpdate { Team = state } });
 
         [TestMethod]
         public void JoinUsesLegacyRosterOrderAndExactActionFields()
@@ -1307,7 +1499,7 @@ namespace ZoneEngine_New.Tests
             public IEnumerable<MessageBody> AllBodies => _sessions.Values.SelectMany(s => s.Bodies);
             public Fixture(Action<Player, Action>? dispatch = null)
                 => Teams = new TeamService(Chat, () => UtcNow, dispatch ?? ((_, action) => action()));
-            public Player Player(int id, int level = 60, int oldTeamStat = 0)
+            public Player Player(int id, int level = 60, int oldTeamStat = 0, Side? side = null)
             {
                 Player player = TestWorld.CreatePlayer(id);
                 player.Name = "Member" + id;
@@ -1316,6 +1508,10 @@ namespace ZoneEngine_New.Tests
                 player.Stats.Set(CharacterStat.MaxHealth, 450);
                 player.Stats.Set(CharacterStat.MaxNanoEnergy, 200);
                 player.Stats.Set(CharacterStat.Team, oldTeamStat);
+                if (side.HasValue)
+                {
+                    player.Stats.Set(CharacterStat.Side, (int)side.Value);
+                }
                 ReplaceSession(player);
                 Teams.AttachPlayer(player);
                 return player;
@@ -1347,9 +1543,17 @@ namespace ZoneEngine_New.Tests
 
         private sealed class TeamChat : IChatEngineLink
         {
-            public readonly List<ChatCommand> Commands = new();
+            public readonly List<(int CharacterId, string ChatCommandString)> Commands = new();
             public void Start() { }
-            public bool TrySend(MessageBase message) { if (message is ChatCommand command) Commands.Add(command); return true; }
+            public bool SendChatCommand(int characterId, string command)
+            {
+                Commands.Add((characterId, command));
+                return true;
+            }
+            public bool SendVicinity(int senderId, string? senderName, byte messageType, string text,
+                IReadOnlyList<int> recipients) => true;
+            public bool SendAnonymousVicinity(string text, IReadOnlyList<int> recipients, byte[]? blob = null) => true;
+            public bool SendOrganizationMessage(int organizationId, string text) => true;
             public void Dispose() { }
         }
 
@@ -1366,7 +1570,7 @@ namespace ZoneEngine_New.Tests
             public void Send(MessageBody body) => Bodies.Add(body);
             public void Send(MessageBody body, int sender, int receiver) => Send(body);
             public void SendInitiateCompression() { }
-            public void TransferToPlayfield(Playfield destination, Vector3 landing) => throw new NotSupportedException();
+            public bool TransferToPlayfield(Playfield destination, Vector3 landing) => throw new NotSupportedException();
         }
     }
 }

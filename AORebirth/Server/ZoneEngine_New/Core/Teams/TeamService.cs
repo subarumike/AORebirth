@@ -41,7 +41,7 @@ namespace ZoneEngine_New.Core.Teams
         // Updated only from that player's attach/refresh/stat-change callback on its owner tick.
         // Team operations on another playfield never enumerate or read this player's mutable Stats.
         private sealed record MemberData(string Name, int Level, int Profession, int MaxHealth,
-            int MaxNano, bool HasVitals);
+            int MaxNano, bool HasVitals, int? Side);
 
         // Rows submitted through the accepted session on its owner tick, not queued projection intentions.
         private sealed class PublishedRoster(int teamId)
@@ -115,9 +115,26 @@ namespace ZoneEngine_New.Core.Teams
                 CaptureData(player);
                 Action<CharacterStat, int, int, bool> observer = (stat, _, _, _) =>
                 {
-                    if (stat is not (CharacterStat.Level or CharacterStat.Profession or CharacterStat.MaxHealth
+                    if (stat is not (CharacterStat.Level or CharacterStat.Profession or CharacterStat.Side or CharacterStat.MaxHealth
                         or CharacterStat.MaxNanoEnergy)) return;
-                    lock (_sync) { if (Owns(player)) CaptureData(player); }
+                    lock (_sync)
+                    {
+                        if (!Owns(player)) return;
+                        int? previousSide = DataOf(player.Identity.Instance)?.Side;
+                        CaptureData(player);
+                        if (stat != CharacterStat.Side || previousSide == DataOf(player.Identity.Instance)?.Side) return;
+                        if (_membership.TryGetValue(player.Identity.Instance, out Team? team))
+                        {
+                            foreach (int id in team.Members)
+                            {
+                                if (_players.TryGetValue(id, out Player? viewer))
+                                {
+                                    QueueRoster(viewer);
+                                }
+                            }
+                        }
+                        _world?.SyncPresenceSoon();
+                    }
                 };
                 _statObservers[player.Identity.Instance] = observer;
                 player.Stats.StatChanged += observer;
@@ -179,20 +196,25 @@ namespace ZoneEngine_New.Core.Teams
                 foreach (int id in team.Members)
                 {
                     MemberData? data = DataOf(id);
+                    var card = data == null ? new AORebirth.World.Contracts.V1.PlayerCard { CharacterId = id } : new AORebirth.World.Contracts.V1.PlayerCard
+                    {
+                        CharacterId = id,
+                        Name = data.Name,
+                        Level = data.Level,
+                        Profession = data.Profession,
+                        MaxHealth = data.MaxHealth,
+                        MaxNano = data.MaxNano,
+                        HasVitals = data.HasVitals
+                    };
+                    if (data?.Side is int side)
+                    {
+                        card.Side = side;
+                    }
                     state.Members.Add(new AORebirth.World.Contracts.V1.TeamMember
                     {
                         CharacterId = id,
                         RaidTeam = team.RaidTeamIndex.GetValueOrDefault(id, -1),
-                        Card = data == null ? new AORebirth.World.Contracts.V1.PlayerCard { CharacterId = id } : new AORebirth.World.Contracts.V1.PlayerCard
-                        {
-                            CharacterId = id,
-                            Name = data.Name,
-                            Level = data.Level,
-                            Profession = data.Profession,
-                            MaxHealth = data.MaxHealth,
-                            MaxNano = data.MaxNano,
-                            HasVitals = data.HasVitals
-                        }
+                        Card = card
                     });
                 }
 
@@ -887,12 +909,19 @@ namespace ZoneEngine_New.Core.Teams
                 }
             }
 
-            ApplyStatsNow(viewer, team, social, send: !initialRoster && !raidRosterReset
-                && (membershipChanged || leadershipChanged || refreshVitals));
+            bool sendStats = !initialRoster && !raidRosterReset
+                && (membershipChanged || leadershipChanged || refreshVitals);
+            bool sideChanged = !initialRoster && !raidRosterReset
+                && viewer.Stats.GetOrZero(CharacterStat.TeamSide) != ResolveTeamSide(team);
+            ApplyStatsNow(viewer, team, social, send: sendStats);
+            if (sideChanged && !sendStats)
+            {
+                SetStatNow(viewer, CharacterStat.TeamSide, ResolveTeamSide(team), true);
+            }
             if (raidRosterReset)
             {
                 // Live lets TeamMember set the new team identity; it sends no preceding Team stat or leader reply.
-                SetStatNow(viewer, CharacterStat.TeamSide, 2, true);
+                SetStatNow(viewer, CharacterStat.TeamSide, ResolveTeamSide(team), true);
                 SetStatNow(viewer, CharacterStat.SocialStatus, social, true);
                 // Original RaidView ignores joins until the viewer's own row restores raid membership.
                 if (!AnnounceNow(viewer, viewerId, team)) return;
@@ -901,7 +930,7 @@ namespace ZoneEngine_New.Core.Teams
             {
                 // Preserve the captured initial handshake; existing viewers receive only row deltas.
                 SetStatNow(viewer, CharacterStat.SocialStatus, social, true);
-                SetStatNow(viewer, CharacterStat.TeamSide, 2, true);
+                SetStatNow(viewer, CharacterStat.TeamSide, ResolveTeamSide(team), true);
                 SetStatNow(viewer, CharacterStat.SocialStatus, social, true);
                 if (viewerId == team.Leader)
                 {
@@ -1050,13 +1079,30 @@ namespace ZoneEngine_New.Core.Teams
             SetStatNow(viewer, CharacterStat.SocialStatus, social, true);
         }
 
-        private static void ApplyStatsNow(Player player, Team? team, int social, bool send)
+        private void ApplyStatsNow(Player player, Team? team, int social, bool send)
         {
             SetStatNow(player, CharacterStat.NumberOfTeamMembers, team?.Members.Count ?? 0, send);
-            SetStatNow(player, CharacterStat.TeamSide, team == null ? 0 : 2, send);
+            SetStatNow(player, CharacterStat.TeamSide, ResolveTeamSide(team), send);
             SetStatNow(player, CharacterStat.SocialStatus, social, send);
             SetStatNow(player, CharacterStat.Team, team == null ? 0 : ClientTeamId(team, player.Identity.Instance), send);
         }
+
+        private int ResolveTeamSide(Team? team)
+        {
+            if (team == null) return (int)Side.Neutral;
+            int? shared = null;
+            foreach (int id in team.Members)
+            {
+                // Mixed or unresolved teams retain the existing projection until their policy is established.
+                if (DataOf(id)?.Side is not int side || (shared.HasValue && shared.Value != side))
+                    return (int)Side.Omni;
+                shared = side;
+            }
+            return shared ?? (int)Side.Omni;
+        }
+
+        private static int? ValidSide(int side)
+            => side >= (int)Side.Neutral && side <= (int)Side.Omni ? side : null;
 
         // Live capture 20261104T005758Z: raid group N has team instance base + N, including remote members.
         private static int ClientTeamId(Team team, int memberId) => team.Id + (team.IsRaid ? RaidListOf(team, memberId) : 0);
@@ -1111,7 +1157,8 @@ namespace ZoneEngine_New.Core.Teams
                 && nano >= 0 && !StatCollection.IsUnset(nano);
             _data[player.Identity.Instance] = new MemberData(player.Name ?? player.FirstName,
                 player.Stats.GetOrZero(CharacterStat.Level), player.Stats.GetOrZero(CharacterStat.Profession),
-                health, nano, hasVitals);
+                health, nano, hasVitals,
+                player.Stats.TryGetValue(CharacterStat.Side, out int side) ? ValidSide(side) : null);
         }
         private static Identity CharacterIdentity(int id) => new() { Type = IdentityType.CanbeAffected, Instance = id };
         private void CancelInvitations(int id)

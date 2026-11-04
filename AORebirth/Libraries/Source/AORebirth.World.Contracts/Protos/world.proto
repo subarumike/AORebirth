@@ -529,6 +529,8 @@ message PlayerCard {
   int32 invaders_killed = 13;
   int32 killed_by_invaders = 14;
   int32 ai_level = 15;
+  // Absence is unresolved; an explicitly present zero is a Neutral character.
+  optional int32 side = 16;
 }
 
 message TeamMember {
