@@ -4729,7 +4729,8 @@ namespace ZoneEngine_New.Core.Entities
                 var pcInfo = new SimplePcInfo
                 {
                     CurrentNano = (uint)Stats.GetOrZero(CharacterStat.CurrentNano),
-                    Team = 0,
+                    // Live zoning SCFU restores the subgroup identity before FullCharacter loads its roster.
+                    Team = Stats.GetOrZero(CharacterStat.Team),
                     Swim = 5,
                     StrengthBase = ClampToShort(Stats.GetOrZero(CharacterStat.Strength, StatDetail.Base)),
                     AgilityBase = ClampToShort(Stats.GetOrZero(CharacterStat.Agility, StatDetail.Base)),

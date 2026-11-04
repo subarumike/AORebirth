@@ -31,7 +31,9 @@ namespace ZoneEngine_New.Core.Teams
 
                 flags = FullCharacterInTeam | (team.IsRaid ? FullCharacterInRaid : 0);
                 using var stream = new MemoryStream();
-                WriteIdentity(stream, CharacterIdentity(team.Leader));
+                // Live 20261104T005758Z zoning: another raid subgroup has no ordinary-team leader in this field.
+                WriteIdentity(stream, !team.IsRaid || RaidListOf(team, viewer.Identity.Instance) == RaidListOf(team, team.Leader)
+                    ? CharacterIdentity(team.Leader) : Identity.None);
                 if (!team.IsRaid)
                 {
                     WriteMembers(stream, viewer, team.Members);

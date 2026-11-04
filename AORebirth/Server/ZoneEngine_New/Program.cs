@@ -112,7 +112,8 @@ namespace ZoneEngine_New
                     return 1;
                 chatEngineLink = rootServices.GetRequiredService<IChatEngineLink>();
                 chatEngineLink.Start();
-                playfieldManager = rootServices.GetRequiredService<PlayfieldManager>();
+                // World's bridge checks this shared Lazy before publishing player presence and levels.
+                playfieldManager = rootServices.GetRequiredService<Lazy<PlayfieldManager>>().Value;
                 // Module GM commands are checked against the built-ins here, before any connection.
                 _ = rootServices.GetRequiredService<GmCommandDispatcher>();
                 _ = rootServices.GetRequiredService<InventoryFlushService>();
