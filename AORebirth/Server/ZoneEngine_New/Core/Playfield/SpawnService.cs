@@ -1526,7 +1526,7 @@ namespace ZoneEngine_New.Core.Playfield
 
             // A charmed NPC leaving the world leaves its owner first.
             if (npc.Pet is { IsCharmed: true })
-                _playfield.GetRequiredService<Pets.PetService>().EndCharm(npc, "despawned", turnOnOwner: false);
+                _playfield.GetRequiredService<Pets.PetService>().EndCharm(npc, "despawned", turnOnOwner: false, staysInWorld: false);
 
             // An NPC leaving the world takes its pets with it.
             if (npc.OwnedPets.Count > 0)

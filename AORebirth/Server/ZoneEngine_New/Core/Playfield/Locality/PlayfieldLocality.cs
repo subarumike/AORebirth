@@ -249,15 +249,16 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         /// <summary>
         /// Sends <paramref name="source"/> afresh to everyone who sees it, for a change only its spawn packet carries
         /// (an NPC becoming or ceasing to be a pet). It is despawned for them now and shown again on a later locality
-        /// tick: the client does not show a spawn in the same burst as the despawn.
+        /// tick: the client does not show a spawn in the same burst as the despawn. <paramref name="except"/> keeps the
+        /// copy it has and is not sent it again.
         /// </summary>
-        public void RespawnForObservers(Dynel source)
+        public void RespawnForObservers(Dynel source, Player? except = null)
         {
             ArgumentNullException.ThrowIfNull(source);
             if (!_tracked.Contains(source))
                 return;
 
-            _visibility.DespawnForObservers(source);
+            _visibility.DespawnForObservers(source, except);
             _pendingRespawns[source] = _tickSerial;
         }
 

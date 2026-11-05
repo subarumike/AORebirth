@@ -4713,10 +4713,14 @@ namespace ZoneEngine_New.Core.Entities
                 Meshes = BuildMeshes(headMesh)
             };
 
-            // Pets keep version 58 (already set for NPCs).
+            // A pet names its master in the SCFU owner field (Flags2 0x4, HasOwner): the client reads that instance
+            // (Gamecode.dll 0x100797d5, into SimpleChar+0x318) and applies it as PetMaster (196) when non-zero
+            // (0x10078b54..0x10078b70). Tab targeting counts an NPC whose PetMaster is the player, a teammate or a
+            // raid member as friendly (N3Msg_GetCloseTarget 0x1001c49a); without it a teammate's pet tabs as hostile.
             if (!StatCollection.IsUnset(petMasterInstance) && petMasterInstance != 0)
             {
-                scfu.Version = 58;
+                scfu.Flags2 |= 0x4;
+                scfu.OwnerInstance = petMasterInstance;
             }
 
             if (FightingTarget.Instance != 0)

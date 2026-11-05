@@ -145,9 +145,9 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         /// Despawns <paramref name="source"/> for every other player that sees it. For a character about to be rebuilt in
         /// place (in-zone death respawn): observers still in range would otherwise keep the copy they had, dead body
         /// included. The caller shows it again on a later tick through the ordinary enter-visibility path; a spawn in
-        /// the same burst as the despawn is not shown by the client.
+        /// the same burst as the despawn is not shown by the client. <paramref name="except"/> keeps the copy it has.
         /// </summary>
-        internal void DespawnForObservers(Dynel source)
+        internal void DespawnForObservers(Dynel source, Player? except = null)
         {
             if (source == null)
             {
@@ -161,7 +161,8 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                 {
                     if (_byIdentity.TryGetValue(recipientKey, out Dynel? recipientDynel)
                         && recipientDynel is Player recipient
-                        && !ReferenceEquals(recipient, source))
+                        && !ReferenceEquals(recipient, source)
+                        && !ReferenceEquals(recipient, except))
                     {
                         LeaveVisibility(recipient, source, observe, VisibilityReason.Despawned);
                     }

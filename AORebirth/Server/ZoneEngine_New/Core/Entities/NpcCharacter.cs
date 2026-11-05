@@ -216,7 +216,7 @@ namespace ZoneEngine_New.Core.Entities
         {
             // A charmed NPC dies as itself, not as a pet: the charm ends first, so its body and rewards are its own.
             if (Pet is { IsCharmed: true })
-                Playfield?.GetService<Pets.PetService>()?.EndCharm(this, "died", turnOnOwner: false);
+                Playfield?.GetService<Pets.PetService>()?.EndCharm(this, "died", turnOnOwner: false, staysInWorld: false);
 
             Brain?.OnOwnerDied();
 
