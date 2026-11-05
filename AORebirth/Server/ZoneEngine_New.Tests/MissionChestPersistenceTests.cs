@@ -187,8 +187,7 @@ public sealed class MissionChestPersistenceTests
             .AddSingleton<IInventoryRepository>(repository).BuildServiceProvider();
         typeof(Playfield).GetField("_serviceProvider", BindingFlags.Instance | BindingFlags.NonPublic)!
             .SetValue(world.Player.Playfield, services);
-        typeof(Playfield).GetField("_nextContainerInventoryHandle", BindingFlags.Instance | BindingFlags.NonPublic)!
-            .SetValue(world.Player.Playfield, 117);
+        world.Player.Inventory.SeedClientContainerHandle(117);
         Chest chest = MissionChestProtocolTests.CreateCapturedChest();
         chest.Playfield = world.Player.Playfield; chest.Position = world.Player.Position;
         registry.Register(chest); registry.Register(world.Player);

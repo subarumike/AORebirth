@@ -391,25 +391,10 @@ namespace ZoneEngine_New.Core.Inventory
             slot = DecodeBackpackSlot(source);
             item = null!;
 
+            // A bag is only ever named by the handle the server gave the client for it. A packet without one is refused.
             int handle = DecodeBackpackHandle(source);
             if (handle != 0 && player.Inventory.TryGetOwnedBackpackPageByHandle(handle, out page))
                 return TryReadRemovableSlot(page, slot, out item);
-
-            if (handle == 0
-                && source.Instance > 0
-                && player.Inventory.TryGetOwnedBackpackPageByHandle(source.Instance, out page))
-            {
-                slot = 0;
-                return TryReadRemovableSlot(page, slot, out item);
-            }
-
-            if (handle == 0
-                && source.Type == IdentityType.Container
-                && player.Inventory.TryGetUniqueOwnedBackpackSlot(source.Instance, out page, out item))
-            {
-                slot = source.Instance;
-                return (page.Flags & ContainerFlags.CanRemove) != 0 && !item.Locked;
-            }
 
             return false;
         }
@@ -545,28 +530,14 @@ namespace ZoneEngine_New.Core.Inventory
                 int handle = DecodeBackpackHandle(source);
                 slot = DecodeBackpackSlot(source);
 
-                Playfield? playfield = player.Playfield;
-                if (playfield == null)
+                LootableDynel? lootable = FindOpenLootByHandle(player, handle);
+                if (lootable == null || (lootable.Loot.Flags & ContainerFlags.CanRemove) == 0)
                     return false;
 
-                foreach (Dynel dynel in playfield.GetRequiredService<DynelRegistry>().Dynels())
-                {
-                    if (dynel is not LootableDynel lootable || lootable.InventoryHandle != handle)
-                        continue;
-
-                    if (lootable.OpenerIdentity != player.Identity)
-                        return false;
-
-                    if ((lootable.Loot.Flags & ContainerFlags.CanRemove) == 0)
-                        return false;
-
-                    page = lootable.Loot;
-                    lootSource = lootable;
-                    return page.Content.TryGetValue(slot, out item!) && !item.Locked
-                        && (lootable is not Chest chest || chest.CanDistribute(item));
-                }
-
-                return false;
+                page = lootable.Loot;
+                lootSource = lootable;
+                return page.Content.TryGetValue(slot, out item!) && !item.Locked
+                    && (lootable is not Chest chest || chest.CanDistribute(item));
             }
 
             if (!player.Inventory.TryGetItem(source.Type, source.Instance, out item))
@@ -598,15 +569,25 @@ namespace ZoneEngine_New.Core.Inventory
             int handle = DecodeBackpackHandle(source);
             if (handle == 0)
                 return null;
-            if (player.Inventory.TryGetOwnedBackpackPageByHandle(handle, out _))
+            return FindOpenLootByHandle(player, handle) as Chest;
+        }
+
+        /// <summary>
+        /// The loot this player has open under <paramref name="handle"/>, a handle from their own pool (shared with their
+        /// bags, so it cannot also name a bag). Loot they closed, that despawned, or that someone else now has open is null.
+        /// </summary>
+        internal static LootableDynel? FindOpenLootByHandle(Player player, int handle)
+        {
+            if (handle == 0 || player.Playfield == null
+                || !player.Inventory.TryGetLootByHandle(handle, out Identity lootIdentity))
                 return null;
             DynelRegistry? registry = player.Playfield.GetService<DynelRegistry>();
-            if (registry == null)
+            if (registry == null || !registry.TryGet(lootIdentity, out Dynel? dynel)
+                || dynel is not LootableDynel lootable
+                || lootable.OpenerIdentity != player.Identity
+                || lootable.InventoryHandle != handle)
                 return null;
-            foreach (Dynel dynel in registry.Dynels())
-                if (dynel is Chest chest && chest.InventoryHandle == handle)
-                    return chest;
-            return null;
+            return lootable;
         }
 
         void CompletePending(PendingEquip pending)

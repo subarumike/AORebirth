@@ -196,8 +196,6 @@ public sealed class AcceptedSubwayShopRuntimeTests
             var playfield = (Playfield)RuntimeHelpers.GetUninitializedObject(typeof(Playfield));
             typeof(Playfield).GetField("<Identity>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
                 .SetValue(playfield, new Identity { Type = IdentityType.Playfield2, Instance = playfieldId });
-            typeof(Playfield).GetField("_nextContainerInventoryHandle", BindingFlags.Instance | BindingFlags.NonPublic)!
-                .SetValue(playfield, 1);
             return playfield;
         }
         public void Dispose()

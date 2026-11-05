@@ -788,6 +788,7 @@ namespace ZoneEngine_New.Core.Playfield
 
             if (lootable.IsOpen)
                 lootable.Close();
+            lootable.ReleaseClientHandles();
 
             Identity identity = lootable.Identity;
             _playfield.GetRequiredService<PlayfieldLocality>().UnregisterDynel(lootable);
@@ -1359,6 +1360,15 @@ namespace ZoneEngine_New.Core.Playfield
             PlayfieldLocality locality = _playfield.GetRequiredService<PlayfieldLocality>();
             locality.DeactivatePlayerVisibility(player);
 
+            // Loot the player has open closes while the client still has it: the teleport drops it client-side, and
+            // left open here it would take two uses to reopen (the first only closes it).
+            foreach (Identity loot in player.Inventory.KnownLootIdentities())
+            {
+                if (_registry.TryGet(loot, out Dynel? dynel) && dynel is LootableDynel lootable
+                    && lootable.OpenerIdentity == player.Identity)
+                    lootable.Close();
+            }
+
             int characterId = player.Identity.Instance;
             int playfieldId = _playfield.Identity.Instance;
 
@@ -1367,6 +1377,9 @@ namespace ZoneEngine_New.Core.Playfield
             // The client rebuilds this character standing still: drop input held before death (its key releases
             // never arrive) and any path, or observers are told it is still running.
             player.Motor.ResetForPlayfieldTransfer(onFloor);
+            // The rebuilt character has no bag contents on the client: forget what was sent, so the next use of a
+            // bag sends its contents again instead of only opening a bag the client knows nothing about.
+            player.Inventory.ResetBackpackClientState();
 
             session.Send(
                 _playfield.CreatePlayfieldAnarchyFMessage(

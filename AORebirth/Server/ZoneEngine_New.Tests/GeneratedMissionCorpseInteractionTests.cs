@@ -119,7 +119,6 @@ public sealed class GeneratedMissionCorpseInteractionTests
             _services = new ServiceCollection().AddSingleton(new DynelRegistry())
                 .AddSingleton(new PlayfieldLocality(0x160001, null)).BuildServiceProvider();
             typeof(Playfield).GetField("_serviceProvider", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(playfield, _services);
-            typeof(Playfield).GetField("_nextContainerInventoryHandle", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(playfield, 1);
             Player.Playfield = playfield; Player.Session = Session; Session.BindPlayer(Player);
             Player.Stats.Set(CharacterStat.Health, 100);
             State = new() { OwnerId = 77, QuestType = 0xDAC3, QuestInstance = 99, RuntimeInstance = 7001,

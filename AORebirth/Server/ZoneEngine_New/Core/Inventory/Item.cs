@@ -459,8 +459,9 @@ namespace ZoneEngine_New.Core.Inventory
             Playfield playfield = player.Playfield!;
             if (page.Content.Count > 0)
             {
-                int handle = EnsureHandle(page, inventory, playfield, containerIdentity);
-                RegisterParentSlotHandle(inventory, slotIdentity, containerIdentity);
+                int handle = EnsureHandle(page, inventory, containerIdentity);
+                if (handle == 0)
+                    return false;
                 player.Session!.Send(
                     page.BuildChestItemFullUpdate(player.Identity, playfield.ClientPlayfieldId, slotIdentity));
                 player.Session.Send(
@@ -473,10 +474,11 @@ namespace ZoneEngine_New.Core.Inventory
             }
             else
             {
-                int introduceHandle = playfield.AllocateContainerInventoryHandle();
-                int openHandle = EnsureHandle(page, inventory, playfield, containerIdentity);
+                int introduceHandle = inventory.AllocateClientContainerHandle();
                 inventory.RegisterBackpackHandle(introduceHandle, containerIdentity);
-                RegisterParentSlotHandle(inventory, slotIdentity, containerIdentity);
+                int openHandle = EnsureHandle(page, inventory, containerIdentity);
+                if (introduceHandle == 0 || openHandle == 0)
+                    return false;
                 player.Session!.Send(
                     page.BuildInventoryUpdateMessage(
                         player.Identity,
@@ -517,24 +519,14 @@ namespace ZoneEngine_New.Core.Inventory
             Identity = new Identity { Type = IdentityType.Container, Instance = instance };
         }
 
-        static void RegisterParentSlotHandle(
-            PlayerInventory inventory,
-            Identity slotIdentity,
-            Identity containerIdentity)
-        {
-            if (slotIdentity.Type == IdentityType.Inventory && slotIdentity.Instance > 0)
-                inventory.RegisterBackpackHandle(slotIdentity.Instance, containerIdentity);
-        }
-
         static int EnsureHandle(
             Container page,
             PlayerInventory inventory,
-            Playfield playfield,
             Identity containerIdentity)
         {
             if (page.InventoryHandle == 0)
             {
-                page.InventoryHandle = playfield.AllocateContainerInventoryHandle();
+                page.InventoryHandle = inventory.AllocateClientContainerHandle();
                 inventory.RegisterBackpackHandle(page.InventoryHandle, containerIdentity);
             }
 

@@ -25,6 +25,10 @@ namespace ZoneEngine_New.Core.Inventory
 
         private readonly Dictionary<int, Container> _backpackPages = new();
         private readonly Dictionary<int, Identity> _handleToContainer = new();
+        // Loot (corpses, chests) this player was given a handle for. Bags and loot share one handle pool per player,
+        // as on live: a bag opened on handle 0x69 makes the next corpse looted 0x6A.
+        private readonly Dictionary<int, Identity> _handleToLoot = new();
+        private int _nextClientHandle = 1;
         private readonly Dictionary<int, DirtyEntry> _dirty = new();
         private readonly object _dirtyGate = new();
 
@@ -92,6 +96,8 @@ namespace ZoneEngine_New.Core.Inventory
             CreatePages(characterId);
             _backpackPages.Clear();
             _handleToContainer.Clear();
+            _handleToLoot.Clear();
+            _nextClientHandle = 1;
             lock (_dirtyGate)
                 _dirty.Clear();
             _overflowArrival.Clear();
@@ -695,7 +701,64 @@ namespace ZoneEngine_New.Core.Inventory
             }
 
             _handleToContainer.Clear();
+            _handleToLoot.Clear();
         }
+
+        /// <summary>
+        /// The next client inventory handle (1..0xFFFF) for a bag or loot this player opens. Skips handles still bound to
+        /// a bag or loot, so one handle never names two containers for this client.
+        /// </summary>
+        public int AllocateClientContainerHandle()
+        {
+            for (int attempt = 0; attempt < ushort.MaxValue; attempt++)
+            {
+                int handle = _nextClientHandle;
+                _nextClientHandle = handle == ushort.MaxValue ? 1 : handle + 1;
+                if (IsClientHandleFree(handle))
+                    return handle;
+            }
+
+            // Every handle names a live container. Callers refuse the open; nothing is sent with handle 0.
+            return 0;
+        }
+
+        /// <summary>Pins the next handle this player is given; tests replay captured handle numbers with it.</summary>
+        internal void SeedClientContainerHandle(int next)
+        {
+            if (next <= 0 || next > ushort.MaxValue)
+                throw new ArgumentOutOfRangeException(nameof(next));
+            _nextClientHandle = next;
+        }
+
+        /// <summary>
+        /// A handle is taken while it names loot or a bag the player still owns (carried or banked). A bag that left the
+        /// player (dropped, sold, deleted, on the trade table) gives its handles back here and is re-introduced on its
+        /// next use, the same as after a zone change.
+        /// </summary>
+        bool IsClientHandleFree(int handle)
+        {
+            if (_handleToLoot.ContainsKey(handle))
+                return false;
+            if (!_handleToContainer.TryGetValue(handle, out Identity container))
+                return true;
+
+            _backpackPages.TryGetValue(container.Instance, out Container? page);
+            if (page?.LinkedItem is Item bag && IsOwnedBag(bag))
+                return false;
+
+            if (page != null)
+            {
+                page.IsOpen = false;
+                page.InventoryHandle = 0;
+            }
+
+            foreach (int stale in _handleToContainer.Where(pair => pair.Value == container).Select(pair => pair.Key).ToList())
+                _handleToContainer.Remove(stale);
+            return true;
+        }
+
+        bool IsOwnedBag(Item bag)
+            => IsHydrated && (ContainsCarriedItem(bag) || (Bank.IsHydrated && Bank.Content.ContainsValue(bag)));
 
         public void RegisterBackpackHandle(int handle, Identity containerIdentity)
         {
@@ -704,6 +767,37 @@ namespace ZoneEngine_New.Core.Inventory
 
             _handleToContainer[handle] = containerIdentity;
         }
+
+        /// <summary>The handle this client knows the loot by, allocating one from the shared pool on first open.</summary>
+        public int GetOrAllocateLootHandle(Identity lootIdentity)
+        {
+            foreach (KeyValuePair<int, Identity> pair in _handleToLoot)
+            {
+                if (pair.Value == lootIdentity)
+                    return pair.Key;
+            }
+
+            int handle = AllocateClientContainerHandle();
+            if (handle != 0)
+                _handleToLoot[handle] = lootIdentity;
+            return handle;
+        }
+
+        public bool TryGetLootByHandle(int handle, out Identity lootIdentity)
+            => _handleToLoot.TryGetValue(handle, out lootIdentity);
+
+        /// <summary>
+        /// Frees the handle given for loot that left the world, so a later dynel on the same identity gets a fresh one and
+        /// the pool does not fill with despawned corpses.
+        /// </summary>
+        public void ReleaseLootHandle(Identity lootIdentity)
+        {
+            foreach (int handle in _handleToLoot.Where(pair => pair.Value == lootIdentity).Select(pair => pair.Key).ToList())
+                _handleToLoot.Remove(handle);
+        }
+
+        /// <summary>Loot this client holds a handle for (it may since have closed or despawned).</summary>
+        public List<Identity> KnownLootIdentities() => _handleToLoot.Values.ToList();
 
         public bool TryGetContainerByHandle(int handle, out Identity containerIdentity)
         {
@@ -743,35 +837,6 @@ namespace ZoneEngine_New.Core.Inventory
                 return false;
 
             return ContainsCarriedItem(bag);
-        }
-
-        public bool TryGetUniqueOwnedBackpackSlot(int slot, out Container page, out Item item)
-        {
-            page = null!;
-            item = null!;
-            Container? found = null;
-
-            foreach (Container candidate in _backpackPages.Values)
-            {
-                Item? bag = candidate.LinkedItem;
-                if (bag == null || !ContainsCarriedItem(bag))
-                    continue;
-
-                if (!candidate.Content.TryGetValue(slot, out Item? occupant))
-                    continue;
-
-                if (found != null)
-                    return false;
-
-                found = candidate;
-                item = occupant;
-            }
-
-            if (found == null)
-                return false;
-
-            page = found;
-            return true;
         }
 
         public void MarkDirty(Item item, Container page, int placement)

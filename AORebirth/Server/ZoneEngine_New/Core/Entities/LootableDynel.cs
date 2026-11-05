@@ -29,6 +29,8 @@ namespace ZoneEngine_New.Core.Entities
         int _inventoryHandle;
         bool _wasOpened;
         DateTime? _emptyDespawnAtUtc;
+        // Everyone given a client handle for this loot, so despawn can hand the handles back to their pools.
+        readonly HashSet<Identity> _handleHolders = new();
 
         protected LootableDynel(Identity identity, IdentityType lootContainerType, int lootCapacity)
             : base(identity)
@@ -175,8 +177,11 @@ namespace ZoneEngine_New.Core.Entities
             if (!CanOpenLoot(player))
                 return false;
 
-            if (_inventoryHandle == 0 && Playfield != null)
-                _inventoryHandle = Playfield.AllocateContainerInventoryHandle();
+            // The handle comes from the opener's own pool, shared with their bags; another opener gets one from theirs.
+            _inventoryHandle = player.Inventory.GetOrAllocateLootHandle(Identity);
+            if (_inventoryHandle == 0)
+                return false;
+            _handleHolders.Add(player.Identity);
 
             OpenerIdentity = player.Identity;
             _wasOpened = true;
@@ -210,6 +215,29 @@ namespace ZoneEngine_New.Core.Entities
             }
 
             _emptyDespawnAtUtc = DateTime.UtcNow.Add(EmptyDespawnDelay);
+        }
+
+        /// <summary>
+        /// Hands every client handle for this loot back to its holder's pool. Called on despawn, while the playfield is
+        /// still attached. A holder who already left the playfield had their pool reset on the way out.
+        /// </summary>
+        public void ReleaseClientHandles()
+        {
+            if (_handleHolders.Count == 0)
+                return;
+
+            DynelRegistry? registry = Playfield?.GetService<DynelRegistry>();
+            if (registry != null)
+            {
+                foreach (Identity holder in _handleHolders)
+                {
+                    if (registry.TryGet(holder, out Dynel? dynel) && dynel is Player player)
+                        player.Inventory.ReleaseLootHandle(Identity);
+                }
+            }
+
+            _handleHolders.Clear();
+            _inventoryHandle = 0;
         }
 
         public void Close()
