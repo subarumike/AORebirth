@@ -64,6 +64,7 @@ cl /nologo /std:c++17 /O2 /GL /Gy /EHsc /W4 /WX /MT ^
   "%SRC%\gui_rect_fix.cpp" ^
   "%SRC%\logging.cpp" ^
   "%SRC%\login_key_patch.cpp" ^
+  "%SRC%\playfield_name_fix.cpp" ^
   "%SRC%\randy_color_fix.cpp" ^
   "%SRC%\roomspace_fix.cpp" ^
   "%SRC%\version_proxy.cpp" ^
