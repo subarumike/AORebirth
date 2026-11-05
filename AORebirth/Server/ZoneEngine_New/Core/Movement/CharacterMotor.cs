@@ -652,7 +652,10 @@ namespace ZoneEngine_New.Core.Movement
         public bool Consume(CharDCMoveMessage message)
         {
             ArgumentNullException.ThrowIfNull(message);
+            // Both corrections are per-move verdicts. A root pull-back raised by the last held move used to stay raised
+            // after the root ended, and every free move then snapped the client back to where it already was.
             JumpCorrectionDue = false;
+            RootCorrectionDue = false;
             if (_character.IsRooted)
                 return ConsumeRooted(message);
 
