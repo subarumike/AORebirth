@@ -314,8 +314,8 @@ namespace ZoneEngine_New.Core.Nanos
         }
 
         /// <param name="area">
-        /// An AreaCastNano spread: a hostile child spares its caster, friendly pets, and NPCs that cannot be attacked
-        /// (or that an NPC caster leaves alone); a friendly one reaches all.
+        /// An AreaCastNano spread: a hostile child catches only what its caster could attack
+        /// (<see cref="IsCaughtByHostileArea"/>); a friendly one reaches all.
         /// </param>
         internal static bool AcceptsRecipient(Character source, Character candidate, NanoSpell child, bool area = false)
         {
@@ -351,14 +351,18 @@ namespace ZoneEngine_New.Core.Nanos
         }
 
         /// <summary>
-        /// A hostile area effect catches friend and foe alike except its source, pets owned by its source or team/raid,
-        /// NPCs that cannot be attacked, and the NPCs an NPC source leaves alone (<see cref="IsSparedByNpcArea"/>).
+        /// A hostile area effect catches only what its source could attack (<see cref="CombatRules.CanAttack"/>: never
+        /// the source, its team or raid, players it may not fight by PvP flags, gas or level range). Pets owned by the
+        /// source or its team/raid, NPCs that cannot be attacked, and the NPCs an NPC source leaves alone
+        /// (<see cref="IsSparedByNpcArea"/>) are spared too. Each candidate is judged against the source, not the
+        /// area's centre, so a target-centred area never reaches the caster's allies around that target.
         /// </summary>
         internal static bool IsCaughtByHostileArea(Character source, Character candidate)
             => !ReferenceEquals(source, candidate)
                 && candidate is not NpcCharacter { Attackable: false }
                 && !IsFriendlyPet(source, candidate)
-                && !IsSparedByNpcArea(source, candidate);
+                && !IsSparedByNpcArea(source, candidate)
+                && CombatRules.CanAttack(source, candidate);
 
         /// <summary>Pet affiliation follows its owner; a raid uses the existing team membership rules.</summary>
         internal static bool IsFriendlyPet(Character source, Character candidate)
