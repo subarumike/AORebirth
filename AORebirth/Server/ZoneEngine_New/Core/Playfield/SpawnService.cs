@@ -1639,7 +1639,8 @@ namespace ZoneEngine_New.Core.Playfield
                         _flush.HardFlush(player);
                     }
 
-                    _snapshot.Commit(player);
+                    // Leaving dead must not store the corpse: the character is saved where its respawn would put it.
+                    _snapshot.Commit(player, player.SettleDeathForLogout());
                 }
                 catch (Exception exception)
                 {

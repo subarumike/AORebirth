@@ -2690,7 +2690,9 @@ namespace ZoneEngine_New.Core.Entities
             if (max <= 0)
                 return;
 
-            int percent = (int)Math.Clamp((long)current * 100 / max, 0, 100);
+            // A living vital is never stored as 0%: 5 HP of 1,700 rounded down to 0, and that character logged back in
+            // at 0 HP, alive on the server and dead on the client, with no respawn to clear it.
+            int percent = (int)Math.Clamp((long)current * 100 / max, current > 0 ? 1 : 0, 100);
             Stats.Set(percentStat, percent, StatDetail.Base, dirty: true);
         }
 
@@ -2700,8 +2702,10 @@ namespace ZoneEngine_New.Core.Entities
         protected int ResolveVitalPercent(CharacterStat percentStat, CharacterStat currentStat, CharacterStat maxStat)
         {
             int stored = Stats.Get(percentStat);
+            // A player is never loaded dead: login is not a death, so nothing would ever respawn them. A stored 0% health
+            // (a logout while dead, before that was settled) loads as 1%.
             if (!StatCollection.IsUnset(stored))
-                return Math.Clamp(stored, 0, 100);
+                return Math.Clamp(stored, IsPlayer && percentStat == CharacterStat.PercentRemainingHealth ? 1 : 0, 100);
 
             int max = Stats.GetOrZero(maxStat);
             if (max <= 0)

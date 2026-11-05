@@ -1865,6 +1865,60 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         /// <summary>
+        /// A character leaving the world dead (or before its respawn ran: a logout, a client crash that times out) is
+        /// saved as the respawn would have left it: alive at full health, at its respawn destination. Saved dead it came
+        /// back at the corpse with 0 HP, alive on the server, dead on the client, and its respawn request was ignored.
+        /// Returns where to store the character, or null to keep it where it stands (alive, no respawn resolved).
+        /// </summary>
+        internal (int Playfield, Vector3 Landing)? SettleDeathForLogout()
+        {
+            if (!IsDead && !_respawnPending)
+                return null;
+
+            (int Playfield, Vector3 Landing)? destination = null;
+            if (Playfield is Playfield playfield)
+            {
+                try
+                {
+                    destination = ResolveRespawn(playfield);
+                }
+                catch (Exception exception) when (!_respawnAtStuckLocation)
+                {
+                    Logger.Error(exception, "Logout respawn failed character=" + Identity.Instance + "; using the stuck location.");
+                    Stats.Set(CharacterStat.ResurrectDest, 0, StatDetail.Base);
+                    _respawnAtStuckLocation = true;
+                    try
+                    {
+                        destination = ResolveRespawn(playfield);
+                    }
+                    catch (Exception stuckException)
+                    {
+                        Logger.Error(stuckException, "Logout respawn at the stuck location failed character=" + Identity.Instance + ".");
+                    }
+                }
+                catch (Exception exception)
+                {
+                    Logger.Error(exception, "Logout respawn at the stuck location failed character=" + Identity.Instance + ".");
+                }
+            }
+
+            _respawnObserversCleared = false;
+            _respawnAtStuckLocation = false;
+            Revive();
+            if (destination != null)
+            {
+                // As a respawn elsewhere: not a proxy entry, so an exit there does not lead back through the old entrance.
+                Stats.Set(CharacterStat.ExternalPlayfieldInstance, 0, StatDetail.Base, dirty: true);
+                Stats.Set(CharacterStat.ExternalDoorInstance, 0, StatDetail.Base, dirty: true);
+            }
+
+            Logger.Info(string.Format(CultureInfo.InvariantCulture,
+                "Death settled on logout character={0} respawnPf={1}",
+                Identity.Instance, destination?.Playfield ?? 0));
+            return destination;
+        }
+
+        /// <summary>
         /// Where a death brings this character back: the stuck location after a failed resolution, else the last save
         /// point, else the new-character start (Arete Landing), else Respawn.json. Throws when none is configured.
         /// </summary>
