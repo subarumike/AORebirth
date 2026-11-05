@@ -560,9 +560,10 @@ namespace ZoneEngine_New.Core.Ai
                     || brain.Pet != null || brain._evading || other.IsPacified || brain.Hate.Contains(attacker))
                     continue;
                 bool guards = guardCall && other.MobTemplate?.Has(Mobs.NpcFeature.Guard) == true;
-                // A mob with no aggressiveness (BreedHostility 0) only fights what attacks it; a guard still answers a
-                // fellow guard's call.
-                if (!guards && !NpcAiRules.IsProximityHostile(other.Stats.GetOrZero(CharacterStat.BreedHostility)))
+                // A mob with no aggressiveness (BreedHostility 0) only fights what attacks it, unless it is Social; a
+                // guard still answers a fellow guard's call.
+                if (!guards && !NpcAiRules.IsProximityHostile(other.Stats.GetOrZero(CharacterStat.BreedHostility))
+                    && other.MobTemplate?.Has(Mobs.NpcFeature.Social) != true)
                     continue;
                 if (other.Stats.GetOrZero(CharacterStat.Side) != side
                     || (rules.SameClanOnly && !guards && other.Stats.GetOrZero(CharacterStat.Clan) != clan))
