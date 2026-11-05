@@ -61,6 +61,9 @@ namespace ZoneEngine_New.Core.Helpers
         /// <summary>"You failed to hide as you are currently fighting." (category 110). A stealth attempt mid-fight.</summary>
         public const int FailedToHideWhileFighting = 247632055;
 
+        /// <summary>"You can't log out while in a fight." (category 110). A /camp refused mid-fight.</summary>
+        public const int CantLogoutInFight = 207248100;
+
         /// <summary>"You have to kill %d more %s to fulfill one of your missions!" (category 110, FormatFeedback).</summary>
         public const int KillsRemaining = 204307477;
 

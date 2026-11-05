@@ -272,7 +272,13 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
                 case CharacterActionType.Logout:
                 {
-                    //TODO: Combat guard this at least
+                    // No /camp out of a fight: attacking something or being attacked refuses it.
+                    if (player.IsInCombat)
+                    {
+                        ClientFeedback.Send(player, ClientFeedback.CantLogoutInFight);
+                        break;
+                    }
+
                     session.Send(
                         new StartLogoutMessage
                         {
