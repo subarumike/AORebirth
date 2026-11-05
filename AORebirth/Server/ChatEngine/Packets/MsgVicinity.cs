@@ -50,21 +50,18 @@ namespace ChatEngine.Packets
         /// </param>
         /// <returns>
         /// </returns>
-        public static byte[] Create(uint playerid, string message, byte chatType)
+        public static byte[] Create(uint playerid, string message, byte chatType, bool gm = false)
         {
             PacketWriter writer = new PacketWriter(34);
             writer.WriteUInt32(playerid);
             writer.WriteString(message);
 
-            // Blob start
-            // This blob is actually byte array,
-            // but we have only one byte to send with it
-            // so I didn't add array stuff
-            // and made it always one byte.
-            writer.WriteUInt16(1);
+            // Block: the vicinity kind first, then the line-flag entries (02 01 for a GM, see ChatLineFlags).
+            writer.WriteUInt16((ushort)(gm ? 3 : 1));
             writer.WriteByte(chatType);
+            if (gm)
+                writer.WriteBytes(ChatLineFlags.GmEntry);
 
-            // Blob ends
             return writer.Finish();
         }
 

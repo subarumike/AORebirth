@@ -100,8 +100,8 @@ namespace ChatEngine.PacketHandlers
                                 (uint)tellClient.Character.CharacterId, new byte[] { 0x00, 0x01, 0x00 })));
                 }
 
-                byte[] pgroup = MsgPrivateGroup.Create(client.Character.CharacterId, message, string.Empty);
-                tellClient.Send(pgroup);
+                tellClient.Send(
+                    MsgPrivate.Create(client.Character.CharacterId, message, ChatLineFlags.IsGm(client)));
             }
             else
             {

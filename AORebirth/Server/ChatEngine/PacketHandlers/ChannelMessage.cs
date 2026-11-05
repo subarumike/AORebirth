@@ -82,13 +82,7 @@ namespace ChatEngine.PacketHandlers
             // Check if it is a Chat Command (starting with a dot)
             if (!ProcessServerCommand(text, client))
             {
-                byte[] newpacket = new byte[packet.Length + 4];
-
-                Array.Copy(packet, 0, newpacket, 0, 9);
-                Array.Copy(senderId, 0, newpacket, 9, 4);
-                Array.Copy(packet, 9, newpacket, 13, packet.Length - 9);
-                newpacket[2] = (byte)(packet.Length >> 8);
-                newpacket[3] = (byte)packet.Length;
+                byte[] newpacket = InsertSender(packet, senderId, ChatLineFlags.IsGm(client));
 
                 foreach (Client recipient in client.ChatServer().ConnectedClients.Values)
                 {
@@ -123,6 +117,52 @@ namespace ChatEngine.PacketHandlers
         #endregion
 
         #region Methods
+
+        /// <summary>
+        /// The client's channel packet (type, length, channel type, channel id, text S, block S) relayed with the sender
+        /// id after the channel id. A GM's block gets the line-flags entry 02 01 appended (entries start at the block's
+        /// first byte); everyone else's block is relayed as sent.
+        /// </summary>
+        private static byte[] InsertSender(byte[] packet, byte[] senderId, bool gm)
+        {
+            const int TextOffset = 9;
+            int blockEnd = -1;
+            int blockLengthOffset = -1;
+            if (gm && packet.Length >= TextOffset + 2)
+            {
+                blockLengthOffset = TextOffset + 2 + ((packet[TextOffset] << 8) | packet[TextOffset + 1]);
+                if (blockLengthOffset + 2 <= packet.Length)
+                {
+                    blockEnd = blockLengthOffset + 2 + ((packet[blockLengthOffset] << 8) | packet[blockLengthOffset + 1]);
+                    if (blockEnd > packet.Length)
+                        blockEnd = -1;
+                }
+            }
+
+            byte[] gmEntry = blockEnd >= 0 ? ChatLineFlags.GmEntry : Array.Empty<byte>();
+            byte[] newpacket = new byte[packet.Length + senderId.Length + gmEntry.Length];
+            Array.Copy(packet, 0, newpacket, 0, TextOffset);
+            Array.Copy(senderId, 0, newpacket, TextOffset, senderId.Length);
+            int shift = senderId.Length;
+            if (gmEntry.Length == 0)
+            {
+                Array.Copy(packet, TextOffset, newpacket, TextOffset + shift, packet.Length - TextOffset);
+            }
+            else
+            {
+                Array.Copy(packet, TextOffset, newpacket, TextOffset + shift, blockEnd - TextOffset);
+                Array.Copy(gmEntry, 0, newpacket, blockEnd + shift, gmEntry.Length);
+                Array.Copy(packet, blockEnd, newpacket, blockEnd + shift + gmEntry.Length, packet.Length - blockEnd);
+                int blockLength = ((packet[blockLengthOffset] << 8) | packet[blockLengthOffset + 1]) + gmEntry.Length;
+                newpacket[blockLengthOffset + shift] = (byte)(blockLength >> 8);
+                newpacket[blockLengthOffset + shift + 1] = (byte)blockLength;
+            }
+
+            int bodyLength = newpacket.Length - 4;
+            newpacket[2] = (byte)(bodyLength >> 8);
+            newpacket[3] = (byte)bodyLength;
+            return newpacket;
+        }
 
         /// <summary>
         /// </summary>

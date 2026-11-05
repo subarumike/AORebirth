@@ -118,7 +118,7 @@ namespace ChatEngine.BotIntegration
             }
 
             EnsureKnownBot(target, wireId, displayName);
-            target.Send(MsgPrivate.Create(wireId, request.Text, 3, 0));
+            target.Send(MsgPrivate.Create(wireId, request.Text));
             return BotOperationResult.Allowed("TELL_SENT");
         }
 

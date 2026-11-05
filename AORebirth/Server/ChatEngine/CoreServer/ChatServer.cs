@@ -1066,11 +1066,7 @@ namespace ChatEngine.CoreServer
                 return;
             }
 
-            byte[] packet = MsgPrivate.Create(
-                0,
-                message.Text,
-                message.Unk1 != 0 ? message.Unk1 : 3,
-                message.Unk2);
+            byte[] packet = MsgPrivate.Create(0, message.Text);
             if (packet == null)
             {
                 return;
@@ -1130,10 +1126,16 @@ namespace ChatEngine.CoreServer
 
         private void DistributeVicinityChat(VicinityChatMessage vicinityChatMessage)
         {
+            // A player's line comes without a sender name (an NPC's carries one); only a player can be a GM.
+            Client sender;
+            bool gm = vicinityChatMessage.SenderName == null
+                      && this.ConnectedClients.TryGetValue((uint)vicinityChatMessage.SenderId, out sender)
+                      && ChatLineFlags.IsGm(sender);
             byte[] packet = MsgVicinity.Create(
                 (uint)vicinityChatMessage.SenderId,
                 vicinityChatMessage.Text,
-                (byte)vicinityChatMessage.MessageType);
+                (byte)vicinityChatMessage.MessageType,
+                gm);
 
             string lookup = vicinityChatMessage.SenderName
                             ?? CharacterDao.Instance.GetCharacterNameById(vicinityChatMessage.SenderId);
