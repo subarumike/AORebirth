@@ -2,6 +2,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 {
     using System.Collections.Generic;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
 
     using ZoneEngine_New.Core.Entities;
@@ -43,41 +44,76 @@ namespace ZoneEngine_New.Core.Playfield.Locality
         /// </summary>
         public void Announce(MessageBody message, Dynel? exclude = null, Dynel? alsoExclude = null)
         {
+            // A message about a player some neighbors cannot see (sneaking past their Perception, or GM-hidden) skips
+            // them: the player is despawned on their clients and must not leak moves or actions there.
+            Player? concealed = ConcealedSubject(message, exclude, alsoExclude);
+
             if (!_grid.IsOutdoor && !_grid.IsDungeon)
             {
-                SendToOccupants(_grid.OccupantsInAllCells(), message, exclude, alsoExclude);
+                SendToOccupants(_grid.OccupantsInAllCells(), message, exclude, alsoExclude, concealed);
                 return;
             }
 
             _grid.CollectNeighbors(Id, _visibilityNeighborLevel, _neighborBuffer);
             foreach (int cellId in _neighborBuffer)
-            {
-                foreach (Dynel dynel in _grid.OccupantsInCell(cellId))
-                {
-                    if (IsExcluded(dynel, exclude, alsoExclude))
-                        continue;
-
-                    if (dynel is Player player && player.Session != null)
-                        player.Session.Send(message);
-                }
-            }
+                SendToOccupants(_grid.OccupantsInCell(cellId), message, exclude, alsoExclude, concealed);
         }
 
         static void SendToOccupants(
             IEnumerable<Dynel> occupants,
             MessageBody message,
             Dynel? exclude,
-            Dynel? alsoExclude)
+            Dynel? alsoExclude,
+            Player? concealed)
         {
             foreach (Dynel dynel in occupants)
             {
                 if (IsExcluded(dynel, exclude, alsoExclude))
                     continue;
 
-                if (dynel is Player player && player.Session != null)
-                    player.Session.Send(message);
+                if (dynel is not Player player || player.Session == null)
+                    continue;
+
+                if (concealed != null && !ReferenceEquals(player, concealed)
+                    && LocalityVisibility.IsHiddenFrom(player, concealed))
+                    continue;
+
+                player.Session.Send(message);
             }
         }
+
+        /// <summary>
+        /// The player <paramref name="message"/> is about (its N3 identity), when that player is currently concealed
+        /// from at least someone; null otherwise. The subject is one of the excluded dynels or an occupant of this cell,
+        /// since callers announce from the subject's own cell.
+        /// </summary>
+        Player? ConcealedSubject(MessageBody message, Dynel? exclude, Dynel? alsoExclude)
+        {
+            if (message is not N3Message n3)
+                return null;
+
+            Identity subject = n3.Identity;
+            Player? player = MatchPlayer(exclude, subject) ?? MatchPlayer(alsoExclude, subject);
+            if (player == null)
+            {
+                foreach (Dynel dynel in _occupants)
+                {
+                    if (dynel is Player occupant && occupant.Identity == subject)
+                    {
+                        player = occupant;
+                        break;
+                    }
+                }
+            }
+
+            return player != null
+                   && (player.HiddenFromPlayers || player.Motor.State == Movement.MovementState.Sneak)
+                ? player
+                : null;
+        }
+
+        static Player? MatchPlayer(Dynel? dynel, Identity subject)
+            => dynel is Player player && player.Identity == subject ? player : null;
 
         static bool IsExcluded(Dynel dynel, Dynel? exclude, Dynel? alsoExclude)
             => ReferenceEquals(dynel, exclude) || ReferenceEquals(dynel, alsoExclude);
