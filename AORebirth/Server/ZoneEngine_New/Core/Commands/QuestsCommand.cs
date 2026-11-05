@@ -24,7 +24,8 @@ namespace ZoneEngine_New.Core.Commands
     /// <c>.quests</c>: the selected player's (or your own) active quests in a popup. Every quest gets a link to
     /// <c>.quests info &lt;questId&gt; &lt;characterId&gt;</c> (all of its details; <c>.quests info &lt;questHash&gt;</c> shows the
     /// Quests.json template itself), and a quest with an ACG dungeon a link
-    /// that runs <c>.quests tp &lt;questId&gt;</c>, which puts you (never the selected player) at its entrance.
+    /// that runs <c>.quests tp &lt;questId&gt;</c>, which puts you (never the selected player) at its entrance. Every quest
+    /// also gets a <c>.quests drop &lt;questId&gt; &lt;characterId&gt;</c> link.
     /// </summary>
     public sealed class QuestsCommand : IGmCommand
     {
@@ -45,7 +46,7 @@ namespace ZoneEngine_New.Core.Commands
 
         public int RequiredGmLevel => 1;
 
-        public string Usage => ".quests (selected player's active quests) | .quests info <questHash> | .quests info <questId> [characterId] | .quests tp <questId> | .quests done [characterId] | .quests wipe <questHash> [characterId]";
+        public string Usage => ".quests (selected player's active quests) | .quests info <questHash> | .quests info <questId> [characterId] | .quests tp <questId> | .quests done [characterId] | .quests wipe <questHash> [characterId] | .quests drop <questId> [characterId]";
 
         public GmCommandHelp Help { get; } = new(
             "Shows and inspects quests.",
@@ -56,6 +57,7 @@ namespace ZoneEngine_New.Core.Commands
                 new(".quests tp <questId>", "Takes you to the quest's dungeon entrance."),
                 new(".quests done [characterId]", "Your look-at player's completed quests: every quest whose mission bit is set, plus completed journal entries."),
                 new(".quests wipe <questHash> [characterId]", "Development: clears the quest's mission bit on your look-at player, so it counts as not completed."),
+                new(".quests drop <questId> [characterId]", "Development: drops one quest from your look-at player's log (active or completed, NoDelete too), so it can be given again."),
             ],
             [
                 new(".quests", "Active quests of your target."),
@@ -64,6 +66,7 @@ namespace ZoneEngine_New.Core.Commands
                 new(".quests tp 12", "Go to quest 12's entrance."),
                 new(".quests done", "Completed quests of your target, each with a wipe link."),
                 new(".quests wipe ABCD", "Clear quest ABCD's mission bit on your target."),
+                new(".quests drop ABCD", "Drop quest ABCD from your target's log."),
             ],
             "Wipe clears the mission bit, which is what 'quest HASH done', HasCompletedQuest and item requirements read. "
             + "The completed journal entry stays. Quests that share the bit are cleared with it.");
@@ -90,6 +93,12 @@ namespace ZoneEngine_New.Core.Commands
                 return;
             }
 
+            if (context.Args.Length >= 1 && string.Equals(context.Args[0], "drop", StringComparison.OrdinalIgnoreCase))
+            {
+                DropQuest(context);
+                return;
+            }
+
             if (context.Args.Length >= 1 && string.Equals(context.Args[0], "info", StringComparison.OrdinalIgnoreCase))
             {
                 ShowInfo(context);
@@ -107,7 +116,8 @@ namespace ZoneEngine_New.Core.Commands
                     continue;
 
                 string row = string.Format(CultureInfo.InvariantCulture, "{0} [{1}] {2}  {3}",
-                    Safe(quest.Template.Name), Safe(quest.QuestId), Remaining(quest, now), InfoLink(quest.QuestId, subject));
+                    Safe(quest.Template.Name), Safe(quest.QuestId), Remaining(quest, now), InfoLink(quest.QuestId, subject))
+                    + "  " + DropLink(quest.QuestId, subject);
                 if (_dungeons.TryGetEntrance(quest.QuestId, out MissionEntrancePlacement entrance))
                     row += string.Format(CultureInfo.InvariantCulture, "  <a href='chatcmd:///say .quests tp {0}'>[TP: {1}]</a>",
                         quest.QuestId, Safe(entrance.DisplayName));
@@ -133,6 +143,32 @@ namespace ZoneEngine_New.Core.Commands
             }
 
             GmCommandFeedback.SendLines(context.Session, context.Player, lines);
+        }
+
+        static string DropLink(string questId, Player subject)
+            => string.Format(CultureInfo.InvariantCulture, "<a href='chatcmd:///say .quests drop {0} {1}'>[Drop]</a>",
+                Safe(questId), subject.Identity.Instance);
+
+        /// <summary>Development: drops one quest from the subject's log (<see cref="QuestService.TryDrop"/>).</summary>
+        void DropQuest(GmCommandContext context)
+        {
+            if (context.Args.Length < 2)
+            {
+                context.SendUsage("Usage: .quests drop <questId> [characterId]");
+                return;
+            }
+
+            if (!TryResolveSubject(context, 2, out Player subject))
+                return;
+
+            string questId = context.Args[1].Trim();
+            if (!_quests.GetLog(subject).Quests.ContainsKey(questId))
+                questId = questId.ToUpperInvariant();
+
+            if (_quests.TryDrop(subject, questId, out string result))
+                GmCommandFeedback.Send(context.Session, context.Player, Safe(result));
+            else
+                GmCommandFeedback.SendError(context.Session, context.Player, Safe(result));
         }
 
         static string InfoLink(string questId, Player subject)
@@ -480,7 +516,7 @@ namespace ZoneEngine_New.Core.Commands
             var rows = new List<string>
             {
                 DiagAoml.Title(who + " - completed quests"),
-                DiagAoml.Muted(string.Format(CultureInfo.InvariantCulture, "{0} by mission bit, {1} from the journal only. [Wipe] clears the bit.",
+                DiagAoml.Muted(string.Format(CultureInfo.InvariantCulture, "{0} by mission bit, {1} from the journal only. [Wipe] clears the bit, [Drop] drops the journal entry.",
                     total - journalOnly.Count, journalOnly.Count)),
             };
 
@@ -513,11 +549,12 @@ namespace ZoneEngine_New.Core.Commands
                 {
                     rows.Add(string.Format(
                         CultureInfo.InvariantCulture,
-                        "{0} {1} {2} {3}",
+                        "{0} {1} {2} {3}  {4}",
                         DiagAoml.Color(DiagAoml.Yellow, "*"),
                         DiagAoml.Name(Safe(quest.Template.Name)),
                         DiagAoml.Label("[" + Safe(string.IsNullOrWhiteSpace(quest.Template.Hash) ? quest.QuestId : quest.Template.Hash) + "]"),
-                        DiagAoml.Muted("assigned " + Utc(quest.AssignedAtUtc))));
+                        DiagAoml.Muted("assigned " + Utc(quest.AssignedAtUtc)),
+                        DropLink(quest.QuestId, subject)));
                 }
             }
 

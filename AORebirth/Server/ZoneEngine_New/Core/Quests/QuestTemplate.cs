@@ -74,6 +74,16 @@ namespace ZoneEngine_New.Core.Quests
         /// <summary>Single follow-up quest hash, assigned when this one completes.</summary>
         public string? NextStep { get; set; }
 
+        /// <summary>
+        /// Hours a template quest stays active after it is assigned, then it expires like a generated one (the Perk-Reset
+        /// Service Provider's 48 hour Full Perk Points Reset Service). Null or 0: never expires.
+        /// </summary>
+        public int? ExpiresAfterHours { get; set; }
+
+        /// <summary>When a template quest assigned at <paramref name="assignedAtUtc"/> expires; null when it never does.</summary>
+        public DateTime? ExpiresAt(DateTime assignedAtUtc)
+            => ExpiresAfterHours is int hours and > 0 ? assignedAtUtc.AddHours(hours) : null;
+
         public QuestReward? Reward { get; set; }
 
         /// <summary>

@@ -3,6 +3,7 @@ namespace ZoneEngine_New.Core.Knubot;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 
 using ZoneEngine_New.Core.Inventory;
@@ -211,9 +212,15 @@ public static class KnubotParser
                     break;
 
                 case "useitem":
-                    if (words.Length != 2 || !KnubotCondition.TryPositive(words[1], out int useItemId) || !load.Items.TryGet(useItemId, out _))
+                    // An item hash (PRRS, the Perk Reset Item) or an item id; a hash must name exactly one template.
+                    int useItemId = 0;
+                    bool useItemResolved = words.Length == 2
+                        && (KnubotCondition.TryPositive(words[1], out useItemId)
+                            || (load.TryItemTemplates(words[1], out HashSet<int> useItemTemplates)
+                                && useItemTemplates.Count == 1 && (useItemId = useItemTemplates.First()) > 0));
+                    if (!useItemResolved || !load.Items.TryGet(useItemId, out _))
                     {
-                        errors.Add("expected {useitem ITEMID} with a known item id: {" + body + "}");
+                        errors.Add("expected {useitem ITEMHASH} (one template) or {useitem ITEMID} with a known item: {" + body + "}");
                         break;
                     }
 

@@ -238,7 +238,7 @@ public sealed record KnubotGiveBuff(int NanoId) : KnubotEffect
 }
 
 /// <summary>
-/// <c>{useitem ITEMID}</c>: the item's OnUse runs on the player, nothing goes to the inventory. For live's virtual
+/// <c>{useitem ITEMHASH}</c> or <c>{useitem ITEMID}</c>: the item's OnUse runs on the player, nothing goes to the inventory. For live's virtual
 /// items (Null flag) that apply a service: Specialization Item - First..Fourth Spec 229611-229613/229614 set
 /// Specialization for Professor Dedlock.
 /// </summary>

@@ -692,6 +692,31 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         /// <summary>
+        /// Full perk reset (ResetAllPerks, the Perk Reset Item 281017 the Perk-Reset Service Provider uses): untrains
+        /// every regular and alien perk at once. Research stays, and the single-untrain cooldown neither blocks it nor
+        /// starts; the provider's own 48 hour quest limits it. The client clears its perk map on ClearAllPerks
+        /// (capture 20260716-Reset-perks Action=201; Gamecode.dll 0x1005349a keeps only its research entries).
+        /// </summary>
+        public void ResetAllPerks()
+        {
+            bool removed = false;
+            foreach (int perkId in TrainedPerks.Snapshot())
+            {
+                if (!PerkCatalog.IsResearch(perkId) && TrainedPerks.Remove(perkId))
+                    removed = true;
+            }
+
+            if (!removed)
+                return;
+
+            OnTrainedPerksChanged(() => Session?.Send(new CharacterActionMessage
+            {
+                Identity = Identity, Action = CharacterActionType.ClearAllPerks
+            }));
+            FlushDirtyStats();
+        }
+
+        /// <summary>
         /// GM setup: the trained perks become exactly <paramref name="perkIds"/> (regular, alien and finished research),
         /// with no perk point, requirement or reset rules, and research in progress and the research goal are dropped.
         /// Refreshes the perk templates and actions and rebases.

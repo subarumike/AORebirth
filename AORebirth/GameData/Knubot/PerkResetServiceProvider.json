@@ -1,0 +1,88 @@
+{
+  "Notes": "Perk-Reset Service Provider (OVSO), Jobe Platform. Captured 2026-11-05 by QuestDialogCapture. Yes uses the Perk Reset Item PRRS (281017, OnUse ResetAllPerks) and starts Full Perk Points Reset Service (BVLG), which expires 48 hours later (Quests.json ExpiresAfterHours). While BVLG is active he asks 20 million credits for another reset in a credits-only Give window (live KnubotStartTrade slots=0). The paid line was not captured; it repeats his service line and restarts the 48 hours. *Contains Generated Dialog*",
+  "Npcs": [
+    "OVSO"
+  ],
+  "Openers": [
+    {
+      "If": [
+        "HasQuest BVLG"
+      ],
+      "Say": "4"
+    },
+    {
+      "Say": "1"
+    }
+  ],
+  "Replies": {
+    "i_would_like_to": {
+      "Text": "I would like to reset all my perks.",
+      "Goto": "2"
+    },
+    "yes": {
+      "Text": "Yes.",
+      "Goto": "3"
+    },
+    "i_just_had_a": {
+      "Text": "I just had a full perk reset... but I want another one... right now!",
+      "Goto": "5"
+    }
+  },
+  "Lines": {
+    "1": {
+      "Text": "{delay 1}Hi there.",
+      "Replies": [
+        "i_would_like_to"
+      ]
+    },
+    "2": {
+      "Text": [
+        "{givequest NMD7}",
+        "Are you sure?"
+      ],
+      "Replies": [
+        "yes"
+      ]
+    },
+    "3": {
+      "Text": [
+        "{completequest NMD7}",
+        "{useitem PRRS}",
+        "{givequest BVLG}",
+        "{delay 1}There you go. You will need to wait at least 48 hours until you do this again... at least those are the rules they have given me... something about safety or something."
+      ],
+      "Replies": []
+    },
+    "4": {
+      "Text": "{delay 1}Hi there.",
+      "Replies": [
+        "i_just_had_a"
+      ]
+    },
+    "5": {
+      "Text": [
+        "Perhaps I'd be willing to bend the rules a little... if you were willing to make a contribution to my retirement fund... or just give me a lot of credits... either option would work. Let's say 20 million... take it or leave it.",
+        "{opentrade}"
+      ],
+      "Replies": []
+    },
+    "paid": {
+      "Text": [
+        "{completequest BVLG}",
+        "{useitem PRRS}",
+        "{givequest BVLG}",
+        "{delay 1}There you go. You will need to wait at least 48 hours until you do this again... at least those are the rules they have given me... something about safety or something."
+      ],
+      "Replies": []
+    }
+  },
+  "Trades": {
+    "another_reset": {
+      "If": [
+        "HasQuest BVLG"
+      ],
+      "Credits": 20000000,
+      "Goto": "paid"
+    }
+  }
+}

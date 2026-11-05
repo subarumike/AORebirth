@@ -93,6 +93,12 @@ namespace ZoneEngine_New.Core.Inventory
                     return TimedEffect(templateId, target, source, spell);
                 case FunctionType.LockPerk:
                     return LockPerk(target, source, spell);
+                case FunctionType.ResetAllPerks:
+                    // Perk Reset Item 281017 (Perk-Reset Service Provider): every perk but research goes back.
+                    if (target is not Player resetPlayer)
+                        return false;
+                    resetPlayer.ResetAllPerks();
+                    return true;
                 case FunctionType.UploadNano:
                     return target is Player uploadPlayer && UploadNano(uploadPlayer, spell);
                 case FunctionType.CastNano:

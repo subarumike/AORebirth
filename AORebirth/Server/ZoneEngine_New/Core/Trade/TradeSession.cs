@@ -27,11 +27,11 @@ namespace ZoneEngine_New.Core.Trade
 
         readonly Dictionary<int, Item> _items = new();
 
-        /// <param name="slots">The window's slots, 1 to <see cref="Capacity"/>: a Knubot window has only as many as its
-        /// largest trade needs.</param>
+        /// <param name="slots">The window's slots, 0 to <see cref="Capacity"/>: a Knubot window has only as many as its
+        /// largest trade needs (0 for a credits-only window).</param>
         public TradeOffer(int slots = Capacity)
         {
-            Slots = Math.Clamp(slots, 1, Capacity);
+            Slots = Math.Clamp(slots, 0, Capacity);
         }
 
         /// <summary>How many items this side of the window holds.</summary>

@@ -160,11 +160,12 @@ public sealed class KnubotScript(string id, string[] npcs, KnubotOpener[] opener
 
     /// <summary>
     /// The Give Item window's slots: enough for the largest trade, counting every wanted item as its own slot (an
-    /// unstacked offer), at least 1 and at most the window's <see cref="Trade.TradeOffer.Capacity"/>.
+    /// unstacked offer), at most the window's <see cref="Trade.TradeOffer.Capacity"/>. 0 when every trade takes only
+    /// credits (live Perk-Reset Service Provider KnubotStartTrade slots=0); 1 for a script with no trades.
     /// </summary>
     public int TradeSlots { get; } = Math.Clamp(
         trades.Length == 0 ? 1 : trades.Max(trade => trade.Items.Sum(item => Math.Max(1, item.Count))),
-        1, Trade.TradeOffer.Capacity);
+        0, Trade.TradeOffer.Capacity);
 
     /// <summary>A reply with no content behind it yet: the engine says a debug line and offers the same replies again.</summary>
     public bool IsDeadEnd(KnubotReply reply)
