@@ -97,7 +97,7 @@ namespace ZoneEngine_New.Core.Nanos
         /// <summary>
         /// True when an OnUse function is more than a one-shot launch: anything but casting another nano (CastNano,
         /// TeamCastNano, AreaCastNano, CastChance), summoning a pet or spawning an item or monster, or one of those
-        /// repeating on a timer (its ticks run from the NCU entry).
+        /// repeating or delayed on a timer (its ticks run from the NCU entry).
         /// </summary>
         bool HasEffectOfItsOwn()
         {
@@ -109,7 +109,7 @@ namespace ZoneEngine_New.Core.Nanos
                 bool launches = (FunctionType)spell.FunctionType is FunctionType.CastNano or FunctionType.TeamCastNano
                     or FunctionType.AreaCastNano or FunctionType.CastChance or FunctionType.SummonPet
                     or FunctionType.SpawnItem or FunctionType.SpawnMonster2;
-                if (!launches || (spell.TickCount > 1 && spell.TickInterval > 0))
+                if (!launches || (spell.TickCount > 1 && spell.TickInterval > 0) || Buff.IsDelayedOnce(spell))
                     return true;
             }
 

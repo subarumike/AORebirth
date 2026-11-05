@@ -642,6 +642,11 @@ namespace ZoneEngine_New.Core.Inventory
                 && skipPassiveModifiers)
                 return true;
 
+            // A buff landing (skipPassiveModifiers) leaves a delayed single tick to its NCU entry, which runs it one
+            // interval later: Soothing Herbs 263341 recasts itself at 45 s, not on the land.
+            if (skipPassiveModifiers && Nanos.Buff.IsDelayedOnce(spell))
+                return true;
+
             return ItemUseFunctions.TryExecute(Id, target, source, spell, inventoryRepository, items, criteria,
                 isTick: isTick,
                 templateDamageType: Stats.TryGetValue(CharacterStat.DamageType, out int damageType) ? damageType : 0,
