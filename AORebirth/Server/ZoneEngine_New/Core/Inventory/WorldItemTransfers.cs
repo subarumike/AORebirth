@@ -67,9 +67,14 @@ namespace ZoneEngine_New.Core.Inventory
             player.ShowSkillLock(computerLiteracy, DropLockSeconds, player.LockSkill(computerLiteracy, DropLockSeconds, now));
 
             if (slot.Type != IdentityType.Inventory
-                || !InventoryActionService.TryResolveOwnedSlot(player, slot, out _, out Item item)
-                || IsNoDrop(item))
+                || !InventoryActionService.TryResolveOwnedSlot(player, slot, out _, out Item item))
                 return Refuse(player, logger, "item not droppable from " + slot);
+
+            if (DropRefusal(item) is { } feedback)
+            {
+                Helpers.ClientFeedback.Send(player, feedback);
+                return Refuse(player, logger, feedback + " template=" + item.LowId);
+            }
 
             if (!TryPlace(player, playfield, requested, out AoVector3 rest, out AoVector3 normal))
                 return Refuse(player, logger, "drop ray hit nothing");
@@ -205,10 +210,20 @@ namespace ZoneEngine_New.Core.Inventory
             return (Quaternion)Quaternion.Hamilton(tilt, heading).Normalize();
         }
 
-        static bool IsNoDrop(Item item)
+        /// <summary>
+        /// The client's own drop gate (Gamecode.dll N3Msg_IsDropPossible, 0x10048d42), on the template's stats: the item
+        /// needs Carry and flag bit 0x1000 (0x100808b4, else reason 0x12), and must be neither Unique (reason 0xf) nor
+        /// NoDrop (reason 0x11). Returns the feedback N3Msg_DropItem shows for the refusal, or null when droppable.
+        /// </summary>
+        static string? DropRefusal(Item item)
         {
             int flags = item.Definition?.Stats.TryGetValue(CharacterStat.Flags, out int value) == true ? value : 0;
-            return (flags & (int)ItemFlags.NoDrop) != 0;
+            if (!item.Can(CanFlags.Carry) || (flags & (int)ItemFlags.Stationary) == 0
+                || (flags & (int)ItemFlags.Unique) != 0)
+                return "Feedback_ItemCantBeDroppedAtThatLocation";
+            if ((flags & (int)ItemFlags.NoDrop) != 0)
+                return "Feedback_ThisIsANoDropItem";
+            return null;
         }
 
         static bool Refuse(Player player, IZoneLogger? logger, string reason)
