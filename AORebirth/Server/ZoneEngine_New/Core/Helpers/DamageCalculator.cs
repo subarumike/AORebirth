@@ -363,6 +363,24 @@ namespace ZoneEngine_New.Core.Helpers
         }
 
         /// <summary>
+        /// The attacker's active damage type: what a swing with its armed weapon deals (the main hand, else the combined
+        /// martial arts slot, else the off hand), with its DamageOverrideType over that. A Hit that names no damage type
+        /// (Nano Feast 253119 [Health, -550, -690, 0]) deals this type. 0 with no weapon and no override.
+        /// </summary>
+        internal static int ResolveActiveDamageType(Character attacker)
+        {
+            ArgumentNullException.ThrowIfNull(attacker);
+            CharacterWeapon? weapon = null;
+            foreach (WeaponSlot slot in (ReadOnlySpan<WeaponSlot>)[WeaponSlot.MainHand, WeaponSlot.CombinedMA, WeaponSlot.OffHand])
+            {
+                if (attacker.Weapons.TryGetValue(slot, out weapon) && weapon != null)
+                    break;
+            }
+
+            return ResolveDamageType(attacker, weapon?.DamageTypeItem);
+        }
+
+        /// <summary>
         /// The defender's Reflect AC (share of the damage turned back, in percent) and Max Reflected Damage (most the
         /// attacker takes back) for a damage type (90-97).
         /// </summary>

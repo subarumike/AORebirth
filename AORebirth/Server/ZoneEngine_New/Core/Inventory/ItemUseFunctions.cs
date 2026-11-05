@@ -222,6 +222,12 @@ namespace ZoneEngine_New.Core.Inventory
 
             var stat = (CharacterStat)statId;
 
+            // A hostile Health hit that names no damage type deals the caster's active one: its armed weapon's type or
+            // its damage type override (Nano Feast 253119 [Health, -550, -690, 0]).
+            if (acStat == 0 && stat == CharacterStat.Health && minHit < 0
+                && source != null && !ReferenceEquals(source, target))
+                acStat = Helpers.DamageCalculator.ResolveActiveDamageType(source);
+
             // Daily Mission XP Reward [XP, 100, 0, 0] (levels 1-100) down to [XP, 5, 0, 0] (215+): a percentage of the
             // current level's bar, awarded as XP so it levels.
             if (stat == CharacterStat.XP && spell.ArgumentCount >= 3 && third == 0 && minHit > 0)
