@@ -41,7 +41,13 @@ namespace ZoneEngine_New.Core.Teams
         // Updated only from that player's attach/refresh/stat-change callback on its owner tick.
         // Team operations on another playfield never enumerate or read this player's mutable Stats.
         private sealed record MemberData(string Name, int Level, int Profession, int MaxHealth,
-            int MaxNano, bool HasVitals);
+            int MaxNano, bool HasVitals, int Side);
+
+        // Original client side text table 2005: 0 neutral, 1 clan, 2 omni, 7 mixed.
+        private const int MixedTeamSide = 7;
+        // Original client CharacterAction 0x1B raises team event 0x10; TeamViewModule_c takes Target.Instance as the
+        // team level ("Team level is %u") and resets it to 1 itself on leave or disband.
+        private const CharacterActionType TeamLevelAction = (CharacterActionType)0x1B;
 
         // Rows submitted through the accepted session on its owner tick, not queued projection intentions.
         private sealed class PublishedRoster(int teamId)
@@ -53,6 +59,7 @@ namespace ZoneEngine_New.Core.Teams
             public bool IsRaid;
             public bool ChatJoined;
             public bool RaidChatJoined;
+            public int TeamLevel;
         }
 
         private readonly object _sync = new();
@@ -116,8 +123,13 @@ namespace ZoneEngine_New.Core.Teams
                 Action<CharacterStat, int, int, bool> observer = (stat, _, _, _) =>
                 {
                     if (stat is not (CharacterStat.Level or CharacterStat.Profession or CharacterStat.MaxHealth
-                        or CharacterStat.MaxNanoEnergy)) return;
-                    lock (_sync) { if (Owns(player)) CaptureData(player); }
+                        or CharacterStat.MaxNanoEnergy or CharacterStat.Side)) return;
+                    lock (_sync)
+                    {
+                        if (!Owns(player)) return;
+                        CaptureData(player);
+                        if (stat is CharacterStat.Level or CharacterStat.Side) QueueTeamFacts(player.Identity.Instance);
+                    }
                 };
                 _statObservers[player.Identity.Instance] = observer;
                 player.Stats.StatChanged += observer;
@@ -191,7 +203,8 @@ namespace ZoneEngine_New.Core.Teams
                             Profession = data.Profession,
                             MaxHealth = data.MaxHealth,
                             MaxNano = data.MaxNano,
-                            HasVitals = data.HasVitals
+                            HasVitals = data.HasVitals,
+                            Side = data.Side
                         }
                     });
                 }
@@ -887,12 +900,18 @@ namespace ZoneEngine_New.Core.Teams
                 }
             }
 
-            ApplyStatsNow(viewer, team, social, send: !initialRoster && !raidRosterReset
-                && (membershipChanged || leadershipChanged || refreshVitals));
+            int teamSide = TeamSideOf(team);
+            bool sideChanged = viewer.Stats.GetOrZero(CharacterStat.TeamSide) != teamSide;
+            bool sendStats = !initialRoster && !raidRosterReset
+                && (membershipChanged || leadershipChanged || refreshVitals);
+            ApplyStatsNow(viewer, team, social, send: sendStats);
+            // A member's side can change the team side without any roster change.
+            if (!initialRoster && !raidRosterReset && !sendStats && sideChanged)
+                SetStatNow(viewer, CharacterStat.TeamSide, teamSide, true);
             if (raidRosterReset)
             {
                 // Live lets TeamMember set the new team identity; it sends no preceding Team stat or leader reply.
-                SetStatNow(viewer, CharacterStat.TeamSide, 2, true);
+                SetStatNow(viewer, CharacterStat.TeamSide, teamSide, true);
                 SetStatNow(viewer, CharacterStat.SocialStatus, social, true);
                 // Original RaidView ignores joins until the viewer's own row restores raid membership.
                 if (!AnnounceNow(viewer, viewerId, team)) return;
@@ -901,7 +920,7 @@ namespace ZoneEngine_New.Core.Teams
             {
                 // Preserve the captured initial handshake; existing viewers receive only row deltas.
                 SetStatNow(viewer, CharacterStat.SocialStatus, social, true);
-                SetStatNow(viewer, CharacterStat.TeamSide, 2, true);
+                SetStatNow(viewer, CharacterStat.TeamSide, teamSide, true);
                 SetStatNow(viewer, CharacterStat.SocialStatus, social, true);
                 if (viewerId == team.Leader)
                 {
@@ -974,6 +993,7 @@ namespace ZoneEngine_New.Core.Teams
                 SetStatNow(viewer, CharacterStat.Team, ClientTeamId(team, viewerId), true);
             }
             if (published == null) return;
+            if (!PublishTeamLevelNow(viewer, published, team)) return;
             published.Leader = team.Leader;
             published.ExplicitLeadershipTransfer = team.ExplicitLeadershipTransfer;
             if (!published.ChatJoined)
@@ -1050,12 +1070,70 @@ namespace ZoneEngine_New.Core.Teams
             SetStatNow(viewer, CharacterStat.SocialStatus, social, true);
         }
 
-        private static void ApplyStatsNow(Player player, Team? team, int social, bool send)
+        private void ApplyStatsNow(Player player, Team? team, int social, bool send)
         {
             SetStatNow(player, CharacterStat.NumberOfTeamMembers, team?.Members.Count ?? 0, send);
-            SetStatNow(player, CharacterStat.TeamSide, team == null ? 0 : 2, send);
+            SetStatNow(player, CharacterStat.TeamSide, team == null ? 0 : TeamSideOf(team), send);
             SetStatNow(player, CharacterStat.SocialStatus, social, send);
             SetStatNow(player, CharacterStat.Team, team == null ? 0 : ClientTeamId(team, player.Identity.Instance), send);
+        }
+
+        /// <summary>
+        /// TeamSide (stat 213) from the members' Side (stat 33): neutral members leave it alone, one non-neutral side
+        /// becomes the team side, and two different non-neutral sides make a mixed team. All-neutral stays neutral.
+        /// </summary>
+        private int TeamSideOf(Team team)
+        {
+            int side = 0;
+            foreach (int id in team.Members)
+            {
+                int memberSide = DataOf(id)?.Side ?? 0;
+                if (memberSide <= 0 || memberSide == side) continue;
+                if (side != 0) return MixedTeamSide;
+                side = memberSide;
+            }
+            return side;
+        }
+
+        /// <summary>The team level is its highest member's level, the same level team eligibility ranges use.</summary>
+        private int TeamLevelOf(Team team)
+        {
+            int level = 1;
+            foreach (int id in team.Members)
+                if (DataOf(id) is { } data) level = Math.Max(level, data.Level);
+            return level;
+        }
+
+        private bool PublishTeamLevelNow(Player viewer, PublishedRoster published, Team team)
+        {
+            int level = TeamLevelOf(team);
+            if (published.TeamLevel == level) return true;
+            if (!SendNow(viewer, Action(viewer, TeamLevelAction, new Identity { Type = IdentityType.None, Instance = level })))
+                return false;
+            published.TeamLevel = level;
+            return true;
+        }
+
+        /// <summary>
+        /// A member's level or side changed: refresh team side and level for the team's local members. This does not
+        /// bump the projection epoch, so it never supersedes a pending roster publish (which sends both anyway).
+        /// </summary>
+        private void QueueTeamFacts(int memberId)
+        {
+            if (!_membership.TryGetValue(memberId, out Team? team)) return;
+            foreach (int id in team.Members)
+            {
+                if (!_players.TryGetValue(id, out Player? viewer)) continue;
+                Dispatch(viewer, () =>
+                {
+                    if (!IsActive(viewer) || !_membership.TryGetValue(id, out Team? current) || !ReferenceEquals(current, team)
+                        || !_publishedRosters.TryGetValue(id, out PublishedRoster? published) || published.TeamId != team.Id) return;
+                    int side = TeamSideOf(team);
+                    if (viewer.Stats.GetOrZero(CharacterStat.TeamSide) != side)
+                        SetStatNow(viewer, CharacterStat.TeamSide, side, true);
+                    PublishTeamLevelNow(viewer, published, team);
+                });
+            }
         }
 
         // Live capture 20261104T005758Z: raid group N has team instance base + N, including remote members.
@@ -1111,7 +1189,7 @@ namespace ZoneEngine_New.Core.Teams
                 && nano >= 0 && !StatCollection.IsUnset(nano);
             _data[player.Identity.Instance] = new MemberData(player.Name ?? player.FirstName,
                 player.Stats.GetOrZero(CharacterStat.Level), player.Stats.GetOrZero(CharacterStat.Profession),
-                health, nano, hasVitals);
+                health, nano, hasVitals, player.Stats.GetOrZero(CharacterStat.Side));
         }
         private static Identity CharacterIdentity(int id) => new() { Type = IdentityType.CanbeAffected, Instance = id };
         private void CancelInvitations(int id)

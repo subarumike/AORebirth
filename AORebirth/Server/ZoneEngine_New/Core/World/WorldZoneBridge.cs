@@ -90,7 +90,8 @@ namespace ZoneEngine_New.Core.World
                 HasVitals = hasVitals,
                 InvadersKilled = player.Stats.GetOrZero(CharacterStat.InvadersKilled),
                 KilledByInvaders = player.Stats.GetOrZero(CharacterStat.KilledByInvaders),
-                AiLevel = player.Stats.GetOrZero(CharacterStat.AlienLevel)
+                AiLevel = player.Stats.GetOrZero(CharacterStat.AlienLevel),
+                Side = player.Stats.GetOrZero(CharacterStat.Side)
             };
         }
 
