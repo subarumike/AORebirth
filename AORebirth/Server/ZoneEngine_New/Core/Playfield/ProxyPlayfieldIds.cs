@@ -122,7 +122,10 @@ namespace ZoneEngine_New.Core.Playfield
 
                 int destination = 0;
                 int destinationDoor = 0;
-                if (PortalDoorLandingResolver.TryReadPortal(dynel, out PortalDestination portal))
+                // A vicinity-fired TeleportProxy instances its interior the same way (ItemUseFunctions.TeleportProxy
+                // runs ResolveTarget for both), so it must resolve here too or the instance can never be created.
+                if (PortalDoorLandingResolver.TryReadPortal(dynel, out PortalDestination portal)
+                    || PortalDoorLandingResolver.TryReadVicinityProxy(dynel, out portal))
                 {
                     if (portal.Kind != PortalLandingKind.DoorDynel || !portal.RecordsReturn)
                         continue;

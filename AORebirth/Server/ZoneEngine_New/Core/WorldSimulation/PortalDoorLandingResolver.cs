@@ -157,6 +157,21 @@ namespace ZoneEngine_New.Core.WorldSimulation
         }
 
         /// <summary>
+        /// Reads a TeleportProxy a door carries on <see cref="AodbEventType.OnTargetInVicinity"/> instead of walk-in
+        /// (566 door C0070236 into 1137, 655 door C000028F into 1702). Such a door is not a walk-in portal: it fires
+        /// through its vicinity pad, but it records a return and so leads into a per-door interior instance exactly
+        /// as a walk-in TeleportProxy does.
+        /// </summary>
+        public static bool TryReadVicinityProxy(PlayfieldDynel? dynel, out PortalDestination destination)
+        {
+            destination = default;
+            return dynel?.Modifiers != null
+                && dynel.Modifiers.TryGetValue(AodbEventType.OnTargetInVicinity, out Modifier? modifier)
+                && modifier?.Modifiers != null
+                && TryReadProxyPortal(modifier, out destination);
+        }
+
+        /// <summary>
         /// Reads a TeleportProxy / TeleportProxy2 argument list of the form
         /// <c>{PlayfieldDoor, destPlayfieldId, destDoorIndex, ...}</c>. A list that continues
         /// <c>{..., Playfield3, (destinationIndex &lt;&lt; 16) | destPlayfieldId, ...}</c> names a
