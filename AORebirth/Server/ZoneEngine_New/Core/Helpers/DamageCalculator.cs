@@ -1,6 +1,7 @@
 namespace ZoneEngine_New.Core.Helpers
 {
     using System;
+    using System.Linq;
 
     using AORebirth.Enums;
 
@@ -197,7 +198,8 @@ namespace ZoneEngine_New.Core.Helpers
         /// <summary>
         /// Whether a hostile nano lands or is resisted. The nano's Attack skills (its nano skill lines) plus the caster's
         /// Add All Off. make the attack rating; its Defend skills plus the target's Add All Def. make the defense rating.
-        /// A nano without Defend skills defends with Nano Resist. The two ratings go through the weapon hit curve.
+        /// A nano without positively weighted Defend skills has no defense contest and lands without a roll. Nanos
+        /// declaring defense skills send the two ratings through the weapon hit curve.
         /// NOTE: the retail nano-resist formula is not known. This reuses the weapon hit curve so a nano skill against an
         /// equal Nano Resist lands about as often as an equal weapon skill hits; it may need tuning once players report
         /// land rates.
@@ -215,10 +217,14 @@ namespace ZoneEngine_New.Core.Helpers
             ArgumentNullException.ThrowIfNull(nano);
 
             attackRating = ResolveAttackRating(caster, nano);
-            defenseRating = nano.Defend is { Count: > 0 }
-                ? ResolveDefenseRating(target, nano)
-                : NormalizeStat(target.Stats.GetOrZero(CharacterStat.NanoAC))
-                    + NormalizeStat(target.Stats.GetOrZero(CharacterStat.DMSModifier));
+            defenseRating = 0;
+            if (nano.Defend is not { Count: > 0 } || !nano.Defend.Values.Any(static weight => weight > 0))
+            {
+                landChancePercent = 100;
+                return true;
+            }
+
+            defenseRating = ResolveDefenseRating(target, nano);
             double hitPercentage = HitPercentage(attackRating, defenseRating, aggDef: 0);
             landChancePercent = (int)Math.Round(Math.Clamp(hitPercentage, 0, 1) * 100);
             return NextDouble() <= hitPercentage;

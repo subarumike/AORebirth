@@ -1,5 +1,13 @@
 # AORebirth Project State
 
+IMPLEMENTED, CLIENT UNVERIFIED (2026-11-04, Mongo landing): hostile nanos with
+no positively weighted authored defense now land without a defense roll. This
+removes the invented Nano Resist/Add All Def contest from standard Mongo taunt
+children while retaining genuine defense checks and existing target/pet/range
+rules. Four regression cases are added but not executed; source/data inspection
+and compilation are the authorized validation scope. No GameData, production or
+service changes. Exact failed live casts remain uncorrelated.
+
 PROVEN FOCUSED TESTS, CLIENT/LIVE UNVERIFIED (2026-11-04, ChatEngine framing):
 commit `50bf8097bd5970bc9aff85216bddc04569a6281c` assembles native frames across
 TCP chunks, preserves coalesced frames and rejects incomplete string fields.

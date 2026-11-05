@@ -1,5 +1,18 @@
 # Current Task
 
+ACTIVE (2026-11-04): repair Mongo's intermittent landing on `codex/mongo-landing`,
+based on freshly fetched public master `4583042389370a54f3f7b106c53ba82ddcfb6098`.
+Current standard Mongo taunt children declare no attack/defense skills, but
+ResolveNanoLand invents a Nano Resist/Add All Def contest. Remove that invented
+contest for absent/zero-weight defense skills; preserve authored positive
+defenses, target eligibility, pet protection, radius, LOS and strain immunity.
+No GameData, taunt amounts, production access, deployment or service changes.
+Compile within the nano subsystem. Four regression cases are added but may not
+be run without Mike's explicit suite authorization. Actual failed live casts
+have not been correlated to logs; live-client verification remains unverified.
+
+## Retained previous task
+
 IMPLEMENTED AND TESTED (2026-11-04): repair shared ChatEngine TCP framing and incomplete sends
 on `codex/chatengine-framing`, based on freshly fetched public master
 `4457f015e60728fed8eeca304e47486770e66685`. Mike explicitly authorized focused
