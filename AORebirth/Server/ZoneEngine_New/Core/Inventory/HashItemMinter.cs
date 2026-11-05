@@ -32,6 +32,18 @@ namespace ZoneEngine_New.Core.Inventory
         }
 
         /// <summary>
+        /// Drops every per-hash cache. Called after ItemTemplates.json is reloaded: the caches hold leaf ranges, ladder
+        /// tiers and QL spans of the old catalog, so a SpawnItem would otherwise keep minting from the old hash tree.
+        /// </summary>
+        public void ClearCaches()
+        {
+            _qualitySpans.Clear();
+            _leafRanges.Clear();
+            _familySpans.Clear();
+            _ladderTiers.Clear();
+        }
+
+        /// <summary>
         /// Rolls <paramref name="hash"/> into an item carrying a freshly allocated instance id.
         /// </summary>
         public bool TryMint(string hash, int desiredQuality, ItemSource source, out Item item)

@@ -114,9 +114,12 @@ namespace ZoneEngine_New.Core.GameData
 
     /// <summary>
     /// ItemTemplates.json, the hash catalog inside <see cref="GameDataStore"/>. Knubot item conditions resolve hashes
-    /// when the scripts load, so a successful reload reloads Knubot too.
+    /// when the scripts load, so a successful reload reloads Knubot too. The minter's per-hash QL caches were built from
+    /// the old catalog, so they are dropped as well.
     /// </summary>
-    public sealed class ItemTemplatesReload(IGameData gameData, KnubotCatalog knubot) : IReloadableGameData
+    public sealed class ItemTemplatesReload(IGameData gameData, KnubotCatalog knubot,
+        ZoneEngine_New.Core.Inventory.HashItemMinter minter)
+        : IReloadableGameData
     {
         public string Name => "ItemTemplates";
 
@@ -131,6 +134,7 @@ namespace ZoneEngine_New.Core.GameData
             if (!items.Ok)
                 return items;
 
+            minter.ClearCaches();
             KnubotLoadResult scripts = knubot.Reload();
             if (scripts.Problems.Count == 0)
                 return items;
