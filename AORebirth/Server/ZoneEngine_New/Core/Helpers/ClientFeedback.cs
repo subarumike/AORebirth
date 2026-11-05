@@ -199,6 +199,12 @@ namespace ZoneEngine_New.Core.Helpers
         /// </summary>
         public const int LootedItemFrom = 60420421;
 
+        /// <summary>
+        /// Longest 's' argument: the client reads its length as one UTF-8 coded character holding length + 1, and the
+        /// message string goes out as ASCII, so length + 1 must stay a single byte (0x7F).
+        /// </summary>
+        public const int MaxTextArgumentLength = 126;
+
         /// <summary>A text argument the client looks up itself: 'R' + base-85 category + base-85 message id.</summary>
         public readonly record struct TextReference(int Category, int MessageId);
 
@@ -256,8 +262,8 @@ namespace ZoneEngine_New.Core.Helpers
                 else
                 {
                     string value = arg?.ToString() ?? string.Empty;
-                    if (value.Length > 254)
-                        value = value[..254];
+                    if (value.Length > MaxTextArgumentLength)
+                        value = value[..MaxTextArgumentLength];
                     text.Append('s').Append((char)(value.Length + 1)).Append(value);
                 }
             }

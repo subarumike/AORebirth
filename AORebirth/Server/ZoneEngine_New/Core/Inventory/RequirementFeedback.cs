@@ -86,7 +86,7 @@ namespace ZoneEngine_New.Core.Inventory
                     if (sent.Add(messageId + "|" + string.Join("|", args)))
                         ClientFeedback.SendFormatted(player, messageId, args);
                 }
-                else if (Describe(entry, nameOf) is var line && sent.Add(line))
+                else if (Describe(entry, nameOf) is { } line && sent.Add(line))
                 {
                     plain.Add(line);
                 }
@@ -94,6 +94,8 @@ namespace ZoneEngine_New.Core.Inventory
 
             if (plain.Count > 0)
                 SendText(player, "Requirements not met: " + string.Join(", ", plain));
+            else if (sent.Count == 0)
+                ClientFeedback.Send(player, ClientFeedback.CheckItemRequirements);
         }
 
         /// <summary>
@@ -103,7 +105,27 @@ namespace ZoneEngine_New.Core.Inventory
         public static void SendText(Player player, string text)
         {
             ArgumentNullException.ThrowIfNull(player);
-            ClientFeedback.SendFormatted(player, ClientFeedback.PlainText, text);
+            foreach (string line in WrapLines(text ?? string.Empty, ClientFeedback.MaxTextArgumentLength))
+                ClientFeedback.SendFormatted(player, ClientFeedback.PlainText, line);
+        }
+
+        /// <summary>
+        /// <paramref name="text"/> in lines of at most <paramref name="max"/> characters, each one plain text message
+        /// (see <see cref="ClientFeedback.MaxTextArgumentLength"/>). Breaks after ", " first, then at a space.
+        /// </summary>
+        internal static IEnumerable<string> WrapLines(string text, int max)
+        {
+            string rest = text;
+            while (rest.Length > max)
+            {
+                int comma = rest.LastIndexOf(", ", max - 1, StringComparison.Ordinal);
+                int space = rest.LastIndexOf(' ', max);
+                int cut = comma > 0 ? comma + 1 : space > 0 ? space : max;
+                yield return rest[..cut].TrimEnd();
+                rest = rest[cut..].TrimStart();
+            }
+
+            yield return rest;
         }
 
         /// <summary>A nano or item named by its template, when the playfield's catalog has it.</summary>
@@ -171,10 +193,17 @@ namespace ZoneEngine_New.Core.Inventory
         static string Spaced<T>(T value) where T : struct, Enum
             => Regex.Replace(value.ToString(), "(?<=[a-z])(?=[A-Z])", " ");
 
-        /// <summary>A check the client has no line for, in plain words.</summary>
-        static string Describe(UnmetRequirement entry, Func<int, string?> nameOf)
+        /// <summary>
+        /// A check the client has no line for, in plain words. Null for a target test with no wording (it reads no stat,
+        /// so "Flags N (needs Operator 0)" would mean nothing).
+        /// </summary>
+        static string? Describe(UnmetRequirement entry, Func<int, string?> nameOf)
         {
             ItemRequirement requirement = entry.Requirement;
+            // Reads the action's target, whatever subject the leaf sits under.
+            if ((Operator)requirement.Operator == Operator.MustBeCastersPet)
+                return "target must be your pet";
+
             string Named(int id) => nameOf(id) is { Length: > 0 } name ? name : id.ToString(CultureInfo.InvariantCulture);
             string line = requirement.Value.ToString(CultureInfo.InvariantCulture);
             string? state = (Operator)requirement.Operator switch
@@ -194,6 +223,12 @@ namespace ZoneEngine_New.Core.Inventory
             };
             if (state != null)
                 return entry.OnTarget ? "target: " + state : state;
+
+            // Other tests (IsSameAs, IsPet, ...) read no stat. Their leaf can sit under a Not ("not on yourself"), so a
+            // failing leaf need not be what refused the action: say nothing rather than guess.
+            if ((Operator)requirement.Operator is not (Operator.EqualTo or Operator.GreaterThan or Operator.LessThan
+                or Operator.Unequal or Operator.BitAnd or Operator.NotBitAnd or Operator.TestNumPets))
+                return null;
 
             var stat = (CharacterStat)requirement.StatNumber;
             int have = entry.Have;
