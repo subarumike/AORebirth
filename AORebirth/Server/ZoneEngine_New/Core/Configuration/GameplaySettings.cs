@@ -368,8 +368,8 @@ namespace ZoneEngine_New.Core.Configuration
         public bool Enabled { get; init; } = true;
 
         /// <summary>
-        /// Assist radius for an NPC whose spawn point has none (AssistanceRadius 0) or that has no spawn point (summoned,
-        /// GM spawn). 0 keeps those from assisting.
+        /// How far a call for help carries from an attacked NPC whose spawn point has none (AssistanceRadius 0) or that
+        /// has no spawn point (summoned, GM spawn). 0 keeps those from calling for help.
         /// </summary>
         public float DefaultRadius { get; init; }
 
@@ -377,21 +377,21 @@ namespace ZoneEngine_New.Core.Configuration
         public float MaxRadius { get; init; } = 30f;
 
         /// <summary>
-        /// Assist radius against an NPC attacker (not a player's pet) for an NPC whose spawn point has none: NPC-versus-NPC
+        /// Call radius against an NPC attacker (not a player's pet) for an NPC whose spawn point has none: NPC-versus-NPC
         /// fights (a hated family, a guard defending) pull in the victim's kind even where the spawn data gives no radius.
         /// 0 falls back to defaultRadius.
         /// </summary>
         public float NpcVsNpcDefaultRadius { get; init; }
 
         /// <summary>
-        /// Assist radius for a guard answering another guard of its side, whatever the attacker (a player of their own
-        /// side included), when its spawn point gives none. Guard spawns mostly carry AssistanceRadius 0, and a player
+        /// Call radius between guards of one side, whatever the attacker (a player of their own side included), when
+        /// the attacked guard's spawn point gives none. Guard spawns mostly carry AssistanceRadius 0, and a player
         /// attacker otherwise falls to <see cref="DefaultRadius"/>. 0 falls back to the other defaults.
         /// </summary>
         public float GuardDefaultRadius { get; init; }
 
         /// <summary>
-        /// The radius a helper with <paramref name="assistanceRadius"/> from its spawn point comes from;
+        /// How far the call of an attacked NPC with <paramref name="assistanceRadius"/> from its spawn point reaches;
         /// <paramref name="npcAttacker"/> when the enemy is an NPC that is not a player's pet, <paramref name="guards"/>
         /// when a guard is answering a guard.
         /// </summary>

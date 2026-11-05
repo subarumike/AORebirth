@@ -532,8 +532,8 @@ namespace ZoneEngine_New.Core.Ai
         }
 
         /// <summary>
-        /// Social aggro (Gameplay.json socialAggro): NPCs near this one that are of its kind join the fight against
-        /// <paramref name="attacker"/>, nearest first. Runs once per new attacker.
+        /// Social aggro (Gameplay.json socialAggro): NPCs of its kind within this NPC's spawn point AssistanceRadius join
+        /// the fight against <paramref name="attacker"/>, nearest first. Runs once per new attacker.
         /// </summary>
         void CallForHelp(Identity attacker)
         {
@@ -551,6 +551,9 @@ namespace ZoneEngine_New.Core.Ai
             // A guard's call reaches every guard of its side (socialAggro.guardDefaultRadius), whoever the attacker is: a
             // player of their own side that turns on one guard has the rest on it, not just the one it hit.
             bool guardCall = Npc.MobTemplate?.Has(Mobs.NpcFeature.Guard) == true;
+            // The caller's spawn point AssistanceRadius is how far its call carries: a boss with a wide radius pulls in
+            // its retinue, but a retinue mob with a short one does not reach the boss beside it.
+            int callRadius = SpawnAssistanceRadius();
             playfield.GetRequiredService<ZoneEngine_New.Core.Playfield.Locality.PlayfieldLocality>().CollectNearby(Npc, rules.SearchRadius, _nearbyNpcs);
             _helpers.Clear();
             for (int i = 0; i < _nearbyNpcs.Count; i++)
@@ -570,7 +573,7 @@ namespace ZoneEngine_New.Core.Ai
                     continue;
 
                 double distance = Npc.GetEdgeDistanceTo(other);
-                if (distance > rules.RadiusFor(brain.SpawnAssistanceRadius(), npcAttacker, guards) || !ZoneEngine_New.Core.Helpers.CombatRules.CanAttack(other, enemy))
+                if (distance > rules.RadiusFor(callRadius, npcAttacker, guards) || !ZoneEngine_New.Core.Helpers.CombatRules.CanAttack(other, enemy))
                     continue;
                 if (rules.RequireLineOfSight && !other.HasLineOfSightTo(Npc))
                     continue;
