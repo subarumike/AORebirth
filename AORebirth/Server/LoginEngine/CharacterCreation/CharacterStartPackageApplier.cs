@@ -44,6 +44,9 @@ namespace LoginEngine.CharacterCreation
 
             IReadOnlyList<CharacterStartPackageItem> items = package.Items;
             IReadOnlyList<int> nanos = package.UploadedNanos;
+            foreach (CharacterStartPackageItem item in items)
+                if (item.Variants.Count != 0 || item.LowId <= 0 || item.HighId <= 0)
+                    throw new InvalidOperationException("Resolve starting item variants before applying the package.");
             if (items.Count == 0 && nanos.Count == 0)
                 return;
 

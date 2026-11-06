@@ -746,10 +746,25 @@
         },
         {
           "placement": 72,
-          "lowId": 297665,
-          "highId": 297665,
           "quality": 1,
-          "count": 1
+          "count": 1,
+          "variants": [
+            {
+              "gender": "Female",
+              "lowId": 297665,
+              "highId": 297665
+            },
+            {
+              "gender": "Male",
+              "lowId": 297666,
+              "highId": 297666
+            },
+            {
+              "gender": "Neutral",
+              "lowId": 297667,
+              "highId": 297667
+            }
+          ]
         }
       ],
       "uploadedNanos": []

@@ -335,6 +335,9 @@ namespace LoginEngine.Packets
             if (breedAbilities.Gender is int breedGender)
                 this.Gender = breedGender;
 
+            // Resolve editable item variants against the final breed-normalized gender before opening a transaction.
+            startPackage = startPackage.ResolveForGender(this.Gender);
+
             List<DBStats> stats = new List<DBStats>();
             foreach (StatValue starterStat in starter.Stats)
             {

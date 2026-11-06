@@ -85,19 +85,17 @@ namespace AORebirth.Database.Domain.CharacterCreation
                     for (int j = 0; j < row.Items.Length; j++)
                     {
                         ItemRow item = row.Items[j];
-                        if (item == null || item.LowId <= 0 || item.HighId <= 0
-                            || item.Quality <= 0 || item.Count <= 0
+                        if (item == null || item.Quality <= 0 || item.Count <= 0
                             || item.Placement < InventoryFirstSlot
                             || item.Placement >= InventoryFirstSlot + InventorySlotCount)
                             throw InvalidCatalog("professionId=" + row.ProfessionId + ", items[" + j
-                                + "] needs positive item IDs, quality and count, and an inventory placement from "
+                                + "] needs positive quality and count, and an inventory placement from "
                                 + InventoryFirstSlot + " to " + (InventoryFirstSlot + InventorySlotCount - 1) + ".");
                         if (!placements.Add(item.Placement))
                             throw InvalidCatalog("professionId=" + row.ProfessionId
                                 + " repeats inventory placement " + item.Placement + ".");
 
-                        items.Add(new CharacterStartPackageItem(
-                            item.Placement, item.LowId, item.HighId, item.Quality, item.Count));
+                        items.Add(ReadItem(item, "professionId=" + row.ProfessionId + ", items[" + j + "]"));
                     }
 
                     var nanos = new List<int>();
@@ -125,6 +123,40 @@ namespace AORebirth.Database.Domain.CharacterCreation
                 _cached = new CharacterStartPackageCatalog(packages);
                 return _cached;
             }
+        }
+
+        CharacterStartPackageItem ReadItem(ItemRow item, string context)
+        {
+            if (item.Variants == null)
+            {
+                if (item.LowId <= 0 || item.HighId <= 0)
+                    throw InvalidCatalog(context + " needs positive lowId and highId, or gender variants.");
+                return new CharacterStartPackageItem(item.Placement, item.LowId, item.HighId, item.Quality, item.Count);
+            }
+
+            if (item.LowId != 0 || item.HighId != 0 || item.Variants.Length == 0)
+                throw InvalidCatalog(context + " variants must be nonempty and cannot be combined with lowId/highId.");
+
+            var variants = new List<CharacterStartPackageItem.Variant>();
+            var genders = new HashSet<int>();
+            foreach (VariantRow variant in item.Variants)
+            {
+                Gender gender;
+                if (variant == null || variant.LowId <= 0 || variant.HighId <= 0
+                    || !Enum.TryParse(variant.Gender, true, out gender) || gender == Gender.None
+                    || !Enum.IsDefined(typeof(Gender), gender)
+                    || !string.Equals(variant.Gender, Enum.GetName(typeof(Gender), gender), StringComparison.OrdinalIgnoreCase))
+                    throw InvalidCatalog(context + " variants need a named character gender and positive lowId/highId.");
+                if (!genders.Add((int)gender))
+                    throw InvalidCatalog(context + " repeats variant gender " + gender + ".");
+                variants.Add(new CharacterStartPackageItem.Variant((int)gender, variant.LowId, variant.HighId));
+            }
+
+            foreach (Gender gender in Enum.GetValues(typeof(Gender)))
+                if (gender != Gender.None && !genders.Contains((int)gender))
+                    throw InvalidCatalog(context + " has no variant for gender " + gender + ".");
+
+            return new CharacterStartPackageItem(item.Placement, item.Quality, item.Count, variants.AsReadOnly());
         }
 
         InvalidDataException InvalidCatalog(string reason) => new InvalidDataException(_path + ": " + reason);
@@ -191,6 +223,22 @@ namespace AORebirth.Database.Domain.CharacterCreation
 
             [DataMember(Name = "count")]
             public int Count { get; set; }
+
+            [DataMember(Name = "variants")]
+            public VariantRow[] Variants { get; set; }
+        }
+
+        [DataContract]
+        sealed class VariantRow
+        {
+            [DataMember(Name = "gender")]
+            public string Gender { get; set; }
+
+            [DataMember(Name = "lowId")]
+            public int LowId { get; set; }
+
+            [DataMember(Name = "highId")]
+            public int HighId { get; set; }
         }
     }
 }
