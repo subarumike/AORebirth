@@ -86,6 +86,25 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>The character that summoned this pet; null for ordinary NPCs.</summary>
         public Character? PetOwner => Pet?.Owner;
 
+        /// <summary>
+        /// Allied combat (MustAlliedCombat / MustNotAlliedCombat) read on this NPC: a player's pet shares its owner's
+        /// allies (the owner, the owner's pets, the owner's team and their pets); any other NPC is its own only ally.
+        /// Health and Nano Recharger 291082 aims MustNotAlliedCombat at its target, which may be the user's pet.
+        /// Every other leaf goes to <see cref="Character.ResolveRequirement"/>.
+        /// </summary>
+        public override bool? ResolveRequirement(ItemRequirement requirement)
+        {
+            ArgumentNullException.ThrowIfNull(requirement);
+            return (Operator)requirement.Operator switch
+            {
+                Operator.MustNotAlliedCombat => !IsAlliedInCombat(),
+                Operator.MustAlliedCombat => IsAlliedInCombat(),
+                _ => base.ResolveRequirement(requirement)
+            };
+        }
+
+        bool IsAlliedInCombat() => PetOwner is Player owner ? owner.IsAlliedInCombat() : IsInCombat;
+
         /// <summary>Makes this NPC a pet. Called before it is first sent, so observers get it as one.</summary>
         internal void BindPet(Pets.PetController controller)
         {
