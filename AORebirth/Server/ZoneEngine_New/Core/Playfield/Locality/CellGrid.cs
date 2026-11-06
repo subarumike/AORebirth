@@ -355,6 +355,20 @@ namespace ZoneEngine_New.Core.Playfield.Locality
                 yield return dynel;
         }
 
+        /// <summary>Appends every occupant of type <typeparamref name="T"/> in every cell, without allocating.</summary>
+        internal void CollectAllOccupants<T>(List<T> results)
+            where T : Dynel
+        {
+            foreach (KeyValuePair<int, Cell> pair in _cells)
+            {
+                foreach (Dynel dynel in pair.Value.OccupantSet)
+                {
+                    if (dynel is T typed)
+                        results.Add(typed);
+                }
+            }
+        }
+
         internal IEnumerable<Dynel> OccupantsInAllCells()
         {
             foreach (KeyValuePair<int, Cell> pair in _cells)

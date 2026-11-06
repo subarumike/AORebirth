@@ -207,13 +207,18 @@ namespace ZoneEngine_New.Core.WorldSimulation
             if (locality == null)
                 return;
 
+            // Indoors and in dungeons every door's neighbourhood is the whole playfield: collect it once, not per door.
+            bool shared = locality.NearbyIsWholePlayfield;
+            if (shared)
+                locality.CollectAll(_nearby);
+
             bool changed = false;
             foreach (Blocker d in _blockers)
             {
                 if (d.IsLocked && !d.IsOpen)
                     continue;
 
-                bool touched = IsTouched(locality, d, out bool sendOpen, out bool sendClose);
+                bool touched = IsTouched(locality, d, shared, out bool sendOpen, out bool sendClose);
                 if (touched && !d.IsOpen)
                 {
                     d.Open();
@@ -243,12 +248,13 @@ namespace ZoneEngine_New.Core.WorldSimulation
         /// <paramref name="sendClose"/>: one left without being seen to move out - it is neither inside nor just outside
         /// now (it despawned or died there).
         /// </summary>
-        bool IsTouched(PlayfieldLocality locality, Blocker d, out bool sendOpen, out bool sendClose)
+        bool IsTouched(PlayfieldLocality locality, Blocker d, bool sharedNearby, out bool sendOpen, out bool sendClose)
         {
             sendOpen = false;
             float reach = d.Radius + _touchRadius;
             float watch = reach + ApproachMargin;
-            locality.CollectNear(new AoVector3(d.X, d.Y, d.Z), watch, _nearby);
+            if (!sharedNearby)
+                locality.CollectNear(d.Position, watch, _nearby);
             d.NextInContact.Clear();
             d.NextApproaching.Clear();
             foreach (Character character in _nearby)
@@ -327,6 +333,7 @@ namespace ZoneEngine_New.Core.WorldSimulation
                 X = position.xf;
                 Y = position.yf;
                 Z = position.zf;
+                Position = new AoVector3(X, Y, Z);
                 Radius = radius;
                 CenterY = centerY;
                 Height = 2f * centerY;
@@ -344,6 +351,10 @@ namespace ZoneEngine_New.Core.WorldSimulation
             public float X { get; }
             public float Y { get; }
             public float Z { get; }
+
+            /// <summary>The panel's position as a locality query point, built once (the door never moves).</summary>
+            public AoVector3 Position { get; }
+
             public float Radius { get; }
             public float CenterY { get; }
             public float Height { get; }

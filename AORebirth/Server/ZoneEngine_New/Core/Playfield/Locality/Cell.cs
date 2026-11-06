@@ -25,6 +25,9 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
         public IReadOnlyCollection<Dynel> Occupants => _occupants;
 
+        /// <summary>The occupants for an allocation-free foreach on a hot path (struct enumerator). Never modify it.</summary>
+        internal HashSet<Dynel> OccupantSet => _occupants;
+
         internal int OccupantCount => _occupants.Count;
 
         internal void Add(Dynel dynel)

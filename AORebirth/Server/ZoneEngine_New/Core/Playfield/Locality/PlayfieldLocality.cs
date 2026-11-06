@@ -64,14 +64,9 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             ArgumentNullException.ThrowIfNull(results);
             results.Clear();
 
-            if (!_grid.IsOutdoor || _grid.IsDungeon)
+            if (NearbyIsWholePlayfield)
             {
-                foreach (Dynel dynel in _grid.OccupantsInAllCells())
-                {
-                    if (dynel is T typed)
-                        results.Add(typed);
-                }
-
+                _grid.CollectAllOccupants(results);
                 return;
             }
 
@@ -89,14 +84,9 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             ArgumentNullException.ThrowIfNull(results);
             results.Clear();
 
-            if (!_grid.IsOutdoor || _grid.IsDungeon)
+            if (NearbyIsWholePlayfield)
             {
-                foreach (Dynel dynel in _grid.OccupantsInAllCells())
-                {
-                    if (dynel is T typed)
-                        results.Add(typed);
-                }
-
+                _grid.CollectAllOccupants(results);
                 return;
             }
 
@@ -114,12 +104,27 @@ namespace ZoneEngine_New.Core.Playfield.Locality
             {
                 if (!_grid.TryGetCell(_nearbyCellBuffer[i], out Cell cell))
                     continue;
-                foreach (Dynel dynel in cell.Occupants)
+                foreach (Dynel dynel in cell.OccupantSet)
                 {
                     if (dynel is T typed)
                         results.Add(typed);
                 }
             }
+        }
+
+        /// <summary>
+        /// Indoors and in dungeons every occupant is nearby: <see cref="CollectNear{T}"/> and
+        /// <see cref="CollectNearby{T}(Dynel, float, List{T})"/> return the whole playfield wherever they are asked.
+        /// </summary>
+        internal bool NearbyIsWholePlayfield => !_grid.IsOutdoor || _grid.IsDungeon;
+
+        /// <summary>Every occupant of type <typeparamref name="T"/> in the playfield, without allocating. Tick thread only.</summary>
+        internal void CollectAll<T>(List<T> results)
+            where T : Dynel
+        {
+            ArgumentNullException.ThrowIfNull(results);
+            results.Clear();
+            _grid.CollectAllOccupants(results);
         }
 
         /// <summary>
