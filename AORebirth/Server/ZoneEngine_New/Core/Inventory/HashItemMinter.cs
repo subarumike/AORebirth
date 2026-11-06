@@ -224,7 +224,7 @@ namespace ZoneEngine_New.Core.Inventory
         /// (the mob's level ± the table row's LevelMod), rolled at <paramref name="rolledQuality"/>. An ordinary family drops
         /// only when its QL range overlaps the window, at the roll clamped into its range. A Special family
         /// (<see cref="ItemFlags.Special"/>) ignores the window: below its range it drops at its lowest QL, above at its
-        /// highest. So does a family with no QL range (nano crystals, quest items, tokens): it drops at its own QL. A QL ladder (spirits, symbiants: see <see cref="GetLadderTiers"/>) does not: it picks only its tiers
+        /// highest. A QL ladder (spirits, symbiants: see <see cref="GetLadderTiers"/>) does not: it picks only its tiers
         /// in the window, or the tier just below it. Appends to <paramref name="into"/>.
         /// </summary>
         public void RollSpawnIds(
@@ -249,7 +249,7 @@ namespace ZoneEngine_New.Core.Inventory
             {
                 // A leaf listed directly is not filtered by the pick above.
                 FamilySpan span = GetFamilySpan(instances[i]);
-                if (span.Min > span.Max || (!span.IgnoresWindow && (span.Max < min || span.Min > max)))
+                if (span.Min > span.Max || (!span.Special && (span.Max < min || span.Min > max)))
                     continue;
 
                 if (TryRollIdsFor(instances[i], Math.Clamp(roll, span.Min, span.Max), out int lowId, out int highId, out int quality))
@@ -360,7 +360,7 @@ namespace ZoneEngine_New.Core.Inventory
 
         /// <summary>
         /// True when some leaf family reachable from <paramref name="hash"/> can drop for the QL window
-        /// <paramref name="min"/>..<paramref name="max"/>: its QL range overlaps the window, or it is Special or fixed-QL.
+        /// <paramref name="min"/>..<paramref name="max"/>: its QL range overlaps the window, or it is Special.
         /// </summary>
         bool CoversWindow(string hash, int min, int max)
         {
@@ -389,7 +389,7 @@ namespace ZoneEngine_New.Core.Inventory
                 FamilySpan family = GetFamilySpan(instance);
                 spans = family.Min > family.Max
                     ? Array.Empty<QualitySpan>()
-                    : new[] { family.IgnoresWindow ? new QualitySpan(int.MinValue, int.MaxValue) : new QualitySpan(family.Min, family.Max) };
+                    : new[] { family.Special ? new QualitySpan(int.MinValue, int.MaxValue) : new QualitySpan(family.Min, family.Max) };
             }
             else if (_gameData.TryGetHashTemplate(hash, out IReadOnlyList<string> children))
             {
@@ -433,14 +433,7 @@ namespace ZoneEngine_New.Core.Inventory
 
         readonly record struct QualitySpan(int Min, int Max);
 
-        readonly record struct FamilySpan(int Min, int Max, bool Special)
-        {
-            /// <summary>
-            /// The family drops whatever the mob's QL window: it is Special, or it has no QL range (one QL), so it can
-            /// only ever drop at its own QL. Only a scaling family (Min &lt; Max) is filtered by the window.
-            /// </summary>
-            public bool IgnoresWindow => Special || Min == Max;
-        }
+        readonly record struct FamilySpan(int Min, int Max, bool Special);
 
         readonly record struct LeafRange(HashInstance Instance, int Min, int Max);
 
