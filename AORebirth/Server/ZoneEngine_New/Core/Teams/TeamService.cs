@@ -57,7 +57,8 @@ namespace ZoneEngine_New.Core.Teams
             public int Leader;
             public bool ExplicitLeadershipTransfer;
             public bool IsRaid;
-            public bool ChatJoined;
+            // The team chat channel joined (ClientTeamId: in a raid, the raid group's own channel); 0 when none.
+            public int ChatChannel;
             public bool RaidChatJoined;
             public int TeamLevel;
         }
@@ -162,7 +163,7 @@ namespace ZoneEngine_New.Core.Teams
                     Leader = mirror.Leader,
                     ExplicitLeadershipTransfer = mirror.ExplicitLeadershipTransfer,
                     IsRaid = mirror.IsRaid,
-                    ChatJoined = true,
+                    ChatChannel = ClientTeamId(mirror, player.Identity.Instance),
                     RaidChatJoined = mirror.IsRaid
                 };
                 foreach (int id in mirror.Members) published.Members[id] = mirror.IsRaid ? RaidListOf(mirror, id) : -1;
@@ -702,7 +703,7 @@ namespace ZoneEngine_New.Core.Teams
                 {
                     if (!_stopped && _membership.TryGetValue(characterId, out Team? team))
                     {
-                        ChatCommand(characterId, "#aorebirth-team-join " + team.Id);
+                        ChatCommand(characterId, "#aorebirth-team-join " + ClientTeamId(team, characterId));
                         if (team.IsRaid) ChatCommand(characterId, "#aorebirth-raid-convert " + team.Id);
                     }
                 }
@@ -1022,10 +1023,13 @@ namespace ZoneEngine_New.Core.Teams
             if (!PublishTeamLevelNow(viewer, published, team)) return;
             published.Leader = team.Leader;
             published.ExplicitLeadershipTransfer = team.ExplicitLeadershipTransfer;
-            if (!published.ChatJoined)
+            // Team chat is the immediate team: in a raid, the viewer's raid group. ChatEngine's team-join leaves the
+            // previous group's channel, so a raid move switches team chat with it.
+            int chatChannel = ClientTeamId(team, viewerId);
+            if (published.ChatChannel != chatChannel)
             {
-                ChatCommand(viewerId, "#aorebirth-team-join " + team.Id);
-                published.ChatJoined = true;
+                ChatCommand(viewerId, "#aorebirth-team-join " + chatChannel);
+                published.ChatChannel = chatChannel;
             }
             if (team.IsRaid && !published.IsRaid
                 && SendNow(viewer, new RaidMessage { Identity = viewer.Identity, Unknown = 0, Unknown1 = 0 }))
@@ -1247,7 +1251,10 @@ namespace ZoneEngine_New.Core.Teams
             ChatCommand(id, "#aorebirth-team-leave " + teamId);
             if (_publishedRosters.TryGetValue(id, out PublishedRoster? published) && published.TeamId == teamId)
             {
-                published.ChatJoined = false;
+                // A raid group's own team channel (team id + group) is not covered by the team id's leave.
+                if (published.ChatChannel != 0 && published.ChatChannel != teamId)
+                    ChatCommand(id, "#aorebirth-team-leave " + published.ChatChannel);
+                published.ChatChannel = 0;
                 published.RaidChatJoined = false;
             }
         }

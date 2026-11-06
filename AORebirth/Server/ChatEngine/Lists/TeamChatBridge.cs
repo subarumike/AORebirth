@@ -1,6 +1,7 @@
 namespace ChatEngine.Lists
 {
     using System;
+    using System.Linq;
 
     using AORebirth.Communication.Messages;
 
@@ -65,8 +66,17 @@ namespace ChatEngine.Lists
                 return true;
             }
 
-            TeamChannel channel = GetOrCreateTeamChannel(server, teamId);
-            channel.AddClient(client);
+            // A character is in one team chat at a time. In a raid each raid group has its own team channel (raid team
+            // id + group index), so moving between groups or teams leaves the previous team chat here.
+            foreach (ChannelBase joined in client.Channels.ToArray())
+            {
+                if (joined.channelType == ChannelType.Team && joined.ChannelId != teamId)
+                {
+                    RemoveClientFromChannel(server, client, ChannelType.Team, joined.ChannelId);
+                }
+            }
+
+            GetOrCreateTeamChannel(server, teamId).AddClient(client);
             return true;
         }
 
@@ -78,33 +88,12 @@ namespace ChatEngine.Lists
                 return true;
             }
 
-            RaidChannel raidChannel = GetOrCreateRaidChannel(server, teamId);
-            TeamChannel teamChannel = FindChannel(server, ChannelType.Team, teamId) as TeamChannel;
-            if (teamChannel != null)
-            {
-                foreach (IClient connected in teamChannel.SnapshotConnectedClients())
-                {
-                    Client client = connected as Client;
-                    if (client == null)
-                    {
-                        continue;
-                    }
-
-                    teamChannel.RemoveClient(client);
-                    client.Channels.Remove(teamChannel);
-                    raidChannel.AddClient(client);
-                }
-
-                DropIfEmpty(server, teamChannel);
-            }
-
-            // Capture: every convert notifies each teammate's chat. Do not rely on Team
-            // channel membership alone — cross-PF members may miss Team join.
+            // Capture: every convert notifies each teammate's chat, so each member joins the raid channel on its own
+            // command. Team chat stays: the zone keeps each member in its raid group's team channel (team-join).
             Client commandClient = ResolveClient(server, chatCommand.CharacterId);
             if (commandClient != null)
             {
-                RemoveClientFromChannel(server, commandClient, ChannelType.Team, teamId);
-                raidChannel.AddClient(commandClient);
+                GetOrCreateRaidChannel(server, teamId).AddClient(commandClient);
             }
 
             return true;
