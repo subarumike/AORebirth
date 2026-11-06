@@ -169,12 +169,22 @@ namespace ZoneEngine_New.Core.Entities
 
         public string Name { get; }
 
-        /// <summary>Lifetime sent on CFU; units are centiseconds.</summary>
+        /// <summary>Full lifetime at death; units are centiseconds. CFU sends what is left of it.</summary>
         public int TimeExist { get; }
 
         public DateTime ExpiresAtUtc { get; }
 
         public bool IsExpired => DateTime.UtcNow >= ExpiresAtUtc;
+
+        /// <summary>
+        /// Lifetime left, in centiseconds. A client that loads the corpse after it spawned starts its decay countdown
+        /// from the TimeExist it is sent, so it must be told what remains, not the full lifetime.
+        /// </summary>
+        int RemainingTimeExist()
+        {
+            double remaining = Math.Ceiling((ExpiresAtUtc - DateTime.UtcNow).TotalMilliseconds / 10.0);
+            return (int)Math.Clamp(remaining, 0, TimeExist);
+        }
 
         Dictionary<CharacterStat, int> SourceStats { get; } = new();
 
@@ -367,7 +377,7 @@ namespace ZoneEngine_New.Core.Entities
                 if (playerCatMesh != 0)
                     stats.Add(Tuple(CharacterStat.CATMesh, playerCatMesh));
                 stats.Add(Tuple(CharacterStat.Cash, 0));
-                stats.Add(Tuple(CharacterStat.TimeExist, TimeExist));
+                stats.Add(Tuple(CharacterStat.TimeExist, RemainingTimeExist()));
                 stats.Add(Tuple(CharacterStat.DeadTimer, PlayerDeadTimer));
                 AddCopied(stats, CharacterStat.HeadMesh);
                 return stats.ToArray();
@@ -378,7 +388,7 @@ namespace ZoneEngine_New.Core.Entities
 
             AddCopied(stats, CharacterStat.Cash);
             AddCopied(stats, CharacterStat.HeadMesh);
-            stats.Add(Tuple(CharacterStat.TimeExist, TimeExist));
+            stats.Add(Tuple(CharacterStat.TimeExist, RemainingTimeExist()));
             stats.Add(Tuple(CharacterStat.DeadTimer, DefaultDeadTimer));
 
             return stats.ToArray();
