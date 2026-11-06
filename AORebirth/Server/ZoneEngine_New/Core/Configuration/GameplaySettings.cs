@@ -32,6 +32,12 @@ namespace ZoneEngine_New.Core.Configuration
         public GameplayLocation? StuckLocation { get; init; }
 
         /// <summary>
+        /// Playfields (tutorial-island style zones) where /stuck sends the player to their respawn point (save point,
+        /// else the new-character start) instead of <see cref="StuckLocation"/>.
+        /// </summary>
+        public IReadOnlyList<int> StuckToRespawnPlayfields { get; init; } = Array.Empty<int>();
+
+        /// <summary>
         /// A reload takes rounds from a stack of the weapon's ammo. Off, clips still run dry and reload (with the same
         /// pause), but fill without any ammo in the inventory.
         /// </summary>
@@ -127,10 +133,21 @@ namespace ZoneEngine_New.Core.Configuration
                 throw new InvalidDataException(path + ": stuckCooldownSeconds must not be negative.");
             if (StuckLocation is not GameplayLocation stuck || !stuck.IsValid)
                 throw new InvalidDataException(path + ": stuckLocation needs a positive playfield and finite x, y, z.");
+            if (StuckToRespawnPlayfields == null)
+                throw new InvalidDataException(path + ": stuckToRespawnPlayfields must be a list (or omitted).");
+            foreach (int playfield in StuckToRespawnPlayfields)
+            {
+                if (playfield <= 0)
+                    throw new InvalidDataException(path + ": stuckToRespawnPlayfields entries must be positive playfield ids.");
+            }
             if (!double.IsFinite(ZoneInGraceSeconds) || ZoneInGraceSeconds < 0)
                 throw new InvalidDataException(path + ": zoneInGraceSeconds must be a finite number, 0 or more.");
             if (Xp == null || !double.IsFinite(Xp.KillPercentPerLevelDifference) || Xp.KillPercentPerLevelDifference < 0)
                 throw new InvalidDataException(path + ": xp.killPercentPerLevelDifference must be a finite, non-negative number.");
+            if (!double.IsFinite(Xp.GlobalModifier) || Xp.GlobalModifier < 0)
+                throw new InvalidDataException(path + ": xp.globalModifier must be a finite, non-negative multiplier.");
+            if (!double.IsFinite(Xp.ShadowlandsModifier) || Xp.ShadowlandsModifier < 0)
+                throw new InvalidDataException(path + ": xp.shadowlandsModifier must be a finite, non-negative multiplier.");
             if (!double.IsFinite(Xp.SideBonusPercent) || Xp.SideBonusPercent < 0 || Xp.SideBonusPercent > short.MaxValue / 100d)
                 throw new InvalidDataException(path + ": xp.sideBonusPercent must fit the non-negative, hundredths-of-percent InfoPacket field.");
             if (Xp.Caps == null || !Xp.Caps.IsValid)
@@ -176,6 +193,9 @@ namespace ZoneEngine_New.Core.Configuration
                 || SocialAggro.MaxRadius >= Ai.NpcAiRules.MaxLeashRange)
                 throw new InvalidDataException(path + ": socialAggro.defaultRadius, npcVsNpcDefaultRadius, guardDefaultRadius and maxRadius must be 0 up to below the "
                     + Ai.NpcAiRules.MaxLeashRange + " m leash range.");
+            if (!float.IsFinite(SocialAggro.ThreatOnlyRadiusPercent) || SocialAggro.ThreatOnlyRadiusPercent < 0
+                || SocialAggro.ThreatOnlyRadiusPercent > 100)
+                throw new InvalidDataException(path + ": socialAggro.threatOnlyRadiusPercent must be 0 to 100.");
             if (SocialAggro.MaxHelpers < 0)
                 throw new InvalidDataException(path + ": socialAggro.maxHelpers must be 0 (no limit) or more.");
             if (Pets == null || !float.IsFinite(Pets.OwnerThreatSharePercent) || Pets.OwnerThreatSharePercent < 0)
@@ -368,8 +388,8 @@ namespace ZoneEngine_New.Core.Configuration
         public bool Enabled { get; init; } = true;
 
         /// <summary>
-        /// Assist radius for an NPC whose spawn point has none (AssistanceRadius 0) or that has no spawn point (summoned,
-        /// GM spawn). 0 keeps those from assisting.
+        /// How far a call for help carries from an attacked NPC whose spawn point has none (AssistanceRadius 0) or that
+        /// has no spawn point (summoned, GM spawn). 0 keeps those from calling for help.
         /// </summary>
         public float DefaultRadius { get; init; }
 
@@ -377,31 +397,40 @@ namespace ZoneEngine_New.Core.Configuration
         public float MaxRadius { get; init; } = 30f;
 
         /// <summary>
-        /// Assist radius against an NPC attacker (not a player's pet) for an NPC whose spawn point has none: NPC-versus-NPC
+        /// Call radius against an NPC attacker (not a player's pet) for an NPC whose spawn point has none: NPC-versus-NPC
         /// fights (a hated family, a guard defending) pull in the victim's kind even where the spawn data gives no radius.
         /// 0 falls back to defaultRadius.
         /// </summary>
         public float NpcVsNpcDefaultRadius { get; init; }
 
         /// <summary>
-        /// Assist radius for a guard answering another guard of its side, whatever the attacker (a player of their own
-        /// side included), when its spawn point gives none. Guard spawns mostly carry AssistanceRadius 0, and a player
+        /// Call radius between guards of one side, whatever the attacker (a player of their own side included), when
+        /// the attacked guard's spawn point gives none. Guard spawns mostly carry AssistanceRadius 0, and a player
         /// attacker otherwise falls to <see cref="DefaultRadius"/>. 0 falls back to the other defaults.
         /// </summary>
         public float GuardDefaultRadius { get; init; }
 
         /// <summary>
-        /// The radius a helper with <paramref name="assistanceRadius"/> from its spawn point comes from;
+        /// How far the call of an attacked NPC with <paramref name="assistanceRadius"/> from its spawn point reaches;
         /// <paramref name="npcAttacker"/> when the enemy is an NPC that is not a player's pet, <paramref name="guards"/>
         /// when a guard is answering a guard.
         /// </summary>
-        public float RadiusFor(int assistanceRadius, bool npcAttacker = false, bool guards = false)
+        public float RadiusFor(int assistanceRadius, bool npcAttacker = false, bool guards = false, bool threatOnly = false)
         {
             float fallback = guards && GuardDefaultRadius > 0 ? GuardDefaultRadius
                 : npcAttacker && NpcVsNpcDefaultRadius > 0 ? NpcVsNpcDefaultRadius
                 : DefaultRadius;
-            return Math.Min(assistanceRadius > 0 ? assistanceRadius : fallback, MaxRadius);
+            float radius = Math.Min(assistanceRadius > 0 ? assistanceRadius : fallback, MaxRadius);
+            // Guards answering a guard are one force: a taunt on one still brings the rest at the full radius.
+            return threatOnly && !guards ? radius * ThreatOnlyRadiusPercent / 100f : radius;
         }
+
+        /// <summary>
+        /// Percent of the call radius when the attacker's first threat was not damage (a taunt, a debuff, a hostile
+        /// nano that did no damage, the NPC's own proximity aggro on a player). The attacker's first damage afterwards calls again at the full radius. Guards
+        /// answering a guard always come from the full radius. 100 leaves it as it is.
+        /// </summary>
+        public float ThreatOnlyRadiusPercent { get; init; } = 100f;
 
         /// <summary>The farthest any helper can come: how far a call for help has to look.</summary>
         public float SearchRadius => Math.Max(Math.Max(Math.Max(DefaultRadius, NpcVsNpcDefaultRadius), GuardDefaultRadius), MaxRadius);
@@ -505,6 +534,21 @@ namespace ZoneEngine_New.Core.Configuration
     /// <summary>The xp section of Gameplay.json.</summary>
     public sealed class GameplayXp
     {
+        /// <summary>
+        /// Multiplier on every regular XP grant (kill, quest, tradeskill, daily and mission rewards), before the side bonus
+        /// and the per-grant caps. 1.0 leaves XP unchanged. Alien XP is not affected.
+        /// </summary>
+        public double GlobalModifier { get; init; } = 1.0;
+
+        /// <summary>
+        /// Extra multiplier, on top of <see cref="GlobalModifier"/>, for regular XP earned on a Shadowlands playfield
+        /// (ExpansionPlayfield 1, <see cref="Entities.PlayfieldEntryFlags"/>). 1.0 leaves it unchanged.
+        /// </summary>
+        public double ShadowlandsModifier { get; init; } = 1.0;
+
+        /// <summary>The regular XP multiplier on a playfield that is (or is not) in the Shadowlands.</summary>
+        public double RateMultiplier(bool shadowlands) => GlobalModifier * (shadowlands ? ShadowlandsModifier : 1.0);
+
         /// <summary>Flat Side XP bonus for every player's regular kill and quest XP. 0 disables it.</summary>
         public double SideBonusPercent { get; init; }
 

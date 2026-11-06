@@ -45,6 +45,12 @@ public sealed class KnubotTradeFile
     public KnubotTradeItemFile[] Items { get; set; } = [];
     public int Credits { get; set; }
 
+    /// <summary>
+    /// The NPC only looks: the trade matches as usual, nothing is taken, everything offered goes back as on a refusal,
+    /// and the trade's line runs (Alex Gibbs' FOUD, "You should hold onto that trinket"). Needs Items and no Credits.
+    /// </summary>
+    public bool InspectItems { get; set; }
+
     /// <summary>A line id, <c>close</c>, or <c>opener</c>, as on a reply.</summary>
     public string Goto { get; set; } = string.Empty;
 }
@@ -154,11 +160,12 @@ public sealed class KnubotScript(string id, string[] npcs, KnubotOpener[] opener
 
     /// <summary>
     /// The Give Item window's slots: enough for the largest trade, counting every wanted item as its own slot (an
-    /// unstacked offer), at least 1 and at most the window's <see cref="Trade.TradeOffer.Capacity"/>.
+    /// unstacked offer), at most the window's <see cref="Trade.TradeOffer.Capacity"/>. 0 when every trade takes only
+    /// credits (live Perk-Reset Service Provider KnubotStartTrade slots=0); 1 for a script with no trades.
     /// </summary>
     public int TradeSlots { get; } = Math.Clamp(
         trades.Length == 0 ? 1 : trades.Max(trade => trade.Items.Sum(item => Math.Max(1, item.Count))),
-        1, Trade.TradeOffer.Capacity);
+        0, Trade.TradeOffer.Capacity);
 
     /// <summary>A reply with no content behind it yet: the engine says a debug line and offers the same replies again.</summary>
     public bool IsDeadEnd(KnubotReply reply)
@@ -175,8 +182,12 @@ public sealed record KnubotOpener(KnubotCondition[] If, KnubotCondition[] Any, s
 /// <summary><see cref="Id"/> is the reply's key in the script's Replies, for logs.</summary>
 public sealed record KnubotReply(string Id, KnubotTextPiece[] Text, KnubotCondition[] If, string Goto);
 
-/// <summary><see cref="Id"/> is the trade's key in the script's Trades, for logs.</summary>
-public sealed record KnubotTrade(string Id, KnubotCondition[] If, KnubotTradeItem[] Items, int Credits, string Goto)
+/// <summary>
+/// <see cref="Id"/> is the trade's key in the script's Trades, for logs. <see cref="InspectItems"/>: a match takes
+/// nothing and hands everything back (<see cref="KnubotTradeFile.InspectItems"/>).
+/// </summary>
+public sealed record KnubotTrade(string Id, KnubotCondition[] If, KnubotTradeItem[] Items, int Credits, string Goto,
+    bool InspectItems)
 {
     /// <summary>
     /// True when <paramref name="offered"/> is exactly this trade: every item counts toward one wanted hash, every

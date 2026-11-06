@@ -36,6 +36,9 @@ namespace ZoneEngine_New.Core.Ai
                 .Attach(new MoveTowardTargetNode(_brain))
                 .Attach(new StartFightingNode(_brain));
 
+            // A player talking to the NPC: it stands until the chat closes. After leash and combat, before any walk.
+            root.Conditional(() => _brain.IsHeldByConversation, "in-conversation")
+                .Attach(new HoldForConversationNode(_brain));
             // A program's walk: after leash and combat, so a fight preempts it as it preempts a patrol.
             root.Conditional(() => _brain.ScriptHoldsMovement, "scripted-move")
                 .Attach(new ScriptedMoveNode(_brain));

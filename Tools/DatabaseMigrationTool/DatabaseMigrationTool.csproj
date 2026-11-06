@@ -31,6 +31,8 @@
     <EmbeddedResource Include="../../AORebirth/Libraries/Source/AORebirth.Database/SqlTables/*.sql" Link="SqlTables/%(Filename)%(Extension)" />
     <EmbeddedResource Include="../../AORebirth/Libraries/Source/AORebirth.Database/Migrations/20261030_daily_login_character_scope.sql" Link="Migrations/%(Filename)%(Extension)" />
     <Content Include="../../AORebirth/Libraries/Source/AORebirth.Database/Migrations/20261030_daily_login_character_scope.sql" Link="Migrations/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <EmbeddedResource Include="../../AORebirth/Libraries/Source/AORebirth.Database/Migrations/20261102_account_sanctions.sql" Link="Migrations/%(Filename)%(Extension)" />
+    <Content Include="../../AORebirth/Libraries/Source/AORebirth.Database/Migrations/20261102_account_sanctions.sql" Link="Migrations/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="../../AORebirth/Libraries/Source/AORebirth.Database/SqlTables/*.sql" Link="SqlTables/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

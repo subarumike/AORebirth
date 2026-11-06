@@ -692,6 +692,31 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         /// <summary>
+        /// Full perk reset (ResetAllPerks, the Perk Reset Item 281017 the Perk-Reset Service Provider uses): untrains
+        /// every regular and alien perk at once. Research stays, and the single-untrain cooldown neither blocks it nor
+        /// starts; the provider's own 48 hour quest limits it. The client clears its perk map on ClearAllPerks
+        /// (capture 20260716-Reset-perks Action=201; Gamecode.dll 0x1005349a keeps only its research entries).
+        /// </summary>
+        public void ResetAllPerks()
+        {
+            bool removed = false;
+            foreach (int perkId in TrainedPerks.Snapshot())
+            {
+                if (!PerkCatalog.IsResearch(perkId) && TrainedPerks.Remove(perkId))
+                    removed = true;
+            }
+
+            if (!removed)
+                return;
+
+            OnTrainedPerksChanged(() => Session?.Send(new CharacterActionMessage
+            {
+                Identity = Identity, Action = CharacterActionType.ClearAllPerks
+            }));
+            FlushDirtyStats();
+        }
+
+        /// <summary>
         /// GM setup: the trained perks become exactly <paramref name="perkIds"/> (regular, alien and finished research),
         /// with no perk point, requirement or reset rules, and research in progress and the research goal are dropped.
         /// Refreshes the perk templates and actions and rebases.
@@ -1377,7 +1402,7 @@ namespace ZoneEngine_New.Core.Entities
                 ItemLowId = use.LowId,
                 ItemHighId = use.HighId,
                 Quality = use.Quality,
-                Unknown1 = 1,
+                Count = 1,
                 Action = TemplateActionType.PerkAction,
                 Placement = Identity,
                 Unknown3 = (int)shown.Identity.Type,
@@ -1865,6 +1890,60 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         /// <summary>
+        /// A character leaving the world dead (or before its respawn ran: a logout, a client crash that times out) is
+        /// saved as the respawn would have left it: alive at full health, at its respawn destination. Saved dead it came
+        /// back at the corpse with 0 HP, alive on the server, dead on the client, and its respawn request was ignored.
+        /// Returns where to store the character, or null to keep it where it stands (alive, no respawn resolved).
+        /// </summary>
+        internal (int Playfield, Vector3 Landing)? SettleDeathForLogout()
+        {
+            if (!IsDead && !_respawnPending)
+                return null;
+
+            (int Playfield, Vector3 Landing)? destination = null;
+            if (Playfield is Playfield playfield)
+            {
+                try
+                {
+                    destination = ResolveRespawn(playfield);
+                }
+                catch (Exception exception) when (!_respawnAtStuckLocation)
+                {
+                    Logger.Error(exception, "Logout respawn failed character=" + Identity.Instance + "; using the stuck location.");
+                    Stats.Set(CharacterStat.ResurrectDest, 0, StatDetail.Base);
+                    _respawnAtStuckLocation = true;
+                    try
+                    {
+                        destination = ResolveRespawn(playfield);
+                    }
+                    catch (Exception stuckException)
+                    {
+                        Logger.Error(stuckException, "Logout respawn at the stuck location failed character=" + Identity.Instance + ".");
+                    }
+                }
+                catch (Exception exception)
+                {
+                    Logger.Error(exception, "Logout respawn at the stuck location failed character=" + Identity.Instance + ".");
+                }
+            }
+
+            _respawnObserversCleared = false;
+            _respawnAtStuckLocation = false;
+            Revive();
+            if (destination != null)
+            {
+                // As a respawn elsewhere: not a proxy entry, so an exit there does not lead back through the old entrance.
+                Stats.Set(CharacterStat.ExternalPlayfieldInstance, 0, StatDetail.Base, dirty: true);
+                Stats.Set(CharacterStat.ExternalDoorInstance, 0, StatDetail.Base, dirty: true);
+            }
+
+            Logger.Info(string.Format(CultureInfo.InvariantCulture,
+                "Death settled on logout character={0} respawnPf={1}",
+                Identity.Instance, destination?.Playfield ?? 0));
+            return destination;
+        }
+
+        /// <summary>
         /// Where a death brings this character back: the stuck location after a failed resolution, else the last save
         /// point, else the new-character start (Arete Landing), else Respawn.json. Throws when none is configured.
         /// </summary>
@@ -1972,6 +2051,26 @@ namespace ZoneEngine_New.Core.Entities
             Logger.Info(string.Format(CultureInfo.InvariantCulture,
                 "Insurance save character={0} level={1} fee={2} xp={3} saved={4} deathPool={5}",
                 Identity.Instance, level, fee, xp, saved, Stats.GetOrZero(CharacterStat.DeathXpPool, StatDetail.Base)));
+            return true;
+        }
+
+        /// <summary>
+        /// A free save where the character stands (SaveHere), as the Redeemed Tree of Life 227385 does: "This ancient
+        /// tree will work as a Cell Structure Scanner", so the save point and the XP a death cannot take are both stored,
+        /// but nothing is charged. The template's own SystemText row says "Character saved".
+        /// </summary>
+        public bool SaveHere()
+        {
+            if (Playfield == null)
+                return false;
+
+            StoreSavePoint();
+            int xp = Stats.GetOrZero(CharacterStat.XP, StatDetail.Base);
+            Stats.Set(CharacterStat.SavedXP, xp, StatDetail.Base, dirty: true);
+            FlushDirtyStats();
+            SaveState.MarkDirty();
+            Logger.Info(string.Format(CultureInfo.InvariantCulture,
+                "Free save character={0} xp={1}", Identity.Instance, xp));
             return true;
         }
 
@@ -3029,6 +3128,8 @@ namespace ZoneEngine_New.Core.Entities
             CharacterStat._1hEdged,
             CharacterStat._1hBlunt,
             CharacterStat.MartialArts,
+            // The skill window's Critical Increase: the base every character has (Character.BaseCriticalIncrease).
+            CharacterStat.CriticalIncrease,
             CharacterStat.MetaType,
             CharacterStat.TitleLevel,
             CharacterStat.GmLevel,
@@ -3040,7 +3141,8 @@ namespace ZoneEngine_New.Core.Entities
             CharacterStat.MeleeAC,
             CharacterStat.ProjectileAC,
             CharacterStat.RP,
-            // CharacterStat.SpecialCondition,
+            // Carries the used free Full IP Reset bit so the skill window's Reset All count survives a relog.
+            CharacterStat.SpecialCondition,
             CharacterStat.SK,
             CharacterStat.Expansion,
             CharacterStat.ClanRedeemed,

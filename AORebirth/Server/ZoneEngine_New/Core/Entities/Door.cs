@@ -1,6 +1,7 @@
 namespace ZoneEngine_New.Core.Entities
 {
     using System;
+    using System.Collections.Generic;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
@@ -38,7 +39,11 @@ namespace ZoneEngine_New.Core.Entities
         public int TemplateId { get; }
 
         /// <summary>Stat 0; see <see cref="OpenFlag"/> and <see cref="LockedFlag"/>.</summary>
-        public int Flags { get; private set; }
+        public int Flags
+        {
+            get => Stats.GetOrZero(CharacterStat.Flags);
+            private set => Stats.Set(CharacterStat.Flags, value);
+        }
 
         /// <summary>
         /// DoorFullUpdate Unknown7 in live ACG dungeons: (room &lt;&lt; 16) | linked room; the exit is 0xFFFF0000
@@ -49,6 +54,24 @@ namespace ZoneEngine_New.Core.Entities
         public bool IsOpen => (Flags & OpenFlag) != 0;
 
         public bool IsLocked => (Flags & LockedFlag) != 0;
+
+        /// <summary>Authored open state held until an explicit close/lock; ordinary touch doors default false.</summary>
+        public bool CloseInhibited { get; private set; }
+
+        /// <summary>Applies authoritative flags without treating trigger signal bits as door flags.</summary>
+        public void ApplyFlags(int flags, bool? closeInhibit = null)
+        {
+            int previous = Flags;
+            bool previousInhibit = CloseInhibited;
+            Flags = flags;
+            if (closeInhibit is bool inhibit)
+                CloseInhibited = inhibit;
+            if (((previous ^ flags) & (OpenFlag | LockedFlag)) == 0 && previousInhibit == CloseInhibited)
+                return;
+
+            Playfield?.WorldAccess.Instance?.InvalidateLineOfSight();
+            AnnounceStatus();
+        }
 
         /// <summary>Stat 299, sent while the door is locked so the client lets a lock pick be tried on it.</summary>
         public int LockDifficulty { get; }
@@ -99,6 +122,15 @@ namespace ZoneEngine_New.Core.Entities
             };
         }
 
+        /// <summary>The full spawn carries flags, but an authored close-inhibit latch needs the status message.</summary>
+        public override IEnumerable<MessageBody> BuildSpawnCompanionMessages()
+        {
+            if (CloseInhibited)
+            {
+                yield return StatusMessage(Identity, IsOpen, IsLocked, closeInhibit: true);
+            }
+        }
+
         /// <summary>Opens or closes the door for a character standing at it, unless it is locked.</summary>
         public bool TryUse(Player player)
         {
@@ -112,17 +144,20 @@ namespace ZoneEngine_New.Core.Entities
             var locality = Playfield.GetRequiredService<PlayfieldLocality>();
             locality.Announce(this, BuildSpawnMessage(), includeSelf: true);
             // A client that already has the door ignores a second full update; the status update moves it.
-            locality.Announce(this, StatusMessage(Identity, IsOpen, IsLocked), includeSelf: true);
+            locality.Announce(this, StatusMessage(Identity, IsOpen, IsLocked, CloseInhibited), includeSelf: true);
             return true;
         }
 
         /// <summary>
         /// DoorStatusUpdate: sets a door the client already has open or closed, locked or unlocked (Gamecode.dll
         /// DoorStatusUpdateIIR_t, read 0x100A010A, applied 0x1009FF34). The body is version 2, locked, open,
-        /// AccessKey (stat 195), a flag byte and an identity list; retail sends one per door at zone-in
-        /// (every captured door closed and unlocked: 00000002 00 00 00000000 00 03F1).
+        /// AccessKey (stat 195), a close-inhibit byte and an identity list; retail sends these at zone-in and on
+        /// authored state changes. The PF665 capture includes closed/unlocked, open/unlocked and closed/locked
+        /// states; its empty identity list is the four-byte encoded count 000003F1.
         /// </summary>
-        public static DoorStatusUpdateMessage StatusMessage(Identity door, bool open, bool locked) => new()
+        // A true close-inhibit byte sets the client's latch. False does not clear an already set native latch;
+        // explicit locked/closed state must therefore perform a relock rather than relying on that byte alone.
+        public static DoorStatusUpdateMessage StatusMessage(Identity door, bool open, bool locked, bool closeInhibit = false) => new()
         {
             Identity = door,
             Unknown = 0,
@@ -130,7 +165,7 @@ namespace ZoneEngine_New.Core.Entities
             Unknown2 = (byte)(locked ? 1 : 0),
             Unknown3 = (byte)(open ? 1 : 0),
             Unknown4 = 0,
-            Unknown5 = 0,
+            Unknown5 = (byte)(closeInhibit ? 1 : 0),
             Unknown6 = []
         };
 
@@ -148,7 +183,7 @@ namespace ZoneEngine_New.Core.Entities
 
         /// <summary>Sends the door's state to everyone who sees it (a change no client saw happen).</summary>
         public void AnnounceStatus()
-            => Playfield?.GetRequiredService<PlayfieldLocality>().Announce(this, StatusMessage(Identity, IsOpen, IsLocked), includeSelf: true);
+            => Playfield?.GetRequiredService<PlayfieldLocality>().Announce(this, StatusMessage(Identity, IsOpen, IsLocked, CloseInhibited), includeSelf: true);
 
         /// <summary>The last character in contact with the door left it: every client closes it then.</summary>
         public bool CloseAfterTouch()

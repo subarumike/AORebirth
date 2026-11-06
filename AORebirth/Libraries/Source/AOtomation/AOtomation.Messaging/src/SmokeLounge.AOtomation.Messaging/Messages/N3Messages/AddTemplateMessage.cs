@@ -30,11 +30,14 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 
         #region AoMember Properties
 
+        // The client reads the first int as the item's low id and the second as its high id
+        // (same order as the zone-in inventory and TemplateAction); [high, low] kept a bought
+        // stack from joining an owned one until the next zone.
         [AoMember(0)]
-        public int HighId { get; set; }
+        public int LowId { get; set; }
 
         [AoMember(1)]
-        public int LowId { get; set; }
+        public int HighId { get; set; }
 
         [AoMember(2)]
         public int Quality { get; set; }

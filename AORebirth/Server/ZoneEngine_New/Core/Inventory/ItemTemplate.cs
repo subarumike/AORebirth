@@ -229,7 +229,8 @@ namespace ZoneEngine_New.Core.Inventory
                     continue;
                 if (IsSubjectSelector(requirement))
                 {
-                    onTarget = (Operator)requirement.Operator == Operator.OnTarget && getTargetStat != null;
+                    onTarget = (Operator)requirement.Operator is Operator.OnTarget or Operator.OnFightingTarget
+                        && getTargetStat != null;
                     continue;
                 }
 
@@ -407,23 +408,25 @@ namespace ZoneEngine_New.Core.Inventory
                 or Operator.LessThan or Operator.BitAnd or Operator.NotBitAnd;
 
         /// <summary>
-        /// OnTarget / OnSelf / OnUser / OnCaster rows select the subject for the following check group; they are not checks
-        /// themselves (Fists of Stellar Harmony ToUse: caster skills, caster VisualProfession 2, OnTarget,
-        /// VisualProfession 2).
+        /// OnTarget / OnFightingTarget / OnSelf / OnUser / OnCaster rows select the subject for the following check group;
+        /// they are not checks themselves (Fists of Stellar Harmony ToUse: caster skills, caster VisualProfession 2,
+        /// OnTarget, VisualProfession 2).
         /// </summary>
         public static bool IsSubjectSelector(ItemRequirement requirement)
         {
             ArgumentNullException.ThrowIfNull(requirement);
 
-            return (Operator)requirement.Operator is Operator.OnTarget or Operator.OnSelf or Operator.OnUser
-                or Operator.OnCaster;
+            return (Operator)requirement.Operator is Operator.OnTarget or Operator.OnFightingTarget or Operator.OnSelf
+                or Operator.OnUser or Operator.OnCaster;
         }
 
+        // OnFightingTarget reads the target subject: a hostile action's target is the character being fought
+        // (Pistol Mastery's follow-up needs "Affected by Quick Shot" 209924 running on it).
         static RequirementSubject SelectSubject(ItemRequirement selector, RequirementSubject self,
             RequirementSubject? user, RequirementSubject? target)
             => (Operator)selector.Operator switch
             {
-                Operator.OnTarget => target ?? self,
+                Operator.OnTarget or Operator.OnFightingTarget => target ?? self,
                 Operator.OnUser or Operator.OnCaster => user ?? self,
                 _ => self
             };
@@ -445,8 +448,8 @@ namespace ZoneEngine_New.Core.Inventory
         /// An empty OnUse list is a successful no-op; only present but unhandled functions fail.
         /// </summary>
         /// <param name="skipPassiveModifiers">
-        /// When true, Modify, ScalingModify, MonsterShape, and SetFlag are skipped because NCU
-        /// rebase already applies them from active buffs.
+        /// When true, Modify, ScalingModify, MonsterShape, SetFlag and HeadMesh are skipped because
+        /// rebase already supplies the stats and appearance from active buffs.
         /// </param>
         /// <param name="source">
         /// Optional source for damage attribution (nano caster). Defaults to <paramref name="target"/>.
@@ -586,6 +589,15 @@ namespace ZoneEngine_New.Core.Inventory
                 ? target
                 : ItemUseFunctions.ResolveApplyOn(target, source, spell);
 
+        /// <summary>Executes one retained static action after its owner-specific scheduling and requirement gate.</summary>
+        internal bool ExecuteStaticSpell(ItemSpell row, Player player, SpellCriteria criteria,
+            bool requirementsAlreadyChecked = false)
+            => ExecuteSpell(criteria.TriggerContext?.ExecutionTarget as Character ?? player,
+                criteria.TriggerContext?.Source as Character ?? player, row,
+                player.Playfield!.GetRequiredService<IInventoryRepository>(),
+                player.Playfield.GetRequiredService<IItemBuilder>(), false, criteria,
+                skipRequirements: requirementsAlreadyChecked);
+
         bool ExecuteSpell(
             Character target,
             Character? source,
@@ -594,7 +606,8 @@ namespace ZoneEngine_New.Core.Inventory
             IItemBuilder items,
             bool skipPassiveModifiers,
             SpellCriteria criteria,
-            bool isTick = false)
+            bool isTick = false,
+            bool skipRequirements = false)
         {
             // Each function names who it applies to (User / Wearer / Self: whoever used the item or cast the
             // nano; Target: the event target). A nano cast on someone else can still act on its caster, e.g. a
@@ -606,7 +619,7 @@ namespace ZoneEngine_New.Core.Inventory
             Character user = source ?? target;
             target = ResolveApplyOn(target, source, spell);
             Character applyOn = target;
-            if (!ItemTemplate.MeetsRequirements(
+            if (!skipRequirements && !ItemTemplate.MeetsRequirements(
                     spell.Requirements,
                     new RequirementSubject(stat => criteria.Resolve(stat, id => applyOn.Stats.Get(id)), applyOn.ResolveRequirement),
                     new RequirementSubject(stat => user.Stats.Get(stat), user.ResolveRequirement),
@@ -625,8 +638,13 @@ namespace ZoneEngine_New.Core.Inventory
             }
 
             if ((spell.Is(FunctionType.SetFlag) || spell.Is(FunctionType.ChangeActionRestriction)
-                    || spell.Is(FunctionType.ChangeVariable))
+                    || spell.Is(FunctionType.ChangeVariable) || spell.Is(FunctionType.HeadMesh))
                 && skipPassiveModifiers)
+                return true;
+
+            // A buff landing (skipPassiveModifiers) leaves a delayed single tick to its NCU entry, which runs it one
+            // interval later: Soothing Herbs 263341 recasts itself at 45 s, not on the land.
+            if (skipPassiveModifiers && Nanos.Buff.IsDelayedOnce(spell))
                 return true;
 
             return ItemUseFunctions.TryExecute(Id, target, source, spell, inventoryRepository, items, criteria,

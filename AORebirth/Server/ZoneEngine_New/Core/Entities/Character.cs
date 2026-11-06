@@ -95,7 +95,13 @@ namespace ZoneEngine_New.Core.Entities
             // Requirement folds use Stats.Get. Unset is not 0, so a missing opponent count
             // reads as "in combat".
             Stats.Set(CharacterStat.NumberOfFightingOpponents, 0, StatDetail.Base);
+            // Everyone's crit chance before gear and buffs. Runtime-only, so it is never stored; a monster template
+            // that sets Critical Increase replaces it.
+            Stats.Set(CharacterStat.CriticalIncrease, BaseCriticalIncrease, StatDetail.Base);
         }
+
+        /// <summary>Critical Increase (crit chance, percent) every character starts with before gear and buffs.</summary>
+        public const int BaseCriticalIncrease = 3;
 
         /// <summary>
         /// The body radius the client's range checks subtract: CharRadius * Scale / 100, Scale at least 1
@@ -513,7 +519,22 @@ namespace ZoneEngine_New.Core.Entities
             _corpseSwapRemainingSeconds = CorpseSpawnDelayMilliseconds / 1000.0;
 
             List<int>? credited = AwardKillRewards();
+            if (IsPlayer && IsInvader(killer))
+                IncrementStat(CharacterStat.KilledByInvaders);
             RaiseModuleDeathEvents(killer, credited);
+        }
+
+        /// <summary>An alien NPC (NPCFamily 220) itself; pets never count.</summary>
+        static bool IsInvader(Character? killer)
+            => killer is NpcCharacter { PetOwner: null } alien
+                && alien.Stats.GetOrZero(CharacterStat.NPCFamily) == AlienNpcFamily;
+
+        /// <summary>Adds one to a counter stat (saved and sent like any changed stat).</summary>
+        void IncrementStat(CharacterStat stat)
+        {
+            int value = Stats.GetOrZero(stat);
+            if (value < int.MaxValue)
+                Stats.Set(stat, value + 1, StatDetail.Base, dirty: true);
         }
 
         /// <summary>
@@ -626,6 +647,10 @@ namespace ZoneEngine_New.Core.Entities
                 if (amount <= 0)
                     return;
             }
+
+            amount = ApplyXpRateModifier(amount);
+            if (amount <= 0)
+                return;
 
             int earned = amount;
             amount = ApplySideXpBonus(amount);
@@ -1268,13 +1293,33 @@ namespace ZoneEngine_New.Core.Entities
                     // NOTE: Gameplay.json xp.teamMemberPercent is a stand-in table, not live's team XP rule.
                     long amount = (long)(solo * share.Amount / AlienShareBasis * xpRules.MemberPercent(recipients.Count) / 100);
                     amount = Math.Max(amount, xpRules.AlienMinimumXp);
-                    if (amount > 0)
+                    if (amount > 0 && recipient.IsPlayer)
+                    {
                         recipient.AwardAlienXp((int)Math.Min(amount, int.MaxValue));
+                        // Every player paid alien XP for the kill counts it; pets earn neither.
+                        recipient.IncrementStat(CharacterStat.InvadersKilled);
+                    }
                 }
             }
         }
 
         double SideXpBonusPercent => Playfield?.GetService<GameplaySettings>()?.Xp.SideBonusPercent ?? 0;
+
+        /// <summary>
+        /// Regular XP times Gameplay.json xp.globalModifier, and xp.shadowlandsModifier on a Shadowlands playfield.
+        /// Before the side bonus and the per-grant cap; mission callers include this in their durable reward projection.
+        /// </summary>
+        internal int ApplyXpRateModifier(int amount)
+        {
+            if (amount <= 0)
+                return 0;
+            if (Playfield is not { } playfield || playfield.GetService<GameplaySettings>()?.Xp is not GameplayXp xpRules)
+                return amount;
+
+            bool shadowlands = PlayfieldEntryFlags.ExpansionPlayfield(playfield.MetaData) == 1;
+            double scaled = Math.Round(amount * xpRules.RateMultiplier(shadowlands), MidpointRounding.AwayFromZero);
+            return (int)Math.Clamp(scaled, 0, int.MaxValue);
+        }
 
         /// <summary>Regular XP only; mission callers include this in their durable reward projection.</summary>
         internal int ApplySideXpBonus(int amount)
@@ -2665,7 +2710,9 @@ namespace ZoneEngine_New.Core.Entities
             if (max <= 0)
                 return;
 
-            int percent = (int)Math.Clamp((long)current * 100 / max, 0, 100);
+            // A living vital is never stored as 0%: 5 HP of 1,700 rounded down to 0, and that character logged back in
+            // at 0 HP, alive on the server and dead on the client, with no respawn to clear it.
+            int percent = (int)Math.Clamp((long)current * 100 / max, current > 0 ? 1 : 0, 100);
             Stats.Set(percentStat, percent, StatDetail.Base, dirty: true);
         }
 
@@ -2675,8 +2722,10 @@ namespace ZoneEngine_New.Core.Entities
         protected int ResolveVitalPercent(CharacterStat percentStat, CharacterStat currentStat, CharacterStat maxStat)
         {
             int stored = Stats.Get(percentStat);
+            // A player is never loaded dead: login is not a death, so nothing would ever respawn them. A stored 0% health
+            // (a logout while dead, before that was settled) loads as 1%.
             if (!StatCollection.IsUnset(stored))
-                return Math.Clamp(stored, 0, 100);
+                return Math.Clamp(stored, IsPlayer && percentStat == CharacterStat.PercentRemainingHealth ? 1 : 0, 100);
 
             int max = Stats.GetOrZero(maxStat);
             if (max <= 0)
@@ -3135,15 +3184,15 @@ namespace ZoneEngine_New.Core.Entities
 
         /// <summary>
         /// Runs the strain / stacking / NCU gate and lands <paramref name="spell"/> when it passes.
-        /// <paramref name="replaced"/> is the entry this buff pushed out, which the caller still
-        /// has to announce as removed.
+        /// <paramref name="replaced"/> lists the entries this buff pushed out (several when it covers more than one
+        /// nano line), which the caller still has to announce as removed.
         /// </summary>
         public BuffApplyDecision TryApplyBuff(
             NanoSpell spell,
             Identity source,
             DateTime nowUtc,
             out Buff? applied,
-            out Buff? replaced)
+            out IReadOnlyList<Buff> replaced)
         {
             ArgumentNullException.ThrowIfNull(spell);
 
@@ -3152,10 +3201,10 @@ namespace ZoneEngine_New.Core.Entities
             if (decision != BuffApplyDecision.Apply && decision != BuffApplyDecision.Replace)
                 return decision;
 
-            if (replaced != null)
+            for (int i = 0; i < replaced.Count; i++)
             {
-                _buffs.Remove(replaced);
-                RevokeAbsorbs(replaced);
+                _buffs.Remove(replaced[i]);
+                RevokeAbsorbs(replaced[i]);
             }
 
             applied = Buff.Create(spell, source, ++_nextNanoInstance, nowUtc);
@@ -3831,6 +3880,7 @@ namespace ZoneEngine_New.Core.Entities
                 ApplyBackMesh(utility++, item, worn);
 
             List<Mesh> meshes = worn.Resolve(Stats.Get(CharacterStat.VisualFlags));
+            ApplyBuffHeadMeshes(meshes);
 
             if (robe == _wearRobe && SameWearAppearance(textures, meshes))
                 return;
@@ -3845,6 +3895,33 @@ namespace ZoneEngine_New.Core.Entities
             _wearMeshes.AddRange(meshes);
 
             InvalidateAppearance();
+        }
+
+        void ApplyBuffHeadMeshes(List<Mesh> meshes)
+        {
+            // Live AppearanceUpdate (Borealis, 2026-11-03): a buff's HeadMesh occupies the helmet layer;
+            // the character's base head remains underneath. Rebuilding restores current equipment when it ends.
+            foreach (Buff buff in _buffs)
+            {
+                foreach (ItemSpell spell in buff.ModifierSpells)
+                {
+                    if (!spell.Is(FunctionType.HeadMesh)
+                        || !ItemTemplate.MeetsRequirements(spell.Requirements, stat => Stats.Get(stat), ResolveRequirement)
+                        || !spell.TryReadMesh(out int meshId, out int overrideTextureId) || meshId <= 0)
+                        continue;
+
+                    meshes.RemoveAll(mesh => mesh.Position == 0 && mesh.Layer == (byte)MeshLayer.Helmet);
+                    int before = meshes.FindIndex(mesh => mesh.Position > 0
+                        || (mesh.Position == 0 && mesh.Layer > (byte)MeshLayer.Helmet));
+                    meshes.Insert(before < 0 ? meshes.Count : before, new Mesh
+                    {
+                        Position = 0,
+                        Id = (uint)meshId,
+                        OverrideTextureId = overrideTextureId,
+                        Layer = (byte)MeshLayer.Helmet
+                    });
+                }
+            }
         }
 
         /// <summary>True when the robe flag is shown for this character's worn look.</summary>
@@ -4550,6 +4627,24 @@ namespace ZoneEngine_New.Core.Entities
             | AORebirth.Enums.ItemFlags.Stationary
             | AORebirth.Enums.ItemFlags.WantCollision);
 
+        /// <summary>The complete Flags stat sent to clients, including the NPC spawn defaults.</summary>
+        protected int GetClientCharacterFlags()
+        {
+            int flags = Stats.Get(CharacterStat.Flags);
+            if (this is NpcCharacter npc)
+            {
+                flags = (StatCollection.IsUnset(flags) ? 0 : flags) | RetailNpcCharacterFlags;
+                if (npc.Attackable)
+                    flags |= (int)AORebirth.Enums.ItemFlags.CanBeAttacked;
+            }
+            if (Stats.TryGetValue(CharacterStat.GmLevel, out int gmLevel) && gmLevel > 0)
+            {
+                flags &= ~(int)CharacterFlags.NpcStyleFlag28;
+                flags |= (int)CharacterFlags.HasBlueName;
+            }
+            return flags;
+        }
+
         /// <summary>
         /// Builds a SimpleCharFullUpdate (SCFU) spawn packet from current character state.
         /// Structure follows ZoneEngine SimpleCharFullUpdate.ConstructMessage without capture/runtime special cases.
@@ -4568,19 +4663,7 @@ namespace ZoneEngine_New.Core.Entities
             MsgQuaternion heading = Rotation ?? new MsgQuaternion();
 
             string? name = Name;
-            int characterFlags = Stats.Get(CharacterStat.Flags);
-            if (this is NpcCharacter npcCharacter)
-            {
-                characterFlags = (Entities.StatCollection.IsUnset(characterFlags) ? 0 : characterFlags) | RetailNpcCharacterFlags;
-                if (npcCharacter.Attackable)
-                    characterFlags |= (int)AORebirth.Enums.ItemFlags.CanBeAttacked;
-            }
-            if (Stats.TryGetValue(CharacterStat.GmLevel, out int gmLevel) && gmLevel > 0)
-            {
-                // The blue name marks a GM. The name itself stays as stored: a " [GM]" suffix broke %t in chat.
-                characterFlags &= ~(int)CharacterFlags.NpcStyleFlag28;
-                characterFlags |= (int)CharacterFlags.HasBlueName;
-            }
+            int characterFlags = GetClientCharacterFlags();
 
             int maxHealth = Stats.GetOrZero(CharacterStat.MaxHealth);
             int currentHealth = Stats.GetOrZero(CharacterStat.Health);
@@ -4650,10 +4733,14 @@ namespace ZoneEngine_New.Core.Entities
                 Meshes = BuildMeshes(headMesh)
             };
 
-            // Pets keep version 58 (already set for NPCs).
+            // A pet names its master in the SCFU owner field (Flags2 0x4, HasOwner): the client reads that instance
+            // (Gamecode.dll 0x100797d5, into SimpleChar+0x318) and applies it as PetMaster (196) when non-zero
+            // (0x10078b54..0x10078b70). Tab targeting counts an NPC whose PetMaster is the player, a teammate or a
+            // raid member as friendly (N3Msg_GetCloseTarget 0x1001c49a); without it a teammate's pet tabs as hostile.
             if (!StatCollection.IsUnset(petMasterInstance) && petMasterInstance != 0)
             {
-                scfu.Version = 58;
+                scfu.Flags2 |= 0x4;
+                scfu.OwnerInstance = petMasterInstance;
             }
 
             if (FightingTarget.Instance != 0)
@@ -4682,7 +4769,8 @@ namespace ZoneEngine_New.Core.Entities
                 var pcInfo = new SimplePcInfo
                 {
                     CurrentNano = (uint)Stats.GetOrZero(CharacterStat.CurrentNano),
-                    Team = 0,
+                    // Live zoning SCFU restores the subgroup identity before FullCharacter loads its roster.
+                    Team = Stats.GetOrZero(CharacterStat.Team),
                     Swim = 5,
                     StrengthBase = ClampToShort(Stats.GetOrZero(CharacterStat.Strength, StatDetail.Base)),
                     AgilityBase = ClampToShort(Stats.GetOrZero(CharacterStat.Agility, StatDetail.Base)),

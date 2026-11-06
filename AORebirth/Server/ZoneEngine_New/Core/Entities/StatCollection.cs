@@ -71,7 +71,8 @@ namespace ZoneEngine_New.Core.Entities
         /// equipped weapon type criteria the client derives from the weapon page, the playfield-entry flags
         /// (Character.OnEnteredPlayfield), and the vitals. Max health and max nano are recomputed on rebase, and
         /// current health and nano are set from the stored PercentRemainingHealth / PercentRemainingNano, so a stale
-        /// or buff-inflated value is never loaded back.
+        /// or buff-inflated value is never loaded back. Critical Increase is the fixed Character.BaseCriticalIncrease
+        /// plus what gear, buffs and perks give it on rebase, so a stored value can never stack up crit.
         /// </summary>
         public static bool IsRuntimeOnly(CharacterStat stat)
             => stat is CharacterStat.NumberOfFightingOpponents or CharacterStat.Pets
@@ -79,7 +80,8 @@ namespace ZoneEngine_New.Core.Entities
                 or CharacterStat.CharState or CharacterStat.XPKillRange or CharacterStat.LastPerkResetTime
                 or CharacterStat.PlayfieldType or CharacterStat.ExpansionPlayfield or CharacterStat.PlayfieldProxy
                 or CharacterStat.Health or CharacterStat.CurrentNano
-                or CharacterStat.MaxHealth or CharacterStat.MaxNanoEnergy;
+                or CharacterStat.MaxHealth or CharacterStat.MaxNanoEnergy
+                or CharacterStat.CriticalIncrease;
 
         /// <summary>Server bookkeeping stats the client never receives.</summary>
         public static bool IsServerOnly(CharacterStat stat)

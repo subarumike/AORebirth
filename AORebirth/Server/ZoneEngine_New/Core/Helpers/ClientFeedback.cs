@@ -61,6 +61,9 @@ namespace ZoneEngine_New.Core.Helpers
         /// <summary>"You failed to hide as you are currently fighting." (category 110). A stealth attempt mid-fight.</summary>
         public const int FailedToHideWhileFighting = 247632055;
 
+        /// <summary>"You can't log out while in a fight." (category 110). A /camp refused mid-fight.</summary>
+        public const int CantLogoutInFight = 207248100;
+
         /// <summary>"You have to kill %d more %s to fulfill one of your missions!" (category 110, FormatFeedback).</summary>
         public const int KillsRemaining = 204307477;
 
@@ -128,6 +131,18 @@ namespace ZoneEngine_New.Core.Helpers
         /// refund and the skill name, after the RP and IP/skill stats (capture 2026-10-14T00:07:33Z).
         /// </summary>
         public const int SkillResetIpReturned = 226232628;
+
+        /// <summary>
+        /// "Your Full IP Reset has finished.\r\n\r\nYou now have %d IP." (category 110, 0x0D06358B): the line for a
+        /// completed Reset All (CharacterAction ResetSkill with skill 0).
+        /// </summary>
+        public const int FullIpResetFinished = 218510731;
+
+        /// <summary>text.mdb category of the client's GUI strings (skill window, dialogs).</summary>
+        public const int GuiTextCategory = 502;
+
+        /// <summary>"You are only allowed to reset abilities and skills." (category 502, 0x02B705F3).</summary>
+        public const int OnlyAbilitiesAndSkillsResettable = 45549043;
 
         /// <summary>text.mdb category of the client's skill and stat names (id = stat id, e.g. 155 "Evade-ClsC").</summary>
         public const int StatNameCategory = 2003;
@@ -199,6 +214,12 @@ namespace ZoneEngine_New.Core.Helpers
         /// </summary>
         public const int LootedItemFrom = 60420421;
 
+        /// <summary>
+        /// Longest 's' argument: the client reads its length as one UTF-8 coded character holding length + 1, and the
+        /// message string goes out as ASCII, so length + 1 must stay a single byte (0x7F).
+        /// </summary>
+        public const int MaxTextArgumentLength = 126;
+
         /// <summary>A text argument the client looks up itself: 'R' + base-85 category + base-85 message id.</summary>
         public readonly record struct TextReference(int Category, int MessageId);
 
@@ -256,8 +277,8 @@ namespace ZoneEngine_New.Core.Helpers
                 else
                 {
                     string value = arg?.ToString() ?? string.Empty;
-                    if (value.Length > 254)
-                        value = value[..254];
+                    if (value.Length > MaxTextArgumentLength)
+                        value = value[..MaxTextArgumentLength];
                     text.Append('s').Append((char)(value.Length + 1)).Append(value);
                 }
             }

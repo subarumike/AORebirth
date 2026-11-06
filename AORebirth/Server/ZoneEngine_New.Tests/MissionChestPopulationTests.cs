@@ -685,8 +685,6 @@ public sealed class MissionChestPopulationTests
                 .AddSingleton(new PlayfieldLocality(4582, null)).BuildServiceProvider();
             typeof(Playfield).GetField("_serviceProvider", BindingFlags.Instance | BindingFlags.NonPublic)!
                 .SetValue(Playfield, _services);
-            typeof(Playfield).GetField("_nextContainerInventoryHandle", BindingFlags.Instance | BindingFlags.NonPublic)!
-                .SetValue(Playfield, 117);
             typeof(Playfield).GetField("<Identity>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
                 .SetValue(Playfield, new Identity { Type = IdentityType.Playfield, Instance = 4582 });
             typeof(QuestDungeonPlayfield).GetField("<Layout>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
@@ -719,7 +717,6 @@ public sealed class MissionChestPopulationTests
                 .AddSingleton<IItemInstanceIdAllocator>(Ids).AddSingleton<IGameData>(MissionChestPlacementTests.Data.Value)
                 .AddSingleton(locality).BuildServiceProvider();
             typeof(Playfield).GetField("_serviceProvider", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(Playfield, _services);
-            typeof(Playfield).GetField("_nextContainerInventoryHandle", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(Playfield, 117);
             typeof(Playfield).GetField("<Identity>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
                 .SetValue(Playfield, new Identity { Type = IdentityType.Playfield, Instance = 1 });
             typeof(QuestDungeonPlayfield).GetField("<Layout>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!

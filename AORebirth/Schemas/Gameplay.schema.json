@@ -35,6 +35,12 @@
       },
       "additionalProperties": false
     },
+    "stuckToRespawnPlayfields": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      }
+    },
     "requireAmmo": {
       "type": "boolean"
     },
@@ -44,6 +50,14 @@
     "xp": {
       "type": "object",
       "properties": {
+        "globalModifier": {
+          "type": "number",
+          "minimum": 0
+        },
+        "shadowlandsModifier": {
+          "type": "number",
+          "minimum": 0
+        },
         "sideBonusPercent": {
           "type": "number"
         },
@@ -145,6 +159,11 @@
         },
         "guardDefaultRadius": {
           "type": "number"
+        },
+        "threatOnlyRadiusPercent": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 100
         },
         "searchRadius": {
           "type": "number"

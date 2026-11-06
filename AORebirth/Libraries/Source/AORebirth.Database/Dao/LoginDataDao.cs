@@ -35,6 +35,7 @@ namespace AORebirth.Database.Dao
 
     using System;
     using System.Data;
+    using System.Linq;
     using AORebirth.Database.Entities;
     using AORebirth.Interfaces.Persistence.Accounts;
 
@@ -207,6 +208,22 @@ namespace AORebirth.Database.Dao
         public bool Exists(string username)
         {
             return DatabaseDaoFactory.CreateAccountDao().UsernameExists(username);
+        }
+
+        /// <summary>
+        /// True when the account has an active row in account_sanctions: not lifted, and permanent (EndsAtUtc NULL) or
+        /// not yet ended. A suspension needs no job to expire: once EndsAtUtc passes it stops matching.
+        /// </summary>
+        public bool IsSanctioned(string username)
+        {
+            using (IDbConnection conn = Connector.GetConnection())
+            {
+                return conn.Query<long>(
+                    "SELECT EXISTS(SELECT 1 FROM account_sanctions s INNER JOIN login l ON l.Id=s.AccountId "
+                    + "WHERE l.Username=@username AND s.LiftedAtUtc IS NULL "
+                    + "AND (s.EndsAtUtc IS NULL OR s.EndsAtUtc > UTC_TIMESTAMP(6)))",
+                    new { username }).FirstOrDefault() != 0;
+            }
         }
 
         // Existing engine callers still receive the complete legacy account representation.

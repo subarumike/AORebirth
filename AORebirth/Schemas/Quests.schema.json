@@ -124,6 +124,12 @@
         ],
         "pattern": "^[0-9A-Z_]{4}$"
       },
+      "ExpiresAfterHours": {
+        "type": [
+          "integer",
+          "null"
+        ]
+      },
       "Reward": {
         "type": [
           "object",
@@ -141,12 +147,6 @@
           }
         },
         "additionalProperties": false
-      },
-      "ExpiresAfterSeconds": {
-        "type": [
-          "integer",
-          "null"
-        ]
       },
       "StartItems": {
         "type": [

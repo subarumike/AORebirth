@@ -160,8 +160,7 @@ public sealed class MissionChestProtocolTests
             .BuildServiceProvider();
         typeof(Playfield).GetField("_serviceProvider", BindingFlags.Instance | BindingFlags.NonPublic)!
             .SetValue(world.Player.Playfield, services);
-        typeof(Playfield).GetField("_nextContainerInventoryHandle", BindingFlags.Instance | BindingFlags.NonPublic)!
-            .SetValue(world.Player.Playfield, contents.SlotnumberInMainInventory);
+        world.Player.Inventory.SeedClientContainerHandle(contents.SlotnumberInMainInventory);
         var chest = new Chest(request.Target[0])
         {
             SpawnDefinition = CreateCapturedChest().SpawnDefinition,
@@ -225,8 +224,7 @@ public sealed class MissionChestProtocolTests
         using var world = new InventoryActionTests.World();
         var registry = new DynelRegistry();
         using ServiceProvider services = AttachChestServices(world, registry);
-        typeof(Playfield).GetField("_nextContainerInventoryHandle", BindingFlags.Instance | BindingFlags.NonPublic)!
-            .SetValue(world.Player.Playfield, handle);
+        world.Player.Inventory.SeedClientContainerHandle(handle);
         var chest = new Chest(new Identity { Type = IdentityType.Container, Instance = chestInstance })
         {
             SpawnDefinition = CreateCapturedChest().SpawnDefinition,
@@ -346,8 +344,7 @@ public sealed class MissionChestProtocolTests
             .AddSingleton(new PlayfieldLocality(4582, null)).BuildServiceProvider();
         typeof(Playfield).GetField("_serviceProvider", BindingFlags.Instance | BindingFlags.NonPublic)!
             .SetValue(world.Player.Playfield, services);
-        typeof(Playfield).GetField("_nextContainerInventoryHandle", BindingFlags.Instance | BindingFlags.NonPublic)!
-            .SetValue(world.Player.Playfield, 117);
+        world.Player.Inventory.SeedClientContainerHandle(117);
         return services;
     }
 

@@ -159,6 +159,16 @@ namespace ZoneEngine_New.Core.Commands
 
         void GiveCreatedItem(GmCommandContext context, Item item)
         {
+            // Only items a player could hold: world props, NPC weapons and similar templates lack the Carry flag.
+            if (item.Definition == null
+                || !item.Definition.Stats.TryGetValue(CharacterStat.Can, out int can)
+                || ((uint)can & (uint)CanFlags.Carry) == 0)
+            {
+                GmCommandFeedback.Send(context.Session, context.Player,
+                    string.Format(CultureInfo.InvariantCulture, "{0} ({1}) cannot be carried.", item.Name, item.LowId));
+                return;
+            }
+
             Player subject = context.ResolveSubject();
             if (!subject.Inventory.IsHydrated)
             {

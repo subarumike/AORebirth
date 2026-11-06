@@ -3,6 +3,7 @@ namespace ZoneEngine_New.Core.Knubot;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Text;
 
 using ZoneEngine_New.Core.Inventory;
@@ -10,7 +11,7 @@ using ZoneEngine_New.Core.Inventory;
 /// <summary>
 /// Turns line text into ordered pieces and effects. Tags:
 /// text <c>{name}</c> <c>{npc}</c> <c>{itemref LOW HIGH QL}</c> <c>{emote}…{/emote}</c> <c>{delay SECONDS}</c>;
-/// effects (applied when the text reaches them) <c>{givequest HASH}</c> <c>{completequest HASH}</c> <c>{spawn ITEMHASH QL|level [count]}</c> <c>{shop}</c> <c>{opentrade}</c> <c>{givebuff NANOID}</c> <c>{useitem ITEMID}</c>; flow <c>{goto LINE}</c> <c>{close [SECONDS]}</c>.
+/// effects (applied when the text reaches them) <c>{givequest HASH}</c> <c>{completequest HASH}</c> <c>{spawn ITEMHASH QL|level [count]}</c> <c>{take ITEMHASH [count]}</c> <c>{shop}</c> <c>{opentrade}</c> <c>{givebuff NANOID}</c> <c>{useitem ITEMID}</c>; flow <c>{goto LINE}</c> <c>{close [SECONDS]}</c>.
 /// <c>{{</c> and <c>}}</c> write literal braces. Reply text allows only the text tags without delay.
 /// </summary>
 public static class KnubotParser
@@ -178,6 +179,18 @@ public static class KnubotParser
                     Effect(new KnubotSpawnItem(words[1], atLevel ? null : quality, spawnCount));
                     break;
 
+                case "take":
+                    int takeCount = 1;
+                    if (words.Length < 2 || words.Length > 3 || !load.TryItemTemplates(words[1], out HashSet<int> takeTemplates)
+                        || (words.Length == 3 && (!KnubotCondition.TryPositive(words[2], out takeCount) || takeCount > MaxItemCount)))
+                    {
+                        errors.Add("expected {take ITEMHASH [count<=" + MaxItemCount + "]} with a known item hash: {" + body + "}");
+                        break;
+                    }
+
+                    Effect(new KnubotTakeItem(takeTemplates, takeCount));
+                    break;
+
                 case "shop":
                     Expect(words, 1, 1, body, errors);
                     Effect(new KnubotOpenShop());
@@ -199,9 +212,15 @@ public static class KnubotParser
                     break;
 
                 case "useitem":
-                    if (words.Length != 2 || !KnubotCondition.TryPositive(words[1], out int useItemId) || !load.Items.TryGet(useItemId, out _))
+                    // An item hash (PRRS, the Perk Reset Item) or an item id; a hash must name exactly one template.
+                    int useItemId = 0;
+                    bool useItemResolved = words.Length == 2
+                        && (KnubotCondition.TryPositive(words[1], out useItemId)
+                            || (load.TryItemTemplates(words[1], out HashSet<int> useItemTemplates)
+                                && useItemTemplates.Count == 1 && (useItemId = useItemTemplates.First()) > 0));
+                    if (!useItemResolved || !load.Items.TryGet(useItemId, out _))
                     {
-                        errors.Add("expected {useitem ITEMID} with a known item id: {" + body + "}");
+                        errors.Add("expected {useitem ITEMHASH} (one template) or {useitem ITEMID} with a known item: {" + body + "}");
                         break;
                     }
 

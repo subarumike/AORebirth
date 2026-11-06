@@ -24,5 +24,11 @@ namespace ZoneEngine_New.Core.Mobs
         /// template whose Flags has the boss bit (NpcTemplateCatalog), and can be listed for any other hash.
         /// </summary>
         Boss,
+
+        /// <summary>
+        /// Answers its kind's calls for help (Gameplay.json socialAggro) even when it has no aggressiveness of its own
+        /// (BreedHostility 0). Without it, only aggressive NPCs and guards join a fight they were not part of.
+        /// </summary>
+        Social,
     }
 }

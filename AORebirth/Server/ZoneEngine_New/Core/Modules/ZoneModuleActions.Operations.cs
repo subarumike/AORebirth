@@ -23,13 +23,10 @@ namespace ZoneEngine_New.Core.Modules
     /// </summary>
     internal sealed partial class ZoneModuleActions
     {
-        /// <summary>
-        /// The login.Flags value an account ban writes. LoginEngine (CheckLogin) and the account broker admit an account
-        /// only while Flags is 0; nothing else writes Flags after an account is created.
-        /// </summary>
-        internal const int BannedLoginFlags = 1;
+        /// <summary>The issuer recorded on a sanction a module writes when the caller is not known (no capability gate).</summary>
+        internal const string UnknownModuleIssuer = "module";
 
-        sealed record Operation(OperationDescriptor Descriptor, Func<OperationTarget, OperationArgs, Task<OperationResult>> Run);
+        sealed record Operation(OperationDescriptor Descriptor, Func<OperationTarget, OperationArgs, string, Task<OperationResult>> Run);
 
         static OperationParameter Required(string name, OperationValueType type, string summary) => new(name, type, true, summary);
 
@@ -38,6 +35,13 @@ namespace ZoneEngine_New.Core.Modules
         public IReadOnlyList<OperationDescriptor> Operations => _operations.Values.Select(x => x.Descriptor).ToArray();
 
         public Task<OperationResult> Invoke(string operation, OperationTarget target, OperationArgs args)
+            => Invoke(operation, target, args, UnknownModuleIssuer);
+
+        /// <summary>
+        /// <see cref="Invoke(string, OperationTarget, OperationArgs)"/> on behalf of <paramref name="issuer"/>
+        /// (<c>module:Id</c>), which account sanctions record. The capability gate passes it, so a module cannot set it.
+        /// </summary>
+        internal Task<OperationResult> Invoke(string operation, OperationTarget target, OperationArgs args, string issuer)
         {
             args ??= OperationArgs.Empty;
             if (string.IsNullOrEmpty(operation) || !_operations.TryGetValue(operation, out Operation? registered))
@@ -62,7 +66,24 @@ namespace ZoneEngine_New.Core.Modules
                         descriptor.Name + " needs '" + parameter.Name + "' as " + parameter.Type + "."));
             }
 
-            return registered.Run(target, args);
+            return registered.Run(target, args, issuer);
+        }
+
+        public Task<IReadOnlyList<AccountSanctionInfo>> AccountSanctions(string account, int limit = 20)
+        {
+            if (_accounts == null || string.IsNullOrWhiteSpace(account))
+                return Task.FromResult<IReadOnlyList<AccountSanctionInfo>>(Array.Empty<AccountSanctionInfo>());
+
+            return ReadSanctions(_accounts(), account, Math.Clamp(limit, 1, 500));
+        }
+
+        static async Task<IReadOnlyList<AccountSanctionInfo>> ReadSanctions(
+            ZoneEngine_New.Core.Accounts.AccountSanctionService accounts, string account, int limit)
+        {
+            IReadOnlyList<ZoneEngine_New.Core.Accounts.AccountSanction> rows = await accounts.History(account, limit).ConfigureAwait(false);
+            DateTime now = DateTime.UtcNow;
+            return rows.Select(x => new AccountSanctionInfo(x.Id, x.Account, x.IssuedAtUtc, x.EndsAtUtc, x.IssuedBy, x.Reason,
+                x.LiftedAtUtc, x.LiftedBy, x.LiftReason, x.IsActive(now))).ToArray();
         }
 
         Dictionary<string, Operation> BuildOperations()
@@ -70,7 +91,11 @@ namespace ZoneEngine_New.Core.Modules
             var operations = new Dictionary<string, Operation>(StringComparer.OrdinalIgnoreCase);
             void Add(string name, TargetKind target, string summary, OperationParameter[] parameters,
                 Func<OperationTarget, OperationArgs, Task<OperationResult>> run)
-                => operations.Add(name, new Operation(new OperationDescriptor(name, target, parameters, name, summary), run));
+                => operations.Add(name, new Operation(new OperationDescriptor(name, target, parameters, name, summary),
+                    (on, args, _) => run(on, args)));
+            void AddAccount(string name, string summary, OperationParameter[] parameters,
+                Func<OperationTarget, OperationArgs, string, Task<OperationResult>> run)
+                => operations.Add(name, new Operation(new OperationDescriptor(name, TargetKind.Account, parameters, name, summary), run));
 
             Add(OperationNames.NpcRefresh, TargetKind.Npc,
                 "Sends the NPC's spawn extras again to everyone who sees it.", [],
@@ -105,10 +130,25 @@ namespace ZoneEngine_New.Core.Modules
                 Kick);
             if (_accounts != null)
             {
-                Add(OperationNames.AccountBan, TargetKind.Account,
-                    "Blocks the account from logging in (login.Flags). Characters in play stay until they log out or are kicked.",
-                    [Optional("reason", OperationValueType.String, "For the log.")],
-                    Ban);
+                AddAccount(OperationNames.AccountBan,
+                    "Bans the account permanently (a sanction row) and removes its characters in play.",
+                    [Optional("reason", OperationValueType.String, "Kept on the sanction and told to the player.")],
+                    (target, args, issuer) => Sanction(target, args, issuer, null));
+                AddAccount(OperationNames.AccountSuspend,
+                    "Suspends the account for a time (a sanction row) and removes its characters in play. It ends by itself.",
+                    [
+                        Required("seconds", OperationValueType.Int, "How long: 60 seconds to ten years."),
+                        Optional("reason", OperationValueType.String, "Kept on the sanction and told to the player.")
+                    ],
+                    (target, args, issuer) =>
+                    {
+                        args.TryGetInt("seconds", out int seconds);
+                        return Sanction(target, args, issuer, seconds);
+                    });
+                AddAccount(OperationNames.AccountUnban,
+                    "Lifts every active suspension and ban of the account, including a pre-1.8 login.Flags ban.",
+                    [Optional("reason", OperationValueType.String, "Kept on the lifted sanctions.")],
+                    Unban);
             }
             if (_shutdown != null)
             {
@@ -211,34 +251,55 @@ namespace ZoneEngine_New.Core.Modules
             }, OperationResult.Fail(OperationCodes.NotHere, "The player is not in play here."));
         }
 
-        Task<OperationResult> Ban(OperationTarget target, OperationArgs args)
+        /// <summary>account.ban (<paramref name="seconds"/> null) and account.suspend.</summary>
+        async Task<OperationResult> Sanction(OperationTarget target, OperationArgs args, string issuer, long? seconds)
         {
             string account = target.Account?.Trim() ?? string.Empty;
             if (account.Length == 0)
-                return Task.FromResult(OperationResult.Fail(OperationCodes.BadArgs, "An account name is needed."));
+                return OperationResult.Fail(OperationCodes.BadArgs, "An account name is needed.");
+            if (seconds is < ZoneEngine_New.Core.Accounts.AccountSanctionService.MinSuspensionSeconds
+                or > ZoneEngine_New.Core.Accounts.AccountSanctionService.MaxSuspensionSeconds)
+                return OperationResult.Fail(OperationCodes.BadArgs, "seconds must be 60 seconds to ten years.");
 
-            string reason = args.GetString("reason");
-            Func<ZoneEngine_New.Core.Data.ILoginFlagsRepository> accounts = _accounts!;
-            return Task.Run(() =>
+            ZoneEngine_New.Core.Accounts.SanctionIssueResult result;
+            try
             {
-                int rows;
-                try
-                {
-                    rows = accounts().SetLoginFlags(account, BannedLoginFlags);
-                }
-                catch (Exception exception)
-                {
-                    _logger?.Error(exception, "Module operation account.ban failed for account " + account + ".");
-                    return OperationResult.Fail(OperationCodes.Failed, "The account could not be updated.");
-                }
+                result = await _accounts!().Issue(account, seconds, issuer, args.GetString("reason")).ConfigureAwait(false);
+            }
+            catch (Exception exception)
+            {
+                _logger?.Error(exception, "Module account sanction failed for account " + account + ".");
+                return OperationResult.Fail(OperationCodes.Failed, "The sanction could not be recorded.");
+            }
 
-                if (rows == 0)
-                    return OperationResult.Fail(OperationCodes.Failed, "No account named '" + account + "'.");
+            return result.Ok
+                ? OperationResult.Success(string.Format(CultureInfo.InvariantCulture, "Sanction #{0} until {1}; {2} character(s) removed here.",
+                    result.Sanction!.Id, ZoneEngine_New.Core.Accounts.AccountSanctionService.Describe(result.Sanction.EndsAtUtc), result.Removed))
+                : OperationResult.Fail(OperationCodes.Failed, result.Error);
+        }
 
-                _logger?.Warn(string.Format(CultureInfo.InvariantCulture,
-                    "Module operation account.ban account={0} reason={1}", account, reason));
-                return OperationResult.Success();
-            });
+        async Task<OperationResult> Unban(OperationTarget target, OperationArgs args, string issuer)
+        {
+            string account = target.Account?.Trim() ?? string.Empty;
+            if (account.Length == 0)
+                return OperationResult.Fail(OperationCodes.BadArgs, "An account name is needed.");
+
+            ZoneEngine_New.Core.Accounts.SanctionLift lift;
+            try
+            {
+                lift = await _accounts!().Lift(account, issuer, args.GetString("reason")).ConfigureAwait(false);
+            }
+            catch (Exception exception)
+            {
+                _logger?.Error(exception, "Module account unban failed for account " + account + ".");
+                return OperationResult.Fail(OperationCodes.Failed, "The sanctions could not be lifted.");
+            }
+
+            if (!lift.AccountFound)
+                return OperationResult.Fail(OperationCodes.Failed, "No account named '" + account + "'.");
+            return lift.Lifted == 0 && !lift.LegacyFlagsCleared
+                ? OperationResult.Fail(OperationCodes.Failed, "The account has no active suspension or ban.")
+                : OperationResult.Success(string.Format(CultureInfo.InvariantCulture, "{0} sanction(s) lifted.", lift.Lifted));
         }
     }
 }

@@ -74,15 +74,19 @@ namespace ZoneEngine_New.Core.Quests
         /// <summary>Single follow-up quest hash, assigned when this one completes.</summary>
         public string? NextStep { get; set; }
 
-        public QuestReward? Reward { get; set; }
-
         /// <summary>
-        /// A Quests.json quest that runs out this many seconds after it is assigned, with the journal timer, as a
-        /// generated quest does: live's DOJA cooldown mission ("You can only turn in one DOJA chip today.", 64800 s),
-        /// which the chips' HasActiveQuest refuses on while it runs. Null: it never expires. Not read for generated
-        /// quests, which carry their own expiry.
+        /// Hours a template quest stays active after it is assigned, then it expires like a generated one, with the journal
+        /// timer: the Perk-Reset Service Provider's 48 hour Full Perk Points Reset Service, or live's 18 hour DOJA cooldown
+        /// mission ("You can only turn in one DOJA chip today.", 64800 s) that the chips' HasActiveQuest refuses on while
+        /// it runs. Null or 0: never expires. Not read for generated quests, which carry their own expiry.
         /// </summary>
-        public int? ExpiresAfterSeconds { get; set; }
+        public int? ExpiresAfterHours { get; set; }
+
+        /// <summary>When a template quest assigned at <paramref name="assignedAtUtc"/> expires; null when it never does.</summary>
+        public DateTime? ExpiresAt(DateTime assignedAtUtc)
+            => ExpiresAfterHours is int hours and > 0 ? assignedAtUtc.AddHours(hours) : null;
+
+        public QuestReward? Reward { get; set; }
 
         /// <summary>
         /// Items the player is handed when this step is assigned, however it starts (a previous step, Knubot

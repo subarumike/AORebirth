@@ -1,0 +1,53 @@
+{
+  "Channels": [
+    {
+      "Id": 100,
+      "Color": "admin",
+      "Name": "Global",
+      "Flags": [ "CantIgnore", "NoInternational" ],
+      "Conditions": []
+    },
+    {
+      "Id": 1,
+      "Color": "seekingteam",
+      "Name": "Shopping 1-50",
+      "Conditions": [ { "Kind": "Stat", "Stat": "Level", "Min": 1, "Max": 50 } ]
+    },
+    {
+      "Id": 2,
+      "Color": "seekingteam",
+      "Name": "Shopping 51-150",
+      "Conditions": [ { "Kind": "Stat", "Stat": "Level", "Min": 51, "Max": 150 } ]
+    },
+    {
+      "Id": 3,
+      "Color": "seekingteam",
+      "Name": "Shopping 151-220",
+      "Conditions": [ { "Kind": "Stat", "Stat": "Level", "Min": 151, "Max": 220 } ]
+    },
+    {
+      "Id": 6,
+      "Color": "gm",
+      "Name": "Suiv's Playground",
+      "Conditions": [ { "Kind": "GmLevel", "Min": 1 } ]
+    },
+    {
+      "Id": 1,
+      "Color": "newbie",
+      "Name": "Clan",
+      "Conditions": [ { "Kind": "Side", "Sides": [ "Clan" ] } ]
+    },
+    {
+      "Id": 2,
+      "Color": "newbie",
+      "Name": "Omni-Tek",
+      "Conditions": [ { "Kind": "Side", "Sides": [ "Omni" ] } ]
+    },
+    {
+      "Id": 0,
+      "Color": "newbie",
+      "Name": "Neutral",
+      "Conditions": [ { "Kind": "Side", "Sides": [ "Neutral" ] } ]
+    }
+  ]
+}

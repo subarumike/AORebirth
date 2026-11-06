@@ -159,6 +159,14 @@ namespace ZoneEngine_New.Core.GameData
             return true;
         }
 
+        /// <summary>The breed's untrained base for an ability: the value it starts at and the lowest it can be trained back to.</summary>
+        public bool TryGetAbilityFloor(Breed breed, CharacterStat ability, out int floor)
+        {
+            bool found = _abilityRows.TryGetValue((breed, ability), out AbilityRow row);
+            floor = found ? row.Base : 0;
+            return found;
+        }
+
         public static SkillCatalog Load(string root)
         {
             TrickleFile trickle = Read<TrickleFile>(root, GameDataPaths.SkillTrickleFileName);

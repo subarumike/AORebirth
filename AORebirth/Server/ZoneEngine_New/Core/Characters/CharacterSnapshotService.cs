@@ -61,7 +61,11 @@ namespace ZoneEngine_New.Core.Characters
             _logger = logger;
         }
 
-        public void Commit(Player player)
+        /// <summary>
+        /// The logout save. <paramref name="relocate"/> stores the character there instead of where it stands (a death
+        /// settled on logout: <see cref="Player.SettleDeathForLogout"/>), keeping its heading.
+        /// </summary>
+        public void Commit(Player player, (int Playfield, Vector3 Landing)? relocate = null)
         {
             ArgumentNullException.ThrowIfNull(player);
 
@@ -73,7 +77,7 @@ namespace ZoneEngine_New.Core.Characters
                 long sequence = player.SaveState.NextSequence();
                 try
                 {
-                    if (CommitCore(player) is { } committed)
+                    if (CommitCore(player, relocate) is { } committed)
                         player.SaveState.MarkCommitted(sequence, committed.Stats, committed.Location);
                 }
                 catch (DatabaseCommitOutcomeUnknownException)
@@ -168,7 +172,7 @@ namespace ZoneEngine_New.Core.Characters
             }
         }
 
-        private (CharacterRecord Location, List<StatRecord> Stats)? CommitCore(Player player)
+        private (CharacterRecord Location, List<StatRecord> Stats)? CommitCore(Player player, (int Playfield, Vector3 Landing)? relocate)
         {
             int characterId = player.Identity.Instance;
             if (characterId <= 0)
@@ -198,7 +202,13 @@ namespace ZoneEngine_New.Core.Characters
             }
 
             Vector3 position = player.Position;
-            CharacterRecord record = CaptureLocation(player, characterId, playfieldId);
+            if (relocate is { } destination && destination.Playfield > 0)
+            {
+                playfieldId = destination.Playfield;
+                position = destination.Landing;
+            }
+
+            CharacterRecord record = CaptureLocation(player, characterId, playfieldId, position);
             List<StatRecord> stats = CaptureBaseStats(player);
             _characters.SaveSnapshot(record, online: 0, stats);
 
@@ -256,8 +266,10 @@ namespace ZoneEngine_New.Core.Characters
         }
 
         private static CharacterRecord CaptureLocation(Player player, int characterId, int playfieldId)
+            => CaptureLocation(player, characterId, playfieldId, player.Position);
+
+        private static CharacterRecord CaptureLocation(Player player, int characterId, int playfieldId, Vector3 position)
         {
-            Vector3 position = player.Position;
             Quaternion heading = player.Rotation;
             return new CharacterRecord
             {

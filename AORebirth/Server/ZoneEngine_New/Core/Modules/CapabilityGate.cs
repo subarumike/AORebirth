@@ -153,6 +153,12 @@ namespace ZoneEngine_New.Core.Modules
             return actions.RespawnNpc(playfieldId, instance);
         }
 
+        public Task<IReadOnlyList<AccountSanctionInfo>> AccountSanctions(string account, int limit = 20)
+        {
+            gate.Require(ModuleCapabilities.ReadSanctions);
+            return actions.AccountSanctions(account, limit);
+        }
+
         public IReadOnlyList<OperationDescriptor> Operations
             => actions.Operations.Select(x => x with { Granted = gate.AllowsOperation(x.Name) }).ToArray();
 
@@ -161,7 +167,10 @@ namespace ZoneEngine_New.Core.Modules
             if (!string.IsNullOrEmpty(operation) && actions.Operations.Any(x => string.Equals(x.Name, operation, StringComparison.OrdinalIgnoreCase)))
                 gate.RequireOperation(operation);
 
-            OperationResult result = await actions.Invoke(operation, target, args).ConfigureAwait(false);
+            // Account sanctions record which module issued them; the module cannot name itself otherwise.
+            OperationResult result = actions is ZoneModuleActions engine
+                ? await engine.Invoke(operation, target, args, "module:" + gate.ModuleId).ConfigureAwait(false)
+                : await actions.Invoke(operation, target, args).ConfigureAwait(false);
             gate.Log(string.Format(CultureInfo.InvariantCulture,
                 "Module {0} operation {1} target={2}:{3}{4} args=[{5}] result={6}{7}",
                 gate.ModuleId, operation, target.Kind, target.Kind == TargetKind.Account ? target.Account : target.Id.ToString(CultureInfo.InvariantCulture),

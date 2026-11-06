@@ -1967,6 +1967,11 @@ namespace ZoneEngine_New.Core.Trade
         /// <summary>Placement marker meaning "next free slot"; the client picks the real slot.</summary>
         const int NextFreeSlotMarker = 0x6F;
 
+        /// <summary>
+        /// Renders an offered item into the partner's pane with its full stack Count: the receiving client keeps
+        /// this rendered copy when the trade completes, so a 1 here shows a received stack as 1 until rezone
+        /// (capture 2026-11-06T13:42:12Z: 49990-stack render carries 0xC346).
+        /// </summary>
         static void SendItemRender(Player viewer, Item item, Identity source)
             => viewer.Session?.Send(
                 new TemplateActionMessage
@@ -1976,7 +1981,7 @@ namespace ZoneEngine_New.Core.Trade
                     ItemLowId = item.LowId,
                     ItemHighId = item.HighId,
                     Quality = item.Quality,
-                    Unknown1 = 1,
+                    Count = item.StackCount,
                     Action = TemplateActionType.TradeRender,
                     Placement = source,
                     Unknown3 = 0,
@@ -2035,7 +2040,7 @@ namespace ZoneEngine_New.Core.Trade
                     ItemLowId = item.LowId,
                     ItemHighId = item.HighId,
                     Quality = item.Quality,
-                    Unknown1 = 1,
+                    Count = item.StackCount,
                     Action = TemplateActionType.Overflow,
                     Placement = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 },
                     Unknown3 = 0,

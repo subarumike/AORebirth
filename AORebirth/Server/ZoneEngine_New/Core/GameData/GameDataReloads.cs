@@ -9,6 +9,8 @@ namespace ZoneEngine_New.Core.GameData
     using ZoneEngine_New.Core.Knubot;
     using ZoneEngine_New.Core.Mobs;
     using ZoneEngine_New.Core.NpcScripts;
+    using ZoneEngine_New.Core.Quests;
+    using ZoneEngine_New.Core.Tradeskills;
 
     using AORebirth.Core.GameData;
 
@@ -112,9 +114,12 @@ namespace ZoneEngine_New.Core.GameData
 
     /// <summary>
     /// ItemTemplates.json, the hash catalog inside <see cref="GameDataStore"/>. Knubot item conditions resolve hashes
-    /// when the scripts load, so a successful reload reloads Knubot too.
+    /// when the scripts load, so a successful reload reloads Knubot too. The minter's per-hash QL caches were built from
+    /// the old catalog, so they are dropped as well.
     /// </summary>
-    public sealed class ItemTemplatesReload(IGameData gameData, KnubotCatalog knubot) : IReloadableGameData
+    public sealed class ItemTemplatesReload(IGameData gameData, KnubotCatalog knubot,
+        ZoneEngine_New.Core.Inventory.HashItemMinter minter)
+        : IReloadableGameData
     {
         public string Name => "ItemTemplates";
 
@@ -129,6 +134,7 @@ namespace ZoneEngine_New.Core.GameData
             if (!items.Ok)
                 return items;
 
+            minter.ClearCaches();
             KnubotLoadResult scripts = knubot.Reload();
             if (scripts.Problems.Count == 0)
                 return items;
@@ -137,6 +143,43 @@ namespace ZoneEngine_New.Core.GameData
             foreach (string problem in scripts.Problems)
                 problems.Add("Knubot: " + problem);
             return new GameDataReloadResult(Name, true, items.Entries, problems);
+        }
+    }
+
+    /// <summary>Tradeskills.json, swapped inside <see cref="TradeskillService"/>.</summary>
+    public sealed class TradeskillsReload(TradeskillService tradeskills) : IReloadableGameData
+    {
+        public string Name => TradeskillCatalog.ReloadName;
+
+        public IReadOnlyList<string> Files { get; } = [TradeskillCatalog.FileName];
+
+        public GameDataReloadResult Reload() => tradeskills.ReloadCatalog();
+    }
+
+    /// <summary>
+    /// Quests.json. A quest a player already holds keeps its template until it is accepted again. Knubot quest
+    /// conditions and effects resolve quest hashes when the scripts load, so a successful reload reloads Knubot too.
+    /// </summary>
+    public sealed class QuestsReload(QuestCatalog quests, KnubotCatalog knubot) : IReloadableGameData
+    {
+        public string Name => QuestCatalog.ReloadName;
+
+        public IReadOnlyList<string> Files { get; } = [QuestCatalog.FileName];
+
+        public GameDataReloadResult Reload()
+        {
+            GameDataReloadResult loaded = quests.Reload();
+            if (!loaded.Ok)
+                return loaded;
+
+            KnubotLoadResult scripts = knubot.Reload();
+            if (scripts.Problems.Count == 0)
+                return loaded;
+
+            var problems = new List<string>(loaded.Problems);
+            foreach (string problem in scripts.Problems)
+                problems.Add("Knubot: " + problem);
+            return new GameDataReloadResult(Name, true, loaded.Entries, problems);
         }
     }
 

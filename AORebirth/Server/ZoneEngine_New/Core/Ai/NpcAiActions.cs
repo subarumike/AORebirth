@@ -1,7 +1,5 @@
 namespace ZoneEngine_New.Core.Ai
 {
-    using System.Collections.Generic;
-
     using GroveGames.BehaviourTree.Nodes;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -10,7 +8,6 @@ namespace ZoneEngine_New.Core.Ai
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Metrics;
 
-    using Vector3 = AORebirth.Core.Vector.Vector3;
 
     sealed class ReturnToSpawnNode : BehaviourNode
     {
@@ -170,7 +167,6 @@ namespace ZoneEngine_New.Core.Ai
     sealed class PatrolNode : BehaviourNode
     {
         readonly NpcBrain _brain;
-        int _index;
 
         public PatrolNode(NpcBrain brain)
             : base("patrol")
@@ -181,36 +177,31 @@ namespace ZoneEngine_New.Core.Ai
         public override NodeState Evaluate(float deltaTime)
         {
             TickStallWatch.Stage("node.patrol", _brain.Npc.Identity.Instance);
-            IReadOnlyList<Vector3> points = _brain.PatrolWaypoints;
-            if (points.Count == 0)
-            {
-                _brain.PatrolAnchor = null;
-                return _nodeState = NodeState.Failure;
-            }
+            // Success, like WanderNode: a Running patrol was resumed by the root Selector every think without
+            // re-checking leash or hate, so a hit patroller kept walking its route. The route cursor lives in the brain.
+            return _nodeState = _brain.TickPatrol() ? NodeState.Success : NodeState.Failure;
+        }
+    }
 
-            if (_index >= points.Count)
-                _index = 0;
+    /// <summary>
+    /// A player has a Knubot chat open with the NPC (NpcBrain.IsHeldByConversation): it stands instead of walking its
+    /// program, patrol or stroll. After leash and combat, so a fight still takes over.
+    /// </summary>
+    sealed class HoldForConversationNode : BehaviourNode
+    {
+        readonly NpcBrain _brain;
 
-            // Each NPC walks the route shifted by its own stable offset (NpcSpread), so a shared route does not stack.
-            Vector3 dest = NpcSpread.Destination(_brain.Npc, points[_index]);
-            if (NpcAiRules.IsNearby(_brain.Npc.Position, dest, NpcAiRules.ArriveHomeMeters))
-            {
-                // A program bound to this NPC may act at the waypoint (NpcScripts Arrived).
-                _brain.Npc.Scripts?.Raise(NpcScripts.NpcScriptTrigger.Arrived, _index);
-                _index = (_index + 1) % points.Count;
-                dest = NpcSpread.Destination(_brain.Npc, points[_index]);
-            }
-
-            // The leash measures from this waypoint while the patrol walks to it (NpcBrain.LeashAnchor).
-            _brain.PatrolAnchor = dest;
-            _brain.PathTo(dest);
-            return _nodeState = NodeState.Running;
+        public HoldForConversationNode(NpcBrain brain)
+            : base("conversation-hold")
+        {
+            _brain = brain;
         }
 
-        public override void Reset()
+        public override NodeState Evaluate(float deltaTime)
         {
-            _index = 0;
-            _brain.PatrolAnchor = null;
+            TickStallWatch.Stage("node.conversation-hold", _brain.Npc.Identity.Instance);
+            _brain.TickConversationHold();
+            return _nodeState = NodeState.Success;
         }
     }
 

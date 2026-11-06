@@ -1,6 +1,7 @@
 namespace ZoneEngine_New.Core.Helpers
 {
     using System;
+    using System.Linq;
 
     using AORebirth.Enums;
 
@@ -156,6 +157,7 @@ namespace ZoneEngine_New.Core.Helpers
 
             HitType hitType = HitType.Normal;
             bool isBurst = specialAttackStat == CharacterStat.Burst;
+            // Critical Increase is the crit percent: Character.BaseCriticalIncrease plus gear, buffs and perks.
             double critChance = NormalizeStat(attacker.Stats.GetOrZero(CharacterStat.CriticalIncrease));
             // PvP rules (Gameplay.json pvp.critChancePercent) scale the chance against a player.
             critChance = attacker.Playfield?.GetService<Configuration.GameplaySettings>()?.Pvp
@@ -196,7 +198,8 @@ namespace ZoneEngine_New.Core.Helpers
         /// <summary>
         /// Whether a hostile nano lands or is resisted. The nano's Attack skills (its nano skill lines) plus the caster's
         /// Add All Off. make the attack rating; its Defend skills plus the target's Add All Def. make the defense rating.
-        /// A nano without Defend skills defends with Nano Resist. The two ratings go through the weapon hit curve.
+        /// A nano without positively weighted Defend skills has no defense contest and lands without a roll. Nanos
+        /// declaring defense skills send the two ratings through the weapon hit curve.
         /// NOTE: the retail nano-resist formula is not known. This reuses the weapon hit curve so a nano skill against an
         /// equal Nano Resist lands about as often as an equal weapon skill hits; it may need tuning once players report
         /// land rates.
@@ -214,10 +217,14 @@ namespace ZoneEngine_New.Core.Helpers
             ArgumentNullException.ThrowIfNull(nano);
 
             attackRating = ResolveAttackRating(caster, nano);
-            defenseRating = nano.Defend is { Count: > 0 }
-                ? ResolveDefenseRating(target, nano)
-                : NormalizeStat(target.Stats.GetOrZero(CharacterStat.NanoAC))
-                    + NormalizeStat(target.Stats.GetOrZero(CharacterStat.DMSModifier));
+            defenseRating = 0;
+            if (nano.Defend is not { Count: > 0 } || !nano.Defend.Values.Any(static weight => weight > 0))
+            {
+                landChancePercent = 100;
+                return true;
+            }
+
+            defenseRating = ResolveDefenseRating(target, nano);
             double hitPercentage = HitPercentage(attackRating, defenseRating, aggDef: 0);
             landChancePercent = (int)Math.Round(Math.Clamp(hitPercentage, 0, 1) * 100);
             return NextDouble() <= hitPercentage;
@@ -359,6 +366,24 @@ namespace ZoneEngine_New.Core.Helpers
 
             int overrideType = NormalizeStat(attacker.Stats.GetOrZero(CharacterStat.DamageOverrideType));
             return overrideType > 0 ? overrideType : rawDamageType;
+        }
+
+        /// <summary>
+        /// The attacker's active damage type: what a swing with its armed weapon deals (the main hand, else the combined
+        /// martial arts slot, else the off hand), with its DamageOverrideType over that. A Hit that names no damage type
+        /// (Nano Feast 253119 [Health, -550, -690, 0]) deals this type. 0 with no weapon and no override.
+        /// </summary>
+        internal static int ResolveActiveDamageType(Character attacker)
+        {
+            ArgumentNullException.ThrowIfNull(attacker);
+            CharacterWeapon? weapon = null;
+            foreach (WeaponSlot slot in (ReadOnlySpan<WeaponSlot>)[WeaponSlot.MainHand, WeaponSlot.CombinedMA, WeaponSlot.OffHand])
+            {
+                if (attacker.Weapons.TryGetValue(slot, out weapon) && weapon != null)
+                    break;
+            }
+
+            return ResolveDamageType(attacker, weapon?.DamageTypeItem);
         }
 
         /// <summary>

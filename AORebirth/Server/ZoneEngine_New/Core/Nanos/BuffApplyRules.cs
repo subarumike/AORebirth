@@ -8,13 +8,13 @@ namespace ZoneEngine_New.Core.Nanos
         /// <summary>Nothing in NCU conflicts; add the buff.</summary>
         Apply,
 
-        /// <summary>An existing entry must leave first (recast or weaker same-strain nano).</summary>
+        /// <summary>Existing entries must leave first (recast, or weaker nanos on a shared nano line).</summary>
         Replace,
 
         /// <summary>The nano has no duration, so it never enters NCU.</summary>
         RefusedNotABuff,
 
-        /// <summary>A same-strain nano with a higher stacking order is already up.</summary>
+        /// <summary>A nano sharing a line with a higher stacking order is already up.</summary>
         RefusedStrainStronger,
 
         /// <summary>The target does not have enough free NCU.</summary>
@@ -30,23 +30,27 @@ namespace ZoneEngine_New.Core.Nanos
         /// <summary>
         /// Decides whether <paramref name="spell"/> can land. Friendly buffs must fit
         /// <paramref name="maxNcu"/> unless they ignore NCU; hostile nanos never consume it.
+        /// A nano conflicts with every running buff it shares a nano line with (<see cref="NanoSpell.StackingLines"/>):
+        /// one with a higher stacking order refuses it, and the rest all leave when it lands, so a composite
+        /// replaces each single-line nano it covers. <paramref name="replaced"/> lists them on
+        /// <see cref="BuffApplyDecision.Replace"/>; otherwise it is empty.
         /// </summary>
         public static BuffApplyDecision Evaluate(
             NanoSpell spell,
             IReadOnlyList<Buff> active,
             int maxNcu,
-            out Buff? replaced)
+            out IReadOnlyList<Buff> replaced)
         {
             ArgumentNullException.ThrowIfNull(spell);
             ArgumentNullException.ThrowIfNull(active);
 
-            replaced = null;
+            replaced = [];
             if (!spell.IsBuff)
                 return BuffApplyDecision.RefusedNotABuff;
 
-            Buff? sameNano = null;
-            Buff? strainConflict = null;
+            List<Buff>? leaving = null;
             int usedNcu = 0;
+            int freedNcu = 0;
             for (int i = 0; i < active.Count; i++)
             {
                 Buff buff = active[i];
@@ -54,31 +58,28 @@ namespace ZoneEngine_New.Core.Nanos
                     usedNcu += buff.NcuCost;
 
                 // A recast refreshes itself and never loses the stacking comparison.
-                if (buff.Id == spell.Id)
+                if (buff.Id != spell.Id)
                 {
-                    sameNano = buff;
-                    continue;
-                }
+                    if (!spell.SharesStackingLine(buff))
+                        continue;
 
-                if (spell.NanoStrain > 0 && buff.NanoStrain == spell.NanoStrain)
-                {
                     if (buff.StackingOrder > spell.StackingOrder)
                         return BuffApplyDecision.RefusedStrainStronger;
-
-                    strainConflict ??= buff;
                 }
+
+                (leaving ??= new List<Buff>(1)).Add(buff);
+                if (buff.ConsumesNcu)
+                    freedNcu += buff.NcuCost;
             }
 
-            replaced = sameNano ?? strainConflict;
+            if (spell.ConsumesNcu && usedNcu - freedNcu + spell.NcuCost > maxNcu)
+                return BuffApplyDecision.RefusedNotEnoughNcu;
 
-            if (spell.ConsumesNcu)
-            {
-                int freed = replaced != null && replaced.ConsumesNcu ? replaced.NcuCost : 0;
-                if (usedNcu - freed + spell.NcuCost > maxNcu)
-                    return BuffApplyDecision.RefusedNotEnoughNcu;
-            }
+            if (leaving == null)
+                return BuffApplyDecision.Apply;
 
-            return replaced == null ? BuffApplyDecision.Apply : BuffApplyDecision.Replace;
+            replaced = leaving;
+            return BuffApplyDecision.Replace;
         }
     }
 }

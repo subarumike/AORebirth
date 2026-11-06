@@ -44,7 +44,7 @@ namespace ZoneEngine_New.Core.Modules
         private string? _handoffHookOwner;
 
         private ZoneModuleHost(IZoneLogger logger, IKnubotScripts knubot, IZoneGameData gameData,
-            Func<Playfield.PlayfieldManager> playfields, Func<ZoneEngine_New.Core.Data.ILoginFlagsRepository>? accounts,
+            Func<Playfield.PlayfieldManager> playfields, Func<ZoneEngine_New.Core.Accounts.AccountSanctionService>? accounts,
             string? gameDataRoot, Func<ZoneEngine_New.Core.Lifecycle.ShutdownScheduler>? shutdown)
         {
             _logger = logger;
@@ -72,7 +72,7 @@ namespace ZoneEngine_New.Core.Modules
             Func<Knubot.KnubotCatalog> knubot,
             Func<Playfield.PlayfieldManager> playfields,
             Func<ZoneEngine_New.Core.GameData.GameDataReloadRegistry>? gameData = null,
-            Func<ZoneEngine_New.Core.Data.ILoginFlagsRepository>? accounts = null,
+            Func<ZoneEngine_New.Core.Accounts.AccountSanctionService>? accounts = null,
             Func<ZoneEngine_New.Core.Lifecycle.ShutdownScheduler>? shutdown = null)
         {
             ArgumentNullException.ThrowIfNull(logger);
@@ -325,7 +325,7 @@ namespace ZoneEngine_New.Core.Modules
                 ModuleCapabilities.ReadWorld, ModuleCapabilities.RefreshNpc, ModuleCapabilities.SendMessages,
                 ModuleCapabilities.GameDataReload, ModuleCapabilities.RespawnNpc, ModuleCapabilities.ObserveMessages,
                 ModuleCapabilities.ReadSessions, ModuleCapabilities.ObserveActions, ModuleCapabilities.ObserveVisibility,
-                ModuleCapabilities.ObserveChat, ModuleCapabilities.ReadChatText
+                ModuleCapabilities.ObserveChat, ModuleCapabilities.ReadChatText, ModuleCapabilities.ReadSanctions
             };
             known.UnionWith(operations);
             var capabilities = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);

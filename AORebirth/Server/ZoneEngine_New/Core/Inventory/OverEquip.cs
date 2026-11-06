@@ -16,9 +16,12 @@ namespace ZoneEngine_New.Core.Inventory
     /// (FUN_10047a90 / FUN_1004d003); implants, social, HUD, utility and deck slots never are.</item>
     /// <item>Level (FUN_10081e10): for every GreaterThan row of that requirement, r = (float)skill / value with the
     /// full current skill; when r &lt; 1, level = trunc(5 * (1 - r)). The worst row wins, clamped to 0-4.</item>
-    /// <item>Penalty (FUN_10047a73 / FUN_1009aa10): value - trunc(value * level * 0.25), i.e. 25% per level. It hits
-    /// the item's OnWear Modify functions on the client's penalised-stat table (FUN_10062c0c) and a hand weapon's
-    /// MinDamage, MaxDamage and DamageBonus (FUN_1009b337).</item>
+    /// <item>Penalty (FUN_10047a73 / FUN_1009aa10): value - trunc(value * level * 0.25), i.e. 25% per level.</item>
+    /// <item>Armor: the penalty hits its OnWear Modify functions on the client's penalised-stat table (FUN_10062c0c),
+    /// re-judged for armor slots 0x10-0x1F only (FUN_1004d003 -> FUN_1004b624).</item>
+    /// <item>Hand weapons: the penalty hits only MinDamage, MaxDamage and DamageBonus (FUN_1009b337, from the same
+    /// re-judge). Their modifiers keep full strength: the client's modifier re-apply is never run for slots 6 / 8
+    /// (FUN_1004d1ce, the only path that would, has no caller).</item>
     /// </list>
     /// </summary>
     internal static class OverEquip
@@ -91,7 +94,16 @@ namespace ZoneEngine_New.Core.Inventory
             return Math.Clamp(level, 0, 4);
         }
 
-        /// <summary>An OnWear Modify of an OE item: penalised stats lose 25% per level, truncated toward zero.</summary>
+        /// <summary>
+        /// The OE level <paramref name="item"/>'s modifiers are penalised at: <paramref name="level"/> for armor, 0 for a
+        /// wielded weapon (a ToWield requirement), whose OE only cuts its damage (<see cref="ScaleDamage"/>).
+        /// </summary>
+        public static int ModifierLevel(Item item, int level)
+            => level > 0 && item.Definition?.Actions.Exists(action => action.ActionType == (int)ActionType.ToWield) == true
+                ? 0
+                : level;
+
+        /// <summary>An OnWear Modify of an OE armor item: penalised stats lose 25% per level, truncated toward zero.</summary>
         public static int ScaleModifier(CharacterStat stat, int delta, int level)
             => level <= 0 || !PenalisedStats.Contains((int)stat) ? delta : Scale(delta, level);
 

@@ -51,7 +51,9 @@ namespace ZoneEngine_New.Core.Tradeskills
         static readonly Identity NoCombinationTarget = new() { Type = (IdentityType)2, Instance = 0 };
         const int NoCombinationParameter1 = 2;
 
-        readonly TradeskillCatalog _catalog;
+        /// <summary>Swapped whole by <see cref="ReloadCatalog"/>; each lookup reads it once.</summary>
+        volatile TradeskillCatalog _catalog;
+        readonly string _gameDataRoot;
         readonly InventoryActionService _inventory;
         readonly IItemBuilder _items;
         readonly IItemTemplateCatalog _templates;
@@ -91,10 +93,32 @@ namespace ZoneEngine_New.Core.Tradeskills
             _templates = templates ?? throw new ArgumentNullException(nameof(templates));
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             ArgumentNullException.ThrowIfNull(gameData);
+            _gameDataRoot = gameData.RootPath;
             _skillNames = new Lazy<IReadOnlyDictionary<int, string>>(() => LoadSkillNames(gameData.RootPath));
         }
 
         public TradeskillCatalog Catalog => _catalog;
+
+        /// <summary>
+        /// Reads Tradeskills.json again (through the GameData override folder) and swaps the recipes in whole; a file
+        /// that fails to read or parse keeps the old recipes. Reads a file: never call it on a playfield tick.
+        /// </summary>
+        public AORebirth.Modules.Content.GameDataReloadResult ReloadCatalog()
+        {
+            TradeskillCatalog loaded;
+            try
+            {
+                loaded = TradeskillCatalog.Load(_gameDataRoot, text => _logger.Info("Tradeskills: " + text));
+            }
+            catch (Exception exception) when (exception is System.Text.Json.JsonException or System.IO.IOException)
+            {
+                _logger.Warn("Tradeskills.json not reloaded; recipes unchanged: " + exception.Message);
+                return new(TradeskillCatalog.ReloadName, false, _catalog.Count, [exception.Message]);
+            }
+
+            _catalog = loaded;
+            return new(TradeskillCatalog.ReloadName, true, loaded.Count, []);
+        }
 
         // ------------------------------------------------------------------ window
 
@@ -317,7 +341,7 @@ namespace ZoneEngine_New.Core.Tradeskills
                     player.Session?.Send(new TemplateActionMessage
                     {
                         Identity = player.Identity, ItemLowId = result.LowId, ItemHighId = result.HighId, Quality = result.Quality,
-                        Unknown1 = 1, Action = TemplateActionType.Overflow,
+                        Count = result.StackCount, Action = TemplateActionType.Overflow,
                         Placement = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 }
                     });
                     player.Session?.Send(new ContainerAddItemMessage

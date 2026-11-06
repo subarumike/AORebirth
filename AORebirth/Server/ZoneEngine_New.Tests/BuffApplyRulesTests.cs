@@ -23,10 +23,10 @@ namespace ZoneEngine_New.Tests
                 TestNanos.Create(2000, ncuCost: 20),
                 [],
                 maxNcu: 60,
-                out Buff? replaced);
+                out IReadOnlyList<Buff> replaced);
 
             Assert.AreEqual(BuffApplyDecision.Apply, decision);
-            Assert.IsNull(replaced);
+            Assert.AreEqual(0, replaced.Count);
         }
 
         [TestMethod]
@@ -50,10 +50,10 @@ namespace ZoneEngine_New.Tests
                 TestNanos.Create(2003, strain: 55, stackingOrder: 10),
                 [strong],
                 maxNcu: 60,
-                out Buff? replaced);
+                out IReadOnlyList<Buff> replaced);
 
             Assert.AreEqual(BuffApplyDecision.RefusedStrainStronger, decision);
-            Assert.IsNull(replaced);
+            Assert.AreEqual(0, replaced.Count);
         }
 
         [TestMethod]
@@ -65,10 +65,10 @@ namespace ZoneEngine_New.Tests
                 TestNanos.Create(2005, strain: 55, stackingOrder: 20),
                 [weak],
                 maxNcu: 60,
-                out Buff? replaced);
+                out IReadOnlyList<Buff> replaced);
 
             Assert.AreEqual(BuffApplyDecision.Replace, decision);
-            Assert.AreSame(weak, replaced);
+            Assert.AreSame(weak, replaced[0]);
         }
 
         [TestMethod]
@@ -77,10 +77,10 @@ namespace ZoneEngine_New.Tests
             NanoSpell spell = TestNanos.Create(2006, strain: 55, stackingOrder: 10);
             Buff running = Running(spell);
 
-            BuffApplyDecision decision = BuffApplyRules.Evaluate(spell, [running], maxNcu: 60, out Buff? replaced);
+            BuffApplyDecision decision = BuffApplyRules.Evaluate(spell, [running], maxNcu: 60, out IReadOnlyList<Buff> replaced);
 
             Assert.AreEqual(BuffApplyDecision.Replace, decision);
-            Assert.AreSame(running, replaced);
+            Assert.AreSame(running, replaced[0]);
         }
 
         [TestMethod]
@@ -92,10 +92,10 @@ namespace ZoneEngine_New.Tests
                 TestNanos.Create(2008, ncuCost: 5),
                 [first],
                 maxNcu: 60,
-                out Buff? replaced);
+                out IReadOnlyList<Buff> replaced);
 
             Assert.AreEqual(BuffApplyDecision.Apply, decision);
-            Assert.IsNull(replaced);
+            Assert.AreEqual(0, replaced.Count);
         }
 
         [TestMethod]

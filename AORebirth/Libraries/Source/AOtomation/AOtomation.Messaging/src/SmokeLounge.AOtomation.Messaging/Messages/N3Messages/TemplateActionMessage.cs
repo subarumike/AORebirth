@@ -40,8 +40,12 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         [AoMember(2)]
         public int Quality { get; set; }
 
+        /// <summary>
+        /// Item count. 1 for single items; a trade-pane render of a stack carries the full stack size
+        /// (capture 2026-11-06T13:42:12Z: 49990-stack render, 0xC346).
+        /// </summary>
         [AoMember(3)]
-        public int Unknown1 { get; set; }
+        public int Count { get; set; }
 
         [AoMember(4)]
         public TemplateActionType Action { get; set; }

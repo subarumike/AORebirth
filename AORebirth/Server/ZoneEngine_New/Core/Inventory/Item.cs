@@ -129,10 +129,15 @@ namespace ZoneEngine_New.Core.Inventory
         {
             const int baselinePacketFlags = 0x00A1;
             const int visibilityNibble = 0x00A0;
+            // In the slot field 0x02 means "bound to an instance announced under its own identity" (PlayerInventory
+            // adds it for announced hand weapons). The template's ModifiedDescription bit has the same value and must
+            // not leak in: the client then runs its temporary-item test on the slot (Gamecode.dll 0x1002ac44 gate,
+            // TimeExist check at 0x1004cbd2) and refuses the bag move ("Temporary items can't be moved into a bag!").
+            const int announcedInstanceSlotFlag = 0x0002;
 
             // A worn item its PlayShiftRequirements hold off is shown disabled.
             int disabled = PlayshiftSuppressed ? (int)AORebirth.Enums.ItemFlags.Disabled : 0;
-            int flags = Flags & 0xFFFF;
+            int flags = Flags & 0xFFFF & ~announcedInstanceSlotFlag;
             if ((flags & visibilityNibble) == 0)
                 return unchecked((short)(baselinePacketFlags | disabled));
 
@@ -282,7 +287,7 @@ namespace ZoneEngine_New.Core.Inventory
                 ItemLowId = LowId,
                 ItemHighId = HighId,
                 Quality = Quality,
-                Unknown1 = 1,
+                Count = 1,
                 Action = TemplateActionType.Use,
                 Placement = slotIdentity,
                 Unknown3 = (int)target.Identity.Type,
@@ -454,8 +459,9 @@ namespace ZoneEngine_New.Core.Inventory
             Playfield playfield = player.Playfield!;
             if (page.Content.Count > 0)
             {
-                int handle = EnsureHandle(page, inventory, playfield, containerIdentity);
-                RegisterParentSlotHandle(inventory, slotIdentity, containerIdentity);
+                int handle = EnsureHandle(page, inventory, containerIdentity);
+                if (handle == 0)
+                    return false;
                 player.Session!.Send(
                     page.BuildChestItemFullUpdate(player.Identity, playfield.ClientPlayfieldId, slotIdentity));
                 player.Session.Send(
@@ -468,10 +474,11 @@ namespace ZoneEngine_New.Core.Inventory
             }
             else
             {
-                int introduceHandle = playfield.AllocateContainerInventoryHandle();
-                int openHandle = EnsureHandle(page, inventory, playfield, containerIdentity);
+                int introduceHandle = inventory.AllocateClientContainerHandle();
                 inventory.RegisterBackpackHandle(introduceHandle, containerIdentity);
-                RegisterParentSlotHandle(inventory, slotIdentity, containerIdentity);
+                int openHandle = EnsureHandle(page, inventory, containerIdentity);
+                if (introduceHandle == 0 || openHandle == 0)
+                    return false;
                 player.Session!.Send(
                     page.BuildInventoryUpdateMessage(
                         player.Identity,
@@ -512,24 +519,14 @@ namespace ZoneEngine_New.Core.Inventory
             Identity = new Identity { Type = IdentityType.Container, Instance = instance };
         }
 
-        static void RegisterParentSlotHandle(
-            PlayerInventory inventory,
-            Identity slotIdentity,
-            Identity containerIdentity)
-        {
-            if (slotIdentity.Type == IdentityType.Inventory && slotIdentity.Instance > 0)
-                inventory.RegisterBackpackHandle(slotIdentity.Instance, containerIdentity);
-        }
-
         static int EnsureHandle(
             Container page,
             PlayerInventory inventory,
-            Playfield playfield,
             Identity containerIdentity)
         {
             if (page.InventoryHandle == 0)
             {
-                page.InventoryHandle = playfield.AllocateContainerInventoryHandle();
+                page.InventoryHandle = inventory.AllocateClientContainerHandle();
                 inventory.RegisterBackpackHandle(page.InventoryHandle, containerIdentity);
             }
 

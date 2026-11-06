@@ -37,11 +37,22 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
 
         /// <summary>
         /// Server→client: member left the team. Capture 20260727-065826 Action=0x20.
-        /// Parameter1 = team instance; Parameter2 = -1; Target = leaving character.
+        /// Parameter1 = team instance; Target = leaving character.
+        /// Parameter2 = old raid subgroup index (0-5), or -1 for an ordinary team, per the original client receiver.
         /// </summary>
         TeamMemberLeft = 0x00000020,
 
         AcceptTeamRequest = 0x00000023,
+
+        /// <summary>
+        /// Server→client: a mission was accomplished. Target = the quest's journal identity, Parameter1 = its identity
+        /// type (0xDAC3), Parameter2 = its instance. The client looks the quest up and prints "Mission accomplished" with
+        /// the sound, so retail sends it before the QuestMessage Delete (captures 2026-06-15T00:48:56Z, 2026-06-18T13:31:50Z).
+        /// </summary>
+        MissionAccomplished = 0x0000003B,
+
+        /// <summary>Server→client: a quest expired. Same layout and ordering as <see cref="MissionAccomplished"/>.</summary>
+        QuestExpired = 0x0000003C,
 
         RemoveFriendlyNano = 0x00000041,
 

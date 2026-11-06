@@ -47,6 +47,32 @@ namespace AORebirth.Modules.World
         /// <see cref="System.UnauthorizedAccessException"/> when the module is not granted the operation's capability.
         /// </summary>
         Task<OperationResult> Invoke(string operation, OperationTarget target, OperationArgs args);
+
+        /// <summary>
+        /// The account's suspensions and bans, newest first, active or not (module API 1.8): at most <paramref name="limit"/>
+        /// (1 to 500). Empty when it has none or no account has that name. Reads the database on a worker thread. Needs
+        /// <c>read-sanctions</c>.
+        /// </summary>
+        Task<IReadOnlyList<AccountSanctionInfo>> AccountSanctions(string account, int limit = 20);
+    }
+
+    /// <summary>
+    /// One account suspension or ban (module API 1.8). Times are UTC. <see cref="EndsAtUtc"/> is null for a permanent ban.
+    /// <see cref="IssuedBy"/> is <c>gm:Name</c> for a GM command and <c>module:Id</c> for a module.
+    /// </summary>
+    public sealed record AccountSanctionInfo(
+        long Id,
+        string Account,
+        System.DateTime IssuedAtUtc,
+        System.DateTime? EndsAtUtc,
+        string IssuedBy,
+        string Reason,
+        System.DateTime? LiftedAtUtc,
+        string? LiftedBy,
+        string? LiftReason,
+        bool Active)
+    {
+        public bool Permanent => EndsAtUtc == null;
     }
 
     /// <summary>Capability names for the "Capabilities" map in Config/Modules.json.</summary>
@@ -84,5 +110,8 @@ namespace AORebirth.Modules.World
 
         /// <summary>The text of <see cref="Events.IZoneEvents.PlayerSpoke"/> (module API 1.6).</summary>
         public const string ReadChatText = "read-chat-text";
+
+        /// <summary><see cref="IZoneActions.AccountSanctions"/> (module API 1.8).</summary>
+        public const string ReadSanctions = "read-sanctions";
     }
 }

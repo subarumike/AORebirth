@@ -368,6 +368,7 @@ public sealed class NpcScriptCatalog
             if (binding.Patrol != null)
             {
                 brain.PatrolWaypoints = binding.Patrol.Waypoints;
+                brain.PatrolRun = binding.Patrol.Run;
                 brain.PatrolEnabled = true;
             }
             else if (binding.Wander != null)

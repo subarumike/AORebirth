@@ -357,6 +357,9 @@ namespace ZoneEngine_New.Core.Pets
             owner.OwnedPets.Add(npc);
             PublishPetsStat(owner);
             SendAddPet(owner, npc);
+            // Observers learn a pet's master only from its spawn packet's owner field: everyone else who sees the NPC
+            // gets it afresh. The owner keeps its copy, which AddPet has just made its pet.
+            npc.Playfield?.GetRequiredService<PlayfieldLocality>().RespawnForObservers(npc, except: owner);
             RefreshOverEquip(npc);
 
             _logger.Info(string.Format(CultureInfo.InvariantCulture,
@@ -375,9 +378,11 @@ namespace ZoneEngine_New.Core.Pets
         /// (zoning, logging out): the NPC does not go after them. <paramref name="settle"/> is false only when the
         /// nano's end is already running (it settles the NPC once its OnTerminate has run). Does nothing for an NPC
         /// that is not charmed, so every path that ends a charm (the nano running out or stripped, a dismiss, the
-        /// owner zoning or logging out, the NPC dying or despawning) can call it.
+        /// owner zoning or logging out, the NPC dying or despawning) can call it. <paramref name="staysInWorld"/> is
+        /// false when the NPC is dying or leaving the world: it is not sent afresh to its observers then.
         /// </summary>
-        public void EndCharm(NpcCharacter npc, string reason, bool turnOnOwner = true, bool settle = true)
+        public void EndCharm(NpcCharacter npc, string reason, bool turnOnOwner = true, bool settle = true,
+            bool staysInWorld = true)
         {
             ArgumentNullException.ThrowIfNull(npc);
             if (npc.Pet is not { Charm: PetCharm charm } controller)
@@ -398,6 +403,10 @@ namespace ZoneEngine_New.Core.Pets
             npc.Stats.Set(CharacterStat.Side, charm.OriginalSide, StatDetail.Base, dirty: true);
             // The next rebase drops the owner's run speed bonus.
             npc.MarkRebaseDirty();
+            // The client writes PetMaster from a spawn's owner field only when it is non-zero, so a copy that already
+            // has a master keeps it: everyone who sees the NPC, the former owner too, gets a fresh one without an owner.
+            if (staysInWorld)
+                npc.Playfield?.GetRequiredService<PlayfieldLocality>().RespawnForObservers(npc);
 
             NpcBrain brain = charm.OriginalBrain;
             npc.AttachBrain(brain);
@@ -528,8 +537,18 @@ namespace ZoneEngine_New.Core.Pets
         }
 
         /// <summary>
-        /// Tells the owner's client about every pet it has (after it finishes zoning in or reconnects), so its pet
-        /// window lists them. The client ignores a pet it already lists.
+        /// Removes client pet entries before character reconstruction, keeping server ownership intact.
+        /// Local Lost Eden inspection shows that a later removal can miss its already-reset ownership set.
+        /// </summary>
+        public void RemoveClientPetEntries(Player owner)
+        {
+            ArgumentNullException.ThrowIfNull(owner);
+            foreach (NpcCharacter pet in owner.OwnedPets.All)
+                SendRemovePet(owner, pet);
+        }
+
+        /// <summary>
+        /// Tells the owner's client about every pet it currently has after zoning, reconnecting or reconstruction.
         /// </summary>
         public void AnnounceOwnedPets(Player owner)
         {
@@ -929,9 +948,9 @@ namespace ZoneEngine_New.Core.Pets
         }
 
         static void SendAddPet(Player owner, NpcCharacter pet)
-            => owner.Session?.Send(new AddPetMessage { Identity = owner.Identity, Unknown = 0, PetIdentity = pet.Identity });
+            => owner.Session?.Send(new AddPetMessage { Identity = owner.Identity, PetIdentity = pet.Identity });
 
         static void SendRemovePet(Player owner, NpcCharacter pet)
-            => owner.Session?.Send(new RemovePetMessage { Identity = owner.Identity, Unknown = 0, PetIdentity = pet.Identity });
+            => owner.Session?.Send(new RemovePetMessage { Identity = owner.Identity, PetIdentity = pet.Identity });
     }
 }

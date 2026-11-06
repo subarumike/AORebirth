@@ -37,10 +37,11 @@ namespace ZoneEngine_New.Core.Inventory
             if (item.PlayshiftSuppressed)
                 return;
 
-            // The client re-applies only OnWear functions at the over-equipped level (Gamecode.dll FUN_1004b624).
+            // The client re-applies only an OE armor item's OnWear functions at its over-equipped level (Gamecode.dll
+            // FUN_1004b624); an OE hand weapon keeps its modifiers whole and loses only damage (OverEquip.ModifierLevel).
             Dictionary<EventType, List<ItemSpell>> spells = item.SpellList;
             if (spells.TryGetValue(EventType.OnWear, out List<ItemSpell>? wear))
-                StatModifierSpells.Apply(wear, stats, overEquipLevel ?? item.OverEquipLevel);
+                StatModifierSpells.Apply(wear, stats, OverEquip.ModifierLevel(item, overEquipLevel ?? item.OverEquipLevel));
 
             if (includeWield && spells.TryGetValue(EventType.OnWield, out List<ItemSpell>? wield))
                 StatModifierSpells.Apply(wield, stats);

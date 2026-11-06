@@ -1,5 +1,59 @@
 # Current Task
 
+ACTIVE (2026-11-04): repair Mongo's intermittent landing on `codex/mongo-landing`,
+based on freshly fetched public master `4583042389370a54f3f7b106c53ba82ddcfb6098`.
+Current standard Mongo taunt children declare no attack/defense skills, but
+ResolveNanoLand invents a Nano Resist/Add All Def contest. Remove that invented
+contest for absent/zero-weight defense skills; preserve authored positive
+defenses, target eligibility, pet protection, radius, LOS and strain immunity.
+No GameData, taunt amounts, production access, deployment or service changes.
+Compile within the nano subsystem. Four regression cases are added but may not
+be run without Mike's explicit suite authorization. Actual failed live casts
+have not been correlated to logs; live-client verification remains unverified.
+
+## Retained previous task
+
+IMPLEMENTED AND TESTED (2026-11-04): repair shared ChatEngine TCP framing and incomplete sends
+on `codex/chatengine-framing`, based on freshly fetched public master
+`4457f015e60728fed8eeca304e47486770e66685`. Mike explicitly authorized focused
+local regression fixtures. Preserve the separately committed initial bug repairs
+on `codex/nov04-bug-repairs`, canonical GameData and unrelated work. No production
+access, service changes, client control, deployment or master integration is
+authorized. Live log access remains UNVERIFIED; the incident timestamp is UNKNOWN.
+Source defects are proven independently of live attribution. Existing native
+length fields define bounded frame assembly; do not invent flood or HTML policy.
+
+Repair commit `50bf8097bd5970bc9aff85216bddc04569a6281c` passes all 40 focused
+cases on a committed-source rerun (24 receive/codec, 16 send/ownership), with
+zero failures or skips. ChatEngine and LoginEngine compile with zero errors.
+Native framing, complete queued sends and pooled-buffer ownership are corrected;
+no GameData or rate-policy change is included. Exact-input Windows startup and
+Mike's acceptance, Linux packaging and deployment remain outside this run. See
+[the repair report](../reports/CHATENGINE_STREAM_FRAMING_REPAIR.md).
+
+## Retained prior task history
+
+ACTIVE (2026-11-03): implement the static locked-door/switch repair on
+`codex/crypt-door-triggers`, based on freshly fetched public master
+`b091d32d9fdef66ca3e080674ee606643031bdf9`. Use the completed native trigger
+research and finalized PF665 capture; distinguish native proof from editable
+server compatibility policy. Mike authorized focused deterministic/multiplayer
+tests, builds and deployment after validation. Exact-input Windows acceptance
+is still required before Linux release work. Preserve user configuration and
+other pre-existing dirty work. See
+[the scoped repair report](../reports/STATIC_DOOR_TRIGGER_REPAIR.md).
+
+Completed implementation (2026-11-03): integrate the captured Halloween Win and
+Fail button responses after the preceding build. Reuse existing static placements,
+template events, seasonal settings and nano execution. The generic buff HeadMesh repair
+compiles; focused regression cases were authored without running a suite.
+Private activation changes are restricted to the two reviewed existing Borealis
+records and preserve all coordinates, raw metadata and other seasonal content.
+Knockback and unobserved animation packet behavior remain unsupported. Public
+source integration does not accept or deploy a new release tuple.
+
+## Previous source integration
+
 Completed source integration (2026-10-30): combine Mike's locally accepted Daily Login
 Rewards feature at `c8fed6c026f3110043b8a0a18c19460485c62c9d` with freshly
 fetched public master `132459c1d3f732a88abffca4750150446933f57b` on

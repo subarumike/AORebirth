@@ -384,8 +384,8 @@ namespace ZoneEngine_New.Core.Playfield
 
             _registry.Register(dynel);
             _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(dynel);
-            (_playfield as ACGPlayfield)?.World?.RegisterVicinityDynel(
-                identity.Instance, template, position.xf, position.yf, position.zf);
+            _playfield.WorldAccess.Instance?.RegisterVicinityDynel(
+                identity, template, position.xf, position.yf, position.zf);
 
             _logger.Info(
                 string.Format(
@@ -451,7 +451,7 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(dynel);
 
             Identity identity = dynel.Identity;
-            (_playfield as ACGPlayfield)?.World?.UnregisterVicinityDynel(identity.Instance);
+            _playfield.WorldAccess.Instance?.UnregisterVicinityDynel(identity);
             _playfield.GetRequiredService<PlayfieldLocality>().UnregisterDynel(dynel);
             _registry.Unregister(identity);
             dynel.Playfield = null;
@@ -654,8 +654,12 @@ namespace ZoneEngine_New.Core.Playfield
                 StaticDynel dynel = CreateStaticDynel(record);
                 _registry.Register(dynel);
                 _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(dynel);
+                _playfield.WorldAccess.Instance?.BindStaticDoor(dynel);
+                _playfield.GetRequiredService<AreaTriggerService>().Register(dynel);
                 spawned++;
             }
+
+            _playfield.GetRequiredService<AreaTriggerService>().Initialize();
 
             _logger.Info(
                 string.Format(
@@ -687,6 +691,21 @@ namespace ZoneEngine_New.Core.Playfield
                 };
             else
                 dynel = new PlayfieldStaticDynel(identity, template);
+
+            // Placement state overrides shared template defaults (including the authored state-machine resource).
+            if (record.Blob is { Length: > 12 })
+            {
+                try
+                {
+                    DynelBlob blob = new ItemBase().ReadDynelBlob(record.Blob);
+                    foreach (KeyValuePair<int, int> stat in blob.AppliedStats)
+                        dynel.Stats.Set((CharacterStat)stat.Key, stat.Value, StatDetail.Base);
+                }
+                catch (Exception exception)
+                {
+                    _logger.Warn("Static placement state unreadable for " + identity + ": " + exception.GetType().Name);
+                }
+            }
 
             dynel.Playfield = _playfield;
             dynel.Position = new Vector3(record.Position.X, record.Position.Y, record.Position.Z);
@@ -769,6 +788,7 @@ namespace ZoneEngine_New.Core.Playfield
 
             if (lootable.IsOpen)
                 lootable.Close();
+            lootable.ReleaseClientHandles();
 
             Identity identity = lootable.Identity;
             _playfield.GetRequiredService<PlayfieldLocality>().UnregisterDynel(lootable);
@@ -1021,6 +1041,9 @@ namespace ZoneEngine_New.Core.Playfield
             player.StopInPlace();
 
             session.State = SessionState.SpawnReady;
+            // A retained player still reconnects into a rebuilt client world. Restore authored door state
+            // at the same pre-SCFU boundary as initial entry, including the close-inhibit latch.
+            _playfield.WorldAccess.Instance?.Doors.SendStates(session);
 
             PlayerSpawnPayloadValidator.RequireValid(player);
 
@@ -1078,6 +1101,15 @@ namespace ZoneEngine_New.Core.Playfield
             if (player.OwnedPets.Count > 0)
                 _playfield.GetRequiredService<Pets.PetService>().AnnounceOwnedPets(player);
 
+            TryRestoreJournal(player);
+        }
+
+        /// <summary>
+        /// Puts the active quests, authored missions and mission key names back in the client. Every playfield load
+        /// on the client drops its quest journal, so this runs after zone entry and after an in-zone reload.
+        /// </summary>
+        void TryRestoreJournal(Player player)
+        {
             try
             {
                 _playfieldManager.AuthoredQuests.Restore(player);
@@ -1287,8 +1319,17 @@ namespace ZoneEngine_New.Core.Playfield
             ArgumentNullException.ThrowIfNull(player);
             ArgumentNullException.ThrowIfNull(landing);
 
+            if (player.Session == null)
+                return;
+
+            Pets.PetService pets = _playfield.GetRequiredService<Pets.PetService>();
+            pets.RemoveClientPetEntries(player);
             if (SendSamePlayfieldArrival(player, landing))
+            {
                 player.SendDeathRespawnAction();
+                // Re-read current ownership: a released or expired charm must not be announced again.
+                pets.AnnounceOwnedPets(player);
+            }
         }
 
         /// <summary>
@@ -1319,6 +1360,15 @@ namespace ZoneEngine_New.Core.Playfield
             PlayfieldLocality locality = _playfield.GetRequiredService<PlayfieldLocality>();
             locality.DeactivatePlayerVisibility(player);
 
+            // Loot the player has open closes while the client still has it: the teleport drops it client-side, and
+            // left open here it would take two uses to reopen (the first only closes it).
+            foreach (Identity loot in player.Inventory.KnownLootIdentities())
+            {
+                if (_registry.TryGet(loot, out Dynel? dynel) && dynel is LootableDynel lootable
+                    && lootable.OpenerIdentity == player.Identity)
+                    lootable.Close();
+            }
+
             int characterId = player.Identity.Instance;
             int playfieldId = _playfield.Identity.Instance;
 
@@ -1327,6 +1377,9 @@ namespace ZoneEngine_New.Core.Playfield
             // The client rebuilds this character standing still: drop input held before death (its key releases
             // never arrive) and any path, or observers are told it is still running.
             player.Motor.ResetForPlayfieldTransfer(onFloor);
+            // The rebuilt character has no bag contents on the client: forget what was sent, so the next use of a
+            // bag sends its contents again instead of only opening a bag the client knows nothing about.
+            player.Inventory.ResetBackpackClientState();
 
             session.Send(
                 _playfield.CreatePlayfieldAnarchyFMessage(
@@ -1356,6 +1409,8 @@ namespace ZoneEngine_New.Core.Playfield
 
             TryEnsureMissionChests();
             locality.ActivatePlayerVisibility(player);
+            // The teleport reloads the playfield on the client, which clears its quest journal.
+            TryRestoreJournal(player);
             return true;
         }
 
@@ -1484,7 +1539,7 @@ namespace ZoneEngine_New.Core.Playfield
 
             // A charmed NPC leaving the world leaves its owner first.
             if (npc.Pet is { IsCharmed: true })
-                _playfield.GetRequiredService<Pets.PetService>().EndCharm(npc, "despawned", turnOnOwner: false);
+                _playfield.GetRequiredService<Pets.PetService>().EndCharm(npc, "despawned", turnOnOwner: false, staysInWorld: false);
 
             // An NPC leaving the world takes its pets with it.
             if (npc.OwnedPets.Count > 0)
@@ -1597,7 +1652,8 @@ namespace ZoneEngine_New.Core.Playfield
                         _flush.HardFlush(player);
                     }
 
-                    _snapshot.Commit(player);
+                    // Leaving dead must not store the corpse: the character is saved where its respawn would put it.
+                    _snapshot.Commit(player, player.SettleDeathForLogout());
                 }
                 catch (Exception exception)
                 {

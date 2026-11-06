@@ -1068,7 +1068,9 @@ namespace ChatEngine
                     configuration.ChatPort);
                 validationChatServer.MaximumPendingConnections = 100;
 
-                if (validationChatServer.Channels.Count != 8
+                int staticChannelCount = validationChatServer.StaticChannelCount;
+                if (staticChannelCount == 0
+                    || validationChatServer.Channels.Count != staticChannelCount
                     || validationChatServer.ConnectedClients.Count != 0
                     || validationChatServer.IsRunning
                     || validationChatServer.TCPEnabled)
@@ -1082,7 +1084,9 @@ namespace ChatEngine
                 LogManager.Flush();
 
                 Console.WriteLine(
-                    "CHATENGINE_VALIDATION_OK mode=startup channels=8 provider="
+                    "CHATENGINE_VALIDATION_OK mode=startup channels="
+                    + staticChannelCount
+                    + " provider="
                     + configuration.SQLType
                     + " nbug=disabled listeners=0");
                 return 0;

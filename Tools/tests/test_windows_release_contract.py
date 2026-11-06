@@ -343,6 +343,207 @@ class ReleaseContractTests(unittest.TestCase):
             gate.validate_reconciliation(bundle, plan)
         self.assertEqual(gate.inventory(canonical)[0], rows)
 
+    @staticmethod
+    def object_state_machine_catalog():
+        return {"SchemaVersion": 1, "Machines": [{"Id": 1, "InitialState": 0,
+            "InitialStateCompatibility": "INFERRED: reviewed synthetic initial-state binding",
+            "States": [{"Id": 0, "EntrySpells": [], "SignalTimers": [], "Transitions": []}]}],
+            "SignalPolicies": [{"SignalMask": 1, "DoorOperations": ["Unlock", "Open"],
+                "Compatibility": "INFERRED: reviewed synthetic server signal policy"}]}
+
+    def test_object_state_machine_adoption_uses_existing_hash_approval_and_portable_chain(self):
+        canonical = self.root / "canonical"
+        canonical.mkdir()
+        (canonical / "items.dat").write_bytes(b"existing generated fixture")
+        before_rows, _ = gate.inventory(canonical)
+        stage = self.root / "ignored-object-inputs"
+        stage.mkdir()
+        data = stage / "ObjectStateMachines.json"
+        data.write_bytes(gate.encoded(self.object_state_machine_catalog()))
+        text = "Adopt the reviewed ObjectStateMachines.json runtime catalog."
+        instruction = stage / "authorization.txt"
+        instruction.write_bytes(text.encode())
+        mapping = {"PATH": data.name, "STAGED_PATH": str(data), "SHA256": gate.digest(data.read_bytes()),
+            "APPROVAL": {"BY": "Mike", "INSTRUCTION_PATH": str(instruction),
+                "INSTRUCTION_SHA256": gate.digest(instruction.read_bytes()), "TEXT": text}}
+        profile = {"CANONICAL_GAMEDATA_ROOT": str(canonical), "STATE_ROOT": str(self.root),
+            "PROTECTED_GENERATED_FILES": [], "PRIVATE_CATALOG_ADOPTIONS": [mapping]}
+        bundle = self.root / "object-plan"
+        bundle.mkdir()
+        gate.write_json(bundle / "before-manifest.json", before_rows)
+        with mock.patch.object(gate, "tree_files", return_value={}), mock.patch.object(gate, "git", return_value=b"ignored"):
+            plan, projected = gate.reconcile_plan(self.root, profile, bundle, PUBLIC, DUMP,
+                {"PUBLIC_MASTER_SHA": PUBLIC, "CONTENT_DUMP_SHA": DUMP}, before_rows)
+            gate.validate_reconciliation(bundle, plan)
+            summary = gate.summarize_reconciliation(bundle, plan)
+        self.assertEqual(projected, {data.name: data.read_bytes()})
+        self.assertEqual(summary["PRIVATE_CATALOG_ADOPTIONS"][0]["SHA256"], mapping["SHA256"])
+        self.assertNotIn("STAGED_PATH", gate.encoded(summary).decode())
+        self.assertNotIn(str(self.root), gate.encoded(summary).decode())
+        for mutation in (lambda row: row.update(SHA256="f" * 64),
+                         lambda row: row["APPROVAL"].update(BY="Agent"),
+                         lambda row: row["APPROVAL"].update(TEXT="Invented approval for ObjectStateMachines.json"),
+                         lambda row: row["APPROVAL"].update(INSTRUCTION_SHA256="f" * 64)):
+            changed = copy.deepcopy(plan)
+            mutation(changed["PRIVATE_CATALOG_ADOPTIONS"][0])
+            with self.assertRaises(ValueError):
+                gate.validate_reconciliation(bundle, changed)
+        # A second intake may recognize identical bytes, but cannot overwrite private edits.
+        identical = {data.name: gate.content_identity(data.read_bytes(), data.name)}
+        row = copy.deepcopy(plan["PRIVATE_CATALOG_ADOPTIONS"][0])
+        row["CANONICAL_BEFORE"] = row["CANONICAL_AFTER"]
+        replay = {**plan, "PRIVATE_CATALOG_ADOPTIONS": [row]}
+        gate.validate_private_catalog_adoptions(bundle, replay, dict(identical))
+        altered = copy.deepcopy(replay)
+        different = gate.encoded({**self.object_state_machine_catalog(), "SchemaVersion": 2})
+        altered["PRIVATE_CATALOG_ADOPTIONS"][0]["CANONICAL_BEFORE"] = gate.stash(bundle, "different-private", different)
+        with self.assertRaisesRegex(ValueError, "overwrite unexplained private content"):
+            gate.validate_private_catalog_adoptions(bundle, altered,
+                {data.name: gate.content_identity(different, data.name)})
+
+    def test_object_state_machine_adoption_requires_nonempty_classified_valid_states(self):
+        invalid = (
+            lambda row: row.update(SchemaVersion=2),
+            lambda row: row.update(SchemaVersion=True),
+            lambda row: row.update(Machines=[]),
+            lambda row: row.update(SignalPolicies=None),
+            lambda row: row["Machines"][0].update(States=[]),
+            lambda row: row["Machines"][0].update(InitialState=99),
+            lambda row: row["Machines"][0].update(InitialStateCompatibility=" "),
+            lambda row: row["Machines"].append(copy.deepcopy(row["Machines"][0])),
+            lambda row: row["Machines"][0]["States"].append(copy.deepcopy(row["Machines"][0]["States"][0])),
+            lambda row: row["Machines"][0]["States"][0].update(Transitions=[{"TargetState": 2, "Criteria": []}]),
+            lambda row: row["SignalPolicies"][0].update(Compatibility=""),
+            lambda row: row["SignalPolicies"][0].update(SignalMask=0),
+            lambda row: row["SignalPolicies"][0].update(DoorOperations=["Invented"]),
+            lambda row: row["SignalPolicies"][0].update(DoorOperations=[]),
+            lambda row: row["SignalPolicies"][0].update(UseEnabled=1),
+            lambda row: row["SignalPolicies"].append(copy.deepcopy(row["SignalPolicies"][0])),
+        )
+        for index, mutate in enumerate(invalid):
+            content = self.object_state_machine_catalog()
+            mutate(content)
+            with self.subTest(case=index), self.assertRaises(ValueError):
+                gate.validate_object_state_machine_adoption(content)
+        valid = self.object_state_machine_catalog()
+        valid["SignalPolicies"][0].update(DoorOperations=[], UseEnabled=False)
+        gate.validate_object_state_machine_adoption(valid)
+        gate.validate_object_state_machine_adoption(json.loads(json.dumps(valid).replace('"SchemaVersion"', '"schemaVersion"')))
+
+    def test_private_catalog_adoption_paths_preserve_chest_group_and_independent_catalogs(self):
+        for paths in ([], ["ObjectStateMachines.json"], ["QuestRewards.json"],
+                      ["Playfields/17/Spawns.json"], ["Playfields/17/Spawns.json", "ObjectStateMachines.json"],
+                      sorted(gate.INDEPENDENT_PRIVATE_CATALOGS), sorted(gate.PRIVATE_CHEST_CATALOGS),
+                      sorted(gate.PRIVATE_CHEST_CATALOGS | gate.INDEPENDENT_PRIVATE_CATALOGS)):
+            gate.validate_private_catalog_paths([{"PATH": path} for path in paths])
+        for paths in (["ObjectStateMachines.json", "ObjectStateMachines.json"], ["items.dat"],
+                      ["Playfields/17/Spawns.json", "Playfields/17/Spawns.json"],
+                      ["Playfields/0/Spawns.json"], ["Playfields/17/../Spawns.json"],
+                      ["Playfields/17/Spawns.json/extra"], ["Playfields/17/Rooms.json"],
+                      ["Playfields/../17/Spawns.json"], ["/Playfields/17/Spawns.json"],
+                      ["Playfields\\17\\Spawns.json"], ["Playfields/non-numeric/Spawns.json"],
+                      ["ObjectStateMachines.json", sorted(gate.PRIVATE_CHEST_CATALOGS)[0]]):
+            with self.subTest(paths=paths), self.assertRaises(ValueError):
+                gate.validate_private_catalog_paths([{"PATH": path} for path in paths])
+
+    def spawn_catalog_fixture(self):
+        path = "Playfields/17/Spawns.json"
+        before = {"SchemaVersion": 1, "PlayfieldId": 17, "Spawns": [
+            {"Hash": 1, "HashText": "fixture-a", "Position": [1, 2, 3],
+             "Extensions": {"Events": [{"Name": "fixture", "Active": True}]}},
+            {"Hash": 2, "HashText": "fixture-b", "Position": [4, 5, 6]}]}
+        after = copy.deepcopy(before)
+        for entry in after["Spawns"]:
+            entry.update(MinLevel=1, MaxLevel=2, RespawnTime=30)
+        after["Spawns"][0]["Extensions"]["Events"][0]["Unknown1"] = 0
+        canonical = self.root / "canonical"
+        target = canonical / path
+        target.parent.mkdir(parents=True)
+        target.write_bytes(gate.encoded(before))
+        stage = self.root / "ignored-spawn-inputs"
+        stage.mkdir()
+        data = stage / "Spawns.json"
+        data.write_bytes(gate.encoded(after))
+        text = "Approve " + path
+        instruction = stage / "authorization.txt"
+        instruction.write_bytes(text.encode())
+        mapping = {"PATH": path, "STAGED_PATH": str(data), "SHA256": gate.digest(data.read_bytes()),
+            "APPROVAL": {"BY": "Mike", "INSTRUCTION_PATH": str(instruction),
+                "INSTRUCTION_SHA256": gate.digest(instruction.read_bytes()), "TEXT": text}}
+        profile = {"CANONICAL_GAMEDATA_ROOT": str(canonical), "STATE_ROOT": str(self.root),
+            "PROTECTED_GENERATED_FILES": [], "PRIVATE_CATALOG_ADOPTIONS": [mapping]}
+        rows, _ = gate.inventory(canonical)
+        bundle = self.root / "spawn-plan"
+        bundle.mkdir()
+        gate.write_json(bundle / "before-manifest.json", rows)
+        with mock.patch.object(gate, "tree_files", return_value={}), mock.patch.object(gate, "git", return_value=b"ignored"):
+            plan, projected = gate.reconcile_plan(self.root, profile, bundle, PUBLIC, DUMP,
+                {"PUBLIC_MASTER_SHA": PUBLIC, "CONTENT_DUMP_SHA": DUMP}, rows)
+        return path, bundle, plan, projected, before, after, target
+
+    def test_spawn_adoption_preserves_existing_fields_and_portable_approval_chain(self):
+        path, bundle, plan, projected, before, after, target = self.spawn_catalog_fixture()
+        gate.validate_reconciliation(bundle, plan)
+        summary = gate.summarize_reconciliation(bundle, plan)
+        gate.validate_reconciliation_summary(bundle, summary)
+        self.assertEqual(projected, {path: gate.encoded(after)})
+        self.assertEqual(target.read_bytes(), gate.encoded(before))
+        self.assertEqual(summary["PRIVATE_CATALOG_ADOPTIONS"][0]["APPROVAL"]["TEXT"], "Approve " + path)
+        self.assertNotIn("STAGED_PATH", gate.encoded(summary).decode())
+        self.assertNotIn(str(self.root), gate.encoded(summary).decode())
+        lower = json.loads(json.dumps(after).replace('"SchemaVersion"', '"schemaVersion"')
+                           .replace('"PlayfieldId"', '"playfieldId"').replace('"Spawns"', '"spawns"'))
+        gate.validate_spawn_catalog_adoption(path, lower, copy.deepcopy(lower))
+
+    def test_spawn_adoption_rejects_destructive_and_malformed_approved_bytes(self):
+        path, bundle, plan, _, before, after, _ = self.spawn_catalog_fixture()
+        mutations = (
+            lambda value: value["Spawns"][0].pop("Hash"),
+            lambda value: value["Spawns"][0].update(Hash=9),
+            lambda value: value["Spawns"][0].update(Hash=True),
+            lambda value: value["Spawns"][0].update(Hash=1.0),
+            lambda value: value["Spawns"].reverse(),
+            lambda value: value["Spawns"].append(copy.deepcopy(value["Spawns"][0])),
+            lambda value: value["Spawns"].pop(),
+            lambda value: value["Spawns"][0]["Position"].reverse(),
+            lambda value: value["Spawns"][0]["Extensions"]["Events"][0].update(Active=False),
+            lambda value: value["Spawns"][0].update(hash=9),
+            lambda value: value.update(Spawns=[]),
+            lambda value: value.update(Spawns=[None]),
+            lambda value: value.update(Spawns=[{}]),
+            lambda value: value.update(SchemaVersion=True),
+            lambda value: value.update(PlayfieldId=18),
+        )
+        actual = {path: gate.content_identity(gate.encoded(before), path)}
+        for index, mutate in enumerate(mutations):
+            changed, payload = copy.deepcopy(plan), copy.deepcopy(after)
+            mutate(payload)
+            data = gate.encoded(payload)
+            row = changed["PRIVATE_CATALOG_ADOPTIONS"][0]
+            row.update(SHA256=gate.digest(data), CANONICAL_AFTER=gate.stash(bundle, "rejected-" + str(index), data))
+            with self.subTest(case=index), self.assertRaises(ValueError):
+                gate.validate_private_catalog_adoptions(bundle, changed, dict(actual))
+        for malformed in (None, {}, [], {"SchemaVersion": 1, "Spawns": []}):
+            with self.subTest(existing=malformed), self.assertRaises(ValueError):
+                gate.validate_spawn_catalog_adoption(path, malformed, after)
+
+    def test_spawn_adoption_retains_hash_bound_actual_path_approval(self):
+        path, bundle, plan, _, before, _, _ = self.spawn_catalog_fixture()
+        actual = {path: gate.content_identity(gate.encoded(before), path)}
+        mutations = (
+            lambda row: row.update(SHA256="f" * 64),
+            lambda row: row["APPROVAL"].update(BY="Agent"),
+            lambda row: row["APPROVAL"].update(TEXT="Approve Spawns.json"),
+            lambda row: row["APPROVAL"].update(TEXT="Invented approval for " + path),
+            lambda row: row["APPROVAL"].update(INSTRUCTION_SHA256="f" * 64),
+            lambda row: row.update(CANONICAL_BEFORE=None),
+        )
+        for index, mutate in enumerate(mutations):
+            changed = copy.deepcopy(plan)
+            mutate(changed["PRIVATE_CATALOG_ADOPTIONS"][0])
+            with self.subTest(case=index), self.assertRaises(ValueError):
+                gate.validate_private_catalog_adoptions(bundle, changed, dict(actual))
+
     def test_portable_acceptance_survives_location_change_without_windows_binaries(self):
         bundle, _ = make_portable_fixture(self.root)
         relocated = self.root / "private-source" / "evidence"
@@ -453,6 +654,41 @@ class ReleaseContractTests(unittest.TestCase):
         windows["GAMEDATA_SELECTION_EVIDENCE"][0] = gate.descriptor(bundle, selection_path)
         with self.assertRaises(ValueError):
             gate.validate_startup(bundle, windows, attempt)
+
+    def test_approved_whole_document_removal_preserves_private_metadata_and_shops(self):
+        base = {"SchemaVersion": 1, "PlayfieldId": 99, "Npcs": [{"Key": "synthetic"}],
+                "StandaloneShops": [{"Key": "synthetic-shop"}]}
+        private = copy.deepcopy(base)
+        private["Npcs"][0]["HasDialogue"] = True
+        resolution = {"": {"INPUT_HASHES": {"BASE": gate.value_hash(base),
+            "UPSTREAM": "MISSING", "PRIVATE": gate.value_hash(private)},
+            "ACTION": "PRESERVE_PRIVATE", "APPROVAL": "Synthetic test approval"}}
+        original = json.dumps(private).encode()
+        self.assertEqual(gate.merge_bytes(json.dumps(base).encode(), None, original, resolution), original)
+        with self.assertRaises(gate.ContentConflict):
+            gate.merge_value(base, gate.MISSING, private, {})
+
+    def test_whole_document_resolution_rejects_changed_input_hashes(self):
+        base, private = {"a": 1}, {"a": 2}
+        resolution = {"": {"INPUT_HASHES": {"BASE": gate.value_hash(base),
+            "UPSTREAM": "MISSING", "PRIVATE": gate.value_hash(private)},
+            "ACTION": "PRESERVE_PRIVATE", "APPROVAL": "Synthetic test approval"}}
+        for key in ("BASE", "UPSTREAM", "PRIVATE"):
+            invalid = copy.deepcopy(resolution)
+            invalid[""]["INPUT_HASHES"][key] = "f" * 64
+            with self.subTest(key=key), self.assertRaises(gate.ContentConflict):
+                gate.merge_value(base, gate.MISSING, private, invalid)
+
+    def test_whole_document_resolution_requires_approval_and_known_action(self):
+        base, private = {"a": 1}, {"a": 2}
+        resolution = {"": {"INPUT_HASHES": {"BASE": gate.value_hash(base),
+            "UPSTREAM": "MISSING", "PRIVATE": gate.value_hash(private)},
+            "ACTION": "PRESERVE_PRIVATE", "APPROVAL": "Synthetic test approval"}}
+        for key, value in (("APPROVAL", ""), ("ACTION", "UNKNOWN")):
+            invalid = copy.deepcopy(resolution)
+            invalid[""][key] = value
+            with self.subTest(key=key), self.assertRaises(gate.ContentConflict):
+                gate.merge_value(base, gate.MISSING, private, invalid)
 
     def test_reconcile_add_modify_delete_preserves_private_and_detects_conflicts(self):
         base = {"a": 1, "remove": 2, "repaired": 3}

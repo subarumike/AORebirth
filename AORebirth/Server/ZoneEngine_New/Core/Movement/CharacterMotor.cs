@@ -412,16 +412,17 @@ namespace ZoneEngine_New.Core.Movement
         }
 
         /// <summary>How far behind its target a /follow stops (Gamecode.dll player vehicle forward channel, 10071537).</summary>
-        public const float FollowDistanceMeters = 4f;
+        public const float FollowDistanceMeters = CharVehicleSim.FollowStandOff;
 
         /// <summary>The character this player's /follow steers at, or null.</summary>
         public Character? FollowTarget => _followTarget;
 
         /// <summary>
-        /// Starts the server's copy of a player /follow, as every client that applies the FollowTarget ack runs it: each
-        /// tick the body steers at the point <see cref="FollowDistanceMeters"/> short of the target and stops inside it.
-        /// The follower's client sends no movement actions meanwhile, only an Update about every 5 s, which corrects the
-        /// position. Its next other movement action ends the follow (<see cref="Consume"/>), as it does on the clients.
+        /// Starts the server's copy of a player /follow, as every client that applies the FollowTarget ack runs it: the
+        /// sim's own follow channel (<see cref="CharVehicleSim.SetFollowDynel"/>, Gamecode.dll 1007034b) arrives at the
+        /// point <see cref="FollowDistanceMeters"/> short of the target, the same steering the clients run, so the body
+        /// ends where theirs does. The follower's client sends no movement actions meanwhile, only an Update about every
+        /// 5 s. Its next other movement action ends the follow (<see cref="Consume"/>), as it does on the clients.
         /// </summary>
         public void BeginFollow(Character target)
         {
@@ -430,29 +431,30 @@ namespace ZoneEngine_New.Core.Movement
                 return;
 
             ClearPath();
-            // As a server path does: standing status, and the follower drives the body directly.
             _move.Apply((int)MovementAction.FullStop);
             _followTarget = target;
-            _move.OnWaypointPath = true;
+            _sim.FollowCanMove = !_character.IsRooted;
+            _sim.SetFollowDynel(ToVec3(target.Position));
         }
 
-        /// <summary>Ends a /follow: the status takes the body back, stopped, as when a server path ends.</summary>
+        /// <summary>Ends a /follow (1007034b with no target): the status takes the body back, stopped.</summary>
         public void EndFollow()
         {
             if (_followTarget == null)
                 return;
 
             _followTarget = null;
-            _move.OnWaypointPath = false;
+            _sim.ClearFollowDynel();
             _sim.SetForwardDrive(0f);
             _sim.Halt();
             _sim.SetDirection(1);
         }
 
         /// <summary>
-        /// One tick of the follow: hold while held in place (rooted or stunned: the client's Features lack 0x4), stop
-        /// inside <see cref="FollowDistanceMeters"/>, otherwise drive at the point that far short of the target. Ends when
-        /// the target is gone, dead or on another playfield, or the follower died.
+        /// Before each step of the follow, as the client's vehicle does (N3CharVehicle.BeginStep, Character.TickFollow):
+        /// the followed character's position for the follow channel, and whether the follower may walk (rooted or
+        /// stunned: the client's Features lack 0x4, 10070503). Ends when the target is gone, dead or on another
+        /// playfield, or the follower died.
         /// </summary>
         void SteerFollow()
         {
@@ -463,24 +465,8 @@ namespace ZoneEngine_New.Core.Movement
                 return;
             }
 
-            if (_character.IsRooted)
-            {
-                _sim.SetForwardDrive(0f);
-                return;
-            }
-
-            float dx = (float)target.Position.x - _sim.Position.X;
-            float dz = (float)target.Position.z - _sim.Position.Z;
-            float distance = MathF.Sqrt((dx * dx) + (dz * dz));
-            if (distance <= FollowDistanceMeters)
-            {
-                _sim.SetForwardDrive(0f);
-                return;
-            }
-
-            var toward = new Vec3(dx / distance, 0f, dz / distance);
-            _sim.SetRelRot(Quat.LookRotation(toward, Vec3.ReferenceUp));
-            _sim.SetForwardDrive(1f);
+            _sim.FollowCanMove = !_character.IsRooted;
+            _sim.FollowDynelPosition = ToVec3(target.Position);
         }
 
         public void ClearPath()
@@ -666,7 +652,10 @@ namespace ZoneEngine_New.Core.Movement
         public bool Consume(CharDCMoveMessage message)
         {
             ArgumentNullException.ThrowIfNull(message);
+            // Both corrections are per-move verdicts. A root pull-back raised by the last held move used to stay raised
+            // after the root ended, and every free move then snapped the client back to where it already was.
             JumpCorrectionDue = false;
+            RootCorrectionDue = false;
             if (_character.IsRooted)
                 return ConsumeRooted(message);
 
@@ -1114,6 +1103,13 @@ namespace ZoneEngine_New.Core.Movement
                     return false;
             }
 
+            if (_move.State == (int)MovementState.Crawl && LeavesCrawlByChoice(action))
+            {
+                LogRefusedAction(action, "crawling: only LeaveCrawl leaves crawl");
+                ResyncClientCrawl();
+                return false;
+            }
+
             ISurface? surface = BindSurface();
             if (!_move.Act((int)action))
             {
@@ -1200,6 +1196,33 @@ namespace ZoneEngine_New.Core.Movement
 
             SyncModeStats();
             return true;
+        }
+
+        /// <summary>
+        /// Crawl is left only by uncrawling (LeaveCrawl). The client's own rules take a sit, sleep, lounge, sneak,
+        /// walk/run toggle or flight straight out of crawl, so the server refuses those. Swimming (water) and being
+        /// frozen are not the player's choice and still apply.
+        /// </summary>
+        static bool LeavesCrawlByChoice(MovementAction action) => action is MovementAction.SwitchToSit
+            or MovementAction.SwitchToSleep
+            or MovementAction.SwitchToLounge
+            or MovementAction.SwitchToSneak
+            or MovementAction.SwitchToWalk
+            or MovementAction.SwitchToRun
+            or MovementAction.SwitchToFly;
+
+        /// <summary>
+        /// The client already took the refused switch on its own character: put it back in crawl. Unknown 1 is the
+        /// direct-control form, which the receiving client applies to its own character (see CharDCMoveMessageHandler).
+        /// </summary>
+        void ResyncClientCrawl()
+        {
+            if (_character is not Player player || player.Session == null)
+                return;
+
+            CharDCMoveMessage move = CreateMove(MovementAction.SwitchToCrawl);
+            move.Unknown = 1;
+            player.Session.Send(move);
         }
 
         void LogRefusedAction(MovementAction action, string reason)

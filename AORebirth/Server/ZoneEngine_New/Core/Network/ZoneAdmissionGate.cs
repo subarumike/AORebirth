@@ -41,7 +41,8 @@ public interface IZoneAdmissionGate
 /// Checks a client's cookies: a same-instance redirect locally, everything else with World, which grants the lease.
 /// Never hydrates or spawns.
 /// </summary>
-public sealed class ZoneAdmissionGate(ICharacterDao characters, WorldLink world, ZoneRedirects redirects) : IZoneAdmissionGate
+public sealed class ZoneAdmissionGate(ICharacterDao characters, WorldLink world, ZoneRedirects redirects,
+    ZoneEngine_New.Core.Accounts.AccountSanctionService sanctions) : IZoneAdmissionGate
 {
     public async Task<ZoneAdmission> ClaimAsync(ZoneLoginMessage message)
     {
@@ -60,6 +61,13 @@ public sealed class ZoneAdmissionGate(ICharacterDao characters, WorldLink world,
         {
             world.Abandon(message.CharacterId);
             return ZoneAdmission.Refused(reply.Account.Length == 0 ? "unknown_account" : "account_mismatch");
+        }
+
+        // A ticket issued before a suspension or ban (or on another instance) does not get in after it.
+        if (await Task.Run(() => sanctions.FindBlock(reply.Account)).ConfigureAwait(false) != null)
+        {
+            world.Abandon(message.CharacterId);
+            return ZoneAdmission.Refused("account_sanctioned");
         }
 
         ZoneAdmissionKind kind = reply.Kind switch

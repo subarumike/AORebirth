@@ -17,7 +17,8 @@ namespace ZoneEngine_New.Core.Quests
     /// Client journal entries for Quests.json quests, laid out like the retail Rubi-Ka tutorial chain
     /// (KION "Kill a Leet" -> KLTR "Kill three Leets" -> FDTH "Find the Secondhand Peddler", captured 2026-09-27).
     /// Retail flow: assignment sends one QuestFullUpdate with the announce byte set; zone entry re-sends it with the
-    /// byte clear; kills send nothing; completion sends the QuestMessage delete, then the next step's assignment.
+    /// byte clear; kills send nothing; completion sends CharacterAction 0x3b, the QuestMessage delete, then the next
+    /// step's assignment.
     /// Field meanings from the client's Quest_t reader (Gamecode.dll FUN_100abc80), RewardBox_t reader (FUN_10086e85)
     /// and the capture:
     /// Version 15, Flags 2 (+0xa4; 0x100 team mission, 0x400 no delete). ShortInfo = name; LongInfo = name, two
@@ -123,6 +124,24 @@ namespace ZoneEngine_New.Core.Quests
                 return;
 
             player.Session.Send(Build(player, quest, announce));
+        }
+
+        /// <summary>
+        /// Tells the client the quest ended (<see cref="CharacterActionType.MissionAccomplished"/> or
+        /// <see cref="CharacterActionType.QuestExpired"/>); the client prints the text itself. Send before
+        /// <see cref="Delete"/>: the client looks the quest up, so after the delete only the sound plays.
+        /// </summary>
+        internal static void SendEnded(Player player, PlayerQuest quest, CharacterActionType action)
+        {
+            int instance = JournalInstance(quest.QuestId);
+            player.Session?.Send(new CharacterActionMessage
+            {
+                Identity = player.Identity,
+                Action = action,
+                Target = new Identity { Type = IdentityType.Mission, Instance = instance },
+                Parameter1 = (int)IdentityType.Mission,
+                Parameter2 = instance
+            });
         }
 
         internal static void Delete(Player player, PlayerQuest quest)

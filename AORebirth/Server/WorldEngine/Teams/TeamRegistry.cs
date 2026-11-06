@@ -21,6 +21,7 @@ namespace WorldEngine.Teams
     public sealed class TeamRegistry
     {
         const int FirstTeamId = 0x02800000;
+        const int RaidTeamIdentityCount = 6;
         static readonly TimeSpan DeclineCooldown = TimeSpan.FromSeconds(30);
         static readonly TimeSpan InvitationLifetime = TimeSpan.FromMinutes(2);
 
@@ -156,7 +157,8 @@ namespace WorldEngine.Teams
                             team.RaidTeamIndex[member.CharacterId] = member.RaidTeam;
                     _teams[team.Id] = team;
                     foreach (int id in members) _membership[id] = team;
-                    _nextTeamId = Math.Max(_nextTeamId, team.Id);
+                    _nextTeamId = Math.Max(_nextTeamId, team.Id <= int.MaxValue - (RaidTeamIdentityCount - 1)
+                        ? team.Id + RaidTeamIdentityCount - 1 : int.MaxValue);
                     Publish(team, new TeamUpdate { Sync = true });
                 }
             }
@@ -264,8 +266,10 @@ namespace WorldEngine.Teams
 
             if (team == null)
             {
-                if (_nextTeamId == int.MaxValue) return Refused("Team identity space is exhausted.");
-                team = new Team(++_nextTeamId, invitation.Inviter);
+                if (_nextTeamId > int.MaxValue - RaidTeamIdentityCount) return Refused("Team identity space is exhausted.");
+                // Live raid subgroups use consecutive team identities; reserve all six before a possible conversion.
+                team = new Team(_nextTeamId + 1, invitation.Inviter);
+                _nextTeamId += RaidTeamIdentityCount;
                 _teams[team.Id] = team;
                 _membership[invitation.Inviter] = team;
                 foreach (int id in _invitations.Where(p => p.Value.Inviter == invitation.Inviter && p.Value.TeamId == 0)
@@ -308,6 +312,8 @@ namespace WorldEngine.Teams
                 || team.Leader != leader.CharacterId || !team.Members.Contains(targetId)
                 || _state.View(targetId) is not { LinkDead: false })
                 return Refused("Team leadership transfer target is not available or you are not the leader.");
+            if (team.IsRaid && team.RaidTeamIndex.GetValueOrDefault(targetId, 0) > 0)
+                return Refused("Only a member of Team 1 can be promoted to raid leader.");
             team.Leader = targetId;
             team.ExplicitLeadershipTransfer = true;
             Publish(team, new TeamUpdate());
@@ -330,6 +336,7 @@ namespace WorldEngine.Teams
             if (!_membership.TryGetValue(leader.CharacterId, out Team? team)) return Feedback("Feedback_YouAreNotMemberOfTeam");
             if (!team.IsRaid) return Refused("Your team is not a raid.");
             if (team.Leader != leader.CharacterId) return Feedback("Feedback_NeedToBeTeamLeader");
+            if (targetId == team.Leader) return Refused("The raid leader cannot be moved to another team.");
             if (_state.View(targetId) is not { LinkDead: false } || !_membership.TryGetValue(targetId, out Team? targetTeam)
                 || !ReferenceEquals(targetTeam, team))
                 return Refused("That player is not in your raid.");

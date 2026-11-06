@@ -39,7 +39,12 @@ namespace AORebirth.Enums
 
         Unknown2 = 272,
 
-        Unknown3 = 110,
+        /// <summary>
+        /// Subject selector: the following checks read the character being fought (Gamecode.dll 0x100065d8 case 0x6e
+        /// resolves subject kind 14, ItemTarget.Fightingtarget, as case 0x12 OnTarget resolves kind 3).
+        /// items.dat stores operators by name: an items.dat written before this name (as "Unknown3") must be re-extracted.
+        /// </summary>
+        OnFightingTarget = 110,
 
         /// <summary>
         /// </summary>

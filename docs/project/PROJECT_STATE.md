@@ -1,5 +1,44 @@
 # AORebirth Project State
 
+IMPLEMENTED, CLIENT UNVERIFIED (2026-11-04, Mongo landing): hostile nanos with
+no positively weighted authored defense now land without a defense roll. This
+removes the invented Nano Resist/Add All Def contest from standard Mongo taunt
+children while retaining genuine defense checks and existing target/pet/range
+rules. Four regression cases are added but not executed; source/data inspection
+and compilation are the authorized validation scope. No GameData, production or
+service changes. Exact failed live casts remain uncorrelated.
+
+PROVEN FOCUSED TESTS, CLIENT/LIVE UNVERIFIED (2026-11-04, ChatEngine framing):
+commit `50bf8097bd5970bc9aff85216bddc04569a6281c` assembles native frames across
+TCP chunks, preserves coalesced frames and rejects incomplete string fields.
+Shared sends preserve FIFO order and retry partial completions; operation leases
+protect pooled buffers through disposal. All 40 focused cases pass, including
+the committed rerun; ChatEngine and LoginEngine compile with zero errors. HTML,
+UTF8 replacement and flood policy remain unchanged. No GameData, production,
+service, database or website changes occurred. Live log access remains unverified
+and the reported incident time is unknown. See
+[the repair report](../reports/CHATENGINE_STREAM_FRAMING_REPAIR.md).
+
+PROVEN SERVER TESTS, CLIENT UNVERIFIED (2026-11-03, static doors/switches): the
+trigger executor preserves static context, ordered state transitions and authored
+timers, using editable private compatibility policies for unrecovered server
+signal meanings. Sixty focused cases pass, including actual Crypt door chains,
+other-playfield events and two loopback TCP sessions. Actual AO client traversal
+and animation remain unverified. Production has not changed; canonical catalog
+adoption and exact-input Windows release acceptance remain pending. See
+[the scoped repair report](../reports/STATIC_DOOR_TRIGGER_REPAIR.md).
+
+IMPLEMENTED, CLIENT UNVERIFIED (2026-11-03, Halloween button appearance): active
+buff HeadMesh effects now occupy the helmet mesh layer while preserving the base
+head. Appearance rebasing restores current equipment when the buff is removed,
+and both spawn and appearance messages use the same result. Existing item-driven
+Win/Fail text, health and nano responses remain data-defined. Four focused
+regression cases were added but not executed; ZoneEngine_New compilation passed.
+The test project could not compile because unrelated files reference missing
+communication and mission types. Conditional Win-button knockback and the Fail
+animation remain unsupported without proven packet behavior. This change has no
+Linux or live-client acceptance.
+
 PROVEN SOURCE INTEGRATION (2026-10-30): the locally accepted Daily Login feature
 is combined with public master `132459c1d3f732a88abffca4750150446933f57b`, including
 all listed combat, world-object, developer-build and quest updates and PR #46

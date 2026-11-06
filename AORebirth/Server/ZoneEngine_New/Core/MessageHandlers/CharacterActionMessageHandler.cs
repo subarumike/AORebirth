@@ -1,6 +1,7 @@
 namespace ZoneEngine_New.Core.MessageHandlers
 {
     using System;
+    using System.Collections.Generic;
     using System.Globalization;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -56,19 +57,17 @@ namespace ZoneEngine_New.Core.MessageHandlers
         /// </summary>
         static void ResetSkill(Player player, IZoneSession session, int statId)
         {
+            // The skill window's "Reset all skills" sends skill 0 (GUI.dll 100f9c21: N3Msg_ResetSkill(0) on Yes).
+            if (statId == 0)
+            {
+                FullIpReset(player, session);
+                return;
+            }
+
             var skill = (CharacterStat)statId;
             if (!SkillTraining.TryReset(player, skill, player.SkillCatalog, out int refund, out SkillTraining.ResetRefusal refusal))
             {
-                int feedback = refusal switch
-                {
-                    SkillTraining.ResetRefusal.MapNavigation => ClientFeedback.CantResetMapNavigation,
-                    SkillTraining.ResetRefusal.NoResetPoint => ClientFeedback.NeedResetPoint,
-                    SkillTraining.ResetRefusal.ItemsEquipped => ClientFeedback.UnequipBeforeSkillReset,
-                    SkillTraining.ResetRefusal.NothingSpent => ClientFeedback.NoIpSpentOnSkill,
-                    _ => 0
-                };
-                if (feedback != 0)
-                    ClientFeedback.Send(player, feedback);
+                SendResetRefusal(player, refusal);
                 LogUtil.Debug(DebugInfoDetail.Network, string.Format(CultureInfo.InvariantCulture,
                     "Skill reset refused character={0} skill={1} reason={2}", player.Identity.Instance, statId, refusal));
                 return;
@@ -84,6 +83,67 @@ namespace ZoneEngine_New.Core.MessageHandlers
             LogUtil.Debug(DebugInfoDetail.Network, string.Format(CultureInfo.InvariantCulture,
                 "Skill reset character={0} skill={1} refund={2} ip={3} rp={4}", player.Identity.Instance, skill, refund,
                 player.AvailableIp, player.Stats.GetOrZero(CharacterStat.RP, StatDetail.Base)));
+        }
+
+        /// <summary>
+        /// Full IP Reset, answered like a single reset: Stat for what it spent (SpecialCondition for the free reset,
+        /// otherwise FullIPRPoints), then Stat IP + every lowered ability and skill, then the client's own finish line
+        /// 110/218510731 "Your Full IP Reset has finished. You now have %d IP." (no retail capture of this reset yet).
+        /// </summary>
+        static void FullIpReset(Player player, IZoneSession session)
+        {
+            StatCollection stats = player.Stats;
+            bool freeReset = (stats.GetOrZero(CharacterStat.SpecialCondition, StatDetail.Base) & SkillTraining.FreeFullResetUsedBit) == 0;
+            if (!SkillTraining.TryFullReset(player, player.SkillCatalog, out int refund, out List<CharacterStat> changed,
+                    out SkillTraining.ResetRefusal refusal))
+            {
+                SendResetRefusal(player, refusal);
+                LogUtil.Debug(DebugInfoDetail.Network, string.Format(CultureInfo.InvariantCulture,
+                    "Full IP reset refused character={0} reason={1}", player.Identity.Instance, refusal));
+                return;
+            }
+
+            CharacterStat spent = freeReset ? CharacterStat.SpecialCondition : CharacterStat.FullIPRPoints;
+            session.Send(OwnStats(player, (spent, stats.GetOrZero(spent, StatDetail.Base))));
+            var values = new (CharacterStat Stat, int Value)[changed.Count + 1];
+            values[0] = (CharacterStat.IP, Math.Max(0, player.AvailableIp));
+            for (int i = 0; i < changed.Count; i++)
+                values[i + 1] = (changed[i], stats.GetOrZero(changed[i], StatDetail.Base));
+            session.Send(OwnStats(player, values));
+            ClientFeedback.SendFormatted(player, ClientFeedback.FullIpResetFinished, Math.Max(0, player.AvailableIp));
+            player.FlushDirtyStats();
+            LogUtil.Debug(DebugInfoDetail.Network, string.Format(CultureInfo.InvariantCulture,
+                "Full IP reset character={0} free={1} refund={2} lowered={3} ip={4} fullResetPoints={5}",
+                player.Identity.Instance, freeReset, refund, changed.Count, player.AvailableIp,
+                stats.GetOrZero(CharacterStat.FullIPRPoints, StatDetail.Base)));
+        }
+
+        /// <summary>Every refused reset gets a line, so the skill window's reset never looks dead.</summary>
+        static void SendResetRefusal(Player player, SkillTraining.ResetRefusal refusal)
+        {
+            switch (refusal)
+            {
+                case SkillTraining.ResetRefusal.MapNavigation:
+                    ClientFeedback.Send(player, ClientFeedback.CantResetMapNavigation);
+                    break;
+                case SkillTraining.ResetRefusal.NoResetPoint:
+                    ClientFeedback.Send(player, ClientFeedback.NeedResetPoint);
+                    break;
+                case SkillTraining.ResetRefusal.ItemsEquipped:
+                    ClientFeedback.Send(player, ClientFeedback.UnequipBeforeSkillReset);
+                    break;
+                case SkillTraining.ResetRefusal.NothingSpent:
+                    ClientFeedback.Send(player, ClientFeedback.NoIpSpentOnSkill);
+                    break;
+                case SkillTraining.ResetRefusal.NoFullReset:
+                    ClientFeedback.SendFormatted(player, ClientFeedback.PlainText, "You have no Full IP Reset available.");
+                    break;
+                default:
+                    // NotResettable and anything newer: the client's own "You are only allowed to reset abilities and skills."
+                    ClientFeedback.SendFormatted(player, ClientFeedback.PlainText,
+                        new ClientFeedback.TextReference(ClientFeedback.GuiTextCategory, ClientFeedback.OnlyAbilitiesAndSkillsResettable));
+                    break;
+            }
         }
 
         static StatMessage OwnStats(Player player, params (CharacterStat Stat, int Value)[] stats)
@@ -272,7 +332,13 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
                 case CharacterActionType.Logout:
                 {
-                    //TODO: Combat guard this at least
+                    // No /camp out of a fight: attacking something or being attacked refuses it.
+                    if (player.IsInCombat)
+                    {
+                        ClientFeedback.Send(player, ClientFeedback.CantLogoutInFight);
+                        break;
+                    }
+
                     session.Send(
                         new StartLogoutMessage
                         {

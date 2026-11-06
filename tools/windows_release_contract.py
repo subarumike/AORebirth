@@ -36,11 +36,12 @@ PRODUCT_PATHS = ("AORebirth/Server", "AORebirth/Libraries", "AORebirth/Config", 
                  "tools/windows_release_contract.cmd", "tools/build_aorebirth_debug.cmd", "start-engines.cmd", "start-engines.ps1")
 CONFIG_OVERRIDES = {"AORebirth/Config/Config.xml", "AORebirth/Config/ChatEngine.Config.xml"}
 PRIVATE_CHEST_CATALOGS = {"Loot/MissionChestRKAllowlist.json", "Loot/MissionChestSeasonalExclusions.json", "Loot/MissionChestSpecialExclusions.json"}
+INDEPENDENT_PRIVATE_CATALOGS = {"QuestRewards.json", "ObjectStateMachines.json"}
 # Named catalog loaders and GameDataPaths; no extension-only root admission.
-RUNTIME_ROOT_CATALOGS = frozenset("""AbilityCosts.json AlienXp.json ComboNames.json
+RUNTIME_ROOT_CATALOGS = frozenset("""AbilityCosts.json AlienXp.json ChatChannels.json ComboNames.json
 DungeonDoorStyles.json DungeonEntrances.json DungeonGeneration.json DynelCollision.json GoverningForms.json
 ItemBehavior.json items.dat ItemTemplates.json MonsterCombatRules.json MonsterData.json
-MonsterWeapons.json nanos.dat NewCharacter.json NpcTemplates.json PerkActions.json
+MonsterWeapons.json nanos.dat NewCharacter.json NpcTemplates.json ObjectStateMachines.json PerkActions.json
 Perks.json PetReplies.json PetTypes.json Quests.json QuestRewards.json Research.json Respawn.json
 SkillCosts.json SkillTrickle.json SpawnExclusions.json StartPackages.json TeleportRoutes.json Tradeskills.json VendingMachines.json
 WaterExits.json Xp.json""".split())
@@ -364,6 +365,13 @@ def merge_value(base, incoming, private, resolutions, pointer=""):
         return incoming
     if value_hash(incoming) == value_hash(base) or value_hash(incoming) == value_hash(private):
         return private
+    expected = {"BASE": value_hash(base), "UPSTREAM": value_hash(incoming), "PRIVATE": value_hash(private)}
+    if pointer in resolutions:
+        resolution = resolutions[pointer]
+        if (not isinstance(resolution, dict) or resolution.get("INPUT_HASHES") != expected
+                or not resolution.get("APPROVAL") or resolution.get("ACTION") not in ("PRESERVE_PRIVATE", "RESOLVED_VALUE")):
+            raise ContentConflict(pointer, expected)
+        return private if resolution["ACTION"] == "PRESERVE_PRIVATE" else resolution["VALUE"]
     if isinstance(base, dict) and isinstance(private, dict) and (isinstance(incoming, dict) or incoming is MISSING):
         incoming_missing = incoming is MISSING
         incoming = {} if incoming is MISSING else incoming
@@ -376,12 +384,7 @@ def merge_value(base, incoming, private, resolutions, pointer=""):
         return MISSING if incoming_missing and not result else result
     if base is MISSING and isinstance(incoming, dict) and isinstance(private, dict):
         return merge_value({}, incoming, private, resolutions, pointer)
-    resolution = resolutions.get(pointer)
-    expected = {"BASE": value_hash(base), "UPSTREAM": value_hash(incoming), "PRIVATE": value_hash(private)}
-    if (not isinstance(resolution, dict) or resolution.get("INPUT_HASHES") != expected
-            or not resolution.get("APPROVAL") or resolution.get("ACTION") not in ("PRESERVE_PRIVATE", "RESOLVED_VALUE")):
-        raise ContentConflict(pointer, expected)
-    return private if resolution["ACTION"] == "PRESERVE_PRIVATE" else resolution["VALUE"]
+    raise ContentConflict(pointer, expected)
 
 
 def merge_bytes(base, incoming, private, resolutions):
@@ -951,20 +954,129 @@ def validate_catalog_entry_proof(proof, entries, before, after):
         raise ValueError("Selective catalog entry counts or unchanged identities differ")
 
 
+def is_private_spawn_catalog(path):
+    return bool(re.fullmatch(r"Playfields/[1-9][0-9]*/Spawns\.json", path))
+
+
+def validate_private_catalog_paths(rows):
+    if not isinstance(rows, list) or any(not isinstance(row, dict) or not isinstance(row.get("PATH"), str) for row in rows):
+        raise ValueError("Private catalog adoption mappings are invalid")
+    paths = {row["PATH"] for row in rows}
+    if (len(paths) != len(rows) or any(path not in PRIVATE_CHEST_CATALOGS | INDEPENDENT_PRIVATE_CATALOGS
+                                     and not is_private_spawn_catalog(path) for path in paths)
+            or paths & PRIVATE_CHEST_CATALOGS not in (set(), PRIVATE_CHEST_CATALOGS)):
+        raise ValueError("Private catalog adoption requires complete chest policies or independent QuestRewards.json/ObjectStateMachines.json/playfield Spawns.json")
+
+
+def validate_spawn_catalog_adoption(path, existing, content):
+    # Check the loader envelope and add-only preservation; the existing runtime loader
+    # remains authoritative for the meaning of individual placement fields.
+    def envelope(value):
+        if isinstance(value, dict):
+            if len({key.casefold() for key in value}) != len(value):
+                raise ValueError("Spawn adoption fields cannot differ only by case")
+            for item in value.values():
+                envelope(item)
+        elif isinstance(value, list):
+            for item in value:
+                envelope(item)
+
+    def preserved(before, after):
+        if isinstance(before, dict):
+            return isinstance(after, dict) and all(key in after and preserved(item, after[key])
+                                                   for key, item in before.items())
+        if isinstance(before, list):
+            return (isinstance(after, list) and len(before) == len(after)
+                    and all(preserved(old, new) for old, new in zip(before, after)))
+        return type(before) is type(after) and value_hash(before) == value_hash(after)
+
+    for value in (existing, content):
+        envelope(value)
+        fields = {key.casefold(): item for key, item in value.items()} if isinstance(value, dict) else {}
+        if (type(fields.get("schemaversion")) is not int or fields["schemaversion"] != 1
+                or type(fields.get("playfieldid", 0)) is not int
+                or fields.get("playfieldid", 0) not in (0, int(PurePosixPath(path).parts[1]))
+                or not isinstance(fields.get("spawns"), list) or not fields["spawns"]
+                or any(not isinstance(row, dict) or not row for row in fields["spawns"])):
+            raise ValueError("Spawn adoption requires existing and approved nonempty schema-1 playfield spawns")
+    if not preserved(existing, content):
+        raise ValueError("Spawn adoption may only add dictionary fields; every existing field and ordered list must be preserved")
+
+
+def validate_object_state_machine_adoption(content):
+    # Validate the adoption envelope and explicit policy classifications. The existing runtime
+    # loader remains authoritative for entry-spell semantics during governed startup.
+    def fields(value, allowed):
+        if not isinstance(value, dict) or any(not isinstance(key, str) for key in value):
+            raise ValueError("Object state-machine rows must be objects")
+        result = {key.casefold(): item for key, item in value.items()}
+        if len(result) != len(value) or set(result) - set(allowed.split()):
+            raise ValueError("Object state-machine fields are unknown or duplicated")
+        return result
+
+    def integer(value):
+        return type(value) is int and -(2 ** 31) <= value < 2 ** 31
+
+    def classification(value):
+        return isinstance(value, str) and bool(value.strip())
+
+    catalog = fields(content, "schemaversion machines signalpolicies")
+    if (type(catalog.get("schemaversion")) is not int or catalog["schemaversion"] != 1
+            or not isinstance(catalog.get("machines"), list) or not catalog["machines"]
+            or not isinstance(catalog.get("signalpolicies"), list)):
+        raise ValueError("Private object state machines require schema 1 and nonempty machines")
+    machine_ids = set()
+    for raw in catalog["machines"]:
+        machine = fields(raw, "id initialstate initialstatecompatibility serializequeuedsignals states")
+        identity, initial = machine.get("id"), machine.get("initialstate", 0)
+        if (not integer(identity) or identity <= 0 or identity in machine_ids or not integer(initial)
+                or not classification(machine.get("initialstatecompatibility"))
+                or type(machine.get("serializequeuedsignals", False)) is not bool
+                or not isinstance(machine.get("states"), list) or not machine["states"]):
+            raise ValueError("Private object state machines require unique ids, nonempty states and explicit initial-state classification")
+        machine_ids.add(identity)
+        state_ids, targets = set(), []
+        for raw_state in machine["states"]:
+            state = fields(raw_state, "id entryspells signaltimers transitions")
+            state_id = state.get("id", 0)
+            if (not integer(state_id) or state_id < 0 or state_id in state_ids
+                    or any(not isinstance(state.get(key), list) for key in ("entryspells", "signaltimers", "transitions"))):
+                raise ValueError("Private object states require unique nonnegative ids and action/transition lists")
+            state_ids.add(state_id)
+            for raw_transition in state["transitions"]:
+                transition = fields(raw_transition, "targetstate criteria")
+                target = transition.get("targetstate", 0)
+                if not integer(target) or not isinstance(transition.get("criteria"), list):
+                    raise ValueError("Private object transitions require a state id and criteria list")
+                targets.append(target)
+        if initial not in state_ids or any(target not in state_ids for target in targets):
+            raise ValueError("Private object state-machine initial/transition state is missing")
+    masks = set()
+    for raw in catalog["signalpolicies"]:
+        policy = fields(raw, "signalmask dooroperations useenabled compatibility")
+        mask, operations, enabled = policy.get("signalmask"), policy.get("dooroperations"), policy.get("useenabled")
+        if (not integer(mask) or mask == 0 or mask in masks or not isinstance(operations, list)
+                or any(not isinstance(operation, str) or operation.casefold() not in ("unlock", "open", "close", "lock") for operation in operations)
+                or (enabled is not None and type(enabled) is not bool) or (not operations and enabled is None)
+                or not classification(policy.get("compatibility"))):
+            raise ValueError("Private object signal policies require unique masks, valid operations and explicit compatibility classification")
+        masks.add(mask)
+
+
 def validate_private_catalog_adoptions(bundle, value, actual, portable=False):
     rows = value.get("PRIVATE_CATALOG_ADOPTIONS", [])
-    if not isinstance(rows, list) or any(not isinstance(row, dict) for row in rows) or (rows and {row.get("PATH") for row in rows} not in (PRIVATE_CHEST_CATALOGS, {"QuestRewards.json"}, PRIVATE_CHEST_CATALOGS | {"QuestRewards.json"})):
-        raise ValueError("Private catalog adoption must bind chest policies together; QuestRewards.json may be adopted independently")
+    validate_private_catalog_paths(rows)
     seen = set()
     for row in rows:
         if set(row) != {"PATH", "SHA256", "APPROVAL", "APPROVAL_INSTRUCTION", "CANONICAL_BEFORE", "CANONICAL_AFTER"}:
             raise ValueError("Private catalog adoption schema differs")
         path, approval = row["PATH"], row["APPROVAL"]
+        spawn_catalog = is_private_spawn_catalog(path)
         if (path in seen or path in value["PROTECTED_GENERATED_FILES"] or not re.fullmatch("[0-9a-f]{64}", row["SHA256"])
                 or not isinstance(approval, dict) or set(approval) != {"BY", "INSTRUCTION_SHA256", "TEXT"}
                 or approval["BY"] != "Mike" or not re.fullmatch("[0-9a-f]{64}", approval["INSTRUCTION_SHA256"])
                 or not isinstance(approval["TEXT"], str) or not 0 < len(approval["TEXT"]) <= 4096
-                or PurePosixPath(path).name not in approval["TEXT"]):
+                or (path if spawn_catalog else PurePosixPath(path).name) not in approval["TEXT"]):
             raise ValueError("Private catalog adoption lacks exact hash-bound user approval")
         seen.add(path)
         instruction = row["APPROVAL_INSTRUCTION"] if portable else content_identity(load_optional(bundle, row["APPROVAL_INSTRUCTION"]))
@@ -982,7 +1094,9 @@ def validate_private_catalog_adoptions(bundle, value, actual, portable=False):
         validate_manifest([after])
         if after["path"] != path or after["sha256"] != row["SHA256"] or after["size"] <= 0:
             raise ValueError("Private catalog result differs from approved staged bytes")
-        if before is not None and before != after:
+        if spawn_catalog and before is None:
+            raise ValueError("Spawn field adoption requires an existing private spawn catalog")
+        if before is not None and before != after and not spawn_catalog:
             source = value["SOURCE_SNAPSHOTS"]["PUBLIC_PRODUCT_DATA"]["AFTER"].get(path)
             if source != {key: before[key] for key in ("size", "blob")}:
                 raise ValueError("Private catalog adoption would overwrite unexplained private content")
@@ -992,7 +1106,11 @@ def validate_private_catalog_adoptions(bundle, value, actual, portable=False):
                     raise ValueError("Only an empty public placeholder may be replaced by private adoption")
         if not portable:
             content = read_json(load_descriptor(bundle, row["CANONICAL_AFTER"]))
-            if path == "QuestRewards.json":
+            if path == "ObjectStateMachines.json":
+                validate_object_state_machine_adoption(content)
+            elif spawn_catalog:
+                validate_spawn_catalog_adoption(path, read_json(load_descriptor(bundle, row["CANONICAL_BEFORE"])), content)
+            elif path == "QuestRewards.json":
                 if (not isinstance(content, dict) or not content
                         or any(not isinstance(table, dict) or not isinstance(table.get("Entries"), list)
                                or not table["Entries"] for table in content.values())):
@@ -1192,8 +1310,7 @@ def reconcile_plan(root, profile, bundle, public_sha, dump_sha, baseline, before
         projected[path] = incoming
     private_adoptions = []
     mappings = profile.get("PRIVATE_CATALOG_ADOPTIONS", [])
-    if not isinstance(mappings, list) or any(not isinstance(row, dict) for row in mappings) or (mappings and {row.get("PATH") for row in mappings} not in (PRIVATE_CHEST_CATALOGS, {"QuestRewards.json"}, PRIVATE_CHEST_CATALOGS | {"QuestRewards.json"})):
-        raise ValueError("Private catalog adoption requires grouped chest policy mappings or independent QuestRewards.json")
+    validate_private_catalog_paths(mappings)
     for mapping in sorted(mappings, key=lambda row: row["PATH"]):
         if set(mapping) != {"PATH", "STAGED_PATH", "SHA256", "APPROVAL"}:
             raise ValueError("Private policy profile mapping schema differs")

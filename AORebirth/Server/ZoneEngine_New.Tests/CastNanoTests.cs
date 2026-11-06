@@ -19,6 +19,7 @@ namespace ZoneEngine_New.Tests
     using ZoneEngine_New.Core.Ai;
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Pets;
@@ -125,6 +126,64 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(1, nearVendor.Buffs.Count);
             Assert.AreEqual(0, far.Buffs.Count);
             Assert.AreEqual(0, nearSafe.Buffs.Count);
+        }
+
+        [TestMethod]
+        [DataRow(false)]
+        [DataRow(true)]
+        public void NanoWithoutDefenseSkillsLandsDespiteNanoResistAndAddAllDef(bool explicitZeroDefense)
+        {
+            NanoSpell nano = TestNanos.Create(HostileId, flags: NanoFlags.IsHostile);
+            if (explicitZeroDefense)
+            {
+                nano.Defend.Add(CharacterStat.NanoAC, 0);
+            }
+            Player caster = ReadyPlayer(1);
+            Player target = ReadyPlayer(2);
+            caster.Stats.Set(CharacterStat.AMSModifier, 0);
+            target.Stats.Set(CharacterStat.NanoAC, 100000);
+            target.Stats.Set(CharacterStat.DMSModifier, 100000);
+
+            Assert.IsTrue(DamageCalculator.ResolveNanoLand(caster, target, nano, out _, out int defense, out int chance));
+            Assert.AreEqual(0, defense);
+            Assert.AreEqual(100, chance);
+        }
+
+        [TestMethod]
+        public void NanoWithAuthoredDefenseKeepsItsResistanceContest()
+        {
+            NanoSpell nano = TestNanos.Create(HostileId, flags: NanoFlags.IsHostile);
+            nano.Attack.Add(CharacterStat.PsychologicalModification, 100);
+            nano.Defend.Add(CharacterStat.NanoAC, 25);
+            Player caster = ReadyPlayer(1);
+            Player target = ReadyPlayer(2);
+            caster.Stats.Set(CharacterStat.PsychologicalModification, 0);
+            caster.Stats.Set(CharacterStat.AMSModifier, 0);
+            target.Stats.Set(CharacterStat.NanoAC, 1000);
+            target.Stats.Set(CharacterStat.DMSModifier, 100);
+
+            DamageCalculator.ResolveNanoLand(caster, target, nano, out int attack, out int defense, out int chance);
+            Assert.AreEqual(0, attack);
+            Assert.AreEqual(350, defense);
+            Assert.AreEqual(0, chance);
+        }
+
+        [TestMethod]
+        public void AreaTauntWithoutDefenseReachesAnNpcWithHighNanoResist()
+        {
+            var items = new StubItemBuilder().Add(TestNanos.Create(
+                HostileId, durationCentiseconds: 0, can: 0, flags: NanoFlags.IsHostile,
+                modifiers: [Taunt(5000)]));
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            caster.Stats.Set(CharacterStat.AMSModifier, 0);
+            NpcCharacter target = world.Npc(2, 5, 0, 0, attackable: true);
+            target.Stats.Set(CharacterStat.NanoAC, 100000);
+            target.Stats.Set(CharacterStat.DMSModifier, 100000);
+            NpcBrain.Create(target);
+
+            Assert.IsTrue(UseCast(caster, items, FunctionType.AreaCastNano, HostileId, radius: 20));
+            Assert.AreEqual(5000f, target.Brain!.Hate.ThreatOf(caster.Identity));
         }
 
         [TestMethod]

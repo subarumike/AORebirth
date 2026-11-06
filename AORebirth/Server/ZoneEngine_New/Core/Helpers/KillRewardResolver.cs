@@ -19,6 +19,12 @@ namespace ZoneEngine_New.Core.Helpers
     {
         public const int MinimumContributionPercent = 20;
 
+        /// <summary>
+        /// When NPCs (a guard) dealt this share of all damage or more, nobody earns anything from the kill: no XP and
+        /// no loot. Below it, XP is reduced by the NPCs' share (<see cref="DivideByGroup"/>).
+        /// </summary>
+        public const int NpcForfeitPercent = 50;
+
         readonly Dictionary<int, int> _damage = new();
         readonly Dictionary<int, Identity> _identities = new();
         readonly Dictionary<int, int> _firstCreditOrder = new();
@@ -60,6 +66,27 @@ namespace ZoneEngine_New.Core.Helpers
 
         bool IsPlayerDamager(int instance) => !_npcDamagers.Contains(instance);
 
+        /// <summary>
+        /// False when NPCs dealt <see cref="NpcForfeitPercent"/> or more of all damage (pets count as their player
+        /// owners, not as NPCs). A death with no NPC damage always passes.
+        /// </summary>
+        bool PlayersCarriedNpcAssistedKill()
+        {
+            if (_npcDamagers.Count == 0)
+                return true;
+
+            long total = 0;
+            long npcTotal = 0;
+            foreach (KeyValuePair<int, int> pair in _damage)
+            {
+                total += pair.Value;
+                if (!IsPlayerDamager(pair.Key))
+                    npcTotal += pair.Value;
+            }
+
+            return total <= 0 || npcTotal * 100L < total * NpcForfeitPercent;
+        }
+
         public bool TryGetLootWinner(out Identity identity)
         {
             identity = Identity.None;
@@ -89,7 +116,8 @@ namespace ZoneEngine_New.Core.Helpers
         }
 
         /// <summary>
-        /// False when NPCs did the killing: NPC damage was dealt and no player (a pet counts as its owner) reached
+        /// False when NPCs did the killing: NPCs dealt <see cref="NpcForfeitPercent"/> or more of all damage, or no
+        /// player (a pet counts as its owner) reached
         /// <see cref="MinimumContributionPercent"/> of all damage, the same bar as "you did not do enough damage" for
         /// experience. The corpse then carries no rolled loot and no credits. A death with no NPC damage, or with no
         /// recorded damage at all, keeps its spoils.
@@ -98,6 +126,8 @@ namespace ZoneEngine_New.Core.Helpers
         {
             if (_npcDamagers.Count == 0)
                 return true;
+            if (!PlayersCarriedNpcAssistedKill())
+                return false;
 
             long total = 0;
             foreach (int damage in _damage.Values)
@@ -125,6 +155,10 @@ namespace ZoneEngine_New.Core.Helpers
                 total += damage;
 
             if (total <= 0)
+                return qualifiers;
+
+            // A guard that did most of the work leaves nobody with kill credit: no XP, alien XP, title or kill quest.
+            if (!PlayersCarriedNpcAssistedKill())
                 return qualifiers;
 
             foreach (KeyValuePair<int, int> pair in _damage)
@@ -191,7 +225,7 @@ namespace ZoneEngine_New.Core.Helpers
                 if (IsPlayerDamager(pair.Key))
                     playerTotal += pair.Value;
             }
-            if (total <= 0 || playerTotal <= 0)
+            if (total <= 0 || playerTotal <= 0 || !PlayersCarriedNpcAssistedKill())
                 return shares;
 
             // Players earn only for the part of the kill they did: NPC damage (a guard finishing what a player tagged)

@@ -14,6 +14,9 @@
 
 namespace SmokeLounge.AOtomation.Messaging.GameData
 {
+    using SmokeLounge.AOtomation.Messaging.Serialization;
+    using SmokeLounge.AOtomation.Messaging.Serialization.MappingAttributes;
+
     /// <summary>
     /// One SimpleCharFullUpdate extended texture entry (flag HasExtendedTextures): puts a texture on a named material
     /// of the character's mesh. Wire: 32-byte NUL-padded ASCII material name, then texture id and two ints.
@@ -29,12 +32,16 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
         #region Public Properties
 
         /// <summary>Mesh material the texture goes on, e.g. "Material #9".</summary>
+        [AoMember(0, SerializeSize = ArraySizeType.NoSerialization, IsFixedSize = true, FixedSizeLength = MaterialNameLength)]
         public string Material { get; set; }
 
+        [AoMember(1)]
         public int Texture { get; set; }
 
+        [AoMember(2)]
         public int Unknown1 { get; set; }
 
+        [AoMember(3)]
         public int Unknown2 { get; set; }
 
         #endregion

@@ -69,7 +69,6 @@ namespace ZoneEngine_New.Core.Playfield
         private int _admissions;
         private DateTime? _emptySinceUtc;
         private volatile bool _retiring;
-        private int _nextContainerInventoryHandle = 1;
         // TEMP: WIFU Identity.Instance until real weapon-instance identity allocation exists.
         /// <summary>
         /// First announced weapon id. Weapon items reach the client as WeaponInstance (51018) : item InstanceId, and
@@ -399,19 +398,6 @@ namespace ZoneEngine_New.Core.Playfield
             where T : class
             => _serviceProvider == null ? null : _serviceProvider.GetService<T>();
 
-
-        /// <summary>Client inventory handle for an opened container (bags, corpses, chests). Range 1..ushort.MaxValue.</summary>
-        public int AllocateContainerInventoryHandle()
-        {
-            int handle = _nextContainerInventoryHandle;
-            if (_nextContainerInventoryHandle == ushort.MaxValue)
-                _nextContainerInventoryHandle = 1;
-            else
-                _nextContainerInventoryHandle++;
-
-            return handle;
-        }
-
         /// <summary>
         /// TEMP: Playfield-scoped unique id for WeaponItemFullUpdate Identity.Instance.
         /// Increments on every WIFU build; kept above every inventory item InstanceId.
@@ -711,6 +697,7 @@ namespace ZoneEngine_New.Core.Playfield
                 foreach (PlayfieldTransfer transfer in _outgoingTransfers.Keys) transfer.SourceShutdown();
                 _playfieldManager.Knubot?.Shutdown(this);
                 GetRequiredService<ZoneEngine_New.Core.Missions.QuestPropService>().Shutdown();
+                GetRequiredService<AreaTriggerService>().Dispose();
                 Player[] remaining = [.. _dynelRegistry.PlayerEntities()];
                 foreach (Player player in remaining)
                 {
@@ -815,6 +802,8 @@ namespace ZoneEngine_New.Core.Playfield
                 _inventoryMoves.Tick(this, deltaTime);
                 ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("itemuse");
                 GetRequiredService<ItemUseService>().Tick(deltaTime);
+                ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("static.triggers");
+                GetRequiredService<AreaTriggerService>().Tick(deltaTime);
                 ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("trades");
                 _trades.Tick(this, deltaTime);
 
@@ -979,6 +968,8 @@ namespace ZoneEngine_New.Core.Playfield
                 return locality;
             });
             services.AddSingleton<SpawnService>();
+            services.AddSingleton(_ => StaticObjectStateMachineCatalog.Load(_gameData.RootPath, _logger));
+            services.AddSingleton<AreaTriggerService>();
             services.AddSingleton<ZoneEngine_New.Core.Ai.ReachMaps>();
             services.AddSingleton(provider => new Pets.PetService(this, _gameData, _logger));
             services.AddSingleton(_shopDao);

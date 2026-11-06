@@ -95,6 +95,9 @@ namespace ChatEngine.CoreServer
         /// </summary>
         internal ChatEngineBotRouter BotRouter;
 
+        /// <summary>The GameData ChatChannels.json channels, fixed for the process; also in <see cref="Channels"/>.</summary>
+        private readonly ConfiguredChannel[] staticChannels;
+
         #endregion
 
         #region Constructors and Destructors
@@ -103,19 +106,14 @@ namespace ChatEngine.CoreServer
         /// </summary>
         public ChatServer()
         {
-            // Global channel
-            this.Channels.Add(new GlobalChannel(ChannelFlags.None, ChannelType.General, 1, "Global"));
-
-            // Shopping channels (at the moment just level restricted, no sides)
-            this.Channels.Add(new LevelRestrictedChannel(1, 1, 50));
-            this.Channels.Add(new LevelRestrictedChannel(2, 51, 150));
-            this.Channels.Add(new LevelRestrictedChannel(3, 151, 220));
-
-            // Restricted channels (GM, sided channels)
-            this.Channels.Add(new RestrictedChannel(Side.Gm, ChannelFlags.None, ChannelType.GM));
-            this.Channels.Add(new RestrictedChannel(Side.Clan, ChannelFlags.None, ChannelType.General));
-            this.Channels.Add(new RestrictedChannel(Side.Omni, ChannelFlags.None, ChannelType.General));
-            this.Channels.Add(new RestrictedChannel(Side.Neutral, ChannelFlags.None, ChannelType.General));
+            // Static channels (Global, Shopping, sided, GM) and their join conditions come from GameData.
+            IReadOnlyList<ChannelDefinition> definitions = ChannelCatalog.LoadRuntime().Channels;
+            this.staticChannels = new ConfiguredChannel[definitions.Count];
+            for (int i = 0; i < definitions.Count; i++)
+            {
+                this.staticChannels[i] = new ConfiguredChannel(definitions[i]);
+                this.Channels.Add(this.staticChannels[i]);
+            }
 
             this.ClientConnected += this.ClientConnectedToChat;
             this.ClientDisconnected += this.OnClientDisconnect;
@@ -128,16 +126,8 @@ namespace ChatEngine.CoreServer
 
         #region Public Methods and Operators
 
-        /// <summary>
-        /// </summary>
-        /// <typeparam name="T">
-        /// </typeparam>
-        /// <returns>
-        /// </returns>
-        public List<ChannelBase> ChannelsByType<T>()
-        {
-            return this.Channels.Where(x => x is T).ToList();
-        }
+        /// <summary>Number of GameData ChatChannels.json channels.</summary>
+        internal int StaticChannelCount => this.staticChannels.Length;
 
         /// <summary>
         /// </summary>
@@ -651,20 +641,11 @@ namespace ChatEngine.CoreServer
         /// </param>
         internal void AddClientToChannels(Client client)
         {
-            // Automatically add client to its appropriate channels
-            foreach (ChannelBase channel in this.ChannelsByType<GlobalChannel>())
+            // Every static channel whose conditions the character passes; one context reads each stat once.
+            var joinContext = new ChannelJoinContext(client);
+            foreach (ConfiguredChannel channel in this.staticChannels)
             {
-                channel.AddClient(client);
-            }
-
-            foreach (ChannelBase channel in this.ChannelsByType<RestrictedChannel>())
-            {
-                channel.AddClient(client);
-            }
-
-            foreach (ChannelBase channel in this.ChannelsByType<LevelRestrictedChannel>())
-            {
-                channel.AddClient(client);
+                channel.AddClient(client, joinContext);
             }
 
             // Team and raid channels are joined only on the zone's #aorebirth-team-join / raid-convert for that
@@ -1060,11 +1041,7 @@ namespace ChatEngine.CoreServer
                 return;
             }
 
-            byte[] packet = MsgPrivate.Create(
-                0,
-                message.Text,
-                message.Unk1 != 0 ? message.Unk1 : 3,
-                message.Unk2);
+            byte[] packet = MsgPrivate.Create(0, message.Text);
             if (packet == null)
             {
                 return;
@@ -1124,10 +1101,16 @@ namespace ChatEngine.CoreServer
 
         private void DistributeVicinityChat(VicinityChatMessage vicinityChatMessage)
         {
+            // A player's line comes without a sender name (an NPC's carries one); only a player can be a GM.
+            Client sender;
+            bool gm = vicinityChatMessage.SenderName == null
+                      && this.ConnectedClients.TryGetValue((uint)vicinityChatMessage.SenderId, out sender)
+                      && ChatLineFlags.IsGm(sender);
             byte[] packet = MsgVicinity.Create(
                 (uint)vicinityChatMessage.SenderId,
                 vicinityChatMessage.Text,
-                (byte)vicinityChatMessage.MessageType);
+                (byte)vicinityChatMessage.MessageType,
+                gm);
 
             string lookup = vicinityChatMessage.SenderName
                             ?? CharacterDao.Instance.GetCharacterNameById(vicinityChatMessage.SenderId);

@@ -48,11 +48,27 @@ namespace ZoneEngine_New.Core.Nanos
             ExpiresAtUtc = expiresAtUtc;
         }
 
+        /// <summary>Hits and nano casts: the OnUse functions a buff can repeat or delay from its NCU entry.</summary>
+        internal static bool IsTimedFunction(ItemSpell spell)
+            => (FunctionType)spell.FunctionType is FunctionType.Hit or FunctionType.CastNano
+                or FunctionType.TeamCastNano or FunctionType.AreaCastNano or FunctionType.PlayfieldNano
+                or FunctionType.CastNanoIfPossible or FunctionType.NpcCastNanoIfPossible
+                or FunctionType.CastNanoIfPossibleOnFightTarget or FunctionType.NpcCastNanoIfPossibleOnFightTarget;
+
+        /// <summary>
+        /// One tick after a delay (TickCount 1, TickInterval N): runs once, N centiseconds after landing, and not at the
+        /// land. Proc buffs refresh this way: Soothing Herbs 263341 lasts 50 s and recasts itself at 45 s.
+        /// </summary>
+        internal static bool IsDelayedOnce(ItemSpell spell)
+            => spell.TickCount == 1 && spell.TickInterval > 0 && IsTimedFunction(spell);
+
         /// <summary>
         /// Repeated hits and child-nano casts use their data-defined count and interval (centiseconds).
         /// Landing runs the first application; the rest run only while the parent buff remains active.
+        /// A delayed single tick (<see cref="IsDelayedOnce"/>) is not run by the land; it falls due one interval
+        /// after <paramref name="landedUtc"/>.
         /// </summary>
-        void SchedulePeriodic(DateTime nowUtc, int hitsAlreadyDone)
+        void SchedulePeriodic(DateTime nowUtc, DateTime landedUtc, int hitsAlreadyDone)
         {
             _periodic.Clear();
             if (!SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells))
@@ -61,11 +77,13 @@ namespace ZoneEngine_New.Core.Nanos
             for (int i = 0; i < spells.Count; i++)
             {
                 ItemSpell spell = spells[i];
-                bool periodic = (FunctionType)spell.FunctionType is FunctionType.Hit or FunctionType.CastNano
-                    or FunctionType.TeamCastNano or FunctionType.AreaCastNano or FunctionType.PlayfieldNano
-                    or FunctionType.CastNanoIfPossible or FunctionType.NpcCastNanoIfPossible
-                    or FunctionType.CastNanoIfPossibleOnFightTarget or FunctionType.NpcCastNanoIfPossibleOnFightTarget;
-                if (!periodic || spell.TickCount <= 1 || spell.TickInterval == 0)
+                if (IsDelayedOnce(spell))
+                {
+                    _periodic.Add(new PeriodicEffect(spell, 1, landedUtc.AddMilliseconds(spell.TickInterval * 10.0)));
+                    continue;
+                }
+
+                if (!IsTimedFunction(spell) || spell.TickCount <= 1 || spell.TickInterval == 0)
                     continue;
 
                 int remaining = spell.TickCount - hitsAlreadyDone;
@@ -195,10 +213,9 @@ namespace ZoneEngine_New.Core.Nanos
                     "Nano " + spell.Id + " is not a buff and cannot occupy NCU.");
             }
 
-            int duration = Math.Clamp(spell.DurationCentiseconds, 1, MaxDurationCentiseconds);
-            var buff = new Buff(spell, source, nanoInstance, nowUtc.AddMilliseconds(duration * 10L));
+            var buff = new Buff(spell, source, nanoInstance, nowUtc.AddMilliseconds(ClampedDuration(spell) * 10L));
             // The land runs the initial hit.
-            buff.SchedulePeriodic(nowUtc, hitsAlreadyDone: 1);
+            buff.SchedulePeriodic(nowUtc, nowUtc, hitsAlreadyDone: 1);
             return buff;
         }
 
@@ -210,10 +227,15 @@ namespace ZoneEngine_New.Core.Nanos
         {
             ArgumentNullException.ThrowIfNull(spell);
             var buff = new Buff(spell, source, nanoInstance, expiresAtUtc);
-            // Ticks restart from now; the expiry cut in CollectDueTicks keeps them inside what is left.
-            buff.SchedulePeriodic(DateTime.UtcNow, hitsAlreadyDone: 1);
+            // Ticks restart from now; the expiry cut in CollectDueTicks keeps them inside what is left. A delayed single
+            // tick keeps its place before the stored expiry (a proc buff's self-recast stays 5 s before its end), and one
+            // whose time passed while offline runs on the first tick.
+            DateTime landedUtc = expiresAtUtc.AddMilliseconds(-ClampedDuration(spell) * 10L);
+            buff.SchedulePeriodic(DateTime.UtcNow, landedUtc, hitsAlreadyDone: 1);
             return buff;
         }
+
+        static int ClampedDuration(NanoSpell spell) => Math.Clamp(spell.DurationCentiseconds, 1, MaxDurationCentiseconds);
 
         public bool IsExpired(DateTime nowUtc) => nowUtc >= ExpiresAtUtc;
 

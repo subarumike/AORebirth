@@ -42,8 +42,8 @@
     <PackageReference Include="ModelContextProtocol.AspNetCore" Version="2.2.0" />
     <PackageReference Include="MsgPack.Cli" Version="1.0.1" />
     <PackageReference Include="MySqlConnector" Version="2.4.0" />
-    <PackageReference Include="N3Lite" Version="0.1.11" />
-    <PackageReference Include="N3Lite.AORules" Version="0.1.11" />
+    <PackageReference Include="N3Lite" Version="0.1.13" />
+    <PackageReference Include="N3Lite.AORules" Version="0.1.13" />
     <PackageReference Include="NLog" Version="6.1.4" />
   </ItemGroup>
 

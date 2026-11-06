@@ -5,6 +5,9 @@ namespace ZoneEngine_New.Core.WorldSimulation
 
     using ZoneEngine_New.Core.Entities;
 
+    using Identity = SmokeLounge.AOtomation.Messaging.GameData.Identity;
+    using EventType = AORebirth.Enums.EventType;
+
     using Quaternion = AORebirth.Core.Vector.Quaternion;
     using Vector3 = AORebirth.Core.Vector.Vector3;
 
@@ -81,6 +84,11 @@ namespace ZoneEngine_New.Core.WorldSimulation
 
         // Portal
         public int DynelInstance;
+
+        /// <summary>Exact owner of a static event; instance values alone can overlap between dynel types.</summary>
+        public Identity DynelIdentity;
+
+        public EventType StaticEvent = EventType.OnTargetInVicinity;
         public PortalLandingKind LandingKind;
         public int DestDoorInstance;
         public float DoorClearance;
@@ -244,6 +252,10 @@ namespace ZoneEngine_New.Core.WorldSimulation
             return false;
         }
 
+        public bool HasStaticEvent(Identity owner, EventType eventType)
+            => _all.Exists(volume => volume.Kind == ZoneTriggerKind.TargetVicinity
+                && volume.DynelIdentity == owner && volume.StaticEvent == eventType);
+
         public void Add(ZoneTriggerVolume volume)
         {
             ArgumentNullException.ThrowIfNull(volume);
@@ -285,12 +297,26 @@ namespace ZoneEngine_New.Core.WorldSimulation
         public bool RemoveDynel(ZoneTriggerKind kind, int dynelInstance)
         {
             int index = _all.FindIndex(v => v.Kind == kind && v.DynelInstance == dynelInstance);
+            return RemoveAt(index);
+        }
+
+        public void RemoveStaticEvents(Identity owner)
+        {
+            int index;
+            while ((index = _all.FindIndex(v => v.Kind == ZoneTriggerKind.TargetVicinity && v.DynelIdentity == owner)) >= 0)
+            {
+                RemoveAt(index);
+            }
+        }
+
+        bool RemoveAt(int index)
+        {
             if (index < 0)
                 return false;
 
             ZoneTriggerVolume volume = _all[index];
             _all.RemoveAt(index);
-            if (kind == ZoneTriggerKind.TargetVicinity)
+            if (volume.Kind == ZoneTriggerKind.TargetVicinity)
                 VicinityTriggerCount--;
 
             int minBinX = (int)MathF.Floor(volume.MinX / BinSize);

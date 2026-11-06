@@ -28,6 +28,7 @@
     using AoQuaternion = AORebirth.Core.Vector.Quaternion;
     using CharacterStat = SmokeLounge.AOtomation.Messaging.GameData.CharacterStat;
     using IdentityType = SmokeLounge.AOtomation.Messaging.GameData.IdentityType;
+    using Identity = SmokeLounge.AOtomation.Messaging.GameData.Identity;
     using PlayfieldType = ZoneEngine_New.Core.Playfield.Playfield;
 
     /// <summary>A resolved zone transition: where it goes, and which trigger produced it.</summary>
@@ -123,6 +124,7 @@
             world.BakeWallTriggers(geometry.Walls);
             world.BakePortalTriggers(geometry.Dynels, playfieldId);
             world.BakeVicinityTriggers(geometry.Dynels, itemTemplates);
+            world.BakeStaticEntryTriggers(geometry.Dynels, itemTemplates);
             world.BakeMissionEntranceTriggers(geometry.Dynels);
             world.BakeExitDoorTriggers(geometry.Dynels, playfieldId);
             // Configured exits (ExitProxyDoors.json, else a dungeon's doors that open onto no room) are the way out
@@ -658,7 +660,7 @@
         public void RegisterExitProxyDoor(int doorInstance)
         {
             if (doorInstance == 0
-                || _triggers.HasDynel(ZoneTriggerKind.TargetVicinity, doorInstance)
+                || _triggers.HasStaticEvent(new Identity { Type = IdentityType.Door, Instance = doorInstance }, EventType.OnTargetInVicinity)
                 || _triggers.HasDynel(ZoneTriggerKind.ExitDoor, doorInstance)
                 || _triggers.HasDynel(ZoneTriggerKind.PortalDynel, doorInstance)
                 || !ExitProxyDoorCatalog.ShouldRegister(doorInstance, _gameData.GetConfiguredExitProxyDoorInstances(_playfieldId))
@@ -1361,12 +1363,25 @@
             if (events == null || player.Session == null)
                 return;
 
+            var criteria = new SpellCriteria { SourceDoorInstance = pad.DynelInstance };
+            if (events.SpellList.TryGetValue(pad.StaticEvent, out List<ItemSpell>? rows)
+                && rows.Exists(DynelEventSpells.IsAreaTrigger))
+            {
+                // Never infer a placed owner from proximity or its instance number alone.
+                if (playfield.GetRequiredService<DynelRegistry>().TryGet(pad.DynelIdentity, out ZoneEngine_New.Core.Entities.Dynel? dynel)
+                    && dynel is StaticDynel owner)
+                {
+                    playfield.GetRequiredService<AreaTriggerService>().BeginEvent(owner, player, pad.StaticEvent, criteria);
+                }
+                return;
+            }
+
             events.ExecuteSpells(
-                EventType.OnTargetInVicinity,
+                pad.StaticEvent,
                 player,
                 playfield.GetRequiredService<IInventoryRepository>(),
                 playfield.GetRequiredService<IItemBuilder>(),
-                new SpellCriteria { SourceDoorInstance = pad.DynelInstance });
+                criteria);
         }
 
         void BakeVicinityTriggers(PlayfieldDynels? dynels, IItemTemplateCatalog? itemTemplates)
@@ -1406,7 +1421,7 @@
                     ? PortalDoorLandingResolver.Proxy2EntryDoorClearance
                     : 0f;
                 ZoneTriggerVolume pad = AddVicinityPad(
-                    d.IdentityInstance,
+                    new Identity { Type = (IdentityType)d.IdentityType, Instance = d.IdentityInstance },
                     d.TemplateId,
                     events,
                     d.Position.X,
@@ -1424,27 +1439,58 @@
             }
         }
 
+        void BakeStaticEntryTriggers(PlayfieldDynels? dynels, IItemTemplateCatalog? itemTemplates)
+        {
+            if (dynels?.Dynels == null)
+                return;
+            foreach (PlayfieldDynel dynel in dynels.Dynels)
+            {
+                // The established portal path owns transport and its criteria. Do not add a second
+                // crossing or execute its Teleport again merely because it also has entry functions.
+                if (PortalDoorLandingResolver.TryReadPortal(dynel, out _))
+                    continue;
+                ItemTemplate events = DynelEventSpells.WithOnUseFromDynel(new ItemTemplate { Id = dynel.TemplateId }, dynel);
+                if (!events.SpellList.ContainsKey(EventType.OnEnter)
+                    && itemTemplates != null && itemTemplates.TryGet(dynel.TemplateId, out ItemTemplate? template))
+                {
+                    events = template;
+                }
+                if (!events.SpellList.TryGetValue(EventType.OnEnter, out List<ItemSpell>? rows)
+                    || !rows.Exists(DynelEventSpells.IsAreaTrigger))
+                    continue;
+                PlacedLook(dynel, out int mesh, out int scale);
+                AddVicinityPad(new Identity { Type = (IdentityType)dynel.IdentityType, Instance = dynel.IdentityInstance },
+                    dynel.TemplateId, events, dynel.Position.X, dynel.Position.Y, dynel.Position.Z,
+                    mesh, scale, eventType: EventType.OnEnter);
+            }
+        }
+
         /// <summary>
         /// Gives a dynel spawned after the bake (a hash-spawned static such as the Elysium teleporter 245613) the
         /// walk-in pad its OnTargetInVicinity spells need. False when it has none or already has a pad.
         /// </summary>
-        public bool RegisterVicinityDynel(int dynelInstance, ItemTemplate events, float x, float y, float z)
+        public bool RegisterVicinityDynel(Identity identity, ItemTemplate events, float x, float y, float z)
         {
             ArgumentNullException.ThrowIfNull(events);
-            if (!events.SpellList.ContainsKey(EventType.OnTargetInVicinity)
-                || _triggers.HasDynel(ZoneTriggerKind.TargetVicinity, dynelInstance))
-                return false;
-
-            AddVicinityPad(dynelInstance, events.Id, events, x, y, z, placedMesh: 0, placedScale: 0);
-            return true;
+            bool added = false;
+            foreach (EventType eventType in new[] { EventType.OnTargetInVicinity, EventType.OnEnter })
+            {
+                if (!events.SpellList.TryGetValue(eventType, out List<ItemSpell>? rows)
+                    || (eventType == EventType.OnEnter && (!rows.Exists(DynelEventSpells.IsAreaTrigger) || rows.Exists(IsTeleport)))
+                    || _triggers.HasStaticEvent(identity, eventType))
+                    continue;
+                AddVicinityPad(identity, events.Id, events, x, y, z, placedMesh: 0, placedScale: 0, eventType: eventType);
+                added = true;
+            }
+            return added;
         }
 
         /// <summary>Drops the pad <see cref="RegisterVicinityDynel"/> gave a dynel that has since despawned.</summary>
-        public void UnregisterVicinityDynel(int dynelInstance)
-            => _triggers.RemoveDynel(ZoneTriggerKind.TargetVicinity, dynelInstance);
+        public void UnregisterVicinityDynel(Identity identity)
+            => _triggers.RemoveStaticEvents(identity);
 
         ZoneTriggerVolume AddVicinityPad(
-            int dynelInstance,
+            Identity identity,
             int templateId,
             ItemTemplate events,
             float x,
@@ -1452,7 +1498,8 @@
             float z,
             int placedMesh,
             int placedScale,
-            float minRadius = 0f)
+            float minRadius = 0f,
+            EventType eventType = EventType.OnTargetInVicinity)
         {
             float r = TriggerVolumeCatalog.TargetVicinityRadius;
             bool explicitRange = events.Stats.TryGetValue(CharacterStat.VicinityRange, out int vicinityRange) && vicinityRange > 0;
@@ -1472,7 +1519,9 @@
                 CenterY = y,
                 CenterZ = z,
                 Radius = r,
-                DynelInstance = dynelInstance,
+                DynelInstance = identity.Instance,
+                DynelIdentity = identity,
+                StaticEvent = eventType,
                 VicinityEvents = events
             };
             float h = TriggerVolumeCatalog.HalfHeight(pad);
@@ -1497,6 +1546,23 @@
 
         /// <summary>Doors as sight blockers: the playfield's static doors, plus quest dungeon doors as they spawn.</summary>
         public DoorOcclusion Doors => _doors;
+
+        /// <summary>Shares a placed door's live stats with touch, sight and zone-in state publication.</summary>
+        public void BindStaticDoor(StaticDynel door) => _doors.BindStaticDoor(door);
+
+        /// <summary>Applies complete state-machine Flags to a bound door and publishes changed open/lock state.</summary>
+        public bool ApplyDoorFlags(PlayfieldType playfield, StaticDynel door, int flags, bool? closeInhibit = null)
+            => _doors.ApplyDoorFlags(playfield, door, flags, closeInhibit);
+
+        public bool ApplyDoorFlags(PlayfieldType playfield, Entities.Dynel owner, int flags, bool? closeInhibit = null)
+        {
+            if (owner is Door door)
+            {
+                door.ApplyFlags(flags, closeInhibit);
+                return true;
+            }
+            return owner is StaticDynel placed && ApplyDoorFlags(playfield, placed, flags, closeInhibit);
+        }
 
         /// <summary>
         /// Makes a quest dungeon door block line of sight while closed (see <see cref="DoorOcclusion"/>). A template

@@ -382,6 +382,114 @@ namespace ZoneEngine_New.Core.Ai
 
         public IReadOnlyList<Vector3> PatrolWaypoints { get; set; }
 
+        /// <summary>The patrol runs between its waypoints (Movement.Patrol.Run); without it the NPC walks.</summary>
+        public bool PatrolRun { get; set; }
+
+        /// <summary>
+        /// The waypoint the patrol is heading for. Kept on the brain, not in PatrolNode: the node ends every think so
+        /// the root re-checks leash and combat, and starts the route over only on a tree reset.
+        /// </summary>
+        internal int PatrolIndex { get; private set; }
+
+        bool _patrolledThisThink;
+        bool _patrolWalking;
+
+        /// <summary>
+        /// One patrol think: head for the current waypoint at the patrol's pace, and on to the next one on arrival.
+        /// False when there is no route.
+        /// </summary>
+        internal bool TickPatrol()
+        {
+            IReadOnlyList<Vector3> points = PatrolWaypoints;
+            if (points.Count == 0)
+            {
+                PatrolAnchor = null;
+                return false;
+            }
+
+            _patrolledThisThink = true;
+            if (PatrolIndex >= points.Count)
+                PatrolIndex = 0;
+
+            // Each NPC walks the route shifted by its own stable offset (NpcSpread), so a shared route does not stack.
+            Vector3 dest = NpcSpread.Destination(Npc, points[PatrolIndex]);
+            if (NpcAiRules.IsNearby(Npc.Position, dest, NpcAiRules.ArriveHomeMeters))
+            {
+                // A program bound to this NPC may act at the waypoint (NpcScripts Arrived).
+                Npc.Scripts?.Raise(NpcScripts.NpcScriptTrigger.Arrived, PatrolIndex);
+                PatrolIndex = (PatrolIndex + 1) % points.Count;
+                dest = NpcSpread.Destination(Npc, points[PatrolIndex]);
+            }
+
+            _patrolWalking = !PatrolRun;
+            if (PatrolRun)
+            {
+                if (Npc.Motor.State == Movement.MovementState.Walk)
+                    Npc.Motor.ApplyAction(Movement.MovementAction.SwitchToRun);
+            }
+            else if (Npc.Motor.State != Movement.MovementState.Walk)
+            {
+                Npc.Motor.ApplyAction(Movement.MovementAction.SwitchToWalk);
+            }
+
+            // The leash measures from this waypoint while the patrol walks to it (LeashAnchor).
+            PatrolAnchor = dest;
+            PathTo(dest);
+            return true;
+        }
+
+        /// <summary>
+        /// Another branch took over from a walking patrol (a fight, a leash, a chat): back to running pace, unless a
+        /// scripted walk or a stroll set the walk this think.
+        /// </summary>
+        void LeavePatrolPace()
+        {
+            if (!_patrolWalking)
+                return;
+
+            _patrolWalking = false;
+            if (Npc.Motor.State == Movement.MovementState.Walk && !ScriptHoldsMovement && !_wanderedThisThink)
+                Npc.Motor.ApplyAction(Movement.MovementAction.SwitchToRun);
+        }
+
+        // Conversations (Knubot): while a player has a chat open with the NPC it stops what it was walking and stands,
+        // and for a moment after the last chat closes, so the player is not left behind. Leash and combat come before
+        // the hold in the tree, so an attack still ends it. Live (Lolly the Reet and three other patrollers, 2026-10):
+        // no FollowTarget for the whole chat, the route picked up again 1-3 s after the close, and no turn or re-spawn.
+        // Chats normally open and close on the NPC's own playfield tick, but a stale chat left behind by a zoning
+        // player is closed from the playfield the player clicked in next, so the set is guarded. The think's read of
+        // the count stays lock-free.
+        readonly HashSet<int> _talkers = new();
+        DateTime _conversationHoldUntilUtc;
+
+        public bool IsHeldByConversation => _talkers.Count > 0
+            || (_conversationHoldUntilUtc != default && DateTime.UtcNow < _conversationHoldUntilUtc);
+
+        /// <summary>A chat with <paramref name="talker"/> opened: the NPC stops on its next think.</summary>
+        public void BeginConversation(Character talker)
+        {
+            ArgumentNullException.ThrowIfNull(talker);
+            if (Pet != null)
+                return;
+
+            lock (_talkers)
+                _talkers.Add(talker.Identity.Instance);
+        }
+
+        /// <summary>The chat with <paramref name="talker"/> closed; the NPC lingers a moment after the last one.</summary>
+        public void EndConversation(Character talker)
+        {
+            ArgumentNullException.ThrowIfNull(talker);
+            lock (_talkers)
+            {
+                if (_talkers.Remove(talker.Identity.Instance) && _talkers.Count == 0)
+                    _conversationHoldUntilUtc = DateTime.UtcNow.AddSeconds(NpcAiRules.ConversationLingerSeconds);
+            }
+        }
+
+        /// <summary>One held think: stand still where the chat found it.</summary>
+        internal void TickConversationHold() => StopPathing();
+
         /// <summary>When the pathing NPC last made <see cref="NpcFollowTarget.PathStuckProgressMeters"/> of progress.</summary>
         internal DateTime ProgressSinceUtc { get; set; }
 
@@ -429,6 +537,9 @@ namespace ZoneEngine_New.Core.Ai
             {
                 _treeResetPending = false;
                 _tree.Reset();
+                // After a reset the patrol starts its route over, as it did when the node held the cursor.
+                PatrolIndex = 0;
+                PatrolAnchor = null;
             }
 
             // Pacified: no aggression. Drop whatever hate or fight got in and stand down.
@@ -469,16 +580,20 @@ namespace ZoneEngine_New.Core.Ai
 
             // A wanderer drops its stroll and runs as soon as it has anything to fight or flee.
             _wanderedThisThink = false;
+            _patrolledThisThink = false;
             if (!Hate.IsEmpty || _leashing || _evading)
             {
                 StopWandering();
                 InterruptScriptedMovement();
+                LeavePatrolPace();
             }
 
             TickStallWatch.Stage("brain.tree", Npc.Identity.Instance);
             _tree.Tick((float)deltaTime);
             if (!_wanderedThisThink)
                 StopWandering();
+            if (!_patrolledThisThink)
+                LeavePatrolPace();
             TickStallWatch.Stage("brain.nanos", Npc.Identity.Instance);
             _nanos.Tick(DateTime.UtcNow);
 
@@ -487,7 +602,12 @@ namespace ZoneEngine_New.Core.Ai
                 StopPathing();
         }
 
-        public void AddThreat(Identity identity, float amount)
+        /// <summary>
+        /// <paramref name="fromDamage"/> is false for threat alone (a taunt, a debuff, a hostile nano): a new attacker's
+        /// call for help then carries socialAggro.threatOnlyRadiusPercent of its radius, and the attacker's first damage
+        /// afterwards calls again at the full radius.
+        /// </summary>
+        public void AddThreat(Identity identity, float amount, bool fromDamage = false)
         {
             // Pacified NPCs keep no hate.
             if (_evading || Npc.IsPacified)
@@ -495,8 +615,18 @@ namespace ZoneEngine_New.Core.Ai
             bool newAttacker = !Hate.Contains(identity);
             AddHate(identity, amount);
             if (newAttacker)
+            {
+                _threatOnlyCalls.Remove(identity);
+                if (!fromDamage)
+                    _threatOnlyCalls.Add(identity);
+                CallForHelp(identity, threatOnly: !fromDamage);
+            }
+            else if (fromDamage && _threatOnlyCalls.Remove(identity))
                 CallForHelp(identity);
         }
+
+        /// <summary>Attackers whose call for help so far was threat-only (reduced radius); their first damage calls at full.</summary>
+        readonly HashSet<Identity> _threatOnlyCalls = new();
 
         /// <summary>
         /// Puts <paramref name="identity"/> on the hate list. The first hate starts the NPC's fight, whoever started it
@@ -515,10 +645,10 @@ namespace ZoneEngine_New.Core.Ai
         /// pets): the owner earns the configured share of the pet's threat, and at least the proximity minimum the first
         /// time, so the owner is the NPC's next target once the pet is dead, dismissed or out of reach.
         /// </summary>
-        public void AddThreatFrom(Character source, float amount)
+        public void AddThreatFrom(Character source, float amount, bool fromDamage = false)
         {
             ArgumentNullException.ThrowIfNull(source);
-            AddThreat(source.Identity, amount);
+            AddThreat(source.Identity, amount, fromDamage);
 
             if (source is not NpcCharacter { PetOwner: Player owner } || owner.IsDead
                 || Npc.Playfield?.GetService<ZoneEngine_New.Core.Configuration.GameplaySettings>()?.Pets is not { } rules)
@@ -528,14 +658,15 @@ namespace ZoneEngine_New.Core.Ai
             if (rules.OwnerAlwaysOnHateList && !Hate.Contains(owner.Identity))
                 share = Math.Max(share, NpcAiRules.ProximityHate);
             if (share > 0f)
-                AddThreat(owner.Identity, share);
+                AddThreat(owner.Identity, share, fromDamage);
         }
 
         /// <summary>
-        /// Social aggro (Gameplay.json socialAggro): NPCs near this one that are of its kind join the fight against
-        /// <paramref name="attacker"/>, nearest first. Runs once per new attacker.
+        /// Social aggro (Gameplay.json socialAggro): NPCs of its kind within this NPC's spawn point AssistanceRadius join
+        /// the fight against <paramref name="attacker"/>, nearest first. Runs once per new attacker; <paramref name="threatOnly"/>
+        /// scales the radius by socialAggro.threatOnlyRadiusPercent.
         /// </summary>
-        void CallForHelp(Identity attacker)
+        void CallForHelp(Identity attacker, bool threatOnly = false)
         {
             if (Pet != null || !Npc.Attackable || Npc.Playfield is not ZoneEngine_New.Core.Playfield.Playfield playfield)
                 return;
@@ -551,6 +682,9 @@ namespace ZoneEngine_New.Core.Ai
             // A guard's call reaches every guard of its side (socialAggro.guardDefaultRadius), whoever the attacker is: a
             // player of their own side that turns on one guard has the rest on it, not just the one it hit.
             bool guardCall = Npc.MobTemplate?.Has(Mobs.NpcFeature.Guard) == true;
+            // The caller's spawn point AssistanceRadius is how far its call carries: a boss with a wide radius pulls in
+            // its retinue, but a retinue mob with a short one does not reach the boss beside it.
+            int callRadius = SpawnAssistanceRadius();
             playfield.GetRequiredService<ZoneEngine_New.Core.Playfield.Locality.PlayfieldLocality>().CollectNearby(Npc, rules.SearchRadius, _nearbyNpcs);
             _helpers.Clear();
             for (int i = 0; i < _nearbyNpcs.Count; i++)
@@ -560,12 +694,17 @@ namespace ZoneEngine_New.Core.Ai
                     || brain.Pet != null || brain._evading || other.IsPacified || brain.Hate.Contains(attacker))
                     continue;
                 bool guards = guardCall && other.MobTemplate?.Has(Mobs.NpcFeature.Guard) == true;
+                // A mob with no aggressiveness (BreedHostility 0) only fights what attacks it, unless it is Social; a
+                // guard still answers a fellow guard's call.
+                if (!guards && !NpcAiRules.IsProximityHostile(other.Stats.GetOrZero(CharacterStat.BreedHostility))
+                    && other.MobTemplate?.Has(Mobs.NpcFeature.Social) != true)
+                    continue;
                 if (other.Stats.GetOrZero(CharacterStat.Side) != side
                     || (rules.SameClanOnly && !guards && other.Stats.GetOrZero(CharacterStat.Clan) != clan))
                     continue;
 
                 double distance = Npc.GetEdgeDistanceTo(other);
-                if (distance > rules.RadiusFor(brain.SpawnAssistanceRadius(), npcAttacker, guards) || !ZoneEngine_New.Core.Helpers.CombatRules.CanAttack(other, enemy))
+                if (distance > rules.RadiusFor(callRadius, npcAttacker, guards, threatOnly) ||!ZoneEngine_New.Core.Helpers.CombatRules.CanAttack(other, enemy))
                     continue;
                 if (rules.RequireLineOfSight && !other.HasLineOfSightTo(Npc))
                     continue;
@@ -618,6 +757,7 @@ namespace ZoneEngine_New.Core.Ai
         public void ClearHate()
         {
             Hate.Clear();
+            _threatOnlyCalls.Clear();
             _currentTarget = Identity.None;
             _approachTarget = Identity.None;
             _engageTarget = Identity.None;
@@ -777,8 +917,11 @@ namespace ZoneEngine_New.Core.Ai
             if (!WithinProximityWalk(player, range))
                 return;
 
+            // Proximity aggro is threat without damage, like a taunt: its call for help carries the threat-only radius,
+            // and the player's first damage on this NPC calls again at the full radius.
             AddHate(player.Identity, NpcAiRules.ProximityHate);
-            CallForHelp(player.Identity);
+            _threatOnlyCalls.Add(player.Identity);
+            CallForHelp(player.Identity, threatOnly: true);
         }
 
         /// <summary>

@@ -147,17 +147,23 @@ deployment-tooling access and publication rules remain in force.
    only the files changed in this release. Record content reconciliation and
    source provenance without publishing protected content.
 
-Approved authored RK chest policies use the existing reconciliation helper's
-private `PRIVATE_CATALOG_ADOPTIONS` profile mapping. Only the three runtime paths
+Approved authored runtime catalogs use the existing reconciliation helper's
+private `PRIVATE_CATALOG_ADOPTIONS` profile mapping. The three chest runtime paths
 `Loot/MissionChestRKAllowlist.json`, `Loot/MissionChestSeasonalExclusions.json` and
-`Loot/MissionChestSpecialExclusions.json` are eligible, together. Each row binds
+`Loot/MissionChestSpecialExclusions.json` remain eligible together;
+`QuestRewards.json`, `ObjectStateMachines.json` and runtime-consumed
+`Playfields/{numeric-id}/Spawns.json` are independently eligible. Each row binds
 `PATH`, an owning-checkout ignored `STAGED_PATH`, its approved `SHA256`, and
 `APPROVAL` containing `BY=Mike`, ignored `INSTRUCTION_PATH`, the actual user
 instruction's `INSTRUCTION_SHA256`, and a literal `TEXT` excerpt naming the
 policy. Use private paths only in the ignored profile. Normal preparation and
-hash-approved reconciliation adopt these bytes after upstream merging, replace
-only absent/empty public placeholders or retain identical approved bytes, and
-reject unexplained private changes or empty replacement policies. Local replay
+hash-approved reconciliation adopt these bytes after upstream merging. Chest and
+object-state-machine catalogs replace only absent/empty public placeholders or
+retain identical approved bytes; quest rewards preserve every existing table.
+Spawn repairs require approval naming the complete relative path and an existing
+nonempty valid spawn catalog; they may add dictionary fields only, preserving
+every prior field, scalar type/value, list length and placement order. Reject
+unexplained private changes and empty replacement catalogs. Local replay
 retains exact instruction/before/after payloads; portable evidence carries bounded
 identities only. Never reset canonical state or copy policies directly into the
 selected data tree to bypass reconciliation. Generated-items, source verification

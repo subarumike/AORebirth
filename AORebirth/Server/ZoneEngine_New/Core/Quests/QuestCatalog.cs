@@ -6,6 +6,9 @@ namespace ZoneEngine_New.Core.Quests
     using System.IO;
     using System.Text.Json;
 
+    using AORebirth.Core.GameData;
+    using AORebirth.Modules.Content;
+
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
@@ -13,15 +16,18 @@ namespace ZoneEngine_New.Core.Quests
     /// <summary>
     /// GameData/Quests.json templates keyed by hash. Start items may be named by ItemTemplates.json hash and are resolved
     /// to template ids here; one that does not resolve is recorded on the quest (<see cref="QuestTemplate.LoadProblem"/>),
-    /// which still loads. Reward items come from QuestRewards.json.
+    /// which still loads. Reward items come from QuestRewards.json. Loaded whole and swapped on reload; a file that fails
+    /// to load keeps the old templates. A quest a player already holds keeps the template it was accepted with.
     /// </summary>
     public sealed class QuestCatalog
     {
         public const string FileName = "Quests.json";
+        public const string ReloadName = "Quests";
 
-        readonly Dictionary<string, QuestTemplate> _templates = new(StringComparer.Ordinal);
+        volatile IReadOnlyDictionary<string, QuestTemplate> _templates = new Dictionary<string, QuestTemplate>(StringComparer.Ordinal);
 
         readonly IGameData _gameData;
+        readonly IZoneLogger _logger;
         readonly HashItemMinter? _minter;
 
         public QuestCatalog(IGameData gameData, IZoneLogger logger, HashItemMinter? minter = null)
@@ -30,8 +36,9 @@ namespace ZoneEngine_New.Core.Quests
             ArgumentNullException.ThrowIfNull(logger);
 
             _gameData = gameData;
+            _logger = logger;
             _minter = minter;
-            LoadTemplates(Path.Combine(gameData.RootPath, FileName), logger);
+            Reload();
         }
 
         public int Count => _templates.Count;
@@ -42,73 +49,93 @@ namespace ZoneEngine_New.Core.Quests
         /// <summary>Every loaded template (read-only after load).</summary>
         public IEnumerable<QuestTemplate> Templates => _templates.Values;
 
-        void LoadTemplates(string path, IZoneLogger logger)
+        /// <summary>Reads the file (through the GameData override folder) and swaps it in; on any error the old templates stay.</summary>
+        public GameDataReloadResult Reload()
         {
+            string path = GameDataPaths.ResolveFile(_gameData.RootPath, FileName);
             if (!File.Exists(path))
             {
-                logger.Warn(string.Format(CultureInfo.InvariantCulture, "{0} not found at {1}; no quest templates", FileName, path));
-                return;
+                _templates = new Dictionary<string, QuestTemplate>(StringComparer.Ordinal);
+                _logger.Warn(string.Format(CultureInfo.InvariantCulture, "{0} not found at {1}; no quest templates", FileName, path));
+                return new GameDataReloadResult(ReloadName, true, 0, []);
             }
 
             try
             {
-                List<QuestTemplate>? loaded = JsonSerializer.Deserialize<List<QuestTemplate>>(
-                    File.ReadAllText(path), QuestTemplate.JsonOptions);
-                int skipped = 0;
-                var recordsIgnored = new List<string>();
-                foreach (QuestTemplate template in loaded ?? [])
-                {
-                    if (string.IsNullOrEmpty(template.Hash) || !_templates.TryAdd(template.Hash, template))
-                    {
-                        skipped++;
-                        continue;
-                    }
-
-                    if (template.MissionBit is int bit && !MissionBits.IsValid(bit))
-                    {
-                        logger.Warn(string.Format(CultureInfo.InvariantCulture, "Quest {0} MissionBit {1} is outside 0-{2}; ignored",
-                            template.Hash, bit, MissionBits.Count - 1));
-                        template.MissionBit = null;
-                    }
-
-                    if (template.ExpiresAfterSeconds is int seconds && seconds <= 0)
-                    {
-                        logger.Warn(string.Format(CultureInfo.InvariantCulture, "Quest {0} ExpiresAfterSeconds {1} is not positive; ignored",
-                            template.Hash, seconds));
-                        template.ExpiresAfterSeconds = null;
-                    }
-
-                    // Live's dumped compass point stands in for a waypoint nobody wrote by hand.
-                    if (template.Waypoint == null && template.Waypoints is { Count: > 0 } && template.Waypoints[0] is { Playfield: > 0 } dumped)
-                        template.Waypoint = new QuestWaypoint { Playfield = dumped.Playfield, Position = [dumped.X, dumped.Y, dumped.Z] };
-
-                    // Items come only from QuestRewards.json, by Reward.Hash; a record left in Quests.json is dropped so it cannot pay.
-                    if (template.Reward?.Records is { Count: > 0 })
-                    {
-                        recordsIgnored.Add(template.Hash);
-                        template.Reward.Records = null;
-                    }
-
-                    // A hash that does not resolve keeps the quest (its chain still runs); the item is left out when it
-                    // would be given, and the problem shows in the log and in .quests info.
-                    if (UnresolvedItem(template) is string unresolved)
-                    {
-                        template.LoadProblem = "item hash " + unresolved + " does not resolve to one item";
-                        logger.Warn(string.Format(CultureInfo.InvariantCulture, "Quest {0}: {1}", template.Hash, template.LoadProblem));
-                    }
-                }
-
-                if (recordsIgnored.Count > 0)
-                    logger.Warn(string.Format(CultureInfo.InvariantCulture,
-                        "{0} quests carry Reward.Records, which are not read; move them to QuestRewards.json: {1}{2}",
-                        recordsIgnored.Count, string.Join(", ", recordsIgnored.GetRange(0, Math.Min(8, recordsIgnored.Count))),
-                        recordsIgnored.Count > 8 ? ", ..." : string.Empty));
-                logger.Info(string.Format(CultureInfo.InvariantCulture, "GameData quests={0} skipped={1} from {2}", _templates.Count, skipped, path));
+                Dictionary<string, QuestTemplate> templates = LoadTemplates(path, out List<string> warnings);
+                _templates = templates;
+                return new GameDataReloadResult(ReloadName, true, templates.Count, warnings);
             }
             catch (Exception exception)
             {
-                logger.Error(exception, string.Format(CultureInfo.InvariantCulture, "Failed to load {0} from {1}", FileName, path));
+                _logger.Error(exception, string.Format(CultureInfo.InvariantCulture,
+                    "Failed to load {0} from {1}; templates unchanged", FileName, path));
+                return new GameDataReloadResult(ReloadName, false, _templates.Count, [exception.Message]);
             }
+        }
+
+        Dictionary<string, QuestTemplate> LoadTemplates(string path, out List<string> warnings)
+        {
+            var templates = new Dictionary<string, QuestTemplate>(StringComparer.Ordinal);
+            warnings = new List<string>();
+            IZoneLogger logger = _logger;
+            List<QuestTemplate>? loaded = JsonSerializer.Deserialize<List<QuestTemplate>>(
+                File.ReadAllText(path), QuestTemplate.JsonOptions);
+            int skipped = 0;
+            var recordsIgnored = new List<string>();
+            foreach (QuestTemplate template in loaded ?? [])
+            {
+                if (string.IsNullOrEmpty(template.Hash) || !templates.TryAdd(template.Hash, template))
+                {
+                    skipped++;
+                    continue;
+                }
+
+                if (template.MissionBit is int bit && !MissionBits.IsValid(bit))
+                {
+                    logger.Warn(string.Format(CultureInfo.InvariantCulture, "Quest {0} MissionBit {1} is outside 0-{2}; ignored",
+                        template.Hash, bit, MissionBits.Count - 1));
+                    template.MissionBit = null;
+                }
+
+                if (template.ExpiresAfterHours is int hours and < 0)
+                {
+                    string warning = string.Format(CultureInfo.InvariantCulture, "Quest {0} ExpiresAfterHours {1} is negative; ignored",
+                        template.Hash, hours);
+                    warnings.Add(warning);
+                    logger.Warn(warning);
+                    template.ExpiresAfterHours = null;
+                }
+
+                // Live's dumped compass point stands in for a waypoint nobody wrote by hand.
+                if (template.Waypoint == null && template.Waypoints is { Count: > 0 } && template.Waypoints[0] is { Playfield: > 0 } dumped)
+                    template.Waypoint = new QuestWaypoint { Playfield = dumped.Playfield, Position = [dumped.X, dumped.Y, dumped.Z] };
+
+                // Items come only from QuestRewards.json, by Reward.Hash; a record left in Quests.json is dropped so it cannot pay.
+                if (template.Reward?.Records is { Count: > 0 })
+                {
+                    recordsIgnored.Add(template.Hash);
+                    template.Reward.Records = null;
+                }
+
+                // A hash that does not resolve keeps the quest (its chain still runs); the item is left out when it
+                // would be given, and the problem shows in the log and in .quests info.
+                if (UnresolvedItem(template) is string unresolved)
+                {
+                    template.LoadProblem = "item hash " + unresolved + " does not resolve to one item";
+                    warnings.Add("Quest " + template.Hash + ": " + template.LoadProblem);
+                    logger.Warn(string.Format(CultureInfo.InvariantCulture, "Quest {0}: {1}", template.Hash, template.LoadProblem));
+                }
+            }
+
+            if (recordsIgnored.Count > 0)
+                logger.Warn(string.Format(CultureInfo.InvariantCulture,
+                    "{0} quests carry Reward.Records, which are not read; move them to QuestRewards.json: {1}{2}",
+                    recordsIgnored.Count, string.Join(", ", recordsIgnored.GetRange(0, Math.Min(8, recordsIgnored.Count))),
+                    recordsIgnored.Count > 8 ? ", ..." : string.Empty));
+            logger.Info(string.Format(CultureInfo.InvariantCulture, "GameData quests={0} skipped={1} from {2}", templates.Count, skipped, path));
+
+            return templates;
         }
 
         /// <summary>

@@ -474,7 +474,7 @@ public sealed class FriendlyItemUseTests
         Assert.AreEqual(item.LowId, used.ItemLowId);
         Assert.AreEqual(item.HighId, used.ItemHighId);
         Assert.AreEqual(item.Quality, used.Quality);
-        Assert.AreEqual(1, used.Unknown1);
+        Assert.AreEqual(1, used.Count);
         Assert.AreEqual((int)recipient.Identity.Type, used.Unknown3);
         Assert.AreEqual(recipient.Identity.Instance, used.Unknown4);
     }

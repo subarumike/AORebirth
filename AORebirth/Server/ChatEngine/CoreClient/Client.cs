@@ -79,6 +79,15 @@ namespace ChatEngine.CoreClient
         /// </summary>
         private ushort packetNumber = 1;
 
+        // The shared TCP client supplies fixed-size chunks, not complete chat frames.
+        private readonly byte[] receiveHeader = new byte[4];
+
+        private int receiveHeaderLength;
+
+        private byte[] receivePacket;
+
+        private int receivePacketLength;
+
         #endregion
 
         #region Constructors and Destructors
@@ -308,20 +317,54 @@ namespace ChatEngine.CoreClient
         /// </returns>
         protected override bool OnReceive(BufferSegment buffer)
         {
-            // Minimum chat packet is type(2)+length(2)=4 bytes (e.g. LFT uncheck 05DD0000).
-            // Using >4 dropped those and never unlisted.
-            if (this._remainingLength >= 4)
+            int offset = buffer.Offset + this._offset;
+            int remaining = this._remainingLength;
+            while (remaining > 0)
             {
-                byte[] packet = new byte[this._remainingLength];
-                Array.Copy(buffer.SegmentData, 0, packet, 0, this._remainingLength);
-                LogUtil.Debug(DebugInfoDetail.Network, "\r\nReceived:\r\n" + HexOutput.Output(packet));
+                if (this.receivePacket == null)
+                {
+                    int headerBytes = Math.Min(this.receiveHeader.Length - this.receiveHeaderLength, remaining);
+                    Buffer.BlockCopy(buffer.Buffer.Array, offset, this.receiveHeader, this.receiveHeaderLength, headerBytes);
+                    this.receiveHeaderLength += headerBytes;
+                    offset += headerBytes;
+                    remaining -= headerBytes;
+                    if (this.receiveHeaderLength < this.receiveHeader.Length)
+                        break;
 
+                    // The native header is type(2) + unsigned big-endian body length(2).
+                    int bodyLength = (this.receiveHeader[2] << 8) | this.receiveHeader[3];
+                    this.receivePacket = new byte[this.receiveHeader.Length + bodyLength];
+                    Buffer.BlockCopy(this.receiveHeader, 0, this.receivePacket, 0, this.receiveHeader.Length);
+                    this.receivePacketLength = this.receiveHeader.Length;
+                    this.receiveHeaderLength = 0;
+                }
+
+                int bodyBytes = Math.Min(this.receivePacket.Length - this.receivePacketLength, remaining);
+                if (bodyBytes > 0)
+                {
+                    Buffer.BlockCopy(buffer.Buffer.Array, offset, this.receivePacket, this.receivePacketLength, bodyBytes);
+                    this.receivePacketLength += bodyBytes;
+                    offset += bodyBytes;
+                    remaining -= bodyBytes;
+                }
+                if (this.receivePacketLength < this.receivePacket.Length)
+                    break;
+
+                // A handler may send this array asynchronously (Ping does), so never reuse it.
+                byte[] packet = this.receivePacket;
+                this.receivePacket = null;
+                this.receivePacketLength = 0;
+                LogUtil.Debug(DebugInfoDetail.Network, "\r\nReceived:\r\n" + HexOutput.Output(packet));
                 ushort messageNumber = this.GetMessageNumber(packet);
                 Parser parser = new Parser();
-                return parser.Parse(this, packet, messageNumber);
+                // Unknown complete opcodes are logged by Parser; their frame is still consumed.
+                parser.Parse(this, packet, messageNumber);
+                // A handler may disconnect this client before the next coalesced frame.
+                if (this._tcpSock == null)
+                    return true;
             }
 
-            // TODO: check what needs to be done if no suitable packet was found
+            // Every supplied byte was consumed or retained privately. Release the shared chunk.
             return true;
         }
 

@@ -22,7 +22,7 @@ namespace ZoneEngine_New.Core.Inventory
     {
         const int DefaultEquipDelay = 20;
 
-        const int TemplateActionUnknown1 = 1;
+        const int TemplateActionCount = 1;
 
         private readonly object _gate = new();
         private readonly Dictionary<int, PendingEquip> _pending = new();
@@ -170,11 +170,16 @@ namespace ZoneEngine_New.Core.Inventory
             destPage.Content.TryGetValue(destSlot, out Item? destOccupant);
             if (destOccupant != null && destOccupant.Locked)
                 return;
-            if (lootSource is Chest && destOccupant != null)
+            // Loot never swaps: the occupant would be put into the corpse or chest.
+            if (lootSource != null && destOccupant != null)
                 return;
 
             // Occupied wear or unequip-onto-occupied bag is a swap. Bag-to-bag stays empty-only.
             if (destOccupant != null && !destIsWear && !sourceIsWear)
+                return;
+
+            // Equipping from inside a bag swaps the worn item into that bag slot; a worn bag may not go there.
+            if (WouldNestBag(sourcePage, sourceSlot, destPage, destSlot, item, destOccupant))
                 return;
 
             bool touchesEquipment = sourceIsWear || destIsWear;
@@ -386,25 +391,10 @@ namespace ZoneEngine_New.Core.Inventory
             slot = DecodeBackpackSlot(source);
             item = null!;
 
+            // A bag is only ever named by the handle the server gave the client for it. A packet without one is refused.
             int handle = DecodeBackpackHandle(source);
             if (handle != 0 && player.Inventory.TryGetOwnedBackpackPageByHandle(handle, out page))
                 return TryReadRemovableSlot(page, slot, out item);
-
-            if (handle == 0
-                && source.Instance > 0
-                && player.Inventory.TryGetOwnedBackpackPageByHandle(source.Instance, out page))
-            {
-                slot = 0;
-                return TryReadRemovableSlot(page, slot, out item);
-            }
-
-            if (handle == 0
-                && source.Type == IdentityType.Container
-                && player.Inventory.TryGetUniqueOwnedBackpackSlot(source.Instance, out page, out item))
-            {
-                slot = source.Instance;
-                return (page.Flags & ContainerFlags.CanRemove) != 0 && !item.Locked;
-            }
 
             return false;
         }
@@ -437,6 +427,21 @@ namespace ZoneEngine_New.Core.Inventory
             destPage = player.Inventory.Bank;
             return true;
         }
+
+        /// <summary>
+        /// A bag would land inside a bag: the moved item into a bag page, or the swapped-out occupant back into the
+        /// bag page the moved item came from.
+        /// </summary>
+        static bool WouldNestBag(Container sourcePage, int sourceSlot, Container destPage, int destSlot, Item item,
+            Item? destOccupant)
+        {
+            if (ReferenceEquals(sourcePage, destPage) && sourceSlot == destSlot)
+                return false;
+            return (IsBagPage(destPage) && IsBagItem(item))
+                || (destOccupant != null && IsBagPage(sourcePage) && IsBagItem(destOccupant));
+        }
+
+        static bool IsBagPage(Container page) => (page.Flags & ContainerFlags.Backpack) != 0;
 
         public static bool IsBagItem(Item item)
         {
@@ -525,28 +530,14 @@ namespace ZoneEngine_New.Core.Inventory
                 int handle = DecodeBackpackHandle(source);
                 slot = DecodeBackpackSlot(source);
 
-                Playfield? playfield = player.Playfield;
-                if (playfield == null)
+                LootableDynel? lootable = FindOpenLootByHandle(player, handle);
+                if (lootable == null || (lootable.Loot.Flags & ContainerFlags.CanRemove) == 0)
                     return false;
 
-                foreach (Dynel dynel in playfield.GetRequiredService<DynelRegistry>().Dynels())
-                {
-                    if (dynel is not LootableDynel lootable || lootable.InventoryHandle != handle)
-                        continue;
-
-                    if (lootable.OpenerIdentity != player.Identity)
-                        return false;
-
-                    if ((lootable.Loot.Flags & ContainerFlags.CanRemove) == 0)
-                        return false;
-
-                    page = lootable.Loot;
-                    lootSource = lootable;
-                    return page.Content.TryGetValue(slot, out item!) && !item.Locked
-                        && (lootable is not Chest chest || chest.CanDistribute(item));
-                }
-
-                return false;
+                page = lootable.Loot;
+                lootSource = lootable;
+                return page.Content.TryGetValue(slot, out item!) && !item.Locked
+                    && (lootable is not Chest chest || chest.CanDistribute(item));
             }
 
             if (!player.Inventory.TryGetItem(source.Type, source.Instance, out item))
@@ -578,15 +569,25 @@ namespace ZoneEngine_New.Core.Inventory
             int handle = DecodeBackpackHandle(source);
             if (handle == 0)
                 return null;
-            if (player.Inventory.TryGetOwnedBackpackPageByHandle(handle, out _))
+            return FindOpenLootByHandle(player, handle) as Chest;
+        }
+
+        /// <summary>
+        /// The loot this player has open under <paramref name="handle"/>, a handle from their own pool (shared with their
+        /// bags, so it cannot also name a bag). Loot they closed, that despawned, or that someone else now has open is null.
+        /// </summary>
+        internal static LootableDynel? FindOpenLootByHandle(Player player, int handle)
+        {
+            if (handle == 0 || player.Playfield == null
+                || !player.Inventory.TryGetLootByHandle(handle, out Identity lootIdentity))
                 return null;
             DynelRegistry? registry = player.Playfield.GetService<DynelRegistry>();
-            if (registry == null)
+            if (registry == null || !registry.TryGet(lootIdentity, out Dynel? dynel)
+                || dynel is not LootableDynel lootable
+                || lootable.OpenerIdentity != player.Identity
+                || lootable.InventoryHandle != handle)
                 return null;
-            foreach (Dynel dynel in registry.Dynels())
-                if (dynel is Chest chest && chest.InventoryHandle == handle)
-                    return chest;
-            return null;
+            return lootable;
         }
 
         void CompletePending(PendingEquip pending)
@@ -833,7 +834,7 @@ namespace ZoneEngine_New.Core.Inventory
                     ItemLowId = item.LowId,
                     ItemHighId = item.HighId,
                     Quality = item.Quality,
-                    Unknown1 = TemplateActionUnknown1,
+                    Count = TemplateActionCount,
                     Action = action,
                     Placement = new Identity { Type = wearPage, Instance = slot },
                     Unknown3 = 0,
@@ -983,10 +984,12 @@ namespace ZoneEngine_New.Core.Inventory
             Item item, LootableDynel? lootSource)
         {
             Item? existingDest = destPage.Content.GetValueOrDefault(destSlot);
-            if (lootSource is Chest && existingDest != null)
+            if (lootSource != null && existingDest != null)
                 return false;
             if (ReferenceEquals(sourcePage, destPage) && sourceSlot == destSlot)
                 return true;
+            if (WouldNestBag(sourcePage, sourceSlot, destPage, destSlot, item, existingDest))
+                return false;
             player.InvalidateOwnedItemCache();
             if (sourceSlot < sourcePage.Offset || sourceSlot >= sourcePage.Offset + sourcePage.Capacity
                 || destSlot < destPage.Offset || destSlot >= destPage.Offset + destPage.Capacity

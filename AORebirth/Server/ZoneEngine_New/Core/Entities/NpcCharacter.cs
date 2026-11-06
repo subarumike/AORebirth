@@ -86,14 +86,42 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>The character that summoned this pet; null for ordinary NPCs.</summary>
         public Character? PetOwner => Pet?.Owner;
 
+        /// <summary>
+        /// Allied combat (MustAlliedCombat / MustNotAlliedCombat) read on this NPC: a player's pet shares its owner's
+        /// allies (the owner, the owner's pets, the owner's team and their pets); any other NPC is its own only ally.
+        /// Health and Nano Recharger 291082 aims MustNotAlliedCombat at its target, which may be the user's pet.
+        /// Every other leaf goes to <see cref="Character.ResolveRequirement"/>.
+        /// </summary>
+        public override bool? ResolveRequirement(ItemRequirement requirement)
+        {
+            ArgumentNullException.ThrowIfNull(requirement);
+            return (Operator)requirement.Operator switch
+            {
+                Operator.MustNotAlliedCombat => !IsAlliedInCombat(),
+                Operator.MustAlliedCombat => IsAlliedInCombat(),
+                _ => base.ResolveRequirement(requirement)
+            };
+        }
+
+        bool IsAlliedInCombat() => PetOwner is Player owner ? owner.IsAlliedInCombat() : IsInCombat;
+
         /// <summary>Makes this NPC a pet. Called before it is first sent, so observers get it as one.</summary>
         internal void BindPet(Pets.PetController controller)
         {
             ArgumentNullException.ThrowIfNull(controller);
             Pet = controller;
+            Stats.Set(CharacterStat.Flags,
+                GetClientCharacterFlags() | (int)CharacterFlags.IsPet,
+                StatDetail.Base, dirty: true);
         }
 
-        internal void UnbindPet() => Pet = null;
+        internal void UnbindPet()
+        {
+            Pet = null;
+            Stats.Set(CharacterStat.Flags,
+                GetClientCharacterFlags() & ~(int)CharacterFlags.IsPet,
+                StatDetail.Base, dirty: true);
+        }
 
         /// <summary>
         /// The hash this NPC was spawned from (a family/META hash from Spawns.json or a command). The resolved
@@ -207,7 +235,7 @@ namespace ZoneEngine_New.Core.Entities
         {
             // A charmed NPC dies as itself, not as a pet: the charm ends first, so its body and rewards are its own.
             if (Pet is { IsCharmed: true })
-                Playfield?.GetService<Pets.PetService>()?.EndCharm(this, "died", turnOnOwner: false);
+                Playfield?.GetService<Pets.PetService>()?.EndCharm(this, "died", turnOnOwner: false, staysInWorld: false);
 
             Brain?.OnOwnerDied();
 
@@ -335,7 +363,7 @@ namespace ZoneEngine_New.Core.Entities
             // takes a share (NpcBrain.AddThreatFrom). Another NPC's hit counts the same way: the victim fights back and
             // calls its kind for help (Gameplay.json socialAggro.npcVsNpcDefaultRadius) as it would against a player.
             if ((attacker.IsPlayer || attacker is NpcCharacter) && !ReferenceEquals(attacker, this))
-                Brain?.AddThreatFrom(attacker, hpRemoved);
+                Brain?.AddThreatFrom(attacker, hpRemoved, fromDamage: true);
 
             // The percent is only computed when the program listens for health thresholds.
             if (Scripts is { } scripts && scripts.Program.Subscribes(NpcScripts.NpcScriptTrigger.HealthBelow))

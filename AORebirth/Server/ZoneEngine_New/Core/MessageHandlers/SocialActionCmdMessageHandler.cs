@@ -33,6 +33,17 @@ namespace ZoneEngine_New.Core.MessageHandlers
             if (player == null)
                 return;
 
+            // Crawl is left only by uncrawling: a sleep or lounge from it is refused by the motor (which puts the
+            // client back in crawl) and not shown to anyone.
+            if (player.Motor.State == MovementState.Crawl
+                && message.Action is SocialAction.RelaxingSleep or SocialAction.RelaxingLounge)
+            {
+                player.Motor.ApplyAction(message.Action == SocialAction.RelaxingSleep
+                    ? MovementAction.SwitchToSleep
+                    : MovementAction.SwitchToLounge);
+                return;
+            }
+
             if (!player.TryRelaySocialAction(message))
                 return;
 

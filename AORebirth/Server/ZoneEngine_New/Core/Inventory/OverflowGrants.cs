@@ -89,7 +89,7 @@ namespace ZoneEngine_New.Core.Inventory
                 ItemLowId = item.LowId,
                 ItemHighId = item.HighId,
                 Quality = item.Quality,
-                Unknown1 = 1,
+                Count = item.StackCount,
                 Action = TemplateActionType.Overflow,
                 Placement = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 },
                 Unknown3 = 0,

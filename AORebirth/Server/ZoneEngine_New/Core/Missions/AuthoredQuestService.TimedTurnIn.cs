@@ -38,7 +38,7 @@ public sealed partial class AuthoredQuestService
             {
                 // Accepted Use projects the chip but never consumes it; trade is the later consumption boundary.
                 player.Session?.Send(new TemplateActionMessage { Identity = player.Identity, ItemLowId = item.LowId, ItemHighId = item.HighId,
-                    Quality = item.Quality, Placement = slot, Unknown1 = 1, Action = TemplateActionType.Use, Unknown3 = (int)player.Identity.Type, Unknown4 = player.Identity.Instance });
+                    Quality = item.Quality, Placement = slot, Count = 1, Action = TemplateActionType.Use, Unknown3 = (int)player.Identity.Type, Unknown4 = player.Identity.Instance });
                 SendTimedJournal(player, rule.Quest, Content.Journals[rule.Quest].DurationSeconds);
             };
         });

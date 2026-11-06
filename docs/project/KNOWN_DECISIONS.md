@@ -280,6 +280,21 @@ both intervals), which this replaces.
 Consequences: Nano regeneration now scales with Nano Pool; low-Stamina characters heal slower while
 sitting than before (one second off the tick rather than half the tick).
 
+## Social Aggro Reach Comes From The Attacked NPC's Spawn Radius
+
+Decision (2026-11-05): a call for help reaches same-side, same-family NPCs within the attacked NPC's own spawn
+point AssistanceRadius (capped by `socialAggro.maxRadius`), not within each helper's radius.
+
+Reason: on 1931 Uklesh the Frozen (AssistanceRadius 30) answered every nearby Exarch's call (radius 5-7,
+about 9-11 m away), where retail does not link pulling an Exarch to the boss. Pulling Uklesh still brings
+the Exarchs.
+
+Alternatives considered: requiring both radii to reach (no linking either way); lowering UKTH's radius in
+the spawn data (hides the rule for every other wide-radius boss).
+
+Consequences: a wide-radius NPC pulls in its neighbours; a short-radius NPC no longer draws a wide-radius
+neighbour. Chained calls (`chain`) use each helper's own radius as it calls in turn.
+
 ## NPC Hits Draw Threat And Social Aggro Like Player Hits
 
 Decision (2026-10-22): `NpcCharacter.OnDamaged` registers threat from any NPC attacker, not only players

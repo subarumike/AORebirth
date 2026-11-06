@@ -19,9 +19,8 @@ namespace ZoneEngine_New.Core.Quests
     using ZoneEngine_New.Core.Logging;
 
     /// <summary>
-    /// Assigns quests to players and runs them. Template quests come from Quests.json and expire only with
-    /// <see cref="QuestTemplate.ExpiresAfterSeconds"/>, counted from their assignment; generated quests live once in
-    /// <c>generatedquests</c> (definition, expiry, ACG data) and can be shared.
+    /// Assigns quests to players and runs them. Template quests come from Quests.json and expire only when they set ExpiresAfterHours;
+    /// generated quests live once in <c>generatedquests</c> (definition, expiry, ACG data) and can be shared.
     /// Each player's state is a <c>characterquests</c> row, written straight away on every change. A player's log is only touched on that player's playfield.
     /// Existing NPC objectives retain their triggers; generated Find Item advances only from its exact bound pickup.
     /// </summary>
@@ -147,6 +146,48 @@ namespace ZoneEngine_New.Core.Quests
             return false;
         }
 
+        /// <summary>
+        /// GM <c>.quests drop</c>: closes one quest in the player's log as abandoned, whatever its state and NoDelete, so it
+        /// no longer counts as held or done and a <c>{givequest}</c> starts it over. An active one leaves the journal. A
+        /// quest with a reward still pending delivery is refused, so the reward is not lost.
+        /// </summary>
+        public bool TryDrop(Player player, string questId, out string result)
+        {
+            ArgumentNullException.ThrowIfNull(player);
+            if (!GetLog(player).Quests.TryGetValue(questId ?? string.Empty, out PlayerQuest? quest))
+            {
+                result = string.Format(CultureInfo.InvariantCulture, "{0} has no quest {1}.", player.Name, questId);
+                return false;
+            }
+
+            if (quest.IsRewardPending)
+            {
+                result = string.Format(CultureInfo.InvariantCulture, "{0} ({1}) has a reward pending delivery; not dropped.", quest.QuestId, quest.Template.Name);
+                return false;
+            }
+
+            if (quest.State == QuestState.Abandoned)
+            {
+                result = string.Format(CultureInfo.InvariantCulture, "{0} ({1}) is already dropped.", quest.QuestId, quest.Template.Name);
+                return false;
+            }
+
+            bool wasActive = quest.IsActive;
+            QuestState before = quest.State;
+            quest.State = QuestState.Abandoned;
+            Save(player, quest);
+            if (wasActive)
+            {
+                QuestJournal.Delete(player, quest);
+                QuestEnded?.Invoke(player, quest);
+            }
+
+            _logger.Info(string.Format(CultureInfo.InvariantCulture, "Quest dropped by GM char={0} quest={1} ({2}) was={3}",
+                player.Identity.Instance, quest.QuestId, quest.Template.Name, before));
+            result = string.Format(CultureInfo.InvariantCulture, "Dropped {0} ({1}) from {2} (was {3}).", quest.QuestId, quest.Template.Name, player.Name, before);
+            return true;
+        }
+
         /// <summary>World entry: loads the player's quests and puts every active one in the client journal.</summary>
         public void Restore(Player player)
         {
@@ -164,7 +205,7 @@ namespace ZoneEngine_New.Core.Quests
 
         /// <summary>
         /// Gives a Quests.json quest. A completed or closed one is started over; an active one is refused. One with
-        /// <see cref="QuestTemplate.ExpiresAfterSeconds"/> starts its timer now.
+        /// <see cref="QuestTemplate.ExpiresAfterHours"/> starts its timer now.
         /// </summary>
         public bool TryAssignTemplate(Player player, string hash, out string result)
         {
@@ -467,7 +508,7 @@ namespace ZoneEngine_New.Core.Quests
         PlayerQuest Assign(Player player, QuestLog log, string questId, QuestSource source, QuestTemplate template,
             DateTime? expiresAtUtc, string? acgJson)
         {
-            DateTime now = _now();
+            DateTime assignedAtUtc = _now();
             var quest = new PlayerQuest
             {
                 QuestId = questId,
@@ -476,8 +517,8 @@ namespace ZoneEngine_New.Core.Quests
                 State = QuestState.Active,
                 Progress = 0,
                 RequiredCount = template.RequiredCount,
-                AssignedAtUtc = now,
-                ExpiresAtUtc = source == QuestSource.Generated ? expiresAtUtc : TemplateExpiry(template, now),
+                AssignedAtUtc = assignedAtUtc,
+                ExpiresAtUtc = source == QuestSource.Generated ? expiresAtUtc : template.ExpiresAt(assignedAtUtc),
                 AcgBuildingGeneratorJson = acgJson
             };
 
@@ -530,8 +571,8 @@ namespace ZoneEngine_New.Core.Quests
 
                 quest.State = QuestState.Expired;
                 Save(player, quest);
+                QuestJournal.SendEnded(player, quest, CharacterActionType.QuestExpired);
                 QuestJournal.Delete(player, quest);
-                ClientFeedback.Send(player, "Feedback_QuestExpired");
                 QuestEnded?.Invoke(player, quest);
             }
         }
@@ -553,7 +594,6 @@ namespace ZoneEngine_New.Core.Quests
                 var source = (QuestSource)row.Source;
                 QuestTemplate? template = null;
                 GeneratedQuestRow? definition = null;
-                var assignedAtUtc = new DateTime(row.AssignedAtUtcTicks, DateTimeKind.Utc);
                 if (source == QuestSource.Template)
                     template = _catalog.TryGet(row.QuestId, out QuestTemplate found) ? found : null;
                 else if (generated.TryGetValue(row.QuestId, out definition))
@@ -566,6 +606,7 @@ namespace ZoneEngine_New.Core.Quests
                     continue;
                 }
 
+                var assignedAtUtc = new DateTime(row.AssignedAtUtcTicks, DateTimeKind.Utc);
                 log.Quests[row.QuestId] = new PlayerQuest
                 {
                     QuestId = row.QuestId,
@@ -575,9 +616,8 @@ namespace ZoneEngine_New.Core.Quests
                     Progress = row.Progress,
                     RequiredCount = row.RequiredCount,
                     AssignedAtUtc = assignedAtUtc,
-                    ExpiresAtUtc = definition != null
-                        ? new DateTime(definition.ExpiresAtUtcTicks, DateTimeKind.Utc)
-                        : TemplateExpiry(template, assignedAtUtc),
+                    // A template quest's expiry follows from when it was assigned, so it needs no stored column.
+                    ExpiresAtUtc = definition != null ? new DateTime(definition.ExpiresAtUtcTicks, DateTimeKind.Utc) : template.ExpiresAt(assignedAtUtc),
                     AcgBuildingGeneratorJson = definition?.AcgBuildingGeneratorJson
                 };
                 PlayerQuest loaded = log.Quests[row.QuestId];
@@ -595,10 +635,6 @@ namespace ZoneEngine_New.Core.Quests
 
             return log;
         }
-
-        /// <summary>A template quest's end: its stored assignment time plus the template's lifetime, so no column holds it.</summary>
-        static DateTime? TemplateExpiry(QuestTemplate template, DateTime assignedAtUtc)
-            => template.ExpiresAfterSeconds is int seconds ? assignedAtUtc.AddSeconds(seconds) : null;
 
         static QuestTemplate? Deserialize(string? json)
         {

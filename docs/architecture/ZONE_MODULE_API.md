@@ -4,7 +4,7 @@ ZoneEngine_New loads external modules: trusted .NET assemblies that run in the z
 against `AORebirth.Modules.Abstractions` (`AORebirth/Libraries/Source/AORebirth.Modules.Abstractions`). That
 assembly is the whole contract. It holds primitives, strings and small records only, and no ZoneEngine type.
 
-The current version is **1.7**.
+The current version is **1.8**.
 
 ## Loading
 
@@ -43,6 +43,7 @@ The current version is **1.7**.
 | 1.5 | `RegisterMessageObserver`, `World.Session`, `Actions.Operations` and `Actions.Invoke` (named operations), module.json `Operations`, the `observe-messages` and `read-sessions` capabilities |
 | 1.6 | `Clock` and a timestamp on every event; action, cooldown, movement-correction, item-move, chat and combat events; `RegisterVisibilityObserver`; `World.Cooldowns` and `World.MessageCounts`; `MessageSubscription.AllTypes`; more on `NpcSpawned`, `NpcInfo` and `PlayerInfo`; the `observe-actions`, `observe-visibility`, `observe-chat` and `read-chat-text` capabilities |
 | 1.7 | `PlayerInfo.TeamId`, `TeamLeader` and `OrgId`; the `server.shutdown` and `server.shutdown-abort` operations |
+| 1.8 | Account sanctions: the `account.suspend` and `account.unban` operations, `account.ban` recorded as a sanction, `Actions.AccountSanctions`, the `read-sanctions` capability |
 
 ## Context members
 
@@ -58,7 +59,7 @@ The current version is **1.7**.
 | `Events` | Gameplay events (see below). |
 | `Knubot` | `Check(id, json)`, `Reload()`, `OverrideDirectory` (the `AO_REBIRTH_KNUBOT_PATH` folder). |
 | `World` | Read-only snapshots: `Players()`, `Player(id)`, `Playfields()`, `Npcs(pf)`, `Npc(pf, instance)`, `Stat(entity, statId)`. `Session(characterId)` (1.5) reads the character's connection. `Cooldowns(characterId)` and `MessageCounts(sessionId)` (1.6). |
-| `Actions` | `RefreshNpc(pf, instance)`, `SendSystemMessage(characterId, text)`, `SendFeedback(characterId, feedbackId)`, `RespawnNpc(pf, instance)`. From 1.5 also `Operations` and `Invoke(name, target, args)` (see below). |
+| `Actions` | `RefreshNpc(pf, instance)`, `SendSystemMessage(characterId, text)`, `SendFeedback(characterId, feedbackId)`, `RespawnNpc(pf, instance)`. From 1.5 also `Operations` and `Invoke(name, target, args)` (see below). From 1.8 `AccountSanctions(account, limit)` (see Account sanctions). |
 | `GameData` | `OverrideDirectory` (the `AO_REBIRTH_GAMEDATA_OVERRIDE_PATH` folder), `Reloadable` (the names), `Reload(name)` (see below). |
 
 `World` and `Actions` cover **this zone instance only**. A player or NPC on another instance is not found, and
@@ -150,6 +151,7 @@ The `Capabilities` entry in Modules.json is optional.
 | `observe-visibility` | `RegisterVisibilityObserver` (1.6) |
 | `observe-chat` | `PlayerSpoke` without the text (1.6) |
 | `read-chat-text` | the text of `PlayerSpoke` (1.6) |
+| `read-sanctions` | `Actions.AccountSanctions` (1.8) |
 | an operation's name | `Actions.Invoke` of that operation (1.5), for example `player.teleport` |
 
 The operations that replace older actions are also granted by the older name: `refresh-npc` grants `npc.refresh`,
@@ -291,9 +293,21 @@ engine additions and don't change the module API.
 | `player.feedback` | character | `id` | As `SendFeedback`. |
 | `player.teleport` | character | `playfield`, `x`, `y`, `z` | Within the character's playfield, a soft teleport as `.tp` does. To another playfield, the normal playfield transfer (to another instance too), with no exit-proxy return. An unknown playfield is `bad_args`. |
 | `player.kick` | character | `reason` (optional) | Logs the character out as a client logout does, with the normal logout save. |
-| `account.ban` | account | `reason` (optional) | Sets the account's `login.Flags` to 1. LoginEngine and the account broker admit an account only while it is 0. Characters in play stay until they log out or are kicked. Lifting it is a normal account edit (Flags back to 0). |
+| `account.ban` | account | `reason` (optional) | Bans the account permanently. From 1.8 this is a sanction row (see Account sanctions) instead of `login.Flags`, and the account's characters in play are removed. |
+| `account.suspend` | account | `seconds` (60 to ten years), `reason` (optional) | Suspends the account for that long; it ends by itself. The account's characters in play are removed (1.8). |
+| `account.unban` | account | `reason` (optional) | Lifts every active suspension and ban, and a pre-1.8 `login.Flags` ban. Fails when there is none (1.8). |
 | `server.shutdown` | none | `seconds` (1 to 86400), `message` (optional), `reason` (optional) | Shuts this zone instance down the normal way (players saved) after a countdown, as `.shutdown` does: every online player is told at the start and at the usual checkpoints (1 hour ... 1 second), with `message` after each line. Scheduling again replaces the countdown (1.7). |
 | `server.shutdown-abort` | none | `reason` (optional) | Cancels a scheduled shutdown and tells online players; fails when none is scheduled (1.7). |
+
+## Account sanctions
+
+Suspensions and bans live in `account_sanctions` (1.8). A row blocks the account while it is not lifted and has not ended; a ban has no end.
+
+- **Where they apply:** LoginEngine and the account broker refuse a sanctioned account, and the zone refuses its handoff ticket.
+- **Characters in play:** issuing one removes the account's characters on this instance at once (they are told why). Every instance also checks its players once a minute, so a sanction issued on another instance, or written to the database directly, removes them within a minute.
+- **Issuer:** a row records who issued it: `gm:Name` for a GM command, `module:Id` for a module (set by the engine, not by the module).
+- **GM command:** `.account info <target>`, `.account suspend <target> <duration> [reason]` and `.account history <target>` (level 100), `.account ban <target> [reason]` and `.account unban <target> [reason]` (level 1000). A target is an account or character name, or `account:NAME` / `char:NAME`. Durations combine s, m, h, d and w, such as `1d12h`.
+- **`Actions.AccountSanctions(account, limit)`:** the account's rows, newest first, as `AccountSanctionInfo` (times UTC, `EndsAtUtc` null for a ban, `Active`). Needs `read-sanctions`.
 
 ## Clock and timestamps
 

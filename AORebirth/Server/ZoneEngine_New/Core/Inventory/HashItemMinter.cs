@@ -32,6 +32,18 @@ namespace ZoneEngine_New.Core.Inventory
         }
 
         /// <summary>
+        /// Drops every per-hash cache. Called after ItemTemplates.json is reloaded: the caches hold leaf ranges, ladder
+        /// tiers and QL spans of the old catalog, so a SpawnItem would otherwise keep minting from the old hash tree.
+        /// </summary>
+        public void ClearCaches()
+        {
+            _qualitySpans.Clear();
+            _leafRanges.Clear();
+            _familySpans.Clear();
+            _ladderTiers.Clear();
+        }
+
+        /// <summary>
         /// Rolls <paramref name="hash"/> into an item carrying a freshly allocated instance id.
         /// </summary>
         public bool TryMint(string hash, int desiredQuality, ItemSource source, out Item item)
@@ -58,6 +70,36 @@ namespace ZoneEngine_New.Core.Inventory
 
             item = _items.CreateWithNewInstance(lowId, highId, quality, source);
             return true;
+        }
+
+        /// <summary>
+        /// SpawnItem's mint for a hash that may be flagged SpawnAll: a SpawnAll category mints one item per leaf family
+        /// reachable from it, each at its highest QL at or below <paramref name="desiredQuality"/>; a leaf starting above
+        /// the request mints at its lowest QL (Soldier Nanoprogram Container 248265 asks QL 1 for its QL 1-7 crystals). Any other hash, a leaf included, mints one item by <see cref="TryMintHighestUpTo"/>.
+        /// Appends to <paramref name="into"/>.
+        /// </summary>
+        public void MintHighestUpToSpawns(string hash, int desiredQuality, ItemSource source, List<Item> into)
+        {
+            ArgumentNullException.ThrowIfNull(into);
+            if (string.IsNullOrEmpty(hash))
+                return;
+
+            if (!_gameData.IsSpawnAllItemHash(hash))
+            {
+                if (TryMintHighestUpTo(hash, desiredQuality, source, out Item one))
+                    into.Add(one);
+                return;
+            }
+
+            int wanted = desiredQuality < 1 ? 1 : desiredQuality;
+            LeafRange[] leaves = _leafRanges.GetOrAdd(hash, BuildLeafRanges);
+            for (int i = 0; i < leaves.Length; i++)
+            {
+                LeafRange leaf = leaves[i];
+                int reached = leaf.Min > wanted ? leaf.Min : Math.Min(wanted, leaf.Max);
+                if (HashItemCatalog.TrySelectIds(leaf.Instance, reached, CatalogQuality, out int lowId, out int highId))
+                    into.Add(_items.CreateWithNewInstance(lowId, highId, reached, source));
+            }
         }
 
         /// <summary>The ids and QL <see cref="TryMintHighestUpTo"/> would mint, without creating an <see cref="Item"/>.</summary>

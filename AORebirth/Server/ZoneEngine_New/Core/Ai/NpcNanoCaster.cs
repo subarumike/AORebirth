@@ -391,8 +391,7 @@ namespace ZoneEngine_New.Core.Ai
             for (int i = 0; i < buffs.Count; i++)
             {
                 if (buffs[i].Id == spell.Id
-                    || (spell.NanoStrain > 0 && buffs[i].NanoStrain == spell.NanoStrain
-                        && buffs[i].StackingOrder >= spell.StackingOrder))
+                    || (buffs[i].StackingOrder >= spell.StackingOrder && spell.SharesStackingLine(buffs[i])))
                     return true;
             }
 
