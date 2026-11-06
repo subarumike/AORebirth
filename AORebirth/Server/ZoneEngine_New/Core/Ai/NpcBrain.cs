@@ -456,16 +456,23 @@ namespace ZoneEngine_New.Core.Ai
         // and for a moment after the last chat closes, so the player is not left behind. Leash and combat come before
         // the hold in the tree, so an attack still ends it. Live (Lolly the Reet and three other patrollers, 2026-10):
         // no FollowTarget for the whole chat, the route picked up again 1-3 s after the close, and no turn or re-spawn.
+        // Chats normally open and close on the NPC's own playfield tick, but a stale chat left behind by a zoning
+        // player is closed from the playfield the player clicked in next, so the set is guarded. The think's read of
+        // the count stays lock-free.
         readonly HashSet<int> _talkers = new();
         DateTime _conversationHoldUntilUtc;
 
-        public bool IsHeldByConversation => _talkers.Count > 0 || DateTime.UtcNow < _conversationHoldUntilUtc;
+        public bool IsHeldByConversation => _talkers.Count > 0
+            || (_conversationHoldUntilUtc != default && DateTime.UtcNow < _conversationHoldUntilUtc);
 
         /// <summary>A chat with <paramref name="talker"/> opened: the NPC stops on its next think.</summary>
         public void BeginConversation(Character talker)
         {
             ArgumentNullException.ThrowIfNull(talker);
-            if (Pet == null)
+            if (Pet != null)
+                return;
+
+            lock (_talkers)
                 _talkers.Add(talker.Identity.Instance);
         }
 
@@ -473,8 +480,11 @@ namespace ZoneEngine_New.Core.Ai
         public void EndConversation(Character talker)
         {
             ArgumentNullException.ThrowIfNull(talker);
-            if (_talkers.Remove(talker.Identity.Instance) && _talkers.Count == 0)
-                _conversationHoldUntilUtc = DateTime.UtcNow.AddSeconds(NpcAiRules.ConversationLingerSeconds);
+            lock (_talkers)
+            {
+                if (_talkers.Remove(talker.Identity.Instance) && _talkers.Count == 0)
+                    _conversationHoldUntilUtc = DateTime.UtcNow.AddSeconds(NpcAiRules.ConversationLingerSeconds);
+            }
         }
 
         /// <summary>One held think: stand still where the chat found it.</summary>
