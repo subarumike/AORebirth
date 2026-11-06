@@ -5,14 +5,14 @@
       <Link>Properties/SolutionAssemblyInfo.cs</Link>
     </Compile>
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/ChannelBase.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/ChannelCatalog.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/ChannelCondition.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/ChannelFlags.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/ChannelMessageEventArgs.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/ChannelType.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/ClientJoinEventArgs.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/RestrictedChannel.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/GlobalChannel.cs" />
+    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/ConfiguredChannel.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/IChannelBase.cs" />
-    <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/LevelRestrictedChannel.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/OrganizationChannel.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/RaidChannel.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/AORebirth/Server/ChatEngine/Channels/TeamChannel.cs" />

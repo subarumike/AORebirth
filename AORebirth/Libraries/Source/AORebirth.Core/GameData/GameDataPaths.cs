@@ -53,6 +53,9 @@ namespace AORebirth.Core.GameData
 
         public const string MonsterDataFileName = "MonsterData.json";
 
+        /// <summary>Static ChatEngine channels and their join conditions (ChatEngine ChannelCatalog).</summary>
+        public const string ChatChannelsFileName = "ChatChannels.json";
+
         /// <summary>Client collision spheres of door and mission entrance templates (<see cref="DynelCollisionData"/>).</summary>
         public const string DynelCollisionFileName = "DynelCollision.json";
 

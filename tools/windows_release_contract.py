@@ -38,7 +38,7 @@ CONFIG_OVERRIDES = {"AORebirth/Config/Config.xml", "AORebirth/Config/ChatEngine.
 PRIVATE_CHEST_CATALOGS = {"Loot/MissionChestRKAllowlist.json", "Loot/MissionChestSeasonalExclusions.json", "Loot/MissionChestSpecialExclusions.json"}
 INDEPENDENT_PRIVATE_CATALOGS = {"QuestRewards.json", "ObjectStateMachines.json"}
 # Named catalog loaders and GameDataPaths; no extension-only root admission.
-RUNTIME_ROOT_CATALOGS = frozenset("""AbilityCosts.json AlienXp.json ComboNames.json
+RUNTIME_ROOT_CATALOGS = frozenset("""AbilityCosts.json AlienXp.json ChatChannels.json ComboNames.json
 DungeonDoorStyles.json DungeonEntrances.json DungeonGeneration.json DynelCollision.json GoverningForms.json
 ItemBehavior.json items.dat ItemTemplates.json MonsterCombatRules.json MonsterData.json
 MonsterWeapons.json nanos.dat NewCharacter.json NpcTemplates.json ObjectStateMachines.json PerkActions.json

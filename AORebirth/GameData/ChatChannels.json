@@ -1,0 +1,53 @@
+{
+  "Channels": [
+    {
+      "Id": 100,
+      "Type": "General",
+      "Name": "Global",
+      "Flags": [ "CantIgnore", "NoInternational" ],
+      "Conditions": []
+    },
+    {
+      "Id": 1,
+      "Type": "Shopping",
+      "Name": "Shopping 1-50",
+      "Conditions": [ { "Kind": "Stat", "Stat": "Level", "Min": 1, "Max": 50 } ]
+    },
+    {
+      "Id": 2,
+      "Type": "Shopping",
+      "Name": "Shopping 51-150",
+      "Conditions": [ { "Kind": "Stat", "Stat": "Level", "Min": 51, "Max": 150 } ]
+    },
+    {
+      "Id": 3,
+      "Type": "Shopping",
+      "Name": "Shopping 151-220",
+      "Conditions": [ { "Kind": "Stat", "Stat": "Level", "Min": 151, "Max": 220 } ]
+    },
+    {
+      "Id": 6,
+      "Type": "GM",
+      "Name": "Suiv's Playground",
+      "Conditions": [ { "Kind": "GmLevel", "Min": 1 } ]
+    },
+    {
+      "Id": 1,
+      "Type": "General",
+      "Name": "Clan",
+      "Conditions": [ { "Kind": "Side", "Sides": [ "Clan" ] } ]
+    },
+    {
+      "Id": 2,
+      "Type": "General",
+      "Name": "Omni-Tek",
+      "Conditions": [ { "Kind": "Side", "Sides": [ "Omni" ] } ]
+    },
+    {
+      "Id": 0,
+      "Type": "General",
+      "Name": "Neutral",
+      "Conditions": [ { "Kind": "Side", "Sides": [ "Neutral" ] } ]
+    }
+  ]
+}

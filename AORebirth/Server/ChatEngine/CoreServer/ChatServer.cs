@@ -95,10 +95,8 @@ namespace ChatEngine.CoreServer
         /// </summary>
         internal ChatEngineBotRouter BotRouter;
 
-        /// <summary>
-        /// Wire id of the Global channel (type General). Distinct from every Side value.
-        /// </summary>
-        internal const uint GlobalChannelId = 100;
+        /// <summary>The GameData ChatChannels.json channels, fixed for the process; also in <see cref="Channels"/>.</summary>
+        private readonly ConfiguredChannel[] staticChannels;
 
         #endregion
 
@@ -108,20 +106,14 @@ namespace ChatEngine.CoreServer
         /// </summary>
         public ChatServer()
         {
-            // Global channel. Its id must stay outside the Side range (0-7): the sided
-            // General channels below are keyed (General, (uint)Side), so id 1 collided with Clan.
-            this.Channels.Add(new GlobalChannel(ChannelFlags.None, ChannelType.General, GlobalChannelId, "Global"));
-
-            // Shopping channels (at the moment just level restricted, no sides)
-            this.Channels.Add(new LevelRestrictedChannel(1, 1, 50));
-            this.Channels.Add(new LevelRestrictedChannel(2, 51, 150));
-            this.Channels.Add(new LevelRestrictedChannel(3, 151, 220));
-
-            // Restricted channels (GM, sided channels)
-            this.Channels.Add(new RestrictedChannel(Side.Gm, ChannelFlags.None, ChannelType.GM));
-            this.Channels.Add(new RestrictedChannel(Side.Clan, ChannelFlags.None, ChannelType.General));
-            this.Channels.Add(new RestrictedChannel(Side.Omni, ChannelFlags.None, ChannelType.General));
-            this.Channels.Add(new RestrictedChannel(Side.Neutral, ChannelFlags.None, ChannelType.General));
+            // Static channels (Global, Shopping, sided, GM) and their join conditions come from GameData.
+            IReadOnlyList<ChannelDefinition> definitions = ChannelCatalog.LoadRuntime().Channels;
+            this.staticChannels = new ConfiguredChannel[definitions.Count];
+            for (int i = 0; i < definitions.Count; i++)
+            {
+                this.staticChannels[i] = new ConfiguredChannel(definitions[i]);
+                this.Channels.Add(this.staticChannels[i]);
+            }
 
             this.ClientConnected += this.ClientConnectedToChat;
             this.ClientDisconnected += this.OnClientDisconnect;
@@ -134,16 +126,8 @@ namespace ChatEngine.CoreServer
 
         #region Public Methods and Operators
 
-        /// <summary>
-        /// </summary>
-        /// <typeparam name="T">
-        /// </typeparam>
-        /// <returns>
-        /// </returns>
-        public List<ChannelBase> ChannelsByType<T>()
-        {
-            return this.Channels.Where(x => x is T).ToList();
-        }
+        /// <summary>Number of GameData ChatChannels.json channels.</summary>
+        internal int StaticChannelCount => this.staticChannels.Length;
 
         /// <summary>
         /// </summary>
@@ -657,20 +641,11 @@ namespace ChatEngine.CoreServer
         /// </param>
         internal void AddClientToChannels(Client client)
         {
-            // Automatically add client to its appropriate channels
-            foreach (ChannelBase channel in this.ChannelsByType<GlobalChannel>())
+            // Every static channel whose conditions the character passes; one context reads each stat once.
+            var joinContext = new ChannelJoinContext(client);
+            foreach (ConfiguredChannel channel in this.staticChannels)
             {
-                channel.AddClient(client);
-            }
-
-            foreach (ChannelBase channel in this.ChannelsByType<RestrictedChannel>())
-            {
-                channel.AddClient(client);
-            }
-
-            foreach (ChannelBase channel in this.ChannelsByType<LevelRestrictedChannel>())
-            {
-                channel.AddClient(client);
+                channel.AddClient(client, joinContext);
             }
 
             // Team and raid channels are joined only on the zone's #aorebirth-team-join / raid-convert for that
