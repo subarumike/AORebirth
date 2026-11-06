@@ -79,6 +79,9 @@ namespace ZoneEngine_New.Core.Ai
 
         public const float ArriveHomeMeters = 1.5f;
 
+        /// <summary>A patrolling or wandering NPC stands this long after its last Knubot chat closes, then moves on.</summary>
+        public const double ConversationLingerSeconds = 3;
+
         /// <summary>
         /// A complete nav path whose last point is this close in XZ does not count as a chase
         /// chance when the target is still out of LOS or attack range.

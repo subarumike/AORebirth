@@ -117,6 +117,12 @@
     <Compile Include="WorldItemNameTests.cs" />
     <Compile Include="SpawnHeadingTests.cs" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NpcAiFocusedTests)' == 'true'">
+    <Compile Remove="@(Compile)" />
+    <Compile Include="TestDoubles.cs" />
+    <Compile Include="NpcBrainTests.cs" />
+    <Compile Include="NpcPatrolTests.cs" />
+  </ItemGroup>
   <ItemGroup Condition="'$(ExpansionHydrationFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />
     <Compile Include="TestDoubles.cs" />
