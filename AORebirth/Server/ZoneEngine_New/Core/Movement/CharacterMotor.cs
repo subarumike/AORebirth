@@ -1103,6 +1103,13 @@ namespace ZoneEngine_New.Core.Movement
                     return false;
             }
 
+            if (_move.State == (int)MovementState.Crawl && LeavesCrawlByChoice(action))
+            {
+                LogRefusedAction(action, "crawling: only LeaveCrawl leaves crawl");
+                ResyncClientCrawl();
+                return false;
+            }
+
             ISurface? surface = BindSurface();
             if (!_move.Act((int)action))
             {
@@ -1189,6 +1196,33 @@ namespace ZoneEngine_New.Core.Movement
 
             SyncModeStats();
             return true;
+        }
+
+        /// <summary>
+        /// Crawl is left only by uncrawling (LeaveCrawl). The client's own rules take a sit, sleep, lounge, sneak,
+        /// walk/run toggle or flight straight out of crawl, so the server refuses those. Swimming (water) and being
+        /// frozen are not the player's choice and still apply.
+        /// </summary>
+        static bool LeavesCrawlByChoice(MovementAction action) => action is MovementAction.SwitchToSit
+            or MovementAction.SwitchToSleep
+            or MovementAction.SwitchToLounge
+            or MovementAction.SwitchToSneak
+            or MovementAction.SwitchToWalk
+            or MovementAction.SwitchToRun
+            or MovementAction.SwitchToFly;
+
+        /// <summary>
+        /// The client already took the refused switch on its own character: put it back in crawl. Unknown 1 is the
+        /// direct-control form, which the receiving client applies to its own character (see CharDCMoveMessageHandler).
+        /// </summary>
+        void ResyncClientCrawl()
+        {
+            if (_character is not Player player || player.Session == null)
+                return;
+
+            CharDCMoveMessage move = CreateMove(MovementAction.SwitchToCrawl);
+            move.Unknown = 1;
+            player.Session.Send(move);
         }
 
         void LogRefusedAction(MovementAction action, string reason)
