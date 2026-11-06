@@ -64,6 +64,11 @@
       220
     ]
   },
+  "KMEG": {
+    "Features": [
+      "Guard"
+    ]
+  },
   "N032": {
     "Hates": [
       1
@@ -92,6 +97,21 @@
   "RPOF": {
     "Features": [
       "NoCombat"
+    ]
+  },
+  "UIDU": {
+    "Features": [
+      "Guard"
+    ]
+  },
+  "UITR": {
+    "Features": [
+      "Guard"
+    ]
+  },
+  "UOTP": {
+    "Features": [
+      "Guard"
     ]
   },
   "VAWT": {
