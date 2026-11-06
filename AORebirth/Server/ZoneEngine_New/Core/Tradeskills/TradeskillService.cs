@@ -341,7 +341,7 @@ namespace ZoneEngine_New.Core.Tradeskills
                     player.Session?.Send(new TemplateActionMessage
                     {
                         Identity = player.Identity, ItemLowId = result.LowId, ItemHighId = result.HighId, Quality = result.Quality,
-                        Unknown1 = 1, Action = TemplateActionType.Overflow,
+                        Count = result.StackCount, Action = TemplateActionType.Overflow,
                         Placement = new Identity { Type = IdentityType.OverflowWindow, Instance = 0 }
                     });
                     player.Session?.Send(new ContainerAddItemMessage

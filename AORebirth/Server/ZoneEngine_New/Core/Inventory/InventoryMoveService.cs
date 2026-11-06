@@ -22,7 +22,7 @@ namespace ZoneEngine_New.Core.Inventory
     {
         const int DefaultEquipDelay = 20;
 
-        const int TemplateActionUnknown1 = 1;
+        const int TemplateActionCount = 1;
 
         private readonly object _gate = new();
         private readonly Dictionary<int, PendingEquip> _pending = new();
@@ -834,7 +834,7 @@ namespace ZoneEngine_New.Core.Inventory
                     ItemLowId = item.LowId,
                     ItemHighId = item.HighId,
                     Quality = item.Quality,
-                    Unknown1 = TemplateActionUnknown1,
+                    Count = TemplateActionCount,
                     Action = action,
                     Placement = new Identity { Type = wearPage, Instance = slot },
                     Unknown3 = 0,

@@ -36,7 +36,7 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         Overflow = 87,
 
         /// <summary>
-        /// Perk action performed: action template low/high and QL, Unknown1 = 1, Placement = performer,
+        /// Perk action performed: action template low/high and QL, Count = 1, Placement = performer,
         /// Unknown3/Unknown4 = target type/instance. Live capture 2026-10-02T03:54:58Z (Impale, Gore, Blur).
         /// </summary>
         PerkAction = 0x20,

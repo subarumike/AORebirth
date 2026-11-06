@@ -1232,7 +1232,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
             ItemLowId = key.LowId,
             ItemHighId = key.HighId,
             Quality = key.Quality,
-            Unknown1 = 1,
+            Count = 1,
             Action = action,
             Placement = placement,
             Unknown3 = arg3,

@@ -1402,7 +1402,7 @@ namespace ZoneEngine_New.Core.Entities
                 ItemLowId = use.LowId,
                 ItemHighId = use.HighId,
                 Quality = use.Quality,
-                Unknown1 = 1,
+                Count = 1,
                 Action = TemplateActionType.PerkAction,
                 Placement = Identity,
                 Unknown3 = (int)shown.Identity.Type,

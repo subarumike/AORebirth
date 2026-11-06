@@ -287,7 +287,7 @@ namespace ZoneEngine_New.Core.Inventory
                 ItemLowId = LowId,
                 ItemHighId = HighId,
                 Quality = Quality,
-                Unknown1 = 1,
+                Count = 1,
                 Action = TemplateActionType.Use,
                 Placement = slotIdentity,
                 Unknown3 = (int)target.Identity.Type,
