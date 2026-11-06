@@ -441,8 +441,8 @@ public sealed partial class QuestService
                 if (used.Count > 0 && player.Playfield?.GetService<IInventoryRepository>() is IInventoryRepository inventory)
                     foreach (Item item in used)
                         item.Definition.ExecuteOnUseSpells(player, inventory, _items, source: player);
+                QuestJournal.SendEnded(player, quest, CharacterActionType.MissionAccomplished);
                 QuestJournal.Delete(player, quest);
-                ClientFeedback.Send(player, "Feedback_MissionAccomplished");
                 _logger.Info("Quest completed and rewards committed char=" + player.Identity.Instance + " quest=" + quest.QuestId
                     + (tokenReward == null ? string.Empty : " tokenWon=" + tokenReward.Won + " tokenItem=" + tokenReward.ItemId
                         + " tokenKills=" + tokenReward.Killed + "/" + tokenReward.Total));

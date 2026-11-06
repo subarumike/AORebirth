@@ -548,8 +548,8 @@ namespace ZoneEngine_New.Core.Quests
 
                 quest.State = QuestState.Expired;
                 Save(player, quest);
+                QuestJournal.SendEnded(player, quest, CharacterActionType.QuestExpired);
                 QuestJournal.Delete(player, quest);
-                ClientFeedback.Send(player, "Feedback_QuestExpired");
                 QuestEnded?.Invoke(player, quest);
             }
         }
