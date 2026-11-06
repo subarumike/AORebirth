@@ -210,7 +210,8 @@ namespace ZoneEngine_New.Core.Nanos
             Playfield? playfield = player.Playfield;
             TeamService? teams = playfield?.GetService<TeamService>();
             PlayfieldManager? manager = playfield?.GetService<PlayfieldManager>();
-            TeamSnapshot? team = teams?.GetTeam(player);
+            // A raid group is its own team here: team buffs, heals and aura pulses never cross into other raid groups.
+            TeamSnapshot? team = teams?.GetImmediateTeam(player);
             if (team == null || manager == null)
             {
                 if (!player.IsDead)

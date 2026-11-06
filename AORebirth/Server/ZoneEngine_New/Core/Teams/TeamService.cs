@@ -329,6 +329,32 @@ namespace ZoneEngine_New.Core.Teams
                     : null;
         }
 
+        /// <summary>
+        /// The player's immediate team: in a raid, only the members of its own raid group, which acts as an isolated
+        /// team for team buffs, team heals and auras (the raid as a whole still shares XP and loot through
+        /// <see cref="GetTeam"/>). Outside a raid this is the whole team.
+        /// </summary>
+        public TeamSnapshot? GetImmediateTeam(Player player)
+        {
+            lock (_sync)
+            {
+                if (!Owns(player) || !_membership.TryGetValue(player.Identity.Instance, out Team? team))
+                    return null;
+                if (!team.IsRaid)
+                    return new TeamSnapshot(team.Id, team.Leader, Array.AsReadOnly(team.Members.ToArray()), false);
+
+                int group = RaidListOf(team, player.Identity.Instance);
+                var members = new List<int>(team.Members.Count);
+                foreach (int id in team.Members)
+                {
+                    if (RaidListOf(team, id) == group)
+                        members.Add(id);
+                }
+
+                return new TeamSnapshot(team.Id, team.Leader, members.AsReadOnly(), true);
+            }
+        }
+
         /// <summary>The player's team id and whether it leads it, without copying the roster; false when not in a team.</summary>
         public bool TryGetTeamId(Player player, out int teamId, out bool isLeader)
         {
