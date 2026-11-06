@@ -176,6 +176,9 @@ namespace ZoneEngine_New.Core.Configuration
                 || SocialAggro.MaxRadius >= Ai.NpcAiRules.MaxLeashRange)
                 throw new InvalidDataException(path + ": socialAggro.defaultRadius, npcVsNpcDefaultRadius, guardDefaultRadius and maxRadius must be 0 up to below the "
                     + Ai.NpcAiRules.MaxLeashRange + " m leash range.");
+            if (!float.IsFinite(SocialAggro.ThreatOnlyRadiusPercent) || SocialAggro.ThreatOnlyRadiusPercent < 0
+                || SocialAggro.ThreatOnlyRadiusPercent > 100)
+                throw new InvalidDataException(path + ": socialAggro.threatOnlyRadiusPercent must be 0 to 100.");
             if (SocialAggro.MaxHelpers < 0)
                 throw new InvalidDataException(path + ": socialAggro.maxHelpers must be 0 (no limit) or more.");
             if (Pets == null || !float.IsFinite(Pets.OwnerThreatSharePercent) || Pets.OwnerThreatSharePercent < 0)
@@ -395,13 +398,22 @@ namespace ZoneEngine_New.Core.Configuration
         /// <paramref name="npcAttacker"/> when the enemy is an NPC that is not a player's pet, <paramref name="guards"/>
         /// when a guard is answering a guard.
         /// </summary>
-        public float RadiusFor(int assistanceRadius, bool npcAttacker = false, bool guards = false)
+        public float RadiusFor(int assistanceRadius, bool npcAttacker = false, bool guards = false, bool threatOnly = false)
         {
             float fallback = guards && GuardDefaultRadius > 0 ? GuardDefaultRadius
                 : npcAttacker && NpcVsNpcDefaultRadius > 0 ? NpcVsNpcDefaultRadius
                 : DefaultRadius;
-            return Math.Min(assistanceRadius > 0 ? assistanceRadius : fallback, MaxRadius);
+            float radius = Math.Min(assistanceRadius > 0 ? assistanceRadius : fallback, MaxRadius);
+            // Guards answering a guard are one force: a taunt on one still brings the rest at the full radius.
+            return threatOnly && !guards ? radius * ThreatOnlyRadiusPercent / 100f : radius;
         }
+
+        /// <summary>
+        /// Percent of the call radius when the attacker's first threat was not damage (a taunt, a debuff, a hostile
+        /// nano that did no damage). The attacker's first damage afterwards calls again at the full radius. Guards
+        /// answering a guard always come from the full radius. 100 leaves it as it is.
+        /// </summary>
+        public float ThreatOnlyRadiusPercent { get; init; } = 100f;
 
         /// <summary>The farthest any helper can come: how far a call for help has to look.</summary>
         public float SearchRadius => Math.Max(Math.Max(Math.Max(DefaultRadius, NpcVsNpcDefaultRadius), GuardDefaultRadius), MaxRadius);

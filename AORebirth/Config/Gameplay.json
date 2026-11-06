@@ -42,6 +42,7 @@
     "npcVsNpcDefaultRadius": 20,
     "guardDefaultRadius": 20,
     "maxRadius": 30,
+    "threatOnlyRadiusPercent": 50,
     "sameClanOnly": true,
     "requireLineOfSight": true,
     "maxHelpers": 0,

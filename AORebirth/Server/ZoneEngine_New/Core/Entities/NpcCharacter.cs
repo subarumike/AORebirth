@@ -363,7 +363,7 @@ namespace ZoneEngine_New.Core.Entities
             // takes a share (NpcBrain.AddThreatFrom). Another NPC's hit counts the same way: the victim fights back and
             // calls its kind for help (Gameplay.json socialAggro.npcVsNpcDefaultRadius) as it would against a player.
             if ((attacker.IsPlayer || attacker is NpcCharacter) && !ReferenceEquals(attacker, this))
-                Brain?.AddThreatFrom(attacker, hpRemoved);
+                Brain?.AddThreatFrom(attacker, hpRemoved, fromDamage: true);
 
             // The percent is only computed when the program listens for health thresholds.
             if (Scripts is { } scripts && scripts.Program.Subscribes(NpcScripts.NpcScriptTrigger.HealthBelow))

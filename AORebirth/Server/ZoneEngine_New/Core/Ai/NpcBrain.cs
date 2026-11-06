@@ -487,7 +487,12 @@ namespace ZoneEngine_New.Core.Ai
                 StopPathing();
         }
 
-        public void AddThreat(Identity identity, float amount)
+        /// <summary>
+        /// <paramref name="fromDamage"/> is false for threat alone (a taunt, a debuff, a hostile nano): a new attacker's
+        /// call for help then carries socialAggro.threatOnlyRadiusPercent of its radius, and the attacker's first damage
+        /// afterwards calls again at the full radius.
+        /// </summary>
+        public void AddThreat(Identity identity, float amount, bool fromDamage = false)
         {
             // Pacified NPCs keep no hate.
             if (_evading || Npc.IsPacified)
@@ -495,8 +500,18 @@ namespace ZoneEngine_New.Core.Ai
             bool newAttacker = !Hate.Contains(identity);
             AddHate(identity, amount);
             if (newAttacker)
+            {
+                _threatOnlyCalls.Remove(identity);
+                if (!fromDamage)
+                    _threatOnlyCalls.Add(identity);
+                CallForHelp(identity, threatOnly: !fromDamage);
+            }
+            else if (fromDamage && _threatOnlyCalls.Remove(identity))
                 CallForHelp(identity);
         }
+
+        /// <summary>Attackers whose call for help so far was threat-only (reduced radius); their first damage calls at full.</summary>
+        readonly HashSet<Identity> _threatOnlyCalls = new();
 
         /// <summary>
         /// Puts <paramref name="identity"/> on the hate list. The first hate starts the NPC's fight, whoever started it
@@ -515,10 +530,10 @@ namespace ZoneEngine_New.Core.Ai
         /// pets): the owner earns the configured share of the pet's threat, and at least the proximity minimum the first
         /// time, so the owner is the NPC's next target once the pet is dead, dismissed or out of reach.
         /// </summary>
-        public void AddThreatFrom(Character source, float amount)
+        public void AddThreatFrom(Character source, float amount, bool fromDamage = false)
         {
             ArgumentNullException.ThrowIfNull(source);
-            AddThreat(source.Identity, amount);
+            AddThreat(source.Identity, amount, fromDamage);
 
             if (source is not NpcCharacter { PetOwner: Player owner } || owner.IsDead
                 || Npc.Playfield?.GetService<ZoneEngine_New.Core.Configuration.GameplaySettings>()?.Pets is not { } rules)
@@ -528,14 +543,15 @@ namespace ZoneEngine_New.Core.Ai
             if (rules.OwnerAlwaysOnHateList && !Hate.Contains(owner.Identity))
                 share = Math.Max(share, NpcAiRules.ProximityHate);
             if (share > 0f)
-                AddThreat(owner.Identity, share);
+                AddThreat(owner.Identity, share, fromDamage);
         }
 
         /// <summary>
         /// Social aggro (Gameplay.json socialAggro): NPCs of its kind within this NPC's spawn point AssistanceRadius join
-        /// the fight against <paramref name="attacker"/>, nearest first. Runs once per new attacker.
+        /// the fight against <paramref name="attacker"/>, nearest first. Runs once per new attacker; <paramref name="threatOnly"/>
+        /// scales the radius by socialAggro.threatOnlyRadiusPercent.
         /// </summary>
-        void CallForHelp(Identity attacker)
+        void CallForHelp(Identity attacker, bool threatOnly = false)
         {
             if (Pet != null || !Npc.Attackable || Npc.Playfield is not ZoneEngine_New.Core.Playfield.Playfield playfield)
                 return;
@@ -573,7 +589,7 @@ namespace ZoneEngine_New.Core.Ai
                     continue;
 
                 double distance = Npc.GetEdgeDistanceTo(other);
-                if (distance > rules.RadiusFor(callRadius, npcAttacker, guards) || !ZoneEngine_New.Core.Helpers.CombatRules.CanAttack(other, enemy))
+                if (distance > rules.RadiusFor(callRadius, npcAttacker, guards, threatOnly) ||!ZoneEngine_New.Core.Helpers.CombatRules.CanAttack(other, enemy))
                     continue;
                 if (rules.RequireLineOfSight && !other.HasLineOfSightTo(Npc))
                     continue;
@@ -626,6 +642,7 @@ namespace ZoneEngine_New.Core.Ai
         public void ClearHate()
         {
             Hate.Clear();
+            _threatOnlyCalls.Clear();
             _currentTarget = Identity.None;
             _approachTarget = Identity.None;
             _engageTarget = Identity.None;
