@@ -144,6 +144,10 @@ namespace ZoneEngine_New.Core.Configuration
                 throw new InvalidDataException(path + ": zoneInGraceSeconds must be a finite number, 0 or more.");
             if (Xp == null || !double.IsFinite(Xp.KillPercentPerLevelDifference) || Xp.KillPercentPerLevelDifference < 0)
                 throw new InvalidDataException(path + ": xp.killPercentPerLevelDifference must be a finite, non-negative number.");
+            if (!double.IsFinite(Xp.GlobalModifier) || Xp.GlobalModifier < 0)
+                throw new InvalidDataException(path + ": xp.globalModifier must be a finite, non-negative multiplier.");
+            if (!double.IsFinite(Xp.ShadowlandsModifier) || Xp.ShadowlandsModifier < 0)
+                throw new InvalidDataException(path + ": xp.shadowlandsModifier must be a finite, non-negative multiplier.");
             if (!double.IsFinite(Xp.SideBonusPercent) || Xp.SideBonusPercent < 0 || Xp.SideBonusPercent > short.MaxValue / 100d)
                 throw new InvalidDataException(path + ": xp.sideBonusPercent must fit the non-negative, hundredths-of-percent InfoPacket field.");
             if (Xp.Caps == null || !Xp.Caps.IsValid)
@@ -530,6 +534,21 @@ namespace ZoneEngine_New.Core.Configuration
     /// <summary>The xp section of Gameplay.json.</summary>
     public sealed class GameplayXp
     {
+        /// <summary>
+        /// Multiplier on every regular XP grant (kill, quest, tradeskill, daily and mission rewards), before the side bonus
+        /// and the per-grant caps. 1.0 leaves XP unchanged. Alien XP is not affected.
+        /// </summary>
+        public double GlobalModifier { get; init; } = 1.0;
+
+        /// <summary>
+        /// Extra multiplier, on top of <see cref="GlobalModifier"/>, for regular XP earned on a Shadowlands playfield
+        /// (ExpansionPlayfield 1, <see cref="Entities.PlayfieldEntryFlags"/>). 1.0 leaves it unchanged.
+        /// </summary>
+        public double ShadowlandsModifier { get; init; } = 1.0;
+
+        /// <summary>The regular XP multiplier on a playfield that is (or is not) in the Shadowlands.</summary>
+        public double RateMultiplier(bool shadowlands) => GlobalModifier * (shadowlands ? ShadowlandsModifier : 1.0);
+
         /// <summary>Flat Side XP bonus for every player's regular kill and quest XP. 0 disables it.</summary>
         public double SideBonusPercent { get; init; }
 

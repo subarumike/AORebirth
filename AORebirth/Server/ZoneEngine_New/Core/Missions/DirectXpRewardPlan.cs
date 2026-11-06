@@ -71,7 +71,7 @@ public sealed class DirectXpRewardPlan
             ?? throw new InvalidOperationException("Quest XP requires the current GameData owner.");
         if (!data.TryGetXpLevel(level, out var current))
             throw new InvalidOperationException("Quest XP has no level data; reward remains pending.");
-        int amount = player.ApplySideXpBonus(reward);
+        int amount = player.ApplySideXpBonus(player.ApplyXpRateModifier(reward));
         // As Character.AwardXp: personal research takes its share of the whole reward, before the cap; only the XP
         // that remains is capped.
         long research = player.PlanResearchXp(amount);
@@ -140,6 +140,9 @@ public sealed class DirectXpRewardPlan
         // Legacy declines the XP component at the level cap; it does not cancel
         // the enclosing mission's independent cash/item/token reward transaction.
         if (reward == 0 || before == 220) return new(player, reward, before, before, before >= 200, values);
+        // Gameplay.json xp.globalModifier (and xp.shadowlandsModifier in the Shadowlands), as Character.AwardXp.
+        reward = player.ApplyXpRateModifier(reward);
+        if (reward == 0) return new(player, 0, before, before, before >= 200, values);
         bool shadow = before >= 200;
         if (shadow && persistedTotal) throw new InvalidOperationException("Persisted DOJA reward normalization is an RK progression path.");
         // Personal research takes its share of an XP reward (not of Shadowlands SK); the rest is the XP the plan adds.

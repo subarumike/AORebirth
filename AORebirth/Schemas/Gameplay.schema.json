@@ -50,6 +50,14 @@
     "xp": {
       "type": "object",
       "properties": {
+        "globalModifier": {
+          "type": "number",
+          "minimum": 0
+        },
+        "shadowlandsModifier": {
+          "type": "number",
+          "minimum": 0
+        },
         "sideBonusPercent": {
           "type": "number"
         },

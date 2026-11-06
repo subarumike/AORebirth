@@ -648,6 +648,10 @@ namespace ZoneEngine_New.Core.Entities
                     return;
             }
 
+            amount = ApplyXpRateModifier(amount);
+            if (amount <= 0)
+                return;
+
             int earned = amount;
             amount = ApplySideXpBonus(amount);
             int sideBonus = amount - earned;
@@ -1300,6 +1304,22 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         double SideXpBonusPercent => Playfield?.GetService<GameplaySettings>()?.Xp.SideBonusPercent ?? 0;
+
+        /// <summary>
+        /// Regular XP times Gameplay.json xp.globalModifier, and xp.shadowlandsModifier on a Shadowlands playfield.
+        /// Before the side bonus and the per-grant cap; mission callers include this in their durable reward projection.
+        /// </summary>
+        internal int ApplyXpRateModifier(int amount)
+        {
+            if (amount <= 0)
+                return 0;
+            if (Playfield is not { } playfield || playfield.GetService<GameplaySettings>()?.Xp is not GameplayXp xpRules)
+                return amount;
+
+            bool shadowlands = PlayfieldEntryFlags.ExpansionPlayfield(playfield.MetaData) == 1;
+            double scaled = Math.Round(amount * xpRules.RateMultiplier(shadowlands), MidpointRounding.AwayFromZero);
+            return (int)Math.Clamp(scaled, 0, int.MaxValue);
+        }
 
         /// <summary>Regular XP only; mission callers include this in their durable reward projection.</summary>
         internal int ApplySideXpBonus(int amount)

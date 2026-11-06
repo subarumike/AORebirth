@@ -8,6 +8,8 @@
   "shops": { "preferDatabaseStock": true },
   "loot": { "qualityVariancePercent": 25 },
   "xp": {
+    "globalModifier": 1.0,
+    "shadowlandsModifier": 1.85,
     "killPercentPerLevelDifference": 2.5,
     "alienMinimumXp": 150,
     "sideBonusPercent": 10,
