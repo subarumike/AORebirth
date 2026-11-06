@@ -15,17 +15,22 @@ namespace ZoneEngine_New.Core.Modules
     using ZoneEngine_New.Core.Playfield;
 
     /// <summary>
-    /// The module API's world view. Each playfield publishes an immutable snapshot at the end of its tick, but only while
-    /// a module has read it in the last <see cref="DemandLifetime"/>: with no reader a tick costs one dictionary lookup.
-    /// Readers never touch live entities off their tick. A read on the owning tick builds the snapshot in place; a read
-    /// from a module thread waits a bounded time for the next publish; a read from another playfield's tick never waits.
+    /// The module API's world view. Each playfield publishes an immutable snapshot at the end of its tick, only when a
+    /// reader needs one: with no reader a tick costs one dictionary lookup.
+    /// Readers never touch live entities off their tick. A read on the owning tick builds the snapshot in place. A read
+    /// from a module thread is served a snapshot at most one tick old; when the last one is older it asks the playfield
+    /// for one and waits a bounded time for that tick. A read from another playfield's tick never waits, so while such
+    /// reads arrive (within <see cref="DemandLifetime"/>) the playfield publishes on every tick to keep them current.
     /// </summary>
     internal sealed class ZoneModuleWorld : IZoneWorld
     {
-        /// <summary>How long one read keeps a playfield publishing (and a stat watched).</summary>
+        /// <summary>
+        /// How long one read keeps a playfield's snapshot (and a watched stat) alive; for a read from another playfield's
+        /// tick, also how long the playfield keeps publishing on every tick.
+        /// </summary>
         internal static readonly TimeSpan DemandLifetime = TimeSpan.FromSeconds(30);
 
-        /// <summary>A snapshot older than this is not served while the playfield is publishing again.</summary>
+        /// <summary>The freshness limit for a playfield whose tick rate is not known (no heartbeat).</summary>
         static readonly long MaxAgeTicks = Stopwatch.Frequency / 2;
 
         static readonly long DemandTicks = (long)(DemandLifetime.TotalSeconds * Stopwatch.Frequency);
@@ -108,13 +113,17 @@ namespace ZoneEngine_New.Core.Modules
             slot.CooldownWatch[characterId] = now + DemandTicks;
             slot.Demand(now + DemandTicks);
             Snapshot? current = slot.Current;
-            if (known && current != null && current.Cooldowns.TryGetValue(characterId, out CooldownInfo[]? cached))
-                return cached;
             if (Playfield.IsOnTickThread)
+            {
+                slot.DemandEveryTick(now + DemandTicks);
                 return current != null && current.Cooldowns.TryGetValue(characterId, out CooldownInfo[]? stale) ? stale : Array.Empty<CooldownInfo>();
+            }
+
+            if (known && IsFresh(current, playfield, now) && current!.Cooldowns.TryGetValue(characterId, out CooldownInfo[]? cached))
+                return cached;
 
             // A newly watched player is in the snapshot after the next publish.
-            slot.NextPublish.Wait(WaitLimit);
+            slot.RequestPublish().Wait(WaitLimit);
             return slot.Current is Snapshot published && published.Cooldowns.TryGetValue(characterId, out CooldownInfo[]? value)
                 ? value
                 : Array.Empty<CooldownInfo>();
@@ -159,18 +168,24 @@ namespace ZoneEngine_New.Core.Modules
                 return LiveStat(playfield, key);
 
             Snapshot? current = slot.Current;
-            if (known && current != null && current.Stats.TryGetValue(key, out int? cached))
-                return cached;
             if (Playfield.IsOnTickThread)
+            {
+                slot.DemandEveryTick(now + DemandTicks);
                 return current != null && current.Stats.TryGetValue(key, out int? stale) ? stale : null;
+            }
+
+            if (known && IsFresh(current, playfield, now) && current!.Stats.TryGetValue(key, out int? cached))
+                return cached;
 
             // A newly watched stat is in the snapshot after the next publish.
-            Task next = slot.NextPublish;
-            next.Wait(WaitLimit);
+            slot.RequestPublish().Wait(WaitLimit);
             return slot.Current is Snapshot published && published.Stats.TryGetValue(key, out int? value) ? value : null;
         }
 
-        /// <summary>End of a playfield tick (its tick lock held): publish when someone is reading.</summary>
+        /// <summary>
+        /// End of a playfield tick (its tick lock held): publish when a module thread asked for a snapshot, or on every
+        /// tick while another playfield's tick is reading this one.
+        /// </summary>
         internal void OnTick(Playfield playfield)
         {
             if (!_slots.TryGetValue(playfield.Identity.Instance, out Slot? slot))
@@ -189,7 +204,21 @@ namespace ZoneEngine_New.Core.Modules
                 return;
             }
 
+            bool requested = slot.TakeRequest();
+            if (!requested && now > Volatile.Read(ref slot.EveryTickUntil))
+                return;
+
             slot.Publish(Build(playfield, slot, now));
+        }
+
+        /// <summary>Built no more than one tick of <paramref name="playfield"/> ago.</summary>
+        static bool IsFresh(Snapshot? snapshot, Playfield playfield, long now)
+        {
+            if (snapshot == null)
+                return false;
+            int tickRate = playfield.TickRate;
+            long freshTicks = tickRate > 0 ? Stopwatch.Frequency / tickRate : MaxAgeTicks;
+            return now - snapshot.BuiltAt <= freshTicks;
         }
 
         Playfield? Find(int playfieldId)
@@ -211,19 +240,25 @@ namespace ZoneEngine_New.Core.Modules
             long now = Stopwatch.GetTimestamp();
             slot.Demand(now + DemandTicks);
             Snapshot? current = slot.Current;
-            if (current != null && now - current.BuiltAt <= MaxAgeTicks)
-                return current;
             if (playfield.IsTickHeldByCurrentThread)
             {
+                if (IsFresh(current, playfield, now))
+                    return current;
                 current = Build(playfield, slot, now);
                 slot.Publish(current);
                 return current;
             }
 
             if (Playfield.IsOnTickThread)
+            {
+                slot.DemandEveryTick(now + DemandTicks);
+                return current;
+            }
+
+            if (IsFresh(current, playfield, now))
                 return current;
 
-            slot.NextPublish.Wait(WaitLimit);
+            slot.RequestPublish().Wait(WaitLimit);
             return slot.Current;
         }
 
@@ -231,18 +266,22 @@ namespace ZoneEngine_New.Core.Modules
         {
             IReadOnlyList<Playfield> playfields = _manager.Value.SnapshotPlayfields();
             long now = Stopwatch.GetTimestamp();
+            bool onTick = Playfield.IsOnTickThread;
             var waits = new List<Task>();
             foreach (Playfield playfield in playfields)
             {
                 Slot slot = SlotFor(playfield);
                 slot.Demand(now + DemandTicks);
-                Snapshot? current = slot.Current;
-                if ((current == null || now - current.BuiltAt > MaxAgeTicks) && !playfield.IsTickHeldByCurrentThread)
-                    waits.Add(slot.NextPublish);
+                if (playfield.IsTickHeldByCurrentThread)
+                    continue;
+                if (onTick)
+                    slot.DemandEveryTick(now + DemandTicks);
+                else if (!IsFresh(slot.Current, playfield, now))
+                    waits.Add(slot.RequestPublish());
             }
 
             // Every playfield publishes on its own tick: wait for all of them at once, not one after another.
-            if (waits.Count != 0 && !Playfield.IsOnTickThread)
+            if (waits.Count != 0)
                 Task.WaitAll(waits.ToArray(), WaitLimit);
 
             var snapshots = new List<Snapshot>(playfields.Count);
@@ -264,7 +303,7 @@ namespace ZoneEngine_New.Core.Modules
             {
                 long now = Stopwatch.GetTimestamp();
                 Snapshot? current = slot.Current;
-                if (current != null && now - current.BuiltAt <= MaxAgeTicks)
+                if (IsFresh(current, playfield, now))
                     return current;
                 current = Build(playfield, slot, now);
                 slot.Publish(current);
@@ -420,15 +459,38 @@ namespace ZoneEngine_New.Core.Modules
                 set => _current = value;
             }
 
+            /// <summary>Until when another playfield's tick reads this one, so it publishes on every tick.</summary>
+            public long EveryTickUntil;
+
+            int _requested;
+
             /// <summary>Completes at the next publish.</summary>
             public Task NextPublish => Volatile.Read(ref _next).Task;
 
-            public void Demand(long until)
+            /// <summary>
+            /// Asks the next tick to publish and returns that publish. The task is taken before the request is raised, so
+            /// the publish that consumes the request always completes it.
+            /// </summary>
+            public Task RequestPublish()
             {
-                long current = Volatile.Read(ref DemandUntil);
+                Task next = NextPublish;
+                Volatile.Write(ref _requested, 1);
+                return next;
+            }
+
+            /// <summary>On the owning tick: whether a module thread asked for a publish since the last one.</summary>
+            public bool TakeRequest() => Interlocked.Exchange(ref _requested, 0) != 0;
+
+            public void DemandEveryTick(long until) => Raise(ref EveryTickUntil, until);
+
+            public void Demand(long until) => Raise(ref DemandUntil, until);
+
+            static void Raise(ref long field, long until)
+            {
+                long current = Volatile.Read(ref field);
                 while (until > current)
                 {
-                    long seen = Interlocked.CompareExchange(ref DemandUntil, until, current);
+                    long seen = Interlocked.CompareExchange(ref field, until, current);
                     if (seen == current)
                         return;
                     current = seen;

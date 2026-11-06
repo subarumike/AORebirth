@@ -9,8 +9,9 @@ namespace AORebirth.Modules.World
     /// <para>
     /// Every member is safe to call from any thread and returns detached copies; nothing returned changes after it is
     /// returned, and nothing in it refers to a live entity. Values come from snapshots each playfield publishes at the end
-    /// of its tick, so they may be up to one tick stale. Called from a module thread the first read of a playfield can
-    /// wait up to a few ticks for its first snapshot; called from an event handler (already on a tick) it never waits.
+    /// of its tick, so they may be up to one tick stale. Called from a module thread, a read whose playfield's last
+    /// snapshot is more than a tick old waits for that playfield's next tick; called from an event handler (already on a
+    /// tick) it never waits.
     /// </para>
     /// <para>Needs the <c>read-world</c> capability when the module has a capability entry in Modules.json.</para>
     /// </summary>
