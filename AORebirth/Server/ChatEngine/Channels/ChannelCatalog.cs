@@ -44,7 +44,11 @@ namespace ChatEngine.Channels
     /// { "Channels": [ { "Id": 1, "Type": "Shopping", "Name": "Shopping 1-50", "Flags": [ "CantIgnore" ],
     ///                   "Conditions": [ { "Kind": "Stat", "Stat": "Level", "Min": 1, "Max": 50 } ] } ] }
     /// </code>
-    /// Id + Type is the wire identity and must be unique. Condition kinds:
+    /// Id + Type is the wire identity and must be unique. The client colors a channel by its type byte alone (GUI.dll
+    /// maps it to a TextColors.xml ctch_* name), so a channel gives either <c>Type</c> or <c>Color</c>, one of:
+    /// admin, clan, misc, gm, news, tower, pgroup, team, seekingteam, newbie, raid. clan, team and raid share their type
+    /// with the per-group channels, whose ids are positive ints, so those need an Id of 2147483648 or more.
+    /// Condition kinds:
     /// <list type="bullet">
     /// <item><c>Stat</c>: <c>Stat</c> (a stat name, or its number as a string), optional inclusive <c>Min</c>/<c>Max</c>, optional <c>Values</c>.</item>
     /// <item><c>Side</c>: <c>Sides</c> (Neutral, Clan, Omni, Monster, Advisor, Guardian, Gm).</item>
@@ -65,11 +69,37 @@ namespace ChatEngine.Channels
             UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
         };
 
-        /// <summary>Channel types the server creates per organization, team or raid.</summary>
-        private static readonly HashSet<ChannelType> RuntimeOnlyTypes = new HashSet<ChannelType>
+        /// <summary>
+        /// Channel types the server also creates per organization, team or raid. Their ids are positive ints (database
+        /// organization ids, zone team ids), so a static channel of these types must use an id above that range.
+        /// </summary>
+        private static readonly HashSet<ChannelType> GroupTypes = new HashSet<ChannelType>
         {
             ChannelType.Organization, ChannelType.Team, ChannelType.Raid,
         };
+
+        /// <summary>
+        /// The client's channel colors (TextColors.xml ctch_* names) and the type byte its GUI.dll color switch maps to
+        /// each. Every other type byte is shown white.
+        /// </summary>
+        private static readonly Dictionary<string, ChannelType> ColorTypes =
+            new Dictionary<string, ChannelType>(StringComparer.OrdinalIgnoreCase)
+            {
+                { "admin", ChannelType.Admin },
+                { "clan", ChannelType.Organization },
+                { "misc", ChannelType.Leaders },
+                { "gm", ChannelType.GM },
+                { "news", ChannelType.News },
+                { "tower", ChannelType.Towers },
+                { "pgroup", ChannelType.PrivateGroup },
+                { "team", ChannelType.Team },
+                { "seekingteam", ChannelType.Shopping },
+                { "newbie", ChannelType.General },
+                { "raid", ChannelType.Raid },
+            };
+
+        /// <summary>The "Org Msg" channel ChatServer gives org members (Towers type, id 1).</summary>
+        private static readonly (ChannelType, uint) OrgMsgIdentity = (ChannelType.OrgMsg, 1);
 
         private ChannelCatalog(IReadOnlyList<ChannelDefinition> channels)
         {
@@ -140,14 +170,17 @@ namespace ChatEngine.Channels
             }
 
             where += " (" + model.Name + ")";
-            if (!TryParseName(model.Type, out ChannelType type))
+            ChannelType type = ResolveType(model, where);
+            if (GroupTypes.Contains(type) && model.Id.Value <= int.MaxValue)
             {
-                throw Invalid(where, "has unknown Type '" + model.Type + "'.");
+                throw Invalid(
+                    where,
+                    "has Type " + type + ", which per-group channels also use: its Id must be 2147483648 or more.");
             }
 
-            if (RuntimeOnlyTypes.Contains(type))
+            if ((type, model.Id.Value) == OrgMsgIdentity)
             {
-                throw Invalid(where, "has Type " + type + ", which the server creates per group.");
+                throw Invalid(where, "uses the Org Msg channel's Type and Id.");
             }
 
             ChannelFlags flags = ChannelFlags.None;
@@ -162,6 +195,38 @@ namespace ChatEngine.Channels
             }
 
             return new ChannelDefinition(model.Id.Value, type, model.Name.Trim(), flags, ParseConditions(model.Conditions, where, 0));
+        }
+
+        /// <summary>The wire type from <c>Type</c>, or from <c>Color</c> (the type the client shows in that color).</summary>
+        private static ChannelType ResolveType(ChannelModel model, string where)
+        {
+            ChannelType? fromColor = null;
+            if (model.Color != null)
+            {
+                if (!ColorTypes.TryGetValue(model.Color.Trim(), out ChannelType colorType))
+                {
+                    throw Invalid(where, "has unknown Color '" + model.Color + "'.");
+                }
+
+                fromColor = colorType;
+            }
+
+            if (model.Type == null)
+            {
+                return fromColor ?? throw Invalid(where, "needs a Type or a Color.");
+            }
+
+            if (!TryParseName(model.Type, out ChannelType type))
+            {
+                throw Invalid(where, "has unknown Type '" + model.Type + "'.");
+            }
+
+            if (fromColor != null && fromColor.Value != type)
+            {
+                throw Invalid(where, "has Color " + model.Color + ", which is not the color of Type " + model.Type + ".");
+            }
+
+            return type;
         }
 
         private static IReadOnlyList<ChannelCondition> ParseConditions(List<ConditionModel> models, string where, int depth)
@@ -315,6 +380,8 @@ namespace ChatEngine.Channels
             public uint? Id { get; set; }
 
             public string Type { get; set; }
+
+            public string Color { get; set; }
 
             public string Name { get; set; }
 

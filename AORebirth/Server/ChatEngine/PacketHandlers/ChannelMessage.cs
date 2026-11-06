@@ -62,9 +62,11 @@ namespace ChatEngine.PacketHandlers
 
             ChannelBase channel = client.ChatServer().GetChannel(packet);
 
-            // Team/raid channels are membership-only: a stale Team tab must not still reach the team.
+            // Team/raid channels are membership-only: a stale Team tab must not still reach the team. A ChatChannels.json
+            // channel is too, or a character failing its join conditions could still post to it by its id.
             if (channel == null
-                || ((channel.channelType == ChannelType.Team || channel.channelType == ChannelType.Raid)
+                || ((channel.channelType == ChannelType.Team || channel.channelType == ChannelType.Raid
+                        || channel is ConfiguredChannel)
                     && !client.Channels.Contains(channel)))
             {
                 return;

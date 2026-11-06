@@ -64,6 +64,12 @@ namespace ChatEngine.Channels
         /// </summary>
         Shopping = 6 | 0x80,
 
+        /// <summary>Colored by the client as ctch_news (GUI.dll channel color switch).</summary>
+        News = 8,
+
+        /// <summary>Colored by the client as ctch_pgroup (GUI.dll channel color switch).</summary>
+        PrivateGroup = 14,
+
         /// <summary>
         /// </summary>
         General = 7 | 0x80,
