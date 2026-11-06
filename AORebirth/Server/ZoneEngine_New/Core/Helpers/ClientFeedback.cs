@@ -132,6 +132,18 @@ namespace ZoneEngine_New.Core.Helpers
         /// </summary>
         public const int SkillResetIpReturned = 226232628;
 
+        /// <summary>
+        /// "Your Full IP Reset has finished.\r\n\r\nYou now have %d IP." (category 110, 0x0D06358B): the line for a
+        /// completed Reset All (CharacterAction ResetSkill with skill 0).
+        /// </summary>
+        public const int FullIpResetFinished = 218510731;
+
+        /// <summary>text.mdb category of the client's GUI strings (skill window, dialogs).</summary>
+        public const int GuiTextCategory = 502;
+
+        /// <summary>"You are only allowed to reset abilities and skills." (category 502, 0x02B705F3).</summary>
+        public const int OnlyAbilitiesAndSkillsResettable = 45549043;
+
         /// <summary>text.mdb category of the client's skill and stat names (id = stat id, e.g. 155 "Evade-ClsC").</summary>
         public const int StatNameCategory = 2003;
 

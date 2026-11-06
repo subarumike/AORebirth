@@ -3141,7 +3141,8 @@ namespace ZoneEngine_New.Core.Entities
             CharacterStat.MeleeAC,
             CharacterStat.ProjectileAC,
             CharacterStat.RP,
-            // CharacterStat.SpecialCondition,
+            // Carries the used free Full IP Reset bit so the skill window's Reset All count survives a relog.
+            CharacterStat.SpecialCondition,
             CharacterStat.SK,
             CharacterStat.Expansion,
             CharacterStat.ClanRedeemed,

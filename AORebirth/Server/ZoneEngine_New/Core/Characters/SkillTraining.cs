@@ -114,8 +114,12 @@ namespace ZoneEngine_New.Core.Characters
             MapNavigation,
             NoResetPoint,
             ItemsEquipped,
-            NothingSpent
+            NothingSpent,
+            NoFullReset
         }
+
+        /// <summary><see cref="CharacterStat.SpecialCondition"/> bit set once the character's free Full IP Reset is spent.</summary>
+        public const int FreeFullResetUsedBit = 0x4;
 
         /// <summary>
         /// Skill reset (CharacterAction ResetSkill): costs one Reset Point (<see cref="CharacterStat.RP"/>), needs every
@@ -138,9 +142,7 @@ namespace ZoneEngine_New.Core.Characters
             if (resetPoints <= 0)
                 return Refuse(out refusal, ResetRefusal.NoResetPoint);
 
-            PlayerInventory inventory = player.Inventory;
-            if (!inventory.IsHydrated || inventory.Equipment.Content.Count > 0 || inventory.Armor.Content.Count > 0
-                || inventory.Implant.Content.Count > 0 || inventory.Social.Content.Count > 0)
+            if (!EquipmentEmpty(player))
                 return Refuse(out refusal, ResetRefusal.ItemsEquipped);
 
             var breed = (Breed)stats.GetOrZero(CharacterStat.Breed, StatDetail.Base);
@@ -158,6 +160,84 @@ namespace ZoneEngine_New.Core.Characters
             stats.Set(CharacterStat.RP, resetPoints - 1, StatDetail.Base);
             player.RebaseStats();
             return true;
+        }
+
+        /// <summary>
+        /// Full IP Reset (CharacterAction ResetSkill with skill 0, the skill window's "Reset all skills"). Stock client
+        /// (GUI.dll): the button is enabled while (<see cref="CharacterStat.SpecialCondition"/> bit
+        /// <see cref="FreeFullResetUsedBit"/> clear ? 1 : 0) + <see cref="CharacterStat.FullIPRPoints"/> is above 0, and
+        /// its confirm (502 "SkillView_ResetAllConfirm") says all abilities and skills go to their minimum and IP returns
+        /// to the default for the level. So it does not cost Reset Points: it spends the free reset first, then one
+        /// FullIPRPoints. Every ability goes back to the breed base and every skill, Map Navigation included, to
+        /// <see cref="SkillCatalog.SkillFloor"/>; all of <see cref="CharacterStat.UsedIP"/> is returned. Needs every
+        /// equipment page empty and something spent, so an empty reset never uses it up. Nothing changes unless every
+        /// check passes.
+        /// </summary>
+        /// <param name="changed">The abilities and skills whose base was lowered; empty when refused.</param>
+        public static bool TryFullReset(
+            Player player,
+            SkillCatalog catalog,
+            out int refund,
+            out List<CharacterStat> changed,
+            out ResetRefusal refusal)
+        {
+            refund = 0;
+            changed = [];
+            refusal = ResetRefusal.None;
+
+            StatCollection stats = player.Stats;
+            int specialCondition = stats.GetOrZero(CharacterStat.SpecialCondition, StatDetail.Base);
+            bool freeReset = (specialCondition & FreeFullResetUsedBit) == 0;
+            int fullResetPoints = stats.GetOrZero(CharacterStat.FullIPRPoints, StatDetail.Base);
+            if (!freeReset && fullResetPoints <= 0)
+                return Refuse(out refusal, ResetRefusal.NoFullReset);
+
+            if (!EquipmentEmpty(player))
+                return Refuse(out refusal, ResetRefusal.ItemsEquipped);
+
+            var breed = (Breed)stats.GetOrZero(CharacterStat.Breed, StatDetail.Base);
+            var profession = (Profession)stats.GetOrZero(CharacterStat.Profession, StatDetail.Base);
+            var lowered = new List<(CharacterStat Stat, int Floor)>();
+            for (CharacterStat ability = CharacterStat.Strength; ability <= CharacterStat.Psychic; ability++)
+            {
+                if (catalog.TryGetAbilityFloor(breed, ability, out int floor)
+                    && stats.TryGetValue(ability, out int current, StatDetail.Base) && !StatCollection.IsUnset(current)
+                    && current > floor)
+                    lowered.Add((ability, floor));
+            }
+
+            for (CharacterStat skill = CharacterStat.MartialArts; skill <= CharacterStat.NanoAC; skill++)
+            {
+                if (CurrentBase(stats, skill) > SkillCatalog.SkillFloor
+                    && catalog.TryGetRaiseCost(breed, profession, skill, SkillCatalog.SkillFloor, SkillCatalog.SkillFloor, out _))
+                    lowered.Add((skill, SkillCatalog.SkillFloor));
+            }
+
+            int used = stats.GetOrZero(CharacterStat.UsedIP, StatDetail.Base);
+            if (lowered.Count == 0 && used <= 0)
+                return Refuse(out refusal, ResetRefusal.NothingSpent);
+
+            foreach ((CharacterStat stat, int floor) in lowered)
+            {
+                stats.Set(stat, floor, StatDetail.Base);
+                changed.Add(stat);
+            }
+
+            refund = Math.Max(0, used);
+            stats.Set(CharacterStat.UsedIP, 0, StatDetail.Base);
+            if (freeReset)
+                stats.Set(CharacterStat.SpecialCondition, specialCondition | FreeFullResetUsedBit, StatDetail.Base);
+            else
+                stats.Set(CharacterStat.FullIPRPoints, fullResetPoints - 1, StatDetail.Base);
+            player.RebaseStats();
+            return true;
+        }
+
+        static bool EquipmentEmpty(Player player)
+        {
+            PlayerInventory inventory = player.Inventory;
+            return inventory.IsHydrated && inventory.Equipment.Content.Count == 0 && inventory.Armor.Content.Count == 0
+                && inventory.Implant.Content.Count == 0 && inventory.Social.Content.Count == 0;
         }
 
         static bool Refuse(out ResetRefusal refusal, ResetRefusal reason)

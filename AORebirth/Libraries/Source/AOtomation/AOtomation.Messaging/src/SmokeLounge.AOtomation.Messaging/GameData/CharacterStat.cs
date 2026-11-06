@@ -701,6 +701,12 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
         /// <summary>A vending machine's trade limit (346): the most credits one trade with it may move.</summary>
         TradeLimit = 0x0000015A,
 
+        /// <summary>
+        /// Special condition bits (348). Bit 0x4 marks the character's free Full IP Reset as used: the skill window
+        /// counts (bit 0x4 clear ? 1 : 0) + <see cref="FullIPRPoints"/> as the Full IP Resets left (GUI.dll 100fae9a).
+        /// </summary>
+        SpecialCondition = 0x0000015C,
+
         AutoAttackFlags = 0x0000015D,
 
         NextXP = 0x0000015E, 
