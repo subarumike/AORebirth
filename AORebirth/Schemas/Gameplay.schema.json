@@ -35,6 +35,12 @@
       },
       "additionalProperties": false
     },
+    "stuckToRespawnPlayfields": {
+      "type": "array",
+      "items": {
+        "type": "integer"
+      }
+    },
     "requireAmmo": {
       "type": "boolean"
     },

@@ -12,7 +12,8 @@ namespace ZoneEngine_New.Core.Characters
     using Vector3 = AORebirth.Core.Vector.Vector3;
 
     /// <summary>
-    /// /stuck: sends the player to <see cref="GameplaySettings.StuckLocation"/>. Refused while something is attacking the
+    /// /stuck: sends the player to <see cref="GameplaySettings.StuckLocation"/>, or to their respawn point on a
+    /// <see cref="GameplaySettings.StuckToRespawnPlayfields"/> playfield (tutorial-island style zones). Refused while something is attacking the
     /// player or while the Stability skill is still locked from the last /stuck; a successful /stuck locks Stability for
     /// <see cref="GameplaySettings.StuckCooldownSeconds"/>.
     /// </summary>
@@ -51,9 +52,13 @@ namespace ZoneEngine_New.Core.Characters
                 return;
             }
 
-            GameplayLocation target = _settings.StuckLocation!;
-            var landing = new Vector3(target.X, target.Y, target.Z);
-            if (target.Playfield == current.Identity.Instance)
+            if (!TryResolveDestination(player, current, out int targetPlayfield, out Vector3 landing))
+            {
+                RequirementFeedback.SendText(player, "There is nowhere to send you right now.");
+                return;
+            }
+
+            if (targetPlayfield == current.Identity.Instance)
             {
                 LockStability(player, nowUtc);
                 player.TeleportWithinPlayfield(landing);
@@ -63,7 +68,7 @@ namespace ZoneEngine_New.Core.Characters
             // Not a proxy entry, so it leaves no way back through an exit proxy (as a GM jump does).
             player.Stats.Set(CharacterStat.ExternalPlayfieldInstance, 0, StatDetail.Base, dirty: true);
             player.Stats.Set(CharacterStat.ExternalDoorInstance, 0, StatDetail.Base, dirty: true);
-            bool queued = _playfields.Value.WithPlayfield(target.Playfield, player, destination =>
+            bool queued = _playfields.Value.WithPlayfield(targetPlayfield, player, destination =>
             {
                 if (ReferenceEquals(player.Playfield, current))
                     player.Session?.TransferToPlayfield(destination, landing);
@@ -71,6 +76,41 @@ namespace ZoneEngine_New.Core.Characters
 
             if (queued)
                 LockStability(player, nowUtc);
+        }
+
+        /// <summary>
+        /// The respawn point (save point, else the new-character start) on a <see cref="GameplaySettings.StuckToRespawnPlayfields"/>
+        /// playfield, else <see cref="GameplaySettings.StuckLocation"/>.
+        /// </summary>
+        bool TryResolveDestination(Player player, Playfield current, out int playfieldId, out Vector3 landing)
+        {
+            int currentId = current.Identity.Instance;
+            foreach (int respawnPlayfield in _settings.StuckToRespawnPlayfields)
+            {
+                if (respawnPlayfield != currentId)
+                    continue;
+
+                try
+                {
+                    (playfieldId, landing) = player.ResolveSavePointDestination(current);
+                    return true;
+                }
+                catch (InvalidOperationException)
+                {
+                    break;
+                }
+            }
+
+            if (_settings.StuckLocation is GameplayLocation stuck && stuck.IsValid)
+            {
+                playfieldId = stuck.Playfield;
+                landing = new Vector3(stuck.X, stuck.Y, stuck.Z);
+                return true;
+            }
+
+            playfieldId = 0;
+            landing = default;
+            return false;
         }
 
         /// <summary>The configured cooldown as-is: a Stability lock, not scaled by SkillLockModifier.</summary>

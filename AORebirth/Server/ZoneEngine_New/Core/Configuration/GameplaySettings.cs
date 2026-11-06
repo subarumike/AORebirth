@@ -32,6 +32,12 @@ namespace ZoneEngine_New.Core.Configuration
         public GameplayLocation? StuckLocation { get; init; }
 
         /// <summary>
+        /// Playfields (tutorial-island style zones) where /stuck sends the player to their respawn point (save point,
+        /// else the new-character start) instead of <see cref="StuckLocation"/>.
+        /// </summary>
+        public IReadOnlyList<int> StuckToRespawnPlayfields { get; init; } = Array.Empty<int>();
+
+        /// <summary>
         /// A reload takes rounds from a stack of the weapon's ammo. Off, clips still run dry and reload (with the same
         /// pause), but fill without any ammo in the inventory.
         /// </summary>
@@ -127,6 +133,13 @@ namespace ZoneEngine_New.Core.Configuration
                 throw new InvalidDataException(path + ": stuckCooldownSeconds must not be negative.");
             if (StuckLocation is not GameplayLocation stuck || !stuck.IsValid)
                 throw new InvalidDataException(path + ": stuckLocation needs a positive playfield and finite x, y, z.");
+            if (StuckToRespawnPlayfields == null)
+                throw new InvalidDataException(path + ": stuckToRespawnPlayfields must be a list (or omitted).");
+            foreach (int playfield in StuckToRespawnPlayfields)
+            {
+                if (playfield <= 0)
+                    throw new InvalidDataException(path + ": stuckToRespawnPlayfields entries must be positive playfield ids.");
+            }
             if (!double.IsFinite(ZoneInGraceSeconds) || ZoneInGraceSeconds < 0)
                 throw new InvalidDataException(path + ": zoneInGraceSeconds must be a finite number, 0 or more.");
             if (Xp == null || !double.IsFinite(Xp.KillPercentPerLevelDifference) || Xp.KillPercentPerLevelDifference < 0)
@@ -410,7 +423,7 @@ namespace ZoneEngine_New.Core.Configuration
 
         /// <summary>
         /// Percent of the call radius when the attacker's first threat was not damage (a taunt, a debuff, a hostile
-        /// nano that did no damage). The attacker's first damage afterwards calls again at the full radius. Guards
+        /// nano that did no damage, the NPC's own proximity aggro on a player). The attacker's first damage afterwards calls again at the full radius. Guards
         /// answering a guard always come from the full radius. 100 leaves it as it is.
         /// </summary>
         public float ThreatOnlyRadiusPercent { get; init; } = 100f;

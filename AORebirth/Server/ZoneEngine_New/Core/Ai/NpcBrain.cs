@@ -917,8 +917,11 @@ namespace ZoneEngine_New.Core.Ai
             if (!WithinProximityWalk(player, range))
                 return;
 
+            // Proximity aggro is threat without damage, like a taunt: its call for help carries the threat-only radius,
+            // and the player's first damage on this NPC calls again at the full radius.
             AddHate(player.Identity, NpcAiRules.ProximityHate);
-            CallForHelp(player.Identity);
+            _threatOnlyCalls.Add(player.Identity);
+            CallForHelp(player.Identity, threatOnly: true);
         }
 
         /// <summary>
