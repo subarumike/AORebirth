@@ -972,9 +972,14 @@ namespace ZoneEngine_New.Core.Ai
         public bool ShouldLeash()
         {
             TickStallWatch.Stage("brain.leash", Npc.Identity.Instance);
+            // A guard assigned to a fixed post returns when its fight ends, even if its last target was already
+            // removed from hate. Patrols, wanderers and scripted movement retain their own idle destinations.
+            bool guardAwayFromPost = Hate.IsEmpty && HasHome
+                && Npc.MobTemplate?.Has(Mobs.NpcFeature.Guard) == true
+                && !PatrolEnabled && !WanderEnabled && !ScriptHoldsMovement && !HasArrivedHome();
             // A target whose reach map was too costly to build means this fight cannot be judged: reset now rather
             // than search again (and stop players standing out of reach from farming a stuck mob).
-            bool leash = _evading || _resetForUnreachable || (_resetForTargetReset && Hate.IsEmpty)
+            bool leash = _evading || _resetForUnreachable || (_resetForTargetReset && Hate.IsEmpty) || guardAwayFromPost
                 // A scripted march or a patrol leashes by distance from the point it is walking to, not from the spawn.
                 || NpcAiRules.ShouldLeash(Hate, LeashAnchor, Npc.Position, _isEngageable);
             _resetForUnreachable = false;
