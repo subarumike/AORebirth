@@ -70,6 +70,12 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 case OrgClientCommand.GoverningForm:
                     HandleLeaderCommand(message, session, player);
                     return;
+                case OrgClientCommand.Promote:
+                    HandleRankChange(message, session, player, promote: true);
+                    return;
+                case OrgClientCommand.Demote:
+                    HandleRankChange(message, session, player, promote: false);
+                    return;
                 default:
                     // Commands not implemented yet stay silent for members; non-members get the captured refusal
                     // for the commands the captures proved answer "not in an organization".

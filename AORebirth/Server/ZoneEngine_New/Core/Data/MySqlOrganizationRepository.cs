@@ -31,5 +31,11 @@ namespace ZoneEngine_New.Core.Data
 
         public void SaveGoverningForm(int organizationId, int governingForm, int leaderId, int lowestRank)
             => Run(() => _persistence.SaveOrganizationGoverningForm(organizationId, governingForm, leaderId, lowestRank));
+
+        public void SaveRank(int characterId, int rank)
+            => Run(() => _persistence.SaveOrganizationRank(characterId, rank));
+
+        public void SaveLeader(int organizationId, int leaderId)
+            => Run(() => _persistence.SaveOrganizationLeader(organizationId, leaderId));
     }
 }

@@ -21,5 +21,7 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         OrgInvite = 0x05,
 
         OrgContract = 0x06,
+
+        OrgLeadershipTransfer = 0x09,
     }
 }

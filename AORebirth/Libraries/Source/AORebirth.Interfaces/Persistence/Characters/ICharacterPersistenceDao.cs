@@ -24,6 +24,8 @@ namespace AORebirth.Interfaces.Persistence.Characters
         /// member except the leader to <paramref name="lowestRank"/>.
         /// </summary>
         void SaveOrganizationGoverningForm(int organizationId, int governingForm, int leaderId, int lowestRank);
+        void SaveOrganizationRank(int characterId, int rank);
+        void SaveOrganizationLeader(int organizationId, int leaderId);
         IList<PersistedItemData> LoadCarriedItems(int characterId);
         IList<PersistedItemData> LoadBankItems(int characterId);
         IList<PersistedItemData> LoadContainerItems(int containerInstanceId);

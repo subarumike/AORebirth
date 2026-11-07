@@ -25,6 +25,15 @@ namespace ZoneEngine_New.Core.Organizations
         public const string NotLeaderObjective = "$cZ=l";
         public const string NotLeaderHistory = "\"!Qr$";
         public const string NotLeaderGoverningForm = "!Y9V.";
+        public const string PromoteActor = "!ao(2";
+        public const string PromoteTarget = "#\"JF6";
+        public const string DemoteActor = "\"9;=T";
+        public const string DemoteTarget = "$q@>t";
+        public const string DemoteAtLowestRank = "$jh(c";
+        public const string PromoteInvalidTarget = "$m0qh";
+        public const string DemoteInvalidTarget = "#M?Vc";
+        public const string LeadershipGivenOrg = "%UKqG";
+        public const string LeadershipGivenTarget = "\"lW;a";
 
     }
 
@@ -67,6 +76,19 @@ namespace ZoneEngine_New.Core.Organizations
         /// </summary>
         public static string GoverningFormList(string[] names)
             => "~&!!!&t" + OrgChatRefs.GoverningFormList + "~" + string.Join(", ", names) + ".\n";
+
+        /// <summary>String parameter: 's', then the length plus one, then the text.</summary>
+        public static string TextArg(string value) => "s" + (char)(value.Length + 1) + value;
+
+        /// <summary>Feedback (promote/demote recipient line): FormatFeedback carrying the same text envelope as the refs.</summary>
+        public static FormatFeedbackMessage Feedback(Identity recipient, string refAndParameters) => new()
+        {
+            Identity = recipient,
+            Unknown = 1,
+            Unknown1 = 0,
+            Unknown2 = 0,
+            FormattedMessage = Wrap(refAndParameters)
+        };
 
         public static string GoverningFormNotice(string leaderName, string formName)
             => Wrap("#Y8r9s" + (char)(leaderName.Length + 1) + leaderName + "s" + (char)(formName.Length + 1) + formName);

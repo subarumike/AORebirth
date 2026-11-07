@@ -16,5 +16,11 @@ namespace ZoneEngine_New.Core.Data
 
         /// <summary>Stores the form and resets every member except the leader to <paramref name="lowestRank"/>.</summary>
         void SaveGoverningForm(int organizationId, int governingForm, int leaderId, int lowestRank);
+
+        /// <summary>Stores the rank of one member (promote and demote).</summary>
+        void SaveRank(int characterId, int rank);
+
+        /// <summary>Stores the new leader (presidency transfer).</summary>
+        void SaveLeader(int organizationId, int leaderId);
     }
 }

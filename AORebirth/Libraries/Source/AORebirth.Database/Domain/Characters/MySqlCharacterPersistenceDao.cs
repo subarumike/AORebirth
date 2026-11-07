@@ -205,6 +205,21 @@ namespace AORebirth.Database.Domain.Characters
                 "@Value", value, "@Id", organizationId));
         }
 
+        public void SaveOrganizationRank(int characterId, int rank)
+        {
+            if (characterId <= 0) throw new ArgumentOutOfRangeException(nameof(characterId));
+            Transaction((c, t) => Execute(c, t, "UPDATE stats SET StatValue=@Rank WHERE Type=@Type AND Instance=@Id AND StatId=@Level",
+                "@Rank", rank, "@Type", (int)IdentityType.CanbeAffected, "@Id", characterId, "@Level", (int)CharacterStat.ClanLevel));
+        }
+
+        public void SaveOrganizationLeader(int organizationId, int leaderId)
+        {
+            if (organizationId <= 0) throw new ArgumentOutOfRangeException(nameof(organizationId));
+            if (leaderId <= 0) throw new ArgumentOutOfRangeException(nameof(leaderId));
+            Transaction((c, t) => Execute(c, t, "UPDATE organizations SET LeaderId=@Leader WHERE Id=@Id",
+                "@Leader", leaderId, "@Id", organizationId));
+        }
+
         public void SaveOrganizationGoverningForm(int organizationId, int governingForm, int leaderId, int lowestRank)
         {
             if (organizationId <= 0) throw new ArgumentOutOfRangeException(nameof(organizationId));

@@ -3223,12 +3223,21 @@ namespace ZoneEngine_New.Core.Entities
             // monster path and stuck the official client on "Please wait".
             // Do not copy Name into FirstName — official 0x40 uses the DB first/last
             // strings (often empty). Unique name already arrives in SCFU.Name.
+            // A member of an organization is sent as CharacterOrg (0x41): retail adds the organization id and the rank
+            // name, which the client shows as "Clan title" under "Clan".
+            ZoneEngine_New.Core.Data.OrganizationRecord? organization = Organization;
             InfoPacketMessage message = BuildCharacterInfoPacket(
                 0,
-                InfoPacketType.Character,
+                organization is null ? InfoPacketType.Character : InfoPacketType.CharacterOrg,
                 FirstName,
                 LastName);
             var info = (CharacterInfoPacket)message.Info;
+            if (organization is not null)
+            {
+                info.OrganizationId = organization.Id;
+                info.OrganizationRank = Playfield?.GetService<IGameData>()?.GoverningForms.GetRankName(
+                    organization.GovernmentForm, Stats.GetOrZero(CharacterStat.ClanLevel, StatDetail.Base)) ?? string.Empty;
+            }
             Logger.Info(
                 string.Format(
                     CultureInfo.InvariantCulture,
