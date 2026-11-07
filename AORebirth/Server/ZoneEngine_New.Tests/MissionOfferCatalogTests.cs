@@ -27,7 +27,8 @@ public sealed class MissionOfferCatalogTests
     {
         byte[][] bodies = MissionRollCaptureLibrary.CapturedRollBodiesHex.Select(Convert.FromHexString).ToArray();
         var content = new MissionOfferContent(1, Source, bodies.Select(body => Project(body, GeneratedMissionWire.Read(body))).ToImmutableArray());
-        byte[] generated = JsonSerializer.SerializeToUtf8Bytes(content, MissionOfferCatalog.JsonOptions);
+        var exportOptions = new JsonSerializerOptions(MissionOfferCatalog.JsonOptions) { NewLine = "\n" };
+        byte[] generated = JsonSerializer.SerializeToUtf8Bytes(content, exportOptions);
         var roundTrip = JsonSerializer.Deserialize<MissionOfferContent>(generated, MissionOfferCatalog.JsonOptions)!;
         for (int index = 0; index < bodies.Length; index++)
         {

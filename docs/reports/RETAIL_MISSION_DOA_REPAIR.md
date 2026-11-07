@@ -24,7 +24,10 @@ The runtime release manifest admits the two typed catalogs and excludes the
 superseded recorded files. Frozen offers already persisted in the database
 continue to use their existing codec and integrity checks.
 
-The offer catalog SHA256 is `a13bf82d6fa772df58b561f4dad38ce4e0e5d555e2cbda4d2284d64d7ca1e2ce`.
+The canonical offer catalog SHA256 is `65f279081eedb26969a4f234022ad6ca67ca716ec17597c40c49b464d2b19861`.
+The initial Windows export differed only in its line endings. The publication
+check repeated the projection and wire regression with the exact LF catalog
+that Git distributes.
 
 The generated wire SHA256 is `3d1aa7e35baa65d7669390c439d75311e12d249385c9e9e2eb304ea2fe834604`.
 
