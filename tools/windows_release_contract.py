@@ -46,7 +46,7 @@ Perks.json PetReplies.json PetTypes.json Quests.json QuestRewards.json Research.
 SkillCosts.json SkillTrickle.json SpawnExclusions.json StartPackages.json TeleportRoutes.json Tradeskills.json VendingMachines.json
 WaterExits.json Xp.json""".split())
 RUNTIME_MISSION_FILES = frozenset("""Locations.json Text.json RollPolicy.json RollMixes.json
-RollTemplate.json RollBodies.json RewardObservations.json RareLoot.json RareLootChancePercent.json
+MissionOffers.json Keys.json RewardObservations.json RareLoot.json RareLootChancePercent.json
 Source/MissionLevels.csv Source/MissionLevelRules.json Destinations/MissionDestinations.json
 Destinations/MissionEntrancePlacements.json""".split())
 RUNTIME_PLAYFIELD_FILES = frozenset("""metadata.json Districts.json Rooms.json Spawns.json

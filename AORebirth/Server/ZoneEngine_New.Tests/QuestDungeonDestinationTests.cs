@@ -47,6 +47,8 @@ public sealed class QuestDungeonDestinationTests
         Assert.IsFalse(string.IsNullOrWhiteSpace(root), "Set AO_REBIRTH_GAMEDATA_PATH to existing runtime GameData for the real procedural dungeon tests.");
         return new GameDataStore(new StubLogger(), null, root!);
     });
+    static readonly Lazy<MissionKeyPolicy> KeyPolicy = new(() => MissionKeyPolicy.Load(RuntimeData.Value.RootPath,
+        new ItemTemplateCatalog(RuntimeData.Value, new StubLogger())));
 
     [TestMethod]
     public void AcceptancePersistsSelectedIdentityAndPublishesLinkedKeyOnlyAfterCommit()
@@ -80,8 +82,10 @@ public sealed class QuestDungeonDestinationTests
         Assert.AreEqual(f.Offer.DestinationType, parameters.DestinationType);
         Item key = f.Player.Inventory.Inventory.Content.Values.Single();
         Assert.IsTrue(key.IsPersisted);
-        Assert.AreEqual(QuestDungeonService.KeyLowId, key.LowId);
-        Assert.AreEqual(QuestDungeonService.KeyItemType, (int)key.Identity.Type);
+        Assert.AreEqual(f.Keys.KeyTemplateId, key.LowId);
+        Assert.AreEqual(f.Keys.KeyTemplateId, key.HighId);
+        Assert.AreEqual(f.Keys.KeyQuality, key.Quality);
+        Assert.AreEqual(IdentityType.MissionKey, key.Identity.Type);
         Assert.AreEqual(f.Store.Generated!.QuestId, f.Store.Links[key.InstanceId]);
         Assert.AreEqual(f.Player.Identity.Instance, f.Store.Keys.Single().ContainerInstance);
         Assert.IsInstanceOfType<SimpleItemFullUpdateMessage>(f.Session.Sent[0]);
@@ -254,13 +258,13 @@ public sealed class QuestDungeonDestinationTests
         Assert.IsNull(f.Accept());
         var key = f.Player.Inventory.Inventory.Content.Single();
         int duplicatorSlot = f.Player.Inventory.Inventory.FindFreeSlot();
-        Item duplicator = TestWorld.CreateItem(lowId: QuestDungeonService.DuplicatorLowId, instanceId: 700000);
+        Item duplicator = TestWorld.CreateItem(lowId: f.Keys.DuplicatorTemplateId, instanceId: 700000);
         f.Player.Inventory.Inventory.Add(duplicatorSlot, duplicator);
         f.Session.Sent.Clear();
         Assert.IsTrue(f.Service.TryDuplicate(f.Player,
             new Identity { Type = IdentityType.Inventory, Instance = key.Key },
             new Identity { Type = IdentityType.Inventory, Instance = duplicatorSlot }));
-        Assert.AreEqual(2, f.Player.Inventory.Inventory.Content.Values.Count(item => item.LowId == QuestDungeonService.KeyLowId));
+        Assert.AreEqual(2, f.Player.Inventory.Inventory.Content.Values.Count(item => item.LowId == f.Keys.KeyTemplateId));
         Assert.AreSame(duplicator, f.Player.Inventory.Inventory.Content[duplicatorSlot]);
         Assert.AreEqual(2, f.Store.Links.Count);
         Assert.IsTrue(f.Store.Links.Values.All(id => id == f.Store.Generated!.QuestId));
@@ -327,7 +331,7 @@ public sealed class QuestDungeonDestinationTests
         Assert.IsNull(f.Accept());
         var key = f.Player.Inventory.Inventory.Content.Single();
         int unrelatedSlot = f.Player.Inventory.Inventory.FindFreeSlot();
-        Item unrelated = TestWorld.CreateItem(lowId: QuestDungeonService.DuplicatorLowId, instanceId: 700001);
+        Item unrelated = TestWorld.CreateItem(lowId: f.Keys.DuplicatorTemplateId, instanceId: 700001);
         f.Player.Inventory.Inventory.Add(unrelatedSlot, unrelated);
         f.Store.Links.Remove(key.Value.InstanceId);
         f.Session.Sent.Clear();
@@ -754,6 +758,7 @@ public sealed class QuestDungeonDestinationTests
         internal IReadOnlyList<string> Information => _logger.Information;
         internal InventoryActionService Actions => _actions;
         internal IGameData GameData => RuntimeData.Value;
+        internal MissionKeyPolicy Keys => KeyPolicy.Value;
         readonly Playfield _exterior = Blank<Playfield>();
 
         internal Fixture(IMissionDao? completionDao = null, IItemBuilder? items = null, Func<DateTime>? now = null,
@@ -906,7 +911,7 @@ public sealed class QuestDungeonDestinationTests
         {
             Service?.Dispose();
             Service = new QuestDungeonService(Store, _quests, Catalog.Value, Layouts, Offers, _items, _ids,
-                _flush, _actions, new Lazy<PlayfieldManager>(() => Manager), RuntimeData.Value, _logger,
+                _flush, _actions, new Lazy<PlayfieldManager>(() => Manager), RuntimeData.Value, Keys, _logger,
                 new HashItemMinter(RuntimeData.Value, _templates, _items));
         }
         public void Dispose() { Service?.Dispose(); Manager.Dispose(); _flush.Dispose(); }
@@ -935,7 +940,11 @@ public sealed class QuestDungeonDestinationTests
         internal readonly List<(Playfield World, Vector3 Position)> Transfers = [];
         public void BindPlayer(Player player) => Player = player;
         public void UnbindPlayer() => Player = null;
-        public void TransferToPlayfield(Playfield destination, Vector3 landing) => Transfers.Add((destination, landing));
+        public bool TransferToPlayfield(Playfield destination, Vector3 landing)
+        {
+            Transfers.Add((destination, landing));
+            return true;
+        }
         public void SendIntrazoneTeleport(Vector3 landing, AORebirth.Core.Vector.Quaternion heading, int destinationKey)
             => Send(ZoneSession.BuildIntrazoneTeleport(Player!, landing, heading, destinationKey));
         public void Send(byte[] packet) => throw new AssertFailedException("Unexpected raw packet.");
@@ -1017,7 +1026,7 @@ public sealed class QuestDungeonDestinationTests
             => Links.Where(pair => keyInstanceIds.Contains(pair.Key)).ToDictionary(pair => pair.Key, pair => pair.Value);
         public IList<int> RetireUnlinkedKeys(IReadOnlyCollection<int> keyInstanceIds, int keyLowId)
         {
-            Assert.AreEqual(QuestDungeonService.KeyLowId, keyLowId);
+            Assert.AreEqual(KeyPolicy.Value.KeyTemplateId, keyLowId);
             int[] retired = keyInstanceIds.Where(id => !Links.ContainsKey(id)).ToArray();
             foreach (int id in retired) if (!RetiredKeys.Contains(id)) RetiredKeys.Add(id);
             return retired;

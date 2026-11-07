@@ -66,6 +66,7 @@ static partial class ConnectedAcceptanceSmoke
                 return;
             }
             var data = new GameDataStore(new SilentLogger());
+            var keyPolicy = MissionKeyPolicy.Load(gameDataRoot, new ItemTemplateCatalog(data, new SilentLogger()));
             MissionChestRKAllowlist rkPolicy = MissionChestRKAllowlist.Load(gameDataRoot, data.ItemFamilies);
             Require(rkPolicy.Count > 0, "connected-chest-approved-rk-policy-required");
             var terminal = data.GetPlayfieldGeometry(ChestOriginPlayfield).Dynels?.Dynels
@@ -118,8 +119,8 @@ static partial class ConnectedAcceptanceSmoke
                 Quality = 1, StackCount = 3, Source = AORebirth.Enums.ItemSource.Loot });
             int duplicator = repository.LeaseInstanceIdBlock(1);
             repository.Insert(new ItemInstanceRecord { InstanceId = duplicator, ContainerType = 104, ContainerInstance = Owner,
-                ContainerPlacement = 91, ItemType = 0xC76D, LowId = QuestDungeonService.DuplicatorLowId,
-                HighId = QuestDungeonService.DuplicatorLowId, Quality = 1, StackCount = 1, Source = AORebirth.Enums.ItemSource.Loot });
+                ContainerPlacement = 91, ItemType = (int)IdentityType.MissionKeyDuplicator, LowId = keyPolicy.DuplicatorTemplateId,
+                HighId = keyPolicy.DuplicatorTemplateId, Quality = 1, StackCount = 1, Source = AORebirth.Enums.ItemSource.Loot });
             var quests = new MySqlCharacterQuestDao(() => fixture.Open());
             var missions = new MySqlMissionDao(() => fixture.Open());
             var inventory = new MySqlCharacterPersistenceDao(() => fixture.Open());
@@ -158,12 +159,12 @@ static partial class ConnectedAcceptanceSmoke
                     VerifyChestRollCommand(terminalClient, inventory, rkPolicy, 60, "player-level fallback", 20, []);
                     (questId, parameters) = AcceptCaveChestMission(terminalClient, missions, quests,
                         new Identity { Type = (IdentityType)terminal.IdentityType, Instance = terminal.IdentityInstance });
-                    Require(quests.LoadKeyQuests(inventory.LoadCarriedItems(Owner).Where(row => row.LowId == QuestDungeonService.KeyLowId)
+                    Require(quests.LoadKeyQuests(inventory.LoadCarriedItems(Owner).Where(row => row.LowId == keyPolicy.KeyTemplateId)
                         .Select(row => row.InstanceId).ToArray()).Values.Contains(questId), "chest-acceptance-key-link");
                     Console.WriteLine("CONNECTED_CHEST_GENERATE_ACCEPT=PASS VIA=TCP_CURRENT_QUEST_DUNGEON");
                     using (var peer = EnterChest(fixture, password, out peerTicket, ChestPeerAccount, ChestPeerOwner))
                     {
-                        ShareChestKey(terminalClient, peer, inventory, quests, questId, duplicator);
+                        ShareChestKey(terminalClient, peer, inventory, quests, questId, duplicator, keyPolicy.KeyTemplateId);
                         RouteToChestEntrance(peer, parameters, world, ChestPeerOwner);
                     }
                     RouteToChestEntrance(terminalClient, parameters, world);
@@ -454,16 +455,16 @@ static partial class ConnectedAcceptanceSmoke
     }
 
     static void ShareChestKey(ConnectedWireClient owner, ConnectedWireClient peer, MySqlCharacterPersistenceDao inventory,
-        MySqlCharacterQuestDao quests, string questId, int duplicator)
+        MySqlCharacterQuestDao quests, string questId, int duplicator, int keyTemplateId)
     {
-        PersistedItemData original = inventory.LoadCarriedItems(Owner).Single(item => item.LowId == QuestDungeonService.KeyLowId
+        PersistedItemData original = inventory.LoadCarriedItems(Owner).Single(item => item.LowId == keyTemplateId
             && quests.LoadKeyQuests(new[] { item.InstanceId }).TryGetValue(item.InstanceId, out string? linked) && linked == questId);
         PersistedItemData tool = inventory.LoadCarriedItems(Owner).Single(item => item.InstanceId == duplicator);
         owner.Send(new GenericCmdMessage { Identity = Character, User = Character, Temp1 = 0, Count = 21, Temp4 = 0,
             Action = GenericCmdAction.UseItemOnItem, Target = [new Identity { Type = IdentityType.Inventory, Instance = tool.ContainerPlacement },
                 new Identity { Type = IdentityType.Inventory, Instance = original.ContainerPlacement }] }, Owner);
         owner.Wait<GenericCmdMessage>(message => message.Action == GenericCmdAction.UseItemOnItem && message.Temp1 == 1);
-        PersistedItemData copy = inventory.LoadCarriedItems(Owner).Single(item => item.LowId == QuestDungeonService.KeyLowId
+        PersistedItemData copy = inventory.LoadCarriedItems(Owner).Single(item => item.LowId == keyTemplateId
             && item.InstanceId != original.InstanceId && quests.LoadKeyQuests(new[] { item.InstanceId })
                 .TryGetValue(item.InstanceId, out string? linked) && linked == questId);
         var peerIdentity = ChestCharacter(ChestPeerOwner);

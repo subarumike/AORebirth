@@ -1,6 +1,7 @@
 namespace ZoneEngine.Core.Missions;
 
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -29,6 +30,7 @@ internal static class MissionLevelRuntime
             : throw new InvalidOperationException("Mission level content is unavailable or the difficulty is invalid.");
 
     internal static int ClampCharacterLevel(int level) => Current.Value.Clamp(level);
+    internal static IReadOnlyList<int> SupportedQualities => Current.Value.SupportedQualities;
 
     internal static int GetTokenReward(int level)
         => TryGetTokenReward(level, out int tokens, out _) ? tokens : 0;
@@ -46,7 +48,14 @@ internal static class MissionLevelRuntime
 internal sealed class MissionLevelData
 {
     readonly int[][] rows;
-    MissionLevelData(int[][] values) => rows = values;
+    internal IReadOnlyList<int> SupportedQualities { get; }
+
+    MissionLevelData(int[][] values)
+    {
+        rows = values;
+        SupportedQualities = Array.AsReadOnly(rows.SelectMany(row => row.Skip(1).Take(MissionLevelRuntime.SliderPositions))
+            .Distinct().Order().ToArray());
+    }
 
     internal static MissionLevelData Load(string path)
     {

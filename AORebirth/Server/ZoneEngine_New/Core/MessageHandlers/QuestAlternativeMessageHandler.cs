@@ -18,8 +18,18 @@ namespace ZoneEngine_New.Core.MessageHandlers
         private readonly IGeneratedMissionDao _dao;
         private readonly GeneratedMissionService _missions;
         private readonly MissionDestinationCatalog _destinations;
+        private readonly IGeneratedMissionOfferGenerator _rolls;
         public QuestAlternativeMessageHandler(IGeneratedMissionDao dao, GeneratedMissionService missions, MissionDestinationCatalog destinations)
-        { _dao = dao; _missions = missions; _destinations = destinations; }
+            : this(dao, missions, destinations, GeneratedMissionRollService.Shared) { }
+
+        internal QuestAlternativeMessageHandler(IGeneratedMissionDao dao, GeneratedMissionService missions,
+            MissionDestinationCatalog destinations, IGeneratedMissionOfferGenerator rolls)
+        {
+            _dao = dao;
+            _missions = missions;
+            _destinations = destinations;
+            _rolls = rolls;
+        }
         public Type MessageBodyType => typeof(QuestAlternativeMessage);
         public void Handle(MessageBody body, IZoneSession session) => Handle((QuestAlternativeMessage)body, session);
 
@@ -69,12 +79,10 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 {
                     try
                     {
-                        response = GeneratedMissionRollService.Generate(message, player.Identity, level,
-                            playfield.Identity.Instance, player.Position.xf, player.Position.zf,
-                            side,
+                        response = _rolls.Roll(message, player.Identity, level, playfield.Identity.Instance,
                             GeneratedMissionWire.ClientClock(clock, now), seed, nonce,
                             () => next < checked(first + 5) ? next++ : throw new InvalidOperationException("Mission identity reservation exhausted."),
-                            _destinations, breed, profession, out selectedEntrances);
+                            _destinations, out selectedEntrances);
                     }
                     catch (NotSupportedException)
                     {

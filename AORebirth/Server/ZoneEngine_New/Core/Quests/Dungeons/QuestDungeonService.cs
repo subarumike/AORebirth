@@ -40,18 +40,6 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
     /// </summary>
     public sealed class QuestDungeonService : IDisposable
     {
-        public const int KeyLowId = 28577;
-
-        /// <summary>Mission key item identity type (0xC76D).</summary>
-        public const int KeyItemType = 0xC76D;
-
-        public const int DuplicatorLowId = 28564;
-
-        /// <summary>Most keys one dungeon can have, copies included: bounds a duplicator bug or exploit.</summary>
-        public const int MaxKeysPerQuest = 12;
-
-        const string KeyNamePrefix = "Mission key to ";
-
         /// <summary>Shown when a key can not be copied: its dungeon is over or already has the most keys it can.</summary>
         const string KeyRefused = "This mission key can not be copied.";
 
@@ -95,6 +83,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
         readonly InventoryActionService _inventoryActions;
         readonly Lazy<PlayfieldManager> _playfields;
         readonly IGameData _gameData;
+        readonly MissionKeyPolicy _keys;
         readonly HashItemMinter? _hashItems;
         readonly IZoneLogger _logger;
         readonly ZoneEngine_New.Core.World.WorldLink? _world;
@@ -112,9 +101,10 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
         public QuestDungeonService(ICharacterQuestStore store, QuestService quests, MissionDestinationCatalog entrances,
             DungeonLayoutGenerator layouts, IGeneratedMissionDao offers, IItemBuilder items, IItemInstanceIdAllocator ids,
             InventoryFlushService flush, InventoryActionService inventoryActions, Lazy<PlayfieldManager> playfields,
-            IGameData gameData, IZoneLogger logger, HashItemMinter? hashItems = null,
+            IGameData gameData, MissionKeyPolicy keys, IZoneLogger logger, HashItemMinter? hashItems = null,
             ZoneEngine_New.Core.World.WorldLink? world = null, ZoneEngine_New.Core.World.WorldCommands? commands = null)
         {
+            _keys = keys ?? throw new ArgumentNullException(nameof(keys));
             _world = world;
             _commands = commands;
             _commands?.Register(DungeonEndedCommand, OnDungeonEndedElsewhere);
@@ -453,8 +443,8 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                 || !player.Inventory.TryGetItem(targetSlot.Type, targetSlot.Instance, out Item target))
                 return false;
 
-            Item? key = source.LowId == KeyLowId ? source : target.LowId == KeyLowId ? target : null;
-            Item? duplicator = source.LowId == DuplicatorLowId ? source : target.LowId == DuplicatorLowId ? target : null;
+            Item? key = source.LowId == _keys.KeyTemplateId ? source : target.LowId == _keys.KeyTemplateId ? target : null;
+            Item? duplicator = source.LowId == _keys.DuplicatorTemplateId ? source : target.LowId == _keys.DuplicatorTemplateId ? target : null;
             if (key == null || duplicator == null || ReferenceEquals(key, duplicator))
                 return false;
 
@@ -477,7 +467,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                     }
 
                     DateTime now = DateTime.UtcNow;
-                    string? questId = _store.TryAddDuplicateKey(key.InstanceId, KeyRow(plan.Rows[0], now), MaxKeysPerQuest, now.Ticks);
+                    string? questId = _store.TryAddDuplicateKey(key.InstanceId, KeyRow(plan.Rows[0], now), _keys.MaxKeysPerQuest, now.Ticks);
                     if (questId == null)
                     {
                         SendText(player, KeyRefused);
@@ -590,7 +580,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                 foreach (KeyValuePair<int, Item> entry in player.Inventory.Inventory.Content)
                 {
                     Item key = entry.Value;
-                    if (key.LowId == KeyLowId && links.TryGetValue(key.InstanceId, out string? questId)
+                    if (key.LowId == _keys.KeyTemplateId && links.TryGetValue(key.InstanceId, out string? questId)
                         && TryGetDungeon(questId, out CachedDungeon dungeon))
                         SendKeyItem(player, key, dungeon.Parameters.EntranceName, entry.Key);
                 }
@@ -608,7 +598,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                 {
                     foreach (KeyValuePair<int, Item> entry in page.Content.ToArray())
                     {
-                        if (entry.Value.LowId == KeyLowId || entry.Value.LowId == DuplicatorLowId)
+                        if (entry.Value.LowId == _keys.KeyTemplateId || entry.Value.LowId == _keys.DuplicatorTemplateId)
                             held.Add((pageType.ToString(), entry.Key, entry.Value));
                     }
                 }
@@ -624,13 +614,13 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                 {
                     page,
                     slot,
-                    kind = item.LowId == KeyLowId ? "key" : "duplicator",
+                    kind = item.LowId == _keys.KeyTemplateId ? "key" : "duplicator",
                     instance = item.InstanceId,
                     identity = string.Format(CultureInfo.InvariantCulture, "{0:X}:{1}", (int)item.Identity.Type, item.Identity.Instance),
                     persisted = item.IsPersisted,
                     locked = item.Locked,
                     questId,
-                    name = entrance == null ? null : KeyNamePrefix + entrance
+                    name = entrance == null ? null : _keys.NamePrefix + entrance
                 });
             }
 
@@ -659,7 +649,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
             {
                 foreach (Item item in page.Content.Values)
                 {
-                    if (item.LowId == KeyLowId)
+                    if (item.LowId == _keys.KeyTemplateId)
                         keys.Add(item.InstanceId);
                 }
             }
@@ -691,7 +681,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
         /// </summary>
         public void RetireDeadKeysOnLogin(int characterId)
         {
-            int retired = _store.RetireDeadKeysForCharacter(characterId, KeyLowId, OwnedContainerTypes, (int)IdentityType.Container);
+            int retired = _store.RetireDeadKeysForCharacter(characterId, _keys.KeyTemplateId, OwnedContainerTypes, (int)IdentityType.Container);
             if (retired > 0)
                 _logger.Info(string.Format(CultureInfo.InvariantCulture, "Retired {0} dead mission keys for char={1}", retired, characterId));
         }
@@ -1037,14 +1027,14 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
             => _quests.TryUseGeneratedMissionItem(player, sourceSlot, target, out handled);
 
         /// <summary>Keys the player carries: main inventory and bags opened from it.</summary>
-        static List<Item> CarriedKeys(Player player)
+        List<Item> CarriedKeys(Player player)
         {
             var keys = new List<Item>();
             foreach (Item item in player.Inventory.EnumerateHeldItems())
             {
-                if (item.LowId == KeyLowId && item.InstanceId > 0 && item.IsPersisted && !item.Locked)
+                if (item.LowId == _keys.KeyTemplateId && item.InstanceId > 0 && item.IsPersisted && !item.Locked)
                     keys.Add(item);
-                if (keys.Count >= MaxKeysPerQuest * 4)
+                if (keys.Count >= (long)_keys.MaxKeysPerQuest * 4)
                     break;
             }
 
@@ -1057,7 +1047,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
             if (ids.Count == 0)
                 return;
 
-            foreach (int instance in _store.RetireUnlinkedKeys(ids, KeyLowId))
+            foreach (int instance in _store.RetireUnlinkedKeys(ids, _keys.KeyTemplateId))
                 RemoveKeyInMemory(player, instance);
         }
 
@@ -1075,7 +1065,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
             {
                 foreach (KeyValuePair<int, Item> entry in page.Content)
                 {
-                    if (entry.Value.InstanceId != keyInstanceId || entry.Value.LowId != KeyLowId)
+                    if (entry.Value.InstanceId != keyInstanceId || entry.Value.LowId != _keys.KeyTemplateId)
                         continue;
 
                     var slot = new Identity { Type = pageType, Instance = entry.Key };
@@ -1176,7 +1166,8 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
         Item CreateKey()
         {
             int id = _ids.Allocate();
-            return _items.Create(KeyLowId, KeyLowId, 1, ItemSource.Quest, 1, id, new Identity { Type = (IdentityType)KeyItemType, Instance = id });
+            return _items.Create(_keys.KeyTemplateId, _keys.KeyTemplateId, _keys.KeyQuality, ItemSource.Quest, 1, id,
+                new Identity { Type = IdentityType.MissionKey, Instance = id });
         }
 
         static QuestDungeonKeyItemRow KeyRow(ItemInstanceRecord row, DateTime now) => new()
@@ -1202,8 +1193,8 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
         /// ContainerAddItem routes it through overflow, then TemplateAction Overflow and TemplateAction Use move it to
         /// its inventory slot. The client only places an item it already knows, so the item update comes first.
         /// </summary>
-        static void SendKey(Player player, Item key, int slot, string entranceName)
-            => SendGrantedMissionItem(player, key, slot, KeyNamePrefix + entranceName);
+        void SendKey(Player player, Item key, int slot, string entranceName)
+            => SendGrantedMissionItem(player, key, slot, _keys.NamePrefix + entranceName);
 
         static void SendGrantedMissionItem(Player player, Item item, int slot, string name)
         {
@@ -1244,8 +1235,8 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
         /// <paramref name="placement"/> (the overflow slot for a new key, its inventory slot when renaming a held one).
         /// The name's length prefix counts its trailing NUL; the writer does not add one.
         /// </summary>
-        static void SendKeyItem(Player player, Item key, string entranceName, int placement)
-            => SendNamedMissionItem(player, key, KeyNamePrefix + entranceName, placement);
+        void SendKeyItem(Player player, Item key, string entranceName, int placement)
+            => SendNamedMissionItem(player, key, _keys.NamePrefix + entranceName, placement);
 
         static void SendNamedMissionItem(Player player, Item key, string name, int placement)
         {

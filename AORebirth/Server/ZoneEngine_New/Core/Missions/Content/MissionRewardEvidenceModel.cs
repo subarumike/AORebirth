@@ -3,6 +3,8 @@ namespace ZoneEngine.Core.Missions
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
@@ -15,6 +17,19 @@ namespace ZoneEngine.Core.Missions
         // 115 captured offers collapse to 108 unique records on the full evidence key. Repeated rolls and
         // same-key offers are deliberately not retained as probability weights.
         private static readonly RewardEvidence[] Evidence = MissionContentJson.Read<RewardEvidence[]>("RewardObservations.json");
+
+        internal static void ValidateCatalog()
+        {
+            if (Evidence.Length == 0 || Evidence.Any(reward => reward is null || reward.CharacterLevel <= 0 || reward.MissionQl <= 0
+                || !MissionLevelRuntime.TryDecodeDifficultySlider(reward.DifficultyWire, out _)
+                || reward.Type == MissionRollType.Unknown || !Enum.IsDefined(reward.Type) || reward.PlayfieldId <= 0
+                || reward.CashReward < 0 || reward.ExperienceReward < 0
+                || !MissionRollSliders.IsSupportedPercentage(reward.GoodBad) || !MissionRollSliders.IsSupportedPercentage(reward.OrderChaos)
+                || !MissionRollSliders.IsSupportedPercentage(reward.OpenHidden) || !MissionRollSliders.IsSupportedPercentage(reward.PhysicalMystical)
+                || !MissionRollSliders.IsSupportedPercentage(reward.HeadOnStealth) || !MissionRollSliders.IsSupportedPercentage(reward.MoneyExperience))
+                || Enum.GetValues<MissionRollType>().Any(type => type != MissionRollType.Unknown && !Evidence.Any(reward => reward.Type == type)))
+                throw new InvalidDataException("Invalid or incomplete mission numeric reward evidence.");
+        }
 
         internal static void Apply(
             QuestInfo offer,

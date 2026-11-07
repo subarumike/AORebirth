@@ -186,6 +186,12 @@ def make_portable_fixture(root, generated=False):
 
 
 class ReleaseContractTests(unittest.TestCase):
+    def test_admits_typed_mission_content_and_excludes_recorded_packets(self):
+        for path in ("Missions/MissionOffers.json", "Missions/Keys.json"):
+            self.assertTrue(gate.runtime_content_path(path), path)
+        for path in ("Missions/RollBodies.json", "Missions/RollTemplate.json"):
+            self.assertFalse(gate.runtime_content_path(path), path)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name)

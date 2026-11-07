@@ -64,6 +64,10 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
         TempBag = 0x0000C767, 
 
         Corpse = 0x0000C76A,
+        /// <summary>Mission key item identity used by the captured inventory grant.</summary>
+        MissionKey = 0x0000C76D,
+        /// <summary>Mission key duplicator item identity from its RDB definition.</summary>
+        MissionKeyDuplicator = 0x0000C76E,
 
         MailTerminal = 0x0000C773,
         

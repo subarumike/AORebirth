@@ -74,6 +74,12 @@ try
     {
         FixtureSql.CreateBaseline(connection);
         AuthoredMissionSmoke.CreateBaseline(connection);
+        if (connectedChests)
+        {
+            // Account migrations now require the baseline login table before engine startup.
+            FixtureSql.Execute(connection, File.ReadAllText(Path.Combine(ConnectedAcceptanceSmoke.RepositoryRoot(),
+                "AORebirth/Libraries/Source/AORebirth.Database/SqlTables/login.sql")));
+        }
     }
     if (connected)
     {

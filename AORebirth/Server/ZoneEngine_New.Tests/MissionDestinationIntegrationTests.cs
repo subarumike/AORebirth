@@ -2,6 +2,7 @@ namespace ZoneEngine_New.Tests;
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -52,6 +53,68 @@ public sealed class MissionDestinationIntegrationTests
 
     [ClassCleanup(ClassCleanupBehavior.EndOfClass)]
     public static void Cleanup() => Environment.SetEnvironmentVariable(GameDataPaths.EnvironmentVariableName, previousGameDataRoot);
+
+    [TestMethod]
+    public void GeneratedRollPreservesDeterministicWireAcrossCapturedConditions()
+    {
+        var inputs = BenchmarkInputs();
+        using var digest = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
+        for (int index = 0; index < 78; index++)
+        {
+            var input = inputs[index % inputs.Length];
+            byte[] first = RollAndSerialize(input, index);
+            CollectionAssert.AreEqual(first, RollAndSerialize(input, index));
+            digest.AppendData(first);
+        }
+        string hash = Convert.ToHexStringLower(digest.GetHashAndReset());
+        TestContext.WriteLine("MISSION_ROLL_WIRE_SHA256=" + hash);
+        // Captured before runtime edits on public master cda38284540f45573424fb399a60c9ab7627a6f7.
+        Assert.AreEqual("3d1aa7e35baa65d7669390c439d75311e12d249385c9e9e2eb304ea2fe834604", hash);
+    }
+
+    [TestMethod]
+    [TestCategory("MissionRollBenchmark")]
+    public void MeasureGeneratedRollCpuAndAllocations()
+    {
+        var inputs = BenchmarkInputs();
+        for (int index = 0; index < 512; index++)
+            RollAndSerialize(inputs[index % inputs.Length], index);
+
+        const int rolls = 4096;
+        using var process = Process.GetCurrentProcess();
+        for (int trial = 0; trial < 3; trial++)
+        {
+            long wireBytes = 0;
+            var cpuStart = process.TotalProcessorTime;
+            long allocationStart = GC.GetAllocatedBytesForCurrentThread();
+            long start = Stopwatch.GetTimestamp();
+            for (int index = 0; index < rolls; index++)
+                wireBytes += RollAndSerialize(inputs[index % inputs.Length], index).Length;
+            var elapsed = Stopwatch.GetElapsedTime(start);
+            long allocated = GC.GetAllocatedBytesForCurrentThread() - allocationStart;
+            var cpu = process.TotalProcessorTime - cpuStart;
+            TestContext.WriteLine(FormattableString.Invariant(
+                $"MISSION_ROLL_BENCHMARK trial={trial + 1} rolls={rolls} cpu_ms={cpu.TotalMilliseconds:F2} wall_ms={elapsed.TotalMilliseconds:F2} allocated_bytes={allocated} wire_bytes={wireBytes}"));
+        }
+    }
+
+    sealed record RollInput(QuestAlternativeMessage Request, int Level, int Playfield, int Breed, int Profession);
+
+    static RollInput[] BenchmarkInputs()
+    {
+        return [new(Request(), 2, 655, 1, 15), new(CenteredBorealisRequest(), 35, 800, 3, 12)];
+    }
+
+    static byte[] RollAndSerialize(RollInput input, int index)
+    {
+        int next = 100000 + 5 * index;
+        var response = GeneratedMissionRollService.Generate(input.Request, Owner, input.Level, input.Playfield,
+            0, 0, MissionLocationSide.Omni, 1201445827, 17 + index, index, () => next++, catalog,
+            input.Breed, input.Profession, out _);
+        if (response.QuestInfos.Length != 5 || next != 100005 + 5 * index)
+            throw new InvalidOperationException("The roll did not allocate exactly five offer identities.");
+        return GeneratedMissionWire.Write(response);
+    }
 
     [TestMethod]
     public void CatalogPreservesFullAndObservedSetsCompleteIdentityExactCoordinatesAndNames()
@@ -295,9 +358,10 @@ public sealed class MissionDestinationIntegrationTests
     [DataRow(200)]
     public void UnsupportedQualityFailsBeforeAllocatingAnyOfferIdentity(int level)
     {
+        var strictCatalog = LoadStrictDestinationCatalog();
         int allocations = 0;
         Assert.ThrowsExactly<NotSupportedException>(() => GeneratedMissionRollService.Generate(CenteredBorealisRequest(), Owner, level,
-            800, 0, 0, MissionLocationSide.Omni, 1201445827, 17, 4567, () => 100000 + allocations++, catalog, 3, 15, out _));
+            800, 0, 0, MissionLocationSide.Omni, 1201445827, 17, 4567, () => 100000 + allocations++, strictCatalog, 3, 15, out _));
         Assert.AreEqual(0, allocations);
     }
 
@@ -317,9 +381,10 @@ public sealed class MissionDestinationIntegrationTests
         Assert.IsTrue(catalog.TryGetDestinations(800, 25, out var ql25, out bool ql25Fallback));
         Assert.IsTrue(ql25Fallback);
         Assert.AreEqual(124, ql25.Count);
+        var strictCatalog = LoadStrictDestinationCatalog();
         foreach (int origin in new[] { 655, 800, 540 })
         {
-            Assert.IsFalse(catalog.TryGetDestinations(origin, 34, out var unsupported, out bool fallback));
+            Assert.IsFalse(strictCatalog.TryGetDestinations(origin, 34, out var unsupported, out bool fallback));
             Assert.AreEqual(0, unsupported.Count);
             Assert.IsFalse(fallback);
         }
@@ -473,7 +538,7 @@ public sealed class MissionDestinationIntegrationTests
     [TestMethod]
     public void UnsupportedQualityHandlerDoesNotPublishChargeOrSendOffers()
     {
-        using var fixture = new RollFixture(34);
+        using var fixture = new RollFixture(34, LoadStrictDestinationCatalog());
         fixture.Handle();
         Assert.AreEqual(0, fixture.Dao.PublishCalls);
         Assert.IsNull(fixture.Dao.Batch);
@@ -536,6 +601,16 @@ public sealed class MissionDestinationIntegrationTests
     static MissionPlacementIdentity ReadIdentity(JsonNode? node) => new(
         node!["IdentityType"]!.GetValue<uint>(), node["IdentityInstance"]!.GetValue<uint>());
 
+    static MissionDestinationCatalog LoadStrictDestinationCatalog()
+    {
+        using var files = new TemporaryCatalog();
+        const string fileName = "MissionDestinations.json";
+        JsonNode policy = files.Read(fileName);
+        policy["AllowNearestTerminalQlFallback"] = false;
+        files.Write(fileName, policy);
+        return MissionDestinationCatalog.Load(files.Root);
+    }
+
     sealed class TemporaryCatalog : IDisposable
     {
         static readonly string[] Files = ["MissionEntrancePlacements.json", "MissionDestinations.json"];
@@ -566,7 +641,7 @@ public sealed class MissionDestinationIntegrationTests
         readonly ServiceProvider _services;
         readonly QuestAlternativeMessageHandler _handler;
 
-        internal RollFixture(int level)
+        internal RollFixture(int level, MissionDestinationCatalog? destinationCatalog = null)
         {
             // The existing test convention avoids loading unrelated NPCs or starting a heartbeat.
             var playfield = (Playfield)RuntimeHelpers.GetUninitializedObject(typeof(Playfield));
@@ -587,7 +662,7 @@ public sealed class MissionDestinationIntegrationTests
             Player.Stats.Set(CharacterStat.Cash, 5000, StatDetail.Base);
             Player.Session = Session;
             Session.BindPlayer(Player);
-            _handler = new QuestAlternativeMessageHandler(Dao, new GeneratedMissionService(Dao, new StubLogger()), catalog);
+            _handler = new QuestAlternativeMessageHandler(Dao, new GeneratedMissionService(Dao, new StubLogger()), destinationCatalog ?? catalog);
         }
         internal void Handle() => _handler.Handle(LiveShadeRequest(), Session);
         public void Dispose() => _services.Dispose();
@@ -604,7 +679,7 @@ public sealed class MissionDestinationIntegrationTests
         { GameTimeSynchronizedAtUtc = utcNow; GameTimeServerSeconds = serverSeconds; }
         public void BindPlayer(Player player) => Player = player;
         public void UnbindPlayer() => Player = null;
-        public void TransferToPlayfield(Playfield destination, AORebirth.Core.Vector.Vector3 landing) => throw new AssertFailedException();
+        public bool TransferToPlayfield(Playfield destination, AORebirth.Core.Vector.Vector3 landing) => throw new AssertFailedException();
         public void Send(byte[] packet) => throw new AssertFailedException("Unexpected raw packet.");
         public void Send(Message message) => Sent.Add(message.Body);
         public void Send(MessageBody body) => Sent.Add(body);

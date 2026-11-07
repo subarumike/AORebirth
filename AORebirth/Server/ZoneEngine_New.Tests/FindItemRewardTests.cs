@@ -67,7 +67,7 @@ public sealed class FindItemRewardTests
         Assert.AreEqual(0, f.Store.Links.Count, "Completion must remove mission key bindings through the existing lifecycle.");
         // This fixture does not run the world projection queue; use the existing world-entry cleanup.
         f.Service.RestoreKeys(f.Player);
-        Assert.IsFalse(f.Player.Inventory.EnumerateHeldItems().Any(i => i.LowId == QuestDungeonService.KeyLowId));
+        Assert.IsFalse(f.Player.Inventory.EnumerateHeldItems().Any(i => i.LowId == f.Keys.KeyTemplateId));
         f.Quests.RetryPendingRewards(f.Player, force: true);
         Assert.AreEqual(1, run.Dao.Completed);
         f.AssertNoErrors();
@@ -260,7 +260,7 @@ public sealed class FindItemRewardTests
             fresh.Playfield = run.Exterior;
             fresh.Position = new(run.Fixture.Entrance.LocalX, run.Fixture.Entrance.LocalY, run.Fixture.Entrance.LocalZ);
             fresh.Stats.Set(CharacterStat.Health, 100);
-            Item key = run.Fixture.Player.Inventory.Inventory.Content.Values.Single(i => i.LowId == QuestDungeonService.KeyLowId);
+            Item key = run.Fixture.Player.Inventory.Inventory.Content.Values.Single(i => i.LowId == run.Fixture.Keys.KeyTemplateId);
             Assert.IsTrue(fresh.Inventory.Inventory.Add(fresh.Inventory.Inventory.FindFreeSlot(), key));
             Thread.Sleep(800); // The existing request throttle is 750 ms; exercise durable closure beyond it.
             Assert.IsFalse(run.Fixture.Service.TryEnter(fresh, run.Fixture.Target), "A cached active layout must not admit a durably completed quest.");

@@ -32,11 +32,12 @@ internal sealed class MissionRollSliders
         byte[] wire = [request.GoodBadSlider, request.OrderChaosSlider, request.OpenHiddenSlider,
             request.PhysicalMysticalSlider, request.HeadOnStealthSlider, request.MoneyExperienceSlider];
         var values = wire.Select(value => (int)unchecked((sbyte)value)).ToArray();
-        if (values.Any(value => value is < -100 or > 100)) return false;
+        if (values.Any(value => !IsSupportedPercentage(value))) return false;
         profile = new(values);
         error = string.Empty;
         return true;
     }
+    internal static bool IsSupportedPercentage(int value) => value is >= -100 and <= 100;
     internal bool Matches(params int[] values) => _values.SequenceEqual(values);
     internal int SemanticDistance(params int[] values)
     {

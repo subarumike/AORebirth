@@ -17,6 +17,7 @@ namespace ZoneEngine_New
 
     using Utility;
 
+    using ZoneEngine.Core.Missions;
     using ZoneEngine_New.Core.Characters;
     using ZoneEngine_New.Core.Chat;
     using ZoneEngine_New.Core.Commands;
@@ -104,6 +105,15 @@ namespace ZoneEngine_New
                         gameData.MonsterDataCount));
                 // NPC scripts compile now, so a bad program is reported at startup rather than at the first spawn.
                 rootServices.GetRequiredService<ZoneEngine_New.Core.NpcScripts.NpcScriptCatalog>();
+                var missionOffers = rootServices.GetRequiredService<GeneratedMissionRollService>().OfferCatalog;
+                _ = rootServices.GetRequiredService<Utility.GameData.Missions.MissionDestinationCatalog>();
+                _ = MissionLevelRuntime.SupportedQualities;
+                MissionRollEvidenceCatalog.ValidateCatalog();
+                MissionRewardEvidenceModel.ValidateCatalog();
+                MissionRollRewardItems.ValidateCatalog(rootServices.GetRequiredService<IItemTemplateCatalog>());
+                _ = MissionTextContent.Current;
+                _ = MissionGeographyContent.Current;
+                logger.Info($"Mission offers ready sha256={missionOffers.Sha256} sourceSha256={missionOffers.SourceSha256} responses={missionOffers.ResponseCount} definitions={missionOffers.DefinitionCount}");
                 // External modules load before any playfield or connection can raise into them, and before World
                 // registration, which says whether a module's handoff hook decides on logins to this zone.
                 modules = rootServices.GetRequiredService<ZoneEngine_New.Core.Modules.ZoneModuleHost>();
@@ -366,7 +376,11 @@ namespace ZoneEngine_New
             services.AddSingleton<ZoneEngine_New.Core.Quests.QuestService>();
             services.AddSingleton(_ => Utility.GameData.Missions.MissionDestinationCatalog.Load(
                 AORebirth.Core.GameData.GameDataPaths.ResolveRuntimeRoot()));
+            services.AddSingleton(_ => GeneratedMissionRollService.Shared);
+            services.AddSingleton<IGeneratedMissionOfferGenerator>(provider => provider.GetRequiredService<GeneratedMissionRollService>());
             services.AddSingleton<ZoneEngine_New.Core.Quests.Dungeons.DungeonLayoutGenerator>();
+            services.AddSingleton(provider => ZoneEngine_New.Core.Quests.Dungeons.MissionKeyPolicy.Load(
+                provider.GetRequiredService<IGameData>().RootPath, provider.GetRequiredService<IItemTemplateCatalog>()));
             services.AddSingleton<ZoneEngine_New.Core.Quests.Dungeons.QuestDungeonService>();
 
             //NPC scripts (GameData/NpcScripts)
@@ -443,7 +457,10 @@ namespace ZoneEngine_New
             AddMessageHandler<RaidCmdMessageHandler>(services);
             AddMessageHandler<OrgClientMessageHandler>(services);
             AddMessageHandler<TeamChatMessageHandler>(services);
-            AddMessageHandler<QuestAlternativeMessageHandler>(services);
+            services.AddSingleton<IMessageHandler>(provider => new QuestAlternativeMessageHandler(
+                provider.GetRequiredService<IGeneratedMissionDao>(), provider.GetRequiredService<GeneratedMissionService>(),
+                provider.GetRequiredService<Utility.GameData.Missions.MissionDestinationCatalog>(),
+                provider.GetRequiredService<IGeneratedMissionOfferGenerator>()));
             AddMessageHandler<CreateQuestMessageHandler>(services);
             AddMessageHandler<QuestMessageHandler>(services);
             AddMessageHandler<PetCommandMessageHandler>(services);

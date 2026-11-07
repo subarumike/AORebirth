@@ -25,11 +25,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     #endregion
 
     /// <summary>
-    /// Guards the mission-roll template used by <see cref="GeneratedMissionRollService"/>. The service decodes a
-    /// captured server->client QuestAlternative response into live objects and re-serializes it back to the
-    /// client. If our QuestAlternative/QuestInfo serializer does not reproduce the captured bytes exactly,
-    /// the client silently rejects the reply and the mission terminal shows an empty list. This test proves
-    /// the decode/encode round-trip is byte-for-byte faithful.
+    /// Guards the historical QuestAlternative codec contract independently of live offer construction.
     /// </summary>
     [TestClass]
     public class MissionRollTemplateContractTests
@@ -54,9 +50,9 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void CapturedQuestAlternativeTemplateRoundTripsByteForByte()
         {
-            byte[] body = GeneratedMissionWire.TemplateBody;
+            byte[] body = MissionHistoricalRollFixture.TemplateBody;
 
-            QuestAlternativeMessage decoded = GeneratedMissionWire.DecodeTemplate();
+            QuestAlternativeMessage decoded = GeneratedMissionWire.Read(body);
 
             Assert.IsNotNull(decoded.QuestInfos, "QuestInfos should not be null after decode.");
             Assert.AreEqual(5, decoded.QuestInfos.Length, "Captured template should decode to 5 offers.");
@@ -70,13 +66,13 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void EveryCapturedRollBodyRoundTripsAndMatchesItsGoldenHash()
         {
-            Assert.AreEqual(CapturedRollHashes.Length, GeneratedMissionWire.CapturedCount);
+            Assert.AreEqual(CapturedRollHashes.Length, MissionHistoricalRollFixture.CapturedCount);
             using (SHA256 sha256 = SHA256.Create())
             {
-                for (int i = 0; i < GeneratedMissionWire.CapturedCount; i++)
+                for (int i = 0; i < MissionHistoricalRollFixture.CapturedCount; i++)
                 {
-                    byte[] body = GeneratedMissionWire.CapturedBody(i);
-                    QuestAlternativeMessage decoded = GeneratedMissionWire.Read(GeneratedMissionWire.CapturedBody(i));
+                    byte[] body = MissionHistoricalRollFixture.CapturedBody(i);
+                    QuestAlternativeMessage decoded = GeneratedMissionWire.Read(body);
 
                     Assert.IsNotNull(decoded.QuestInfos, "roll " + i + " offers");
                     Assert.AreEqual(5, decoded.QuestInfos.Length, "roll " + i + " offer count");
@@ -98,15 +94,15 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void CapturedFixtureAccessorsReturnDefensiveCopies()
         {
-            byte[] template = GeneratedMissionWire.TemplateBody;
+            byte[] template = MissionHistoricalRollFixture.TemplateBody;
             byte originalTemplateByte = template[0];
             template[0] ^= 0xff;
-            Assert.AreEqual(originalTemplateByte, GeneratedMissionWire.TemplateBody[0]);
+            Assert.AreEqual(originalTemplateByte, MissionHistoricalRollFixture.TemplateBody[0]);
 
-            byte[] roll = GeneratedMissionWire.CapturedBody(0);
+            byte[] roll = MissionHistoricalRollFixture.CapturedBody(0);
             byte originalRollByte = roll[0];
             roll[0] ^= 0xff;
-            Assert.AreEqual(originalRollByte, GeneratedMissionWire.CapturedBody(0)[0]);
+            Assert.AreEqual(originalRollByte, MissionHistoricalRollFixture.CapturedBody(0)[0]);
 
             string[] hexBodies = MissionRollCaptureLibrary.CapturedRollBodiesHex;
             string originalHex = hexBodies[0];
@@ -119,7 +115,7 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         {
             const int capturedResponseIndex = 7;
             QuestAlternativeMessage captured =
-                GeneratedMissionWire.Read(GeneratedMissionWire.CapturedBody(capturedResponseIndex));
+                GeneratedMissionWire.Read(MissionHistoricalRollFixture.CapturedBody(capturedResponseIndex));
             var request = new QuestAlternativeMessage
                           {
                               Identity = new Identity

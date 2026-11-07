@@ -199,7 +199,7 @@ public sealed class ExactSpawnVisibilityTests
         public Player? Player { get; private set; }
         public void BindPlayer(Player player) => Player = player;
         public void UnbindPlayer() => Player = null;
-        public void TransferToPlayfield(Playfield destination, AORebirth.Core.Vector.Vector3 landing) => throw new NotSupportedException();
+        public bool TransferToPlayfield(Playfield destination, AORebirth.Core.Vector.Vector3 landing) => throw new NotSupportedException();
         public void Send(byte[] packet)
         {
             if (FailNext) { FailNext = false; throw new InvalidOperationException("Injected transport failure."); }

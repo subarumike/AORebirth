@@ -2,57 +2,69 @@ namespace ZoneEngine_New.Core.Missions;
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using SmokeLounge.AOtomation.Messaging.GameData;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using Utility.GameData.Missions;
 using ZoneEngine.Core.Missions;
 using ZoneEngine_New.Core.Entities;
 
-/// <summary>Composes editable mission content into a five-offer packet before the DAO publishes and charges it.</summary>
-internal static class GeneratedMissionRollService
+internal interface IGeneratedMissionOfferGenerator
 {
-    sealed record Shell(byte[] Body, int Index, Identity Terminal, MissionOfferDescriptor Description);
+    QuestAlternativeMessage Roll(QuestAlternativeMessage request, Identity character, int characterLevel,
+        int terminalPlayfield, int clientClockSeconds, int seed, int nonce, Func<int> durableIds,
+        MissionDestinationCatalog destinations, out IReadOnlyList<MissionPlacementIdentity> selectedEntrances);
+}
+
+/// <summary>Composes validated mission content before the DAO publishes and charges the roll.</summary>
+internal sealed class GeneratedMissionRollService(MissionOfferCatalog offers) : IGeneratedMissionOfferGenerator
+{
+    static readonly Lazy<GeneratedMissionRollService> Current = new(() => new(MissionOfferCatalog.Load(MissionContentJson.RootPath)));
+
+    internal static GeneratedMissionRollService Shared => Current.Value;
+
+    internal MissionOfferCatalog OfferCatalog => offers;
 
     internal static QuestAlternativeMessage Generate(QuestAlternativeMessage request, Identity character, int characterLevel,
         int terminalPlayfield, float terminalX, float terminalZ, MissionLocationSide side,
         int clientClockSeconds, int seed, int nonce, Func<int> durableIds,
         MissionDestinationCatalog catalog, int breed, int profession,
         out IReadOnlyList<MissionPlacementIdentity> selectedEntrances)
+        => Shared.Roll(request, character, characterLevel, terminalPlayfield, clientClockSeconds, seed, nonce, durableIds,
+            catalog, out selectedEntrances);
+
+    public QuestAlternativeMessage Roll(QuestAlternativeMessage request, Identity character, int characterLevel,
+        int terminalPlayfield, int clientClockSeconds, int seed, int nonce, Func<int> durableIds,
+        MissionDestinationCatalog destinations, out IReadOnlyList<MissionPlacementIdentity> selectedEntrances)
     {
         selectedEntrances = Array.Empty<MissionPlacementIdentity>();
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(durableIds);
-        ArgumentNullException.ThrowIfNull(catalog);
+        ArgumentNullException.ThrowIfNull(destinations);
         if (!MissionRollSliders.TryCreate(request, out var sliders, out var error)) throw new ArgumentException(error, nameof(request));
         int level = MissionLevelRuntime.ClampCharacterLevel(characterLevel);
         int quality = MissionLevelRuntime.GetMissionQuality(characterLevel, request.LevelSlider);
         // The catalog owns exact-QL selection and the optional nearest-QL origin policy.
         // The selected pool never changes mission QL; fallback eligibility is provisional.
-        if (!catalog.TryGetDestinations(terminalPlayfield, quality, out var destinationPool, out _) || destinationPool.Count == 0)
+        if (!destinations.TryGetDestinations(terminalPlayfield, quality, out var destinationPool, out _) || destinationPool.Count == 0)
             throw new NotSupportedException("No configured mission destinations are available at expected QL " + quality + ".");
         var random = new Random(seed);
         var policy = MissionRollPolicy.Current;
-        var response = GeneratedMissionWire.Read(GeneratedMissionWire.CapturedBody((int)((uint)nonce % (uint)GeneratedMissionWire.CapturedCount)));
-        response.Identity = character;
-        response.MissionTerminalIdentity = request.MissionTerminalIdentity;
+        var response = offers.CreateResponse(nonce, character, request.MissionTerminalIdentity);
         var types = MissionRollEvidenceCatalog.SelectTypeMix(level, request.LevelSlider, quality, sliders, random);
-        if (types.Length != 5) throw new InvalidOperationException("A mission offer cohort must contain five entries.");
-        var shells = ReadShells();
+        if (types.Length != MissionOfferCatalog.OfferCount)
+            throw new InvalidOperationException("A mission offer cohort must contain five entries.");
         var identities = new HashSet<int>();
-        var entrances = new List<MissionPlacementIdentity>(5);
-        response.QuestInfos = types.Select(type =>
+        var entrances = new List<MissionPlacementIdentity>(types.Length);
+        response.QuestInfos = new QuestInfo[types.Length];
+        for (int index = 0; index < types.Length; index++)
         {
-            var candidates = shells.Where(s => s.Description.Type == type && MissionOfferCompatibility.IsCompatibleWithSliders(s.Description, sliders)).ToArray();
-            if (candidates.Length == 0) throw new InvalidOperationException("No compatible packet shell exists for " + type);
-            var template = candidates[random.Next(candidates.Length)];
-            // Decode the complete captured envelope so repeated types never share mutable arrays.
-            var offer = GeneratedMissionWire.Read(template.Body).QuestInfos[template.Index];
-            var originalText = MissionOfferTextBuilder.Capture(offer);
+            var type = types[index];
+            var eligible = offers.Select(type, random);
+            var offer = eligible.Definition.Create();
             int identity = durableIds();
             if (identity <= 0 || !identities.Add(identity)) throw new InvalidOperationException("Durable mission identities must be positive and unique.");
-            offer.QuestIdentity = new() { Type = (IdentityType)0xDAC3, Instance = identity };
-            Identity Retarget(Identity value) => (int)value.Type == MissionTerminal.LiveIdentityType && value.Instance == template.Terminal.Instance
+            offer.QuestIdentity = new() { Type = IdentityType.Mission, Instance = identity };
+            Identity Retarget(Identity value) => (int)value.Type == MissionTerminal.LiveIdentityType && value.Instance == eligible.SourceTerminal.Instance
                 ? request.MissionTerminalIdentity : value;
             offer.Unknown5 = Retarget(offer.Unknown5);
             offer.Unknown14 = Retarget(offer.Unknown14);
@@ -63,7 +75,7 @@ internal static class GeneratedMissionRollService
             // Uniform selection of distinct observed identities, with replacement. Observation
             // counts are evidence coverage, never retail probability weights.
             var destination = destinationPool[random.Next(destinationPool.Count)];
-            if (!catalog.TryGetWorldPosition(destination.Identity, out var worldPosition))
+            if (!destinations.TryGetWorldPosition(destination.Identity, out var worldPosition))
                 throw new InvalidOperationException("The selected entrance has no proven WorldPos offsets.");
             entrances.Add(destination.Identity);
             action.Playfield = new() { Type = (IdentityType)worldPosition.PlayfieldIdentityType, Instance = destination.PlayfieldId };
@@ -72,19 +84,14 @@ internal static class GeneratedMissionRollService
             offer.Quality = quality;
             MissionRewardEvidenceModel.Apply(offer, type, level, request.LevelSlider, quality, sliders, destination.PlayfieldId, random);
             var reward = MissionRollRewardItems.Select(quality, random);
-            if (offer.ItemRewards?.Length > 0)
-            {
-                offer.ItemRewards[0].LowId = reward.LowId;
-                offer.ItemRewards[0].HighId = reward.HighId;
-                offer.ItemRewards[0].Quality = reward.Quality;
-            }
-            else offer.ItemRewards = [reward];
-            MissionOfferTextBuilder.Apply(offer, template.Description, originalText);
-            if (!MissionOfferCompatibility.TryValidateGenerated(offer, template.Description, sliders, request.MissionTerminalIdentity, out var descriptor, out var failure)
+            reward.Unknown1 = offer.ItemRewards[0].Unknown1;
+            offer.ItemRewards[0] = reward;
+            MissionOfferTextBuilder.Apply(offer, eligible.Descriptor, eligible.Text);
+            if (!MissionOfferCompatibility.TryValidateGenerated(offer, eligible.Descriptor, sliders, request.MissionTerminalIdentity, out var descriptor, out var failure)
                 || descriptor.Type != type) throw new InvalidOperationException("Invalid composed mission: " + failure);
             if (offer.Info is { } text && !text.EndsWith('\0')) offer.Info = text + '\0';
-            return offer;
-        }).ToArray();
+            response.QuestInfos[index] = offer;
+        }
         selectedEntrances = entrances.AsReadOnly();
         return response;
     }
@@ -98,18 +105,4 @@ internal static class GeneratedMissionRollService
         MissionRollType.FindItemReturn => "RETURN_ITEM",
         _ => throw new NotSupportedException("Unsupported mission destination type.")
     };
-
-    static Shell[] ReadShells()
-    {
-        var shells = new List<Shell>();
-        for (int index = 0; index < GeneratedMissionWire.CapturedCount; index++)
-        {
-            byte[] body = GeneratedMissionWire.CapturedBody(index);
-            var packet = GeneratedMissionWire.Read(body);
-            for (int offer = 0; offer < (packet.QuestInfos?.Length ?? 0); offer++)
-                if (MissionOfferCompatibility.TryDescribeCaptured(packet.QuestInfos![offer], packet.MissionTerminalIdentity, out var descriptor, out _))
-                    shells.Add(new(body, offer, packet.MissionTerminalIdentity, descriptor));
-        }
-        return shells.ToArray();
-    }
 }

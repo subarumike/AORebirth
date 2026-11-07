@@ -3,6 +3,8 @@ namespace ZoneEngine.Core.Missions
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
+    using System.Linq;
 
     /// <summary>
     /// Exact five-offer type cohorts observed in the finalized roll captures. Selection is nearest-evidence
@@ -11,6 +13,18 @@ namespace ZoneEngine.Core.Missions
     internal static class MissionRollEvidenceCatalog
     {
         private static readonly RollMixEvidence[] Mixes = MissionContentJson.Read<RollMixEvidence[]>("RollMixes.json");
+
+        internal static void ValidateCatalog()
+        {
+            if (Mixes.Length == 0 || Mixes.Any(mix => mix is null || mix.CharacterLevel <= 0 || mix.MissionQuality <= 0
+                || !MissionLevelRuntime.TryDecodeDifficultySlider(mix.Difficulty, out _)
+                || mix.Types is not { Length: MissionOfferCatalog.OfferCount }
+                || mix.Types.Any(type => type == MissionRollType.Unknown || !Enum.IsDefined(type))
+                || !MissionRollSliders.IsSupportedPercentage(mix.GoodBad) || !MissionRollSliders.IsSupportedPercentage(mix.OrderChaos)
+                || !MissionRollSliders.IsSupportedPercentage(mix.OpenHidden) || !MissionRollSliders.IsSupportedPercentage(mix.PhysicalMystical)
+                || !MissionRollSliders.IsSupportedPercentage(mix.HeadOnStealth) || !MissionRollSliders.IsSupportedPercentage(mix.MoneyExperience)))
+                throw new InvalidDataException("Invalid mission roll cohort evidence.");
+        }
 
         internal static MissionRollType[] SelectTypeMix(
             int characterLevel,

@@ -25,6 +25,8 @@
     <Compile Include="../../Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionLevelGraphTests.cs" Link="Missions/MissionLevelGraphTests.cs" />
     <Compile Include="../../Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollSemanticsTests.cs" Link="Missions/MissionRollSemanticsTests.cs" />
     <Compile Include="../../Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionRollTemplateContractTests.cs" Link="Missions/MissionRollTemplateContractTests.cs" />
+    <Compile Include="../../../Tests/Fixtures/Gameplay/Missions/MissionRollCaptureLibrary.cs" Link="Fixtures/MissionRollCaptureLibrary.cs" />
+    <Compile Include="../../../Tests/Fixtures/Gameplay/Missions/MissionRollCaptureTemplate.cs" Link="Fixtures/MissionRollCaptureTemplate.cs" />
     <!-- Historical combat fixtures compile only into tests, never NewEngine. -->
     <Compile Include="../../../Tests/Fixtures/Gameplay/Combat/*.cs" Link="Fixtures/Combat/%(Filename)%(Extension)" />
     <Compile Include="../../../Tests/Fixtures/Gameplay/Playfields/CapturedEnemyCombatProfileCatalog.g.cs" Link="Fixtures/CapturedEnemyCombatProfileCatalog.g.cs" />
@@ -74,6 +76,8 @@
     <Compile Remove="@(Compile)" />
     <Compile Include="TestDoubles.cs" />
     <Compile Include="MissionDestinationIntegrationTests.cs" />
+    <Compile Include="MissionOfferCatalogTests.cs" />
+    <Compile Include="../../../Tests/Fixtures/Gameplay/Missions/MissionRollCaptureLibrary.cs" Link="Fixtures/MissionRollCaptureLibrary.cs" />
     <Compile Include="QuestDungeonDestinationTests.cs" />
     <Compile Include="FindItemRewardTests.cs" />
     <Compile Include="ProceduralDungeonFoundationTests.cs" />
@@ -161,6 +165,8 @@
     <Compile Include="QuestDungeonDestinationTests.cs" />
     <Compile Include="ProceduralDungeonFoundationTests.cs" />
     <Compile Include="MissionDestinationIntegrationTests.cs" />
+    <Compile Include="MissionOfferCatalogTests.cs" />
+    <Compile Include="../../../Tests/Fixtures/Gameplay/Missions/MissionRollCaptureLibrary.cs" Link="Fixtures/MissionRollCaptureLibrary.cs" />
     <Compile Include="../../Libraries/Source/AOtomation/AOtomation.Messaging/src/SmokeLounge.AOtomation.Messaging.Tests/MissionLevelGraphTests.cs" Link="Missions/MissionLevelGraphTests.cs" />
   </ItemGroup>
   <ItemGroup Condition="'$(StandaloneRuntimeFocusedTests)' == 'true'">
