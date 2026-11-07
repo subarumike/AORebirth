@@ -1,5 +1,17 @@
 # Current Task
 
+IMPLEMENTED AND FEATURE VALIDATED (2026-11-07) on
+`codex/retail-mission-doa-repair`, based on freshly fetched public master
+`cda38284540f45573424fb399a60c9ab7627a6f7`. Typed offers replace runtime
+packet replay and preserve the five-offer contract in the measured fixture.
+Mission keys read validated GameData. CI checks proposed architecture changes.
+Focused checks, actual private RK loot validation and disposable TCP acceptance
+are recorded in [the repair report](../reports/RETAIL_MISSION_DOA_REPAIR.md).
+Retail content coverage remains provisional where documented. Windows release
+validation and Mike's original-client acceptance remain pending.
+
+## Retained previous task
+
 ACTIVE (2026-11-04): repair Mongo's intermittent landing on `codex/mongo-landing`,
 based on freshly fetched public master `4583042389370a54f3f7b106c53ba82ddcfb6098`.
 Current standard Mongo taunt children declare no attack/defense skills, but
