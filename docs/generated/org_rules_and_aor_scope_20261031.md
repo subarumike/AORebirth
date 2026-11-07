@@ -39,7 +39,7 @@ Rules are **declared**, confirmed where indicated by captures. Packet evidence a
 
 - Invite: selected target in sight, same side, not in an org, not locked; the inviter must be at least 3 ranks above the lowest rank (rank 2 left of the lowest). Anarchism is exempt. The inviter sees nothing unless the target is another side or already in an org. Refusing the dialog produces nothing.
 - Leave: client dialog, then 6 h lock; leaver sees "You've left the organization.", members see "<name> just left your organization."
-- Kick: same right as invite AND a strictly higher rank than the kicked (anarchism exempt); applies immediately, no confirmation, no selection or line of sight needed (by name also works for offline characters). A non-eligible rank gets `$3*4s`; self-kick and non-member have their own messages. Kicked characters get a 6 h lock (anarchist leader 11 h).
+- Kick: the leader kicks every rank; any other rank kicks only members at least 3 ranks below its own (kicker rank <= kicked rank - 3; anarchism exempt; matches the `$3*4s` refusal text); applies immediately, no confirmation, no selection or line of sight needed (by name also works for offline characters). A non-eligible rank gets `$3*4s`; self-kick and non-member have their own messages. Kicked characters get a 6 h lock (anarchist leader 11 h).
 - Locks are cumulative: each new lock is added to the remaining one (6 h x 2 minus elapsed online time). Time only elapses while online.
 
 ## 6. Votes
