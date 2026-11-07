@@ -35,7 +35,8 @@ namespace ZoneEngine_New.Core.World
         readonly CancellationTokenSource _stop = new();
         readonly ConcurrentDictionary<int, LocalLease> _leases = new();
         readonly ConcurrentDictionary<int, ulong> _playfields = new();
-        readonly Channel<ReleaseRequest> _releases = System.Threading.Channels.Channel.CreateUnbounded<ReleaseRequest>(new UnboundedChannelOptions { SingleReader = true });
+        // Shutdown drains this queue using Reader.Count, which the single-reader channel does not support.
+        readonly Channel<ReleaseRequest> _releases = System.Threading.Channels.Channel.CreateUnbounded<ReleaseRequest>();
         readonly ConcurrentDictionary<ulong, long> _heartbeatsSent = new();
         readonly TaskCompletionSource _firstRegistration = new(TaskCreationOptions.RunContinuationsAsynchronously);
         readonly object _registrationSync = new();
@@ -50,6 +51,7 @@ namespace ZoneEngine_New.Core.World
         string _session = string.Empty;
         volatile bool _connected;
         int _fenceLogoutStarted;
+        int _disposed;
         long _gameClockOffsetSeconds;
 
         public WorldLink(IZoneLogger logger)
@@ -744,6 +746,9 @@ namespace ZoneEngine_New.Core.World
 
         public void Dispose()
         {
+            if (Interlocked.Exchange(ref _disposed, 1) != 0)
+                return;
+
             _stop.Cancel();
             _releases.Writer.TryComplete();
             try { Task.WhenAll(new[] { _connectLoop, _releaseLoop, _fenceLoop }.Where(t => t != null)!).Wait(TimeSpan.FromSeconds(2)); }

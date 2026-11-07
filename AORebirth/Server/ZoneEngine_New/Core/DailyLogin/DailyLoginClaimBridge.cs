@@ -84,15 +84,26 @@ public sealed record DailyLoginBridgePaths(string[] ClaimsRoots, string RewardsJ
     public static DailyLoginBridgePaths Resolve()
     {
         string[] configuredRoots = Configured("AO_REBIRTH_DAILY_LOGIN_CLAIMS_ROOTS");
-        string state = Environment.GetEnvironmentVariable("AO_REBIRTH_ZONE_STATE_DIR") ?? string.Empty;
+        bool isolatedRoots = Environment.GetEnvironmentVariable("AO_REBIRTH_DAILY_LOGIN_ISOLATED_ROOTS") == "1";
         // Retain the original combined roots: an added configured bridge must not hide old account progress.
-        string[] roots = configuredRoots
-            .Concat(!string.IsNullOrWhiteSpace(state) ? [Path.Combine(state.Trim(), "daily-login", "claims")] : Array.Empty<string>())
-            .Concat(OperatingSystem.IsWindows()
-                ? [@"C:\xampp\htdocs\daily\data\claims", @"C:\xampp\htdocs\uwg.daily.icc-rk\data\claims"] : Array.Empty<string>())
-            .Distinct(StringComparer.Ordinal).ToArray();
+        var candidates = configuredRoots.AsEnumerable();
+        if (!isolatedRoots)
+        {
+            string state = Environment.GetEnvironmentVariable("AO_REBIRTH_ZONE_STATE_DIR") ?? string.Empty;
+            candidates = candidates
+                .Concat(!string.IsNullOrWhiteSpace(state) ? [Path.Combine(state.Trim(), "daily-login", "claims")] : Array.Empty<string>())
+                .Concat(OperatingSystem.IsWindows()
+                    ? [@"C:\xampp\htdocs\daily\data\claims", @"C:\xampp\htdocs\uwg.daily.icc-rk\data\claims"] : Array.Empty<string>());
+        }
+
+        string[] roots = candidates.Distinct(StringComparer.Ordinal).ToArray();
         if (roots.Length == 0)
+        {
+            if (isolatedRoots)
+                throw new InvalidOperationException("Isolated Daily Login claims require AO_REBIRTH_DAILY_LOGIN_CLAIMS_ROOTS.");
+
             roots = [Path.Combine(AppContext.BaseDirectory, "Content", "Daily", "data", "claims")];
+        }
         string[] rewardPaths = Configured("AO_REBIRTH_DAILY_LOGIN_REWARDS_JSON");
         if (rewardPaths.Length == 0)
             rewardPaths = [Path.Combine(AppContext.BaseDirectory, "Content", "Daily", "rewards.json")];
