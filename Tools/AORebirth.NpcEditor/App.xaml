@@ -6,18 +6,20 @@
         <SolidColorBrush x:Key="Canvas" Color="#141821" />
         <SolidColorBrush x:Key="Panel" Color="#1C2230" />
         <SolidColorBrush x:Key="Input" Color="#242D3C" />
-        <SolidColorBrush x:Key="Line" Color="#465267" />
+        <SolidColorBrush x:Key="Line" Color="#708097" />
         <SolidColorBrush x:Key="Text" Color="#EDF3FB" />
-        <SolidColorBrush x:Key="Muted" Color="#B8C6D9" />
+        <SolidColorBrush x:Key="Muted" Color="#C5D1E1" />
+        <SolidColorBrush x:Key="DisabledText" Color="#A1AEC1" />
         <SolidColorBrush x:Key="Accent" Color="#85DAC6" />
         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightBrushKey}" Color="#365D70" />
         <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightBrushKey}" Color="#30495A" />
         <SolidColorBrush x:Key="{x:Static SystemColors.HighlightTextBrushKey}" Color="#F6FAFF" />
-        <Style TargetType="Window">
+        <SolidColorBrush x:Key="{x:Static SystemColors.InactiveSelectionHighlightTextBrushKey}" Color="#F6FAFF" />
+        <Style x:Key="EditorWindowStyle" TargetType="Window">
             <Setter Property="Background" Value="{StaticResource Canvas}" />
             <Setter Property="Foreground" Value="{StaticResource Text}" />
             <Setter Property="FontFamily" Value="Segoe UI" />
-            <Setter Property="FontSize" Value="13" />
+            <Setter Property="FontSize" Value="14" />
         </Style>
         <Style TargetType="TextBlock">
             <Setter Property="Foreground" Value="{StaticResource Text}" />
@@ -61,11 +63,15 @@
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{StaticResource Accent}" />
                             </Trigger>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="ButtonBorder" Property="BorderBrush" Value="{StaticResource Accent}" />
+                            </Trigger>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="ButtonBorder" Property="Background" Value="#365D70" />
                             </Trigger>
                             <Trigger Property="IsEnabled" Value="False">
-                                <Setter Property="Opacity" Value="0.48" />
+                                <Setter Property="Foreground" Value="{StaticResource DisabledText}" />
+                                <Setter TargetName="ButtonBorder" Property="Background" Value="{StaticResource Canvas}" />
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -76,6 +82,11 @@
             <Setter Property="Foreground" Value="{StaticResource Text}" />
             <Setter Property="VerticalContentAlignment" Value="Center" />
             <Setter Property="Margin" Value="0,4,12,4" />
+            <Style.Triggers>
+                <Trigger Property="IsEnabled" Value="False">
+                    <Setter Property="Foreground" Value="{StaticResource DisabledText}" />
+                </Trigger>
+            </Style.Triggers>
         </Style>
         <Style TargetType="TabControl">
             <Setter Property="Background" Value="{StaticResource Panel}" />
