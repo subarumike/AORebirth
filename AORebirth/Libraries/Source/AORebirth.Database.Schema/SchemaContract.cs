@@ -36,7 +36,8 @@ public static class SchemaContract
         "20261025_character_pet_names.sql",
         "20261029_daily_login_claims.sql",
         "20261030_daily_login_character_scope.sql",
-        "20261102_account_sanctions.sql"
+        "20261102_account_sanctions.sql",
+        "20261107_org_lockout.sql"
     });
 
     // Other governed components may legitimately record these unrelated migrations.
@@ -57,7 +58,7 @@ public static class SchemaContract
         "generatedmissionbindings", "generatedmissionobservations", "generatedmissionartifacts", "generatedmissionobjects",
         "characterskilllocks", "characterquests", "generatedquests", "questdungeonkeys",
         "characterperklocks", "characterresearch", "characternanolinelocks", "characterpetnames", "dailyloginclaims",
-        "account_sanctions"
+        "account_sanctions", "org_lockout"
     });
 
     public static readonly IReadOnlyList<(string Table, string Columns)> UniqueKeys = Array.AsReadOnly(new[]
@@ -81,7 +82,7 @@ public static class SchemaContract
         ("characternanolinelocks", "CharacterId,NanoStrain"),
         ("characterpetnames", "CharacterId,PetType"),
         ("dailyloginclaims", "Id"), ("dailyloginclaims", "ClaimToken"), ("dailyloginclaims", "CharacterId,ClaimDateUtc"),
-        ("account_sanctions", "SanctionId")
+        ("account_sanctions", "SanctionId"), ("org_lockout", "char_id")
     });
 
     private static IReadOnlyList<ColumnRequirement> BuildColumns()
@@ -183,6 +184,9 @@ public static class SchemaContract
         Add("account_sanctions", "int", "AccountId", false);
         Add("account_sanctions", "datetime", "IssuedAtUtc EndsAtUtc LiftedAtUtc");
         Add("account_sanctions", "varchar", "IssuedBy Reason LiftedBy LiftReason");
+        Add("org_lockout", "int", "char_id", false);
+        Add("org_lockout", "varchar", "char_name");
+        Add("org_lockout", "bigint", "seconds_remaining last_updated", false);
         Add("login", "int", "Id Flags");
         Add("login", "varchar", "Username");
         return result.AsReadOnly();
