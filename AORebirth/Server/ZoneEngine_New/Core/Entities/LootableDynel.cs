@@ -75,6 +75,8 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>The owner's equipment, whose OnWear SpawnItem functions drop (<see cref="EquipmentLoot"/>).</summary>
         protected IReadOnlyList<Item>? LootEquipment { get; set; }
 
+        protected bool ShareScalingEquipmentQuality { get; set; }
+
         /// <summary>
         /// Places <see cref="CarriedItems"/>, then rolls what <see cref="LootEquipment"/> spawns and <see cref="ItemTable"/>
         /// against the loot catalog into the remaining <see cref="Loot"/> slots. Each rolled item gets a unique in-memory
@@ -97,7 +99,8 @@ namespace ZoneEngine_New.Core.Entities
 
             var rolled = new List<(int LowId, int HighId, int Quality)>();
             if (LootEquipment != null)
-                EquipmentLoot.Roll(LootEquipment, minter, Loot.Capacity - slot, qualityVariancePercent, rolled);
+                EquipmentLoot.Roll(LootEquipment, minter, Loot.Capacity - slot, qualityVariancePercent, rolled,
+                    ShareScalingEquipmentQuality);
             RollItemTable(ItemTable, LootLevel, minter, Loot.Capacity - slot - rolled.Count, qualityVariancePercent, rolled);
             for (int i = 0; i < rolled.Count; i++, slot++)
             {

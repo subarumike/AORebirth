@@ -3,6 +3,7 @@ namespace ZoneEngine_New.Core.Entities
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.Linq;
 
     using AORebirth.Enums;
 
@@ -46,6 +47,14 @@ namespace ZoneEngine_New.Core.Entities
         public virtual bool AcceptsPlayerCombatNanos => false;
         /// <summary>Interpolated worn items and expanded monster weapons. Capacity 50.</summary>
         public Container Equipment { get; }
+
+        // The RK dyna captures correlate shared scaling QL to bosses wearing the generated modifier equipment.
+        internal bool SharesEquipmentLootQuality
+            => SpawnSource == SpawnSource.HashSpawn
+                && MobTemplate?.Has(NpcFeature.Boss) == true
+                && Playfield?.MetaData is { IsIndoor: false } metadata
+                && PlayfieldEntryFlags.ExpansionPlayfield(metadata) == 0
+                && Equipment.Content.Values.Any(item => IsBossModifier(item.Name));
 
         /// <summary>
         /// False for NoCombat NPCs: vendors and other non-combat NPCs. A NoCombat NPC cannot be attacked, attack, cast or
@@ -472,6 +481,9 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>Equipment items named "Boss Modifier Item (…)" are alternatives: each spawn keeps one at random.</summary>
         const string BossModifierPrefix = "Boss Modifier Item";
 
+        static bool IsBossModifier(string? name)
+            => name?.StartsWith(BossModifierPrefix, StringComparison.OrdinalIgnoreCase) == true;
+
         /// <summary>
         /// The template equipment entries that are boss modifiers, and the one picked for this spawn (-1 when there
         /// are none). Names come from the item templates, so no instance is created for the discarded ones.
@@ -488,7 +500,7 @@ namespace ZoneEngine_New.Core.Entities
                 int lowId = pair[0];
                 int highId = pair.Count >= 2 && pair[1] > 0 ? pair[1] : lowId;
                 string? name = _items.CreateTemplate(lowId, highId, quality).Name;
-                if (name != null && name.StartsWith(BossModifierPrefix, StringComparison.OrdinalIgnoreCase))
+                if (IsBossModifier(name))
                     modifiers.Add(i);
             }
 

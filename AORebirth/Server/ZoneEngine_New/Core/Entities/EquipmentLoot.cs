@@ -10,8 +10,8 @@ namespace ZoneEngine_New.Core.Entities
     /// <summary>
     /// What an NPC's equipment drops: every OnWear SpawnItem on an equipped item (a boss's "Lootgiver" and Boss
     /// Modifier items) spawns its hash. The function's QL, which the item's own QL (the NPC's level) scales, is the
-    /// centre: the drop rolls a QL within Gameplay.json loot.qualityVariancePercent of it and takes the hash's highest QL
-    /// up to that. Rolled when the corpse is made, not when the NPC spawns, so the GM loot simulation rolls the same way.
+    /// centre for Gameplay.json loot.qualityVariancePercent. Outdoor Rubi-Ka bosses with modifier equipment share
+    /// the requested QL across scaling pools with the same centre. Each pool still resolves its own highest eligible QL.
     /// </summary>
     public static class EquipmentLoot
     {
@@ -25,12 +25,32 @@ namespace ZoneEngine_New.Core.Entities
             int capacity,
             int qualityVariancePercent,
             List<(int LowId, int HighId, int Quality)> into)
+            => Roll(equipment, minter, capacity, qualityVariancePercent, into, false);
+
+        internal static void Roll(
+            IEnumerable<Item> equipment,
+            HashItemMinter minter,
+            int capacity,
+            int qualityVariancePercent,
+            List<(int LowId, int HighId, int Quality)> into,
+            bool shareScalingQuality)
+            => Roll(equipment, minter, capacity, qualityVariancePercent, into, shareScalingQuality, Random.Shared);
+
+        internal static void Roll(
+            IEnumerable<Item> equipment,
+            HashItemMinter minter,
+            int capacity,
+            int qualityVariancePercent,
+            List<(int LowId, int HighId, int Quality)> into,
+            bool shareScalingQuality,
+            Random random)
         {
             ArgumentNullException.ThrowIfNull(equipment);
             ArgumentNullException.ThrowIfNull(minter);
             ArgumentNullException.ThrowIfNull(into);
 
             int start = into.Count;
+            Dictionary<int, int>? sharedByCentre = shareScalingQuality ? new() : null;
             foreach (Item item in equipment)
             {
                 foreach (ItemSpell spell in SpawnFunctions(item))
@@ -41,13 +61,32 @@ namespace ZoneEngine_New.Core.Entities
                     if (!TryReadSpawn(spell, out string hash, out int quality))
                         continue;
 
-                    (int min, int max) = LootableDynel.QualityWindow(quality, qualityVariancePercent);
-                    if (!minter.TryRollHighestUpTo(hash, Random.Shared.Next(min, max + 1), out int lowId, out int highId, out int rolledQuality))
+                    int requestedQuality;
+                    if (sharedByCentre != null && minter.HasScalingFamily(hash))
+                    {
+                        if (!sharedByCentre.TryGetValue(quality, out requestedQuality))
+                        {
+                            requestedQuality = RollQuality(quality, qualityVariancePercent, random);
+                            sharedByCentre.Add(quality, requestedQuality);
+                        }
+                    }
+                    else
+                    {
+                        requestedQuality = RollQuality(quality, qualityVariancePercent, random);
+                    }
+
+                    if (!minter.TryRollHighestUpTo(hash, requestedQuality, out int lowId, out int highId, out int rolledQuality))
                         continue;
 
                     into.Add((lowId, highId, rolledQuality));
                 }
             }
+        }
+
+        static int RollQuality(int centre, int variance, Random random)
+        {
+            (int min, int max) = LootableDynel.QualityWindow(centre, variance);
+            return random.Next(min, max + 1);
         }
 
         /// <summary>The OnWear SpawnItem functions of <paramref name="item"/>.</summary>

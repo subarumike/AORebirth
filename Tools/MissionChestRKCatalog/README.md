@@ -11,8 +11,9 @@ metadata exporter. Supply `--gamedata-root` and `--output-root`. It reads
 `items.dat` using the existing `ItemsDatReader` and exports identities, stored
 quality, current flags/stats, ordered criteria, function argument evidence and
 decoded shop stock lines. The receipt binds the export to its source SHA-256.
-Nullable integer function arguments mean that the argument was not an integer;
-the export does not claim to decode arbitrary expressions or other value types.
+Integer and string argument arrays keep their original positions. A null means
+the argument was not of that array's type. The export does not claim to decode
+arbitrary expressions or other value types.
 
 `cache_review_source.py` accepts `--url` and `--output` to cache one bounded
 public source with its URL, HTTP result and content hash. It reuses a matching
@@ -100,3 +101,29 @@ observations are deduplicated by their complete evidence. Capture observations
 append acquisition evidence without changing origin, exclusions, approvals,
 rarity or QL policy. Keep the lookup, input records, source manifest and merged
 evidence outside canonical GameData and public Git.
+
+## RK dynaboss corpse reconciliation
+
+Use the capture decoder and review workflow in docs/ai/WORKFLOW.md to prepare
+the private corpse and item observations. The batch must contain
+rk-corpse-inventories.csv and rk-dyna-item-observations.csv with packet identity,
+the prior NPC full update and aura IDs, and the original inventory descriptors
+and slots. Retain inventories without sufficient identity evidence in the
+corpse input so the report can account for their exclusion.
+
+From the checkout root, export metadata from the GameData selected for the
+review, then pass its receipt and the reviewed batch to the offline tools.
+
+```cmd
+cmd /d /c Tools\export-mission-chest-rk-metadata.cmd --gamedata-root GameData --output-root Captures\reviewed-rk-dyna\item-metadata
+python -B Tools\reconcile_rk_dyna_loot.py --capture-dir Captures\reviewed-rk-dyna --game-data GameData --item-metadata Captures\reviewed-rk-dyna\item-metadata --output-dir Captures\reviewed-rk-dyna\reconciliation
+python -B Tools\simulate_rk_dyna_equipment_loot.py --evidence-root Captures\reviewed-rk-dyna --item-metadata Captures\reviewed-rk-dyna\item-metadata --output Captures\reviewed-rk-dyna\rk-dyna-equipment-simulation.json
+```
+
+Repeat `--capture-dir` to reconcile multiple reviewed batches. The reports
+separate candidate NPC and equipment sources, reachable family membership,
+the runtime's QL and ID selection, and unresolved hashes. For a source-backed
+proposal, `--authoritative-definitions` accepts a reviewed manifest with an
+exact source record and SHA-256. It evaluates the proposal offline. Keep
+capture inputs, metadata exports, and generated reports outside canonical
+GameData and public Git.

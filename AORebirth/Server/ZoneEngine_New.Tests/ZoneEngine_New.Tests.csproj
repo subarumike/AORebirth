@@ -168,4 +168,11 @@
     <Compile Include="WorldLinkShutdownTests.cs" />
     <Compile Include="DailyLoginBridgePathsTests.cs" />
   </ItemGroup>
+  <ItemGroup Condition="'$(RkDynaLootFocusedTests)' == 'true'">
+    <Compile Remove="@(Compile)" />
+    <Compile Include="TestDoubles.cs" />
+    <Compile Include="EquipmentLootTests.cs" />
+    <Compile Include="HashItemCatalogTests.cs" />
+    <Compile Include="MissionChestLootTests.cs" />
+  </ItemGroup>
 </Project>

@@ -142,6 +142,9 @@ namespace ZoneEngine_New.Core.Inventory
             return true;
         }
 
+        internal bool HasScalingFamily(string hash)
+            => Array.Exists(_leafRanges.GetOrAdd(hash, BuildLeafRanges), static leaf => leaf.Min < leaf.Max);
+
         LeafRange[] BuildLeafRanges(string hash)
         {
             var instances = new List<HashInstance>();
