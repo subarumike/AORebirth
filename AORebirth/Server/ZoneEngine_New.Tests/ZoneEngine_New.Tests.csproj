@@ -174,5 +174,6 @@
     <Compile Include="EquipmentLootTests.cs" />
     <Compile Include="HashItemCatalogTests.cs" />
     <Compile Include="MissionChestLootTests.cs" />
+    <Compile Include="RkDynaPrivateLootIntegrationTests.cs" />
   </ItemGroup>
 </Project>

@@ -670,14 +670,16 @@ namespace ZoneEngine_New.Core.Commands
                 ?? new Configuration.GameplayLoot().QualityVariancePercent;
             var drops = new Dictionary<(int LowId, int HighId, int Quality), int>();
             var rolled = new List<(int LowId, int HighId, int Quality)>();
+            var carried = npc.CarriedLoot.Select(item => (item.LowId, item.HighId, item.Quality)).ToArray();
             bool shareScalingQuality = npc.SharesEquipmentLootQuality;
             int emptyCorpses = 0;
             int totalItems = 0;
             for (int roll = 0; roll < rolls; roll++)
             {
                 rolled.Clear();
-                // The corpse's own order: what the equipment spawns first, then the item table into what is left.
-                EquipmentLoot.Roll(npc.Equipment.Content.Values, _minter, Corpse.LootCapacity, variance, rolled,
+                rolled.AddRange(carried);
+                // Match corpse order and remaining capacity: carried items, equipment, then the item table.
+                EquipmentLoot.Roll(npc.Equipment.Content.Values, _minter, Corpse.LootCapacity - rolled.Count, variance, rolled,
                     shareScalingQuality);
                 LootableDynel.RollItemTable(template.ItemTable, level, _minter, Corpse.LootCapacity - rolled.Count, variance, rolled);
                 if (rolled.Count == 0)

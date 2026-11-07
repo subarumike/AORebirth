@@ -258,7 +258,7 @@ def center_bounds(minimum, maximum, variance, observations):
     return min(lower, min(observations)), min(MAX_INT, max(upper, max(observations)))
 
 
-def build_outputs(assignments, opportunities, selected, leaves, helpers, records, qualities, variance):
+def build_outputs(assignments, opportunities, selected, leaves, helpers, records, qualities, variance, smoothed_roots=()):
     counts = Counter()
     support = defaultdict(list)
     matrix = []
@@ -283,15 +283,26 @@ def build_outputs(assignments, opportunities, selected, leaves, helpers, records
         bands = leaves[family]
         minimum, maximum = qualities[bands[0]], qualities[bands[-1]]
         min_center, max_center = center_bounds(minimum, maximum, variance, [center for _, center in observations])
-        policy = {"Weight": len(observations), "MinCenter": min_center, "MaxCenter": max_center}
+        smoothed = root in smoothed_roots
+        weight = len(observations) + (1 if smoothed else 0)
+        policy = {"Weight": weight, "MinCenter": min_center, "MaxCenter": max_center}
         children[root][family] = policy
         eligible = [(identity, center) for identity, center in opportunities[root] if min_center <= center <= max_center]
         weights.append({"Hash": root, "FamilyHash": family, "TemplateIds": json_cell(bands),
                         "MinQl": minimum, "MaxQl": maximum, **policy,
-                        "SupportingCorpses": len({identity for identity, _ in observations}),
+                        "SupportingSlots": len(observations), "SupportingCorpses": len({identity for identity, _ in observations}),
                         "CandidateRollsInCenterRange": len(eligible),
                         "CandidateCorpsesInCenterRange": len({identity for identity, _ in eligible}),
-                        "WeightConfidence": "PROVISIONAL_OBSERVED_SLOT_COUNT"})
+                        "WeightConfidence": "PROVISIONAL_ADD_ONE_SLOT_COUNT" if smoothed else "PROVISIONAL_OBSERVED_SLOT_COUNT"})
+    for root in sorted(REPLACEMENT_ROOTS):
+        installed = records.get(root, {}).get("EquipmentLoot")
+        if not installed:
+            continue
+        for family, previous in installed.items():
+            proposed = children[root].get(family)
+            if (proposed is None or proposed["MinCenter"] > previous["MinCenter"]
+                    or proposed["MaxCenter"] < previous["MaxCenter"]):
+                raise ValueError(f"Proposal would lose installed evidence in {root}/{family}. Include all supporting batches.")
     for root, policy in sorted(children.items()):
         if root in records and not records[root].get("EquipmentLoot"):
             raise ValueError(f"Proposal would replace an existing non-reconstructed pool: {root}")
@@ -306,6 +317,8 @@ def main():
     parser.add_argument("--game-data", type=Path, default=Path("GameData"))
     parser.add_argument("--item-templates", type=Path, help="Explicit ItemTemplates.json source for deriving the overlay")
     parser.add_argument("--gameplay", type=Path, default=Path("AORebirth/Config/Gameplay.json"))
+    parser.add_argument("--smooth-root", action="append", choices=sorted(REPLACEMENT_ROOTS), default=[],
+                        help="Add one to observed support weights in this reviewed root. Repeatable.")
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
@@ -326,17 +339,23 @@ def main():
     assignments, opportunities = assign_slots(bosses, grouped)
     selected, leaves, helpers = resolve_families(assignments, records, qualities)
     overlay, weights, matrix, counts = build_outputs(assignments, opportunities, selected, leaves, helpers,
-                                                      records, qualities, variance)
+                                                      records, qualities, variance, args.smooth_root)
     summary = {
         "confirmedCorpses": len(bosses), "observedSlots": len(assignments),
         "replacementRoots": {root: len(overlay.get(root, {}).get("Children", [])) for root in sorted(REPLACEMENT_ROOTS)},
         "equipmentOnlyLeaves": len(helpers), "configuredVariancePercent": variance,
+        "smoothedWeightRoots": sorted(set(args.smooth_root)),
         "slotOutcomes": [{"basis": basis, "relation": relation, "slots": count}
                          for (basis, relation), count in sorted(counts.items())],
         "inputs": [provenance(path) for path in (boss_path, slot_path, catalog, args.gameplay,
                    args.item_metadata / "item-metadata-source.json")],
     }
     output.mkdir(parents=True, exist_ok=True)
+    for name in ("reconstructed-item-templates.json", "reconstruction-summary.json", "membership-evidence.csv",
+                 "ambiguous-memberships.csv", "provisional-weights.csv"):
+        path = output / name
+        if path.resolve() != path:
+            raise ValueError(f"Refusing redirected reconstruction output: {path}")
     for name, data in (("reconstructed-item-templates.json", overlay), ("reconstruction-summary.json", summary)):
         (output / name).write_text(json.dumps(data, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     if matrix:

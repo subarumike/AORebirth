@@ -161,6 +161,9 @@ namespace ZoneEngine_New.Core.Entities
             return true;
         }
 
+        /// <summary>Non-consuming view of items the NPC already carries for its corpse.</summary>
+        internal IReadOnlyList<Item> CarriedLoot => _carriedLoot is { } loot ? loot : [];
+
         /// <summary>The carried items, handed to the corpse once; later calls return null.</summary>
         public IReadOnlyList<Item>? TakeCarriedLoot()
         {

@@ -126,6 +126,18 @@ Review the reports and apply only the scoped overlay rows to the private
 ItemTemplates.json. Existing item families, shops, mission and ordinary loot
 keep their generic lookup rules.
 
+The finalized RK provisional weighting uses `--smooth-root AABC --smooth-root ARMO --smooth-root OUDY`
+when regenerating the overlay. These roots add one to each supported slot
+count. The generator rejects a proposal that drops an installed family or
+narrows its supported center range. Include all retained supporting batches
+when proposing updates.
+
+`Tools/audit_rk_dyna_residual_loot.py` checks unresolved inventories against
+the original packet sinks and reports every compatible ordered alignment.
+`Tools/audit_rk_dyna_loot_weights.py` separates observed support, requested-QL
+eligibility, expected occurrence, and held-out weighting comparisons. Both
+tools write private reports and treat their source inputs as read-only.
+
 To compare an overlay against a pre-install snapshot, pass both files to the
 simulator with `--overlay` and `--base-item-templates`. Its `--evidence-root`
 uses the reviewed corpse and item CSVs, with `--item-metadata` pointing to the

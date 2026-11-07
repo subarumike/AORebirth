@@ -259,6 +259,36 @@ public sealed class EquipmentLootTests
     }
 
     [TestMethod]
+    public void GmSimulationReservesCarriedSlotsWithoutConsumingThem()
+    {
+        var data = new StubGameData(HashItemCatalog.Parse(ReconstructedJson));
+        var catalog = new StubCatalog().Add(1, 5).Add(2, 100).Add(3, 100).Add(4, 1);
+        var minter = new HashItemMinter(data, catalog, new StubItemBuilder());
+        var settings = new GameplaySettings { Loot = new GameplayLoot { QualityVariancePercent = 0 } };
+        using var services = new ServiceCollection().AddSingleton(settings).BuildServiceProvider();
+        var npc = CreateNpc(services, new PlayfieldMetaData());
+        npc.Equipment.Remove(0);
+        npc.Equipment.Add(0, Wear("Boss Modifier Item (Fixture)", ("FIRST", 100), ("SECOND", 100)));
+        for (int i = 0; i < Corpse.LootCapacity - 1; i++)
+        {
+            Assert.IsTrue(npc.TryCarryLoot(TestWorld.CreateItem(lowId: 3, highId: 3, quality: 100, instanceId: 50 + i)));
+        }
+
+        var command = new NpcCommand(data, catalog, minter);
+        MethodInfo simulate = typeof(NpcCommand).GetMethod("SimulateLoot", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var report = (IReadOnlyList<string>)simulate.Invoke(command, [npc, 2])!;
+        StringAssert.Contains(string.Join("\n", report), $"Items: {Corpse.LootCapacity * 2} ({Corpse.LootCapacity} per corpse)");
+        Assert.AreEqual(Corpse.LootCapacity - 1, npc.CarriedLoot.Count);
+
+        var corpse = new Corpse(new Identity { Type = IdentityType.Corpse, Instance = 2 }, npc, data);
+        corpse.ResolveLoot(minter, 0);
+        Assert.AreEqual(Corpse.LootCapacity, corpse.Loot.Content.Count);
+        Assert.AreEqual(3, corpse.Loot.Content[Corpse.LootCapacity - 2].LowId);
+        Assert.AreEqual(1, corpse.Loot.Content[Corpse.LootCapacity - 1].LowId);
+        Assert.AreEqual(0, npc.CarriedLoot.Count);
+    }
+
+    [TestMethod]
     public void MalformedEquipmentPolicyFailsClosed()
     {
         Assert.ThrowsExactly<FormatException>(() => HashItemCatalog.Parse(

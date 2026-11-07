@@ -7,7 +7,7 @@ import unittest
 
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from reconstruct_rk_dyna_loot import assign_slots, center_bounds, resolve_families  # noqa: E402
+from reconstruct_rk_dyna_loot import assign_slots, build_outputs, center_bounds, resolve_families  # noqa: E402
 
 
 def boss(session):
@@ -64,6 +64,24 @@ class ReconstructionTests(unittest.TestCase):
     def test_center_range_keeps_rounded_bounds_and_observed_fixed_exceptions(self):
         self.assertEqual(center_bounds(150, 200, 25, [195]), (120, 267))
         self.assertEqual(center_bounds(20, 20, 25, [8, 183]), (8, 183))
+
+    def test_smoothed_root_preserves_support_and_proposal_rejects_lost_membership(self):
+        records = {identity: boss(identity) for identity in ("a", "b")}
+        grouped = {identity: [{**row, "NpcIdentity": "1", "NpcName": "Boss", "Playfield": "1", "NpcLevel": "100",
+                               "Count": "1", "ItemName": "Test item"}
+                              for row in slots(record, [(10, 11, 100), (20, 21, 100), (30, 31, 100)])]
+                   for identity, record in records.items()}
+        assignments, opportunities = assign_slots(records, grouped)
+        qualities = {10: 1, 11: 200, 20: 1, 21: 200, 30: 1, 31: 200}
+        selected, leaves, helpers = resolve_families(assignments, {}, qualities)
+        overlay, weights, _, _ = build_outputs(assignments, opportunities, selected, leaves, helpers, {}, qualities, 25,
+                                               smoothed_roots=("ARMO",))
+        self.assertEqual(overlay["ARMO"]["EquipmentLoot"]["RKDY_20_21"]["Weight"], 3)
+        self.assertEqual(overlay["DIST"]["EquipmentLoot"]["RKDY_30_31"]["Weight"], 2)
+        self.assertEqual(next(row for row in weights if row["Hash"] == "ARMO")["SupportingSlots"], 2)
+        installed = {"ARMO": {"EquipmentLoot": {"EARLIER": {"MinCenter": 1, "MaxCenter": 267}}}}
+        with self.assertRaisesRegex(ValueError, "lose installed evidence in ARMO"):
+            build_outputs(assignments, opportunities, selected, leaves, helpers, installed, qualities, 25)
 
 
 if __name__ == "__main__":
