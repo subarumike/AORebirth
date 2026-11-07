@@ -83,6 +83,8 @@ namespace ZoneEngine_New.Core.Accounts
 
     public sealed class MySqlAccountSanctionRepository : IAccountSanctionRepository
     {
+        internal sealed record EditorCredentials(int Id, string Username, string PasswordHash, int GmLevel);
+
         /// <summary>The columns stored as text are capped by the table; longer input is cut, never refused.</summary>
         public const int MaxIssuerLength = 64;
 
@@ -94,6 +96,16 @@ namespace ZoneEngine_New.Core.Accounts
         const string SelectSanction =
             "SELECT s.SanctionId AS Id, l.Username AS Account, s.IssuedAtUtc, s.EndsAtUtc, s.IssuedBy, s.Reason, "
             + "s.LiftedAtUtc, s.LiftedBy, s.LiftReason FROM account_sanctions s INNER JOIN login l ON l.Id=s.AccountId ";
+
+        internal static EditorCredentials? LoadEditorCredentials(string username)
+        {
+            using MySqlConnection connection = Open();
+            return connection.QuerySingleOrDefault<EditorCredentials>(
+                "SELECT l.Id, l.Username, l.Password AS PasswordHash, l.GM AS GmLevel FROM login l "
+                + "WHERE l.Username=@Username AND l.Flags=0 AND l.GM>0 AND NOT EXISTS "
+                + "(SELECT 1 FROM account_sanctions s WHERE s.AccountId=l.Id AND " + ActiveSanction + ")",
+                new { Username = username }, commandTimeout: 5);
+        }
 
         static MySqlConnection Open()
         {

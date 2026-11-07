@@ -5,6 +5,8 @@ namespace ZoneEngine_New.Core.Mobs
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
+    using ZoneEngine_New.Core.GameData;
+
     public sealed class MobItemTableEntry
     {
         public string Hash { get; set; } = string.Empty;
@@ -72,6 +74,8 @@ namespace ZoneEngine_New.Core.Mobs
         public int KnuBotId { get; set; }
 
         public List<MobItemTableEntry> ItemTable { get; set; } = new();
+        internal NpcLeaf? EditorLootLeaf { get; set; }
+        internal int EditorLootEntryCount { get; set; }
 
         public string BinaryListData { get; set; } = string.Empty;
 

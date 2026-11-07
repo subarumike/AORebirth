@@ -3,6 +3,7 @@ namespace ZoneEngine_New.Core.GameData
     using System;
     using System.Collections.Generic;
     using System.Text.Json;
+    using System.Threading;
     using System.Text.Json.Serialization;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -50,6 +51,17 @@ namespace ZoneEngine_New.Core.GameData
         public int FamilyCount => _families.Count;
 
         public int LeafCount => _leaves.Count;
+
+        internal NpcEditorLootJournal EditorLoot { get; private init; } = NpcEditorLootJournal.Empty;
+
+        internal NpcTemplateCatalog WithEditorLoot(NpcEditorLootJournal journal)
+            => new(_families, _leaves, _random, _spawnAll) { RuleFeatures = RuleFeatures, EditorLoot = journal };
+
+        internal bool TryGetEditableLootLeaf(string hash, out NpcLeaf leaf)
+        {
+            leaf = null!;
+            return hash != MobTemplate.FallbackHash && TryGetLeaf(hash, out leaf);
+        }
 
         public static NpcTemplateCatalog Parse(string? json, Random? random = null)
         {
@@ -123,7 +135,7 @@ namespace ZoneEngine_New.Core.GameData
                 return false;
             if (TryResolveLeaf(hash, level, out NpcLeaf leaf))
             {
-                template = Materialize(leaf, level, RuleFeatures?.Invoke(leaf.Hash));
+                template = MaterializeWithEditorLoot(leaf, level);
                 return true;
             }
 
@@ -231,7 +243,7 @@ namespace ZoneEngine_New.Core.GameData
                 }
 
                 if (_leaves.TryGetValue(hash, out NpcLeaf? leaf))
-                    into.Add(Materialize(leaf, level, RuleFeatures?.Invoke(leaf.Hash)));
+                    into.Add(MaterializeWithEditorLoot(leaf, level));
             }
             finally
             {
@@ -338,6 +350,28 @@ namespace ZoneEngine_New.Core.GameData
 
             seen.Remove(hash);
             return found;
+        }
+
+        internal MobTemplate MaterializeWithEditorLoot(NpcLeaf leaf, int? desiredLevel)
+        {
+            MobTemplate template = Materialize(leaf, desiredLevel, RuleFeatures?.Invoke(leaf.Hash));
+            template.EditorLootLeaf = leaf;
+            if (!EditorLoot.Templates.TryGetValue(leaf.Hash, out NpcEditorLootHistory? history))
+                return template;
+
+            template.EditorLootEntryCount = history.Revisions[^1].Entries.Length;
+            foreach (var entry in history.Revisions[^1].Entries)
+            {
+                template.ItemTable.Add(new MobItemTableEntry
+                {
+                    Hash = entry.ItemHash,
+                    Chance = entry.Chance,
+                    Repeats = entry.Repeats,
+                    LevelMod = entry.LevelMod
+                });
+            }
+
+            return template;
         }
 
         public static MobTemplate Materialize(NpcLeaf leaf, int? desiredLevel, IReadOnlyCollection<NpcFeature>? ruleFeatures = null)
@@ -606,6 +640,8 @@ namespace ZoneEngine_New.Core.GameData
 
     public sealed class NpcLeaf
     {
+        string? _editorLootTemplateSignature;
+
         public NpcLeaf(string hash, NpcLevelBand[] bands)
         {
             ArgumentException.ThrowIfNullOrEmpty(hash);
@@ -624,5 +660,8 @@ namespace ZoneEngine_New.Core.GameData
         public int MinLevel => Bands[0].Level;
 
         public int MaxLevel => Bands[^1].Level;
+
+        internal string EditorLootTemplateSignature => LazyInitializer.EnsureInitialized(ref _editorLootTemplateSignature,
+            () => NpcEditorLootJournalFile.TemplateSignature(this));
     }
 }

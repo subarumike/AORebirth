@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <AssemblyName>AORebirth.NpcEditor.AOSharp</AssemblyName>
+    <PlatformTarget>x86</PlatformTarget>
+    <LangVersion>latest</LangVersion>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="AOSharp.Core">
+      <HintPath>$(AOSharpPath)\AOSharp.Core.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+    <Reference Include="AOSharp.Common">
+      <HintPath>$(AOSharpPath)\AOSharp.Common.dll</HintPath>
+      <Private>false</Private>
+    </Reference>
+  </ItemGroup>
+  <Target Name="CheckAOSharpPath" BeforeTargets="ResolveReferences">
+    <Error Condition="!Exists('$(AOSharpPath)\AOSharp.Core.dll') Or !Exists('$(AOSharpPath)\AOSharp.Common.dll')"
+           Text="Supply -p:AOSharpPath=path to the installed AOSharp runtime directory." />
+  </Target>
+</Project>

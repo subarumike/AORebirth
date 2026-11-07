@@ -160,6 +160,8 @@ namespace ZoneEngine_New.Core.Entities
             return carried;
         }
 
+        internal IReadOnlyList<Item> InspectCarriedLoot() => _carriedLoot ?? (IReadOnlyList<Item>)Array.Empty<Item>();
+
         /// <summary>
         /// Binds a shop to this NPC and flags the character so the client draws the vendor cart.
         /// </summary>
@@ -544,6 +546,24 @@ namespace ZoneEngine_New.Core.Entities
             return TryAddEquipment(weapon, logger, combatWeapon: true);
         }
 
+        internal bool IsMonsterCombatSlot(int slot) => _combatWeaponSlots.Contains(slot);
+
+        internal void RebaseEditedEquipment(bool weaponChanged)
+        {
+            RebaseWearAppearance();
+            if (weaponChanged)
+                RebaseWeapons();
+        }
+
+        internal static bool IsProtectedNpcEquipment(Item item)
+            => item.Name.StartsWith(BossModifierPrefix, StringComparison.OrdinalIgnoreCase)
+                || IsLootGiver(item) || HasFunction(item, FunctionType.UploadNano)
+                || HasFunction(item, FunctionType.EquipMonsterWeapon) || HasFunction(item, FunctionType.ComboNameGen)
+                || System.Linq.Enumerable.Any(EquipmentLoot.SpawnFunctions(item));
+
+        static bool IsLootGiver(Item item)
+            => item.Definition?.Name?.Contains("lootgiver", StringComparison.OrdinalIgnoreCase) == true;
+
         bool TryAddEquipment(Item item, IZoneLogger? logger, bool combatWeapon = false, string? sawHash = null)
         {
             int slot = Equipment.FindFreeSlot();
@@ -669,7 +689,7 @@ namespace ZoneEngine_New.Core.Entities
             Stats.ClearBonuses(dirty: true);
             foreach (KeyValuePair<int, Item> slot in Equipment.EnumerateSlots())
             {
-                if (slot.Value.Definition?.Name?.Contains("lootgiver", StringComparison.OrdinalIgnoreCase) == true)
+                if (IsLootGiver(slot.Value))
                     WearBonusApplier.ApplyItem(slot.Value, includeWield: false, Stats);
             }
 
@@ -700,11 +720,17 @@ namespace ZoneEngine_New.Core.Entities
         /// </summary>
         protected override int AppearanceWearSlot(int slot, Item item)
         {
+            int armorSlot = EditableArmorPosition(item);
+            return armorSlot > 0 ? ArmorWearSlotBase + armorSlot : slot;
+        }
+
+        internal static int EditableArmorPosition(Item item)
+        {
             if ((ItemClass)item.GetStat(CharacterStat.ItemClass) != ItemClass.Armor)
-                return slot;
+                return 0;
 
             int armorSlot = StatCollection.Normalize(item.GetStat(CharacterStat.DefaultPos));
-            return armorSlot is > 0 and < ArmorWearSlotBase ? ArmorWearSlotBase + armorSlot : slot;
+            return armorSlot is > 0 and < ArmorWearSlotBase ? armorSlot : 0;
         }
 
         /// <summary>
@@ -814,7 +840,7 @@ namespace ZoneEngine_New.Core.Entities
             }
         }
 
-        static bool IsVisualWeapon(Item item)
+        internal static bool IsVisualWeapon(Item item)
             => (item.GetWeaponFlags() & (WeaponFlags.Melee | WeaponFlags.Ranged)) != 0;
 
         const int RightHandMeshPosition = 1;

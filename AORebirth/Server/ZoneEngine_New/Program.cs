@@ -31,6 +31,7 @@ namespace ZoneEngine_New
     using ZoneEngine_New.Core.Mobs;
     using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Network;
+    using ZoneEngine_New.Core.NpcEditor;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
     using ZoneEngine_New.Core.Trade;
@@ -46,6 +47,7 @@ namespace ZoneEngine_New
         private static ServiceProvider? rootServices;
         private static ZoneNetworkHost? networkHost;
         private static DebugMcpHost? debugMcp;
+        private static NpcEditorHost? npcEditor;
         private static PlayfieldManager? playfieldManager;
         private static IChatEngineLink? chatEngineLink;
         private static WorldLink? worldLink;
@@ -126,6 +128,7 @@ namespace ZoneEngine_New
                 try
                 {
                     debugMcp = DebugMcpHost.Start(rootServices, logger);
+                    npcEditor = NpcEditorHost.Start(rootServices, logger);
                 }
                 catch (Exception)
                 {
@@ -502,6 +505,8 @@ namespace ZoneEngine_New
                     Console.Error.WriteLine("ZONEENGINE_NEW_SHUTDOWN_FAILED type=" + exception.GetType().Name);
                 }
             }
+            Cleanup(() => npcEditor?.DisposeAsync().AsTask().GetAwaiter().GetResult());
+            npcEditor = null;
             Cleanup(() => debugMcp?.DisposeAsync().AsTask().GetAwaiter().GetResult());
             debugMcp = null;
             Cleanup(() => networkHost?.DisposeAsync().AsTask().GetAwaiter().GetResult());

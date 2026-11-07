@@ -4,6 +4,7 @@ namespace ZoneEngine_New.Core.GameData
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
+    using System.Linq;
     using System.Text.Json;
     using System.Threading;
 
@@ -16,6 +17,7 @@ namespace ZoneEngine_New.Core.GameData
 
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Mobs;
+    using ZoneEngine_New.Core.NpcEditor;
     using ZoneEngine_New.Core.WorldSimulation;
 
     /// <summary>
@@ -43,7 +45,10 @@ namespace ZoneEngine_New.Core.GameData
         };
 
         private readonly Lock _playfieldSync = new();
+        private readonly Lock _lootCatalogSync = new();
         private readonly IZoneLogger _logger;
+        private readonly NpcEditorLootJournalFile _editorLootFile;
+        private bool _loadedNpcTemplates;
         // NpcTemplates.json and ItemTemplates.json are swapped whole by a reload (ReloadNpcTemplates /
         // ReloadHashItems); every lookup reads the field once.
         private volatile NpcTemplateCatalog _npcTemplates = new(
@@ -72,11 +77,12 @@ namespace ZoneEngine_New.Core.GameData
         private readonly TeleportDestinationCatalog? _teleportDestinations;
 
         public GameDataStore(IZoneLogger logger, TeleportDestinationCatalog? teleportDestinations = null)
-            : this(logger, teleportDestinations, GameDataPaths.ResolveRuntimeRoot())
+            : this(logger, teleportDestinations, GameDataPaths.ResolveRuntimeRoot(), GameDataPaths.ResolveOverrideRoot())
         {
         }
 
-        internal GameDataStore(IZoneLogger logger, TeleportDestinationCatalog? teleportDestinations, string gameDataRoot)
+        internal GameDataStore(IZoneLogger logger, TeleportDestinationCatalog? teleportDestinations, string gameDataRoot,
+            string? editorLootOverrideRoot = null)
         {
             ArgumentNullException.ThrowIfNull(logger);
             _logger = logger;
@@ -84,18 +90,19 @@ namespace ZoneEngine_New.Core.GameData
 
             RootPath = Path.GetFullPath(gameDataRoot);
             PlayfieldsPath = Path.Combine(RootPath, GameDataPaths.PlayfieldsFolderName);
+            _editorLootFile = new NpcEditorLootJournalFile(RootPath, editorLootOverrideRoot);
 
             EnsureRootExists();
             RespawnContent = RespawnContentCatalog.Load(RootPath);
             // Startup is the one place a broken start location may stop the engine: never on a tick.
             if (RespawnContent.StartLocationError is string startLocationError)
                 throw new InvalidDataException("Invalid NewCharacter.json: " + startLocationError);
+            ReloadHashItems();
             ReloadNpcTemplates();
             LoadMonsterWeapons();
             ComboNames = ComboNameCatalog.Load(RootPath, _logger);
             GoverningForms = GoverningFormCatalog.Load(RootPath, _logger);
             SpawnExclusions = SpawnExclusionCatalog.Load(RootPath, _logger);
-            ReloadHashItems();
             LoadVendingMachines();
             LoadMonsterData();
             LoadXpLevels();
@@ -163,7 +170,7 @@ namespace ZoneEngine_New.Core.GameData
             if (string.IsNullOrEmpty(hash) || !templates.TryGetLeaf(hash, out NpcLeaf leaf))
                 return false;
 
-            template = NpcTemplateCatalog.Materialize(leaf, leaf.MinLevel, templates.RuleFeatures?.Invoke(leaf.Hash));
+            template = templates.MaterializeWithEditorLoot(leaf, leaf.MinLevel);
             return true;
         }
 
@@ -512,6 +519,12 @@ namespace ZoneEngine_New.Core.GameData
         /// </summary>
         internal AORebirth.Modules.Content.GameDataReloadResult ReloadNpcTemplates()
         {
+            lock (_lootCatalogSync)
+                return ReloadNpcTemplatesCore();
+        }
+
+        private AORebirth.Modules.Content.GameDataReloadResult ReloadNpcTemplatesCore()
+        {
             const string name = "NpcTemplates";
             string path = GameDataPaths.ResolveFile(RootPath, GameDataPaths.NpcTemplatesFileName);
             if (!File.Exists(path))
@@ -532,7 +545,20 @@ namespace ZoneEngine_New.Core.GameData
                 string rulesRoot = RootPath;
                 loaded.RuleFeatures = hash =>
                     Mobs.MonsterCombatRulesCatalog.For(rulesRoot).TryGet(hash, out Mobs.MonsterCombatRules rules) ? rules.Features : null;
-                _npcTemplates = loaded;
+                try
+                {
+                    _npcTemplates = loaded.WithEditorLoot(_editorLootFile.Read(loaded, IsEditorLootItem));
+                    _loadedNpcTemplates = true;
+                }
+                catch (Exception exception) when (exception is IOException or InvalidDataException or UnauthorizedAccessException or JsonException)
+                {
+                    NpcTemplateCatalog keep = _loadedNpcTemplates ? _npcTemplates : loaded;
+                    const string error = "The NPC loot overlay failed validation. See the ZoneEngine log and reload NpcTemplates after repair.";
+                    _npcTemplates = keep.WithEditorLoot(keep.EditorLoot with { LoadError = error });
+                    _loadedNpcTemplates = true;
+                    _logger.Error(exception, error);
+                    return new(name, false, keep.LeafCount, [error]);
+                }
                 _logger.Info(
                     string.Format(
                         CultureInfo.InvariantCulture,
@@ -553,6 +579,75 @@ namespace ZoneEngine_New.Core.GameData
                 return new(name, false, _npcTemplates.LeafCount, ["NpcTemplates.json: " + exception.Message]);
             }
         }
+
+        internal NpcEditorLootState GetEditorLoot(NpcEditorLootTarget target)
+            => GetEditorLoot(_npcTemplates, target);
+
+        private NpcEditorLootState GetEditorLoot(NpcTemplateCatalog catalog, NpcEditorLootTarget target)
+        {
+            string? unavailable = _editorLootFile.ConfigurationProblem ?? catalog.EditorLoot.LoadError;
+            if (!catalog.TryGetEditableLootLeaf(target.TemplateHash, out NpcLeaf leaf))
+                unavailable = "Select an NPC with an authored, resolved leaf template.";
+            else if (unavailable == null && target.TemplateSignature != leaf.EditorLootTemplateSignature)
+                unavailable = "The authored NPC template changed. Select a new spawn before editing its loot.";
+            NpcEditorLootRevision[] history = catalog.EditorLoot.HistoryFor(target.TemplateHash);
+            NpcEditorLootRevision? latest = history.Length > 0 ? history[^1] : null;
+            return new(target.TemplateHash, unavailable == null, unavailable, latest?.Revision ?? 0,
+                latest == null ? [] : (NpcEditorLootEntry[])latest.Entries.Clone(),
+                history.Select(revision => new NpcEditorLootRevisionSummary(revision.Revision, revision.Actor,
+                    revision.AtUtc, revision.Action, revision.Entries.Length)).ToArray());
+        }
+
+        internal NpcEditorLootState ChangeEditorLoot(NpcEditorLootTarget target, int expectedRevision, string actor, string action,
+            Func<NpcEditorLootRevision[], NpcEditorLootEntry[]> edit, Func<string, bool> hasRdbTemplates)
+        {
+            if (string.IsNullOrWhiteSpace(actor) || actor.Length > 128)
+                throw new ArgumentException("A valid GM actor is required.", nameof(actor));
+
+            lock (_lootCatalogSync)
+            {
+                NpcTemplateCatalog catalog = _npcTemplates;
+                string hash = target.TemplateHash;
+                if (!catalog.TryGetEditableLootLeaf(hash, out NpcLeaf leaf)
+                    || target.TemplateSignature != leaf.EditorLootTemplateSignature)
+                {
+                    throw new NpcEditorLootConflictException("The authored NPC template changed. Select a new spawn before editing its loot.");
+                }
+
+                NpcEditorLootState current = GetEditorLoot(catalog, target);
+                if (!current.CanSave)
+                    throw new InvalidOperationException(current.UnavailableReason);
+                if (current.Revision != expectedRevision)
+                    throw new NpcEditorLootConflictException("The template's loot revision changed. Refresh and retry.");
+                NpcEditorLootRevision[] history = catalog.EditorLoot.HistoryFor(hash);
+                if (history.Length >= NpcEditorLootJournalFile.MaxRevisionsPerTemplate)
+                    throw new InvalidOperationException("The template's loot history has reached its revision limit.");
+
+                NpcEditorLootEntry[] edited = edit(history);
+                if (edited.Length > NpcEditorLootJournalFile.MaxRowsPerTemplate
+                    || edited.Any(entry => !NpcEditorLootJournalFile.ValidEntry(entry)
+                        || !IsEditorLootItem(entry.ItemHash) || !hasRdbTemplates(entry.ItemHash)))
+                {
+                    throw new ArgumentException("Loot rows require a current item family and valid chance, repeats and level variance.");
+                }
+
+                if (current.Entries.SequenceEqual(edited))
+                    throw new ArgumentException("The loot rows already match this revision.");
+
+                var templates = new Dictionary<string, NpcEditorLootHistory>(catalog.EditorLoot.Templates, StringComparer.Ordinal)
+                {
+                    [hash] = new(target.TemplateSignature,
+                        [.. history, new(current.Revision + 1, actor, DateTimeOffset.UtcNow, action, edited)])
+                };
+                NpcEditorLootJournal updated = _editorLootFile.Write(catalog.EditorLoot, catalog.EditorLoot with { Templates = templates });
+                NpcTemplateCatalog revised = catalog.WithEditorLoot(updated);
+                _npcTemplates = revised;
+                return GetEditorLoot(revised, target);
+            }
+        }
+
+        private bool IsEditorLootItem(string hash) => _hashItems.TryGetInstance(hash, out HashInstance item)
+            && item.TemplateIds.All(id => id > 0);
 
         private void LoadMonsterWeapons()
         {
@@ -613,6 +708,12 @@ namespace ZoneEngine_New.Core.GameData
         /// </summary>
         internal AORebirth.Modules.Content.GameDataReloadResult ReloadHashItems()
         {
+            lock (_lootCatalogSync)
+                return ReloadHashItemsCore();
+        }
+
+        private AORebirth.Modules.Content.GameDataReloadResult ReloadHashItemsCore()
+        {
             const string name = "ItemTemplates";
             string path = GameDataPaths.ResolveFile(RootPath, GameDataPaths.ItemTemplatesFileName);
             if (!File.Exists(path))
@@ -628,6 +729,11 @@ namespace ZoneEngine_New.Core.GameData
             try
             {
                 HashItemCatalog loaded = HashItemCatalog.Parse(File.ReadAllText(path));
+                if (_npcTemplates.EditorLoot.Templates.Values.Any(history => history.Revisions[^1].Entries.Any(
+                    entry => !loaded.TryGetInstance(entry.ItemHash, out HashInstance item) || item.TemplateIds.Any(id => id <= 0))))
+                {
+                    throw new InvalidDataException("ItemTemplates would invalidate a saved NPC loot item family.");
+                }
                 _hashItems = loaded;
                 _logger.Info(
                     string.Format(

@@ -168,4 +168,9 @@
     <Compile Include="WorldLinkShutdownTests.cs" />
     <Compile Include="DailyLoginBridgePathsTests.cs" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NpcEditorFocusedTests)' == 'true'">
+    <Compile Remove="@(Compile)" />
+    <Compile Include="TestDoubles.cs" />
+    <Compile Include="NpcEditor*Tests.cs" />
+  </ItemGroup>
 </Project>
