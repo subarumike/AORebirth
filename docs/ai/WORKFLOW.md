@@ -337,6 +337,27 @@ unchanged engine payloads. Preserve the contract's integrity/cache requirements
 and exclude research, raw evidence, caches and temporary build material from
 runtime payloads. Only required runtime content belongs in the accepted result.
 
+### Standalone Windows package
+
+The maintained producer is `cmd /d /c Tools\WindowsLocalPackage\build-package.cmd`.
+Use the exact parameters and prerequisites in
+[its README](../../Tools/WindowsLocalPackage/README.md). It consumes a successful
+governed four-engine build receipt, a fresh matching content-intake receipt and
+the complete admitted runtime-content manifest. It does not rebuild or publish
+product engines, reuse an older ZIP, or authorize Linux work or deployment.
+
+WorldEngine starts before ChatEngine, LoginEngine and ZoneEngine_New and stops
+after them. The launcher also owns its separate local MySQL, account broker and
+loopback PHP host for Daily Rewards. PHP and ZoneEngine share the installation's
+protected claims directory; the standalone opts out of the global XAMPP roots.
+Focused offline checks use `Tools\WindowsLocalPackage\run-offline-tests.cmd`;
+run them only when explicitly authorized. Use
+`Tools\WindowsLocalPackage\verify-startup.cmd` with a fresh package directory
+to check the bundled runtime, PHP GET/POST, current local schema, four engine
+registrations and clean shutdown. It waits for the launcher's actual exit code.
+See the README for upgrade and backup details. These checks do not record Mike's
+live AO client acceptance.
+
 ### Editable NewEngine content
 
 NPC, vendor, quest and dialogue definitions live in the validated editable

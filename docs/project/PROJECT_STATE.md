@@ -1,5 +1,16 @@
 # AORebirth Project State
 
+PROVEN LOCAL WINDOWS STANDALONE (2026-11-06): the restored producer consumes
+the measured public Windows build and exact admitted runtime-content manifest.
+Public source `d4285053660ccfe9b01cee6ed656af6b78b84e11` repairs WorldLink teardown
+and adds opt-in standalone Daily claims isolation. The launcher manages World,
+Chat, Login and Zone in dependency order, bundled loopback PHP and its owned
+local database. Five runtime, 20 launcher and three receipt regressions passed.
+The staged replacement passed inventory verification and packaged startup,
+including local Daily GET/POST and four zero exit codes on shutdown. Original
+standalone artifacts were preserved. Clean-machine and live-client acceptance
+remain unverified; no production or live schema changes or deployment occurred.
+
 IMPLEMENTED, CLIENT UNVERIFIED (2026-11-04, Mongo landing): hostile nanos with
 no positively weighted authored defense now land without a defense roll. This
 removes the invented Nano Resist/Add All Def contest from standard Mongo taunt

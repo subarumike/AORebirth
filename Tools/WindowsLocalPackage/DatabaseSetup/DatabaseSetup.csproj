@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <AssemblyName>DatabaseSetup</AssemblyName>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Deterministic>true</Deterministic>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../../DatabaseMigrationTool/DatabaseMigrationTool.csproj" />
+    <EmbeddedResource Include="../../../AORebirth/Libraries/Source/AORebirth.Database/SqlTables/aorebirth_identity.sql" LogicalName="AccountIdentity.sql" />
+    <EmbeddedResource Include="../../../AORebirth/Libraries/Source/AORebirth.Database/Migrations/20260816_account_email_verification_tokens.sql" LogicalName="20260816_account_email_verification_tokens.sql" />
+    <EmbeddedResource Include="../../../AORebirth/Libraries/Source/AORebirth.Database/Migrations/20260831_account_password_reset_tokens.sql" LogicalName="20260831_account_password_reset_tokens.sql" />
+  </ItemGroup>
+</Project>

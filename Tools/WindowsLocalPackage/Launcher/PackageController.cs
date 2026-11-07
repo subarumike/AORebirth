@@ -1,0 +1,1620 @@
+namespace AORebirth.WindowsLocalLauncher
+{
+    using System;
+    using System.Collections;
+    using System.Collections.Generic;
+    using System.ComponentModel;
+    using System.Diagnostics;
+    using System.Globalization;
+    using System.IO;
+    using System.IO.Compression;
+    using System.Linq;
+    using System.Net;
+    using System.Net.NetworkInformation;
+    using System.Net.Sockets;
+    using System.Runtime.InteropServices;
+    using System.Security.AccessControl;
+    using System.Security.Cryptography;
+    using System.Text;
+    using System.Threading;
+    using System.Web.Script.Serialization;
+    using System.Xml.Linq;
+
+    internal sealed class PackageController
+    {
+        private readonly string root;
+        private readonly PackageState state;
+        private readonly Action<string> status;
+        private readonly List<OwnedProcess> owned = new List<OwnedProcess>();
+        private string adminPasswordInUse;
+        private bool verified;
+        private volatile bool downloading;
+        private volatile bool downloadCancelled;
+        private volatile HttpWebRequest downloadRequest;
+        private Stopwatch startupTimer;
+        internal const int StartupTimeoutMilliseconds = 900000;
+
+        internal PackageController(string root, Action<string> status)
+        {
+            this.root = root;
+            this.status = status;
+            state = PackageState.Load(root);
+            RecoverOwnedProcesses();
+        }
+
+        internal string ClientFolder { get { return state.ClientFolder; } }
+        internal bool SetupComplete { get { return state.SetupComplete; } }
+        internal bool IsRunning { get { return owned.Any(item => !item.Process.HasExited); } }
+        internal bool LastStopWasClean { get; private set; }
+
+        internal static void RequireFreshStartupData(string root)
+        {
+            PackageState saved = PackageState.Load(root);
+            string mysql = SafePath(root, "data/mysql");
+            if (saved.SetupComplete || saved.OwnsDataDirectory
+                || File.Exists(SafePath(root, "data/owned-processes.xml"))
+                || Directory.Exists(mysql) && Directory.EnumerateFileSystemEntries(mysql).Any())
+                throw new InvalidOperationException("Startup verification requires a fresh extracted package with no existing database or owned processes. Existing data was preserved.");
+        }
+
+        internal Dictionary<string, string> GetSqlLoginDetails()
+        {
+            if (!state.SetupComplete || state.AdminPassword != PackageState.DefaultPassword
+                || state.RuntimePassword != PackageState.DefaultPassword)
+                throw new InvalidOperationException("Press Start server once to apply the local SQL login. You can view it here afterwards, even while the server is stopped.");
+
+            return new Dictionary<string, string>
+            {
+                ["Host"] = "127.0.0.1",
+                ["Port"] = state.DatabasePort.ToString(CultureInfo.InvariantCulture),
+                ["Database"] = "cellao_codex_clean",
+                ["Username"] = "root",
+                ["Password"] = PackageState.DefaultPassword
+            };
+        }
+
+        internal static void VerifyPackage(string root)
+        {
+            string manifest = SafePath(root, "package-manifest.json");
+            var serializer = new JavaScriptSerializer { MaxJsonLength = 32 * 1024 * 1024 };
+            var document = serializer.Deserialize<Dictionary<string, object>>(File.ReadAllText(manifest));
+            if (Convert.ToInt32(document["schemaVersion"], CultureInfo.InvariantCulture) != 2
+                || (string)document["architecture"] != "win-x64")
+                throw new InvalidDataException("This package requires a supported Windows x64 manifest.");
+
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            var inventory = new Dictionary<string, Dictionary<string, object>>(StringComparer.OrdinalIgnoreCase);
+            foreach (Dictionary<string, object> entry in (IEnumerable)document["files"])
+            {
+                string relative = (string)entry["path"];
+                if (!seen.Add(relative.Replace('/', '\\')))
+                    throw new InvalidDataException("The package inventory contains a duplicate file.");
+                inventory.Add(relative.Replace('/', '\\'), entry);
+
+                string file = SafePath(root, relative);
+                if (!File.Exists(file) || new FileInfo(file).Length != Convert.ToInt64(entry["length"], CultureInfo.InvariantCulture))
+                    throw new InvalidDataException("Missing or incomplete package file: " + relative);
+
+                using (var algorithm = SHA256.Create())
+                using (var stream = File.OpenRead(file))
+                {
+                    string hash = BitConverter.ToString(algorithm.ComputeHash(stream)).Replace("-", string.Empty);
+                    if (!hash.Equals((string)entry["sha256"], StringComparison.OrdinalIgnoreCase))
+                        throw new InvalidDataException("Package file verification failed: " + relative);
+                }
+            }
+
+            foreach (string required in new[]
+            {
+                "AORebirth.exe", "runtime/dotnet.exe", "mysql/bin/mysqld.exe", "mysql/bin/mysql.exe",
+                "server/LoginEngine/LoginEngine.dll", "server/ChatEngine/ChatEngine.dll",
+                "server/ZoneEngine_New/ZoneEngine_New.dll", "server/WorldEngine/WorldEngine.dll",
+                "runtime-content-manifest.json", "tools/DatabaseSetup/DatabaseSetup.dll",
+                "tools/DatabaseMigrationTool/DatabaseMigrationTool.dll",
+                "tools/AccountBroker/AORebirth.AccountBroker.Service.exe", "config/Config.xml", "config/client.xml",
+                "php/php.exe", "php/php8.dll", "config/PhpRuntime.manifest.xml", "web/daily-router.php", "web/daily.php.ini",
+                "web/daily/index.app", "web/daily/index.html", "web/daily/claim.php", "web/daily/rewards.json",
+                "web/daily/css/icc.css", "web/daily/js/daily.js",
+                "prerequisites/vc_redist.x64.exe"
+            })
+            {
+                if (!seen.Contains(required.Replace('/', '\\')))
+                    throw new InvalidDataException("Required component missing from inventory: " + required);
+            }
+
+            if (!Directory.Exists(SafePath(root, "GameData")) || !seen.Any(file => file.StartsWith("GameData\\", StringComparison.OrdinalIgnoreCase)))
+                throw new InvalidDataException("The complete GameData package is required.");
+
+            string runtimeManifest = SafePath(root, "runtime-content-manifest.json");
+            object manifestHash;
+            if (!document.TryGetValue("windowsGameDataManifestSha256", out manifestHash) || !IsHash(manifestHash as string))
+                throw new InvalidDataException("The package must identify its governed Windows GameData manifest.");
+            VerifyHash(runtimeManifest, (string)manifestHash, "Runtime content manifest");
+            VerifyRuntimeContent(root, serializer, runtimeManifest, inventory);
+            ValidateConfig(PackageState.ReadXml(SafePath(root, "config/Config.xml")));
+            ReadClient(root);
+        }
+
+        private static void VerifyRuntimeContent(string root, JavaScriptSerializer serializer, string manifest,
+            Dictionary<string, Dictionary<string, object>> inventory)
+        {
+            var admitted = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            object records = serializer.DeserializeObject(File.ReadAllText(manifest));
+            if (!(records is IEnumerable) || records is string || records is IDictionary)
+                throw new InvalidDataException("The runtime content manifest must be an array.");
+
+            foreach (object raw in (IEnumerable)records)
+            {
+                var record = raw as Dictionary<string, object>;
+                object path;
+                object size;
+                object hash;
+                if (record == null || !record.TryGetValue("path", out path) || !(path is string)
+                    || !record.TryGetValue("size", out size) || !(size is int || size is long)
+                    || Convert.ToInt64(size, CultureInfo.InvariantCulture) < 0
+                    || !record.TryGetValue("sha256", out hash) || !IsHash(hash as string))
+                    throw new InvalidDataException("A runtime content manifest entry is invalid.");
+
+                string relative = ((string)path).Replace('\\', '/');
+                if (relative.Split('/').Any(segment => segment.Length == 0 || segment == "." || segment == ".."))
+                    throw new InvalidDataException("A runtime content manifest path is not canonical.");
+
+                string name = ("GameData/" + relative).Replace('/', '\\');
+                SafePath(root, name);
+                Dictionary<string, object> entry;
+                if (!admitted.Add(name) || !inventory.TryGetValue(name, out entry)
+                    || Convert.ToInt64(entry["length"], CultureInfo.InvariantCulture) != Convert.ToInt64(size, CultureInfo.InvariantCulture)
+                    || !string.Equals((string)entry["sha256"], (string)hash, StringComparison.OrdinalIgnoreCase))
+                    throw new InvalidDataException("The package does not match the admitted runtime content: " + relative);
+            }
+
+            if (admitted.Count == 0 || !admitted.SetEquals(inventory.Keys.Where(path => path.StartsWith("GameData\\", StringComparison.OrdinalIgnoreCase))))
+                throw new InvalidDataException("The complete admitted GameData inventory is required.");
+
+            var pending = new Stack<string>();
+            pending.Push(SafePath(root, "GameData"));
+            while (pending.Count != 0)
+            {
+                foreach (string file in Directory.EnumerateFileSystemEntries(pending.Pop()))
+                {
+                    string relative = file.Substring(Path.GetFullPath(root).TrimEnd('\\').Length + 1);
+                    SafePath(root, relative);
+                    if (Directory.Exists(file))
+                        pending.Push(file);
+                    else if (!admitted.Contains(relative.Replace('/', '\\')))
+                        throw new InvalidDataException("Unadmitted GameData file: " + relative);
+                }
+            }
+        }
+
+        internal void SetClientFolder(string folder)
+        {
+            XElement client = ReadClient(root);
+            string executable = SafePath(Path.GetFullPath(folder), (string)client.Attribute("executable"));
+            if (!File.Exists(executable))
+                throw new InvalidDataException("Choose the extracted AORebirth client folder containing " + (string)client.Attribute("executable") + ".");
+
+            VerifyClientExecutable(executable, client);
+            state.ClientFolder = Path.GetFullPath(folder);
+            state.Save(root);
+        }
+
+        internal void DownloadClient()
+        {
+            downloadCancelled = false;
+            downloading = true;
+            try
+            {
+                DownloadClientCore();
+            }
+            catch (Exception) when (downloadCancelled)
+            {
+                throw new OperationCanceledException("Client download cancelled. Partial files were preserved; no incomplete client was selected.");
+            }
+            finally
+            {
+                downloadRequest = null;
+                downloading = false;
+            }
+        }
+
+        internal void CancelDownload()
+        {
+            if (!downloading)
+                return;
+
+            downloadCancelled = true;
+            HttpWebRequest request = downloadRequest;
+            if (request != null)
+            {
+                request.Abort();
+            }
+
+            status("Cancelling the client download...");
+        }
+
+        private void CheckDownloadCancellation()
+        {
+            if (downloadCancelled)
+                throw new OperationCanceledException("Client download cancelled. Partial files were preserved; no incomplete client was selected.");
+        }
+
+        private void DownloadClientCore()
+        {
+            EnsurePackage();
+            CheckDownloadCancellation();
+            InitializeUserFiles();
+            XElement client = ReadClient(root);
+            string expectedHash = (string)client.Attribute("archiveSha256");
+            string downloadKey = expectedHash ?? (string)client.Attribute("executableSha256");
+            string destination = PathOf("client/" + downloadKey.Substring(0, 12));
+            if (Directory.Exists(destination))
+            {
+                SetExtractedClient(destination, client);
+                status("The verified client is already installed.");
+                return;
+            }
+
+            Directory.CreateDirectory(PathOf("data/downloads"));
+            Directory.CreateDirectory(PathOf("client"));
+            string archive = PathOf("data/downloads/client-" + downloadKey + ".zip");
+            if (!File.Exists(archive))
+            {
+                string partial = archive + "." + Guid.NewGuid().ToString("N") + ".partial";
+                status("Downloading the AORebirth client...");
+                var request = (HttpWebRequest)WebRequest.Create((string)client.Attribute("downloadUrl"));
+                request.AllowAutoRedirect = false;
+                request.Timeout = 30000;
+                request.ReadWriteTimeout = 60000;
+                request.UserAgent = "AORebirth-WindowsLocalLauncher/1";
+                downloadRequest = request;
+                CheckDownloadCancellation();
+                using (var response = (HttpWebResponse)request.GetResponse())
+                using (Stream input = response.GetResponseStream())
+                using (var output = new FileStream(partial, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+                {
+                    if (response.StatusCode != HttpStatusCode.OK)
+                        throw new InvalidOperationException("The approved client download did not return the expected file.");
+
+                    long pinnedLength = (long)client.Attribute("archiveLength");
+                    string pinnedEtag = (string)client.Attribute("etag");
+                    if (response.ContentLength != pinnedLength
+                        || (!string.IsNullOrEmpty(pinnedEtag) && response.Headers["ETag"] != pinnedEtag))
+                        throw new InvalidDataException("The website client download metadata changed. Install an updated AORebirth server package before downloading this client.");
+
+                    byte[] buffer = new byte[1024 * 1024];
+                    long downloaded = 0;
+                    long lastReport = 0;
+                    int count;
+                    while ((count = input.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        CheckDownloadCancellation();
+                        output.Write(buffer, 0, count);
+                        downloaded += count;
+                        if (downloaded > 20L * 1024 * 1024 * 1024)
+                            throw new InvalidDataException("The client download exceeded the expected package size limit.");
+
+                        if (downloaded - lastReport >= 16 * 1024 * 1024)
+                        {
+                            status("Downloading client: " + (downloaded / (1024 * 1024)) + " MB" +
+                                (response.ContentLength > 0 ? " of " + (response.ContentLength / (1024 * 1024)) + " MB" : string.Empty));
+                            lastReport = downloaded;
+                        }
+                    }
+
+                    if (response.ContentLength >= 0 && response.ContentLength != downloaded)
+                        throw new InvalidDataException("The client download was interrupted. The partial download was preserved.");
+
+                    output.Flush(true);
+                }
+
+                status("Verifying the downloaded client...");
+                VerifyArchive(partial, client);
+                CheckDownloadCancellation();
+                File.Move(partial, archive);
+            }
+
+            VerifyArchive(archive, client);
+            CheckDownloadCancellation();
+            string staging = PathOf("client/.extract-" + Guid.NewGuid().ToString("N"));
+            Directory.CreateDirectory(staging);
+            status("Extracting the verified client...");
+            long extracted = 0;
+            var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+            using (var zip = ZipFile.OpenRead(archive))
+            {
+                if (zip.Entries.Count > 100000)
+                    throw new InvalidDataException("The client archive contains too many entries.");
+
+                foreach (ZipArchiveEntry entry in zip.Entries)
+                {
+                    CheckDownloadCancellation();
+                    string path = SafePath(staging, entry.FullName);
+                    if (!seen.Add(path) || ((entry.ExternalAttributes >> 16) & 0xF000) == 0xA000)
+                        throw new InvalidDataException("The client archive contains a duplicate path or filesystem link.");
+
+                    if (entry.FullName.EndsWith("/", StringComparison.Ordinal))
+                    {
+                        Directory.CreateDirectory(path);
+                        continue;
+                    }
+
+                    extracted += entry.Length;
+                    if (entry.Length < 0 || extracted > 40L * 1024 * 1024 * 1024)
+                        throw new InvalidDataException("The client archive exceeded the extraction size limit.");
+
+                    Directory.CreateDirectory(Path.GetDirectoryName(path));
+                    using (Stream input = entry.Open())
+                    using (var output = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None))
+                    {
+                        byte[] buffer = new byte[1024 * 1024];
+                        int count;
+                        while ((count = input.Read(buffer, 0, buffer.Length)) > 0)
+                        {
+                            CheckDownloadCancellation();
+                            output.Write(buffer, 0, count);
+                        }
+
+                        if (output.Length != entry.Length)
+                            throw new InvalidDataException("A client file was not fully extracted.");
+                    }
+                }
+            }
+
+            string folder = FindClientFolder(staging, client);
+            VerifyClientExecutable(SafePath(folder, (string)client.Attribute("executable")), client);
+            CheckDownloadCancellation();
+            Directory.Move(staging, destination);
+            SetExtractedClient(destination, client);
+            status("Client downloaded, verified and installed. Press Start server, then create your account and press Play.");
+        }
+
+        internal void InstallPrerequisites()
+        {
+            EnsurePackage();
+            string installer = PathOf("prerequisites/vc_redist.x64.exe");
+            using (Process process = Process.Start(new ProcessStartInfo(installer, "/install /passive /norestart")
+            {
+                UseShellExecute = true,
+                Verb = "runas",
+                WindowStyle = ProcessWindowStyle.Hidden
+            }))
+            {
+                process.WaitForExit();
+                if (process.ExitCode != 0 && process.ExitCode != 3010 && process.ExitCode != 1638)
+                    throw new InvalidOperationException("Microsoft runtime setup failed (exit " + process.ExitCode + ").");
+
+                status(process.ExitCode == 3010 ? "Microsoft runtime installed. Restart Windows before first-time setup." : "Microsoft runtime is installed. Continue with first-time setup.");
+            }
+        }
+
+        internal void Prepare()
+        {
+            EnsurePackage();
+            InitializeUserFiles();
+            status("Setup complete. Your local files are ready. Press Start server to initialize the database if needed and start the server.");
+        }
+
+        internal void Start()
+        {
+            EnsurePackage();
+            if (IsRunning)
+            {
+                EnsureServerReady();
+                return;
+            }
+
+            InitializeUserFiles();
+            RequireFreePorts(PackageTopology.FixedPorts);
+            SelectDatabasePort();
+            startupTimer = Stopwatch.StartNew();
+            try
+            {
+                StartDatabase();
+                status("Checking the owned local database and required versioned upgrades...");
+                var environment = BaseEnvironment();
+                environment["AO_REBIRTH_MIGRATION_CONNECTION"] = AdminConnection(adminPasswordInUse);
+                environment["AO_REBIRTH_MYSQL_ADMIN_PASSWORD"] = state.AdminPassword;
+                RunExecutable("runtime/dotnet.exe", Quote(PathOf("tools/DatabaseSetup/DatabaseSetup.dll"))
+                    + " prepare --root " + Quote(root) + " --port " + state.DatabasePort.ToString(CultureInfo.InvariantCulture), 300000, "database-setup", environment, null);
+                adminPasswordInUse = state.AdminPassword;
+                state.SetupComplete = true;
+                state.Save(root);
+
+                ApplyLocalSqlLogin();
+                status("Checking local database readiness...");
+                var validationEnvironment = BaseEnvironment();
+                validationEnvironment["AO_REBIRTH_MIGRATION_CONNECTION"] = AdminConnection(adminPasswordInUse);
+                validationEnvironment["AO_REBIRTH_MYSQL_ADMIN_PASSWORD"] = state.AdminPassword;
+                RunExecutable("runtime/dotnet.exe", Quote(PathOf("tools/DatabaseSetup/DatabaseSetup.dll"))
+                    + " validate --root " + Quote(root) + " --port " + state.DatabasePort.ToString(CultureInfo.InvariantCulture),
+                    60000, "database-readiness", validationEnvironment, null);
+                RunDotnet("server/ZoneEngine_New/ZoneEngine_New.dll", "--validate-database", 60000, "database-check");
+                RunDotnet("server/ZoneEngine_New/ZoneEngine_New.dll", "--validate-startup", 180000, "world-check");
+                RunDotnet("server/WorldEngine/WorldEngine.dll", "--validate-startup", 60000, "world-coordinator-check");
+                PackageTopology.StartEngines(StartEngine);
+                WaitForWorld(true, 60000);
+                StartDailyPhp();
+                StartBroker();
+                EnsureServerReady();
+                status("Local server is ready. Create an account or press Play.");
+            }
+            catch (Exception startupFailure)
+            {
+                try
+                {
+                    Stop();
+                }
+                catch (Exception shutdownFailure)
+                {
+                    throw new InvalidOperationException("Local server startup failed: " + startupFailure.Message
+                        + Environment.NewLine + "Shutdown also failed: " + shutdownFailure.Message, startupFailure);
+                }
+
+                throw;
+            }
+            finally
+            {
+                startupTimer = null;
+            }
+        }
+
+        internal void CreateAccount()
+        {
+            RequireStartedServer();
+            Process.Start(new ProcessStartInfo("http://127.0.0.1:7510/register") { UseShellExecute = true });
+        }
+
+        internal void Play()
+        {
+            XElement client = ReadClient(root);
+            if (string.IsNullOrWhiteSpace(state.ClientFolder))
+                throw new InvalidOperationException("Download and extract the AORebirth client, then select its folder.");
+
+            string executable = SafePath(state.ClientFolder, (string)client.Attribute("executable"));
+            if (!File.Exists(executable))
+                throw new InvalidDataException("The selected client executable is missing. Select the extracted client folder again.");
+
+            VerifyClientExecutable(executable, client);
+            RequireStartedServer();
+            Process.Start(new ProcessStartInfo(executable, (string)client.Attribute("arguments") ?? string.Empty)
+            {
+                WorkingDirectory = Path.GetDirectoryName(executable),
+                UseShellExecute = true
+            });
+            status("Client launched. Keep this window open while playing.");
+        }
+
+        internal void OpenLogs()
+        {
+            string logs = PathOf("logs");
+            Directory.CreateDirectory(logs);
+            Process.Start(new ProcessStartInfo(logs) { UseShellExecute = true });
+        }
+
+        internal void CheckStatus()
+        {
+            if (!IsRunning)
+            {
+                status("Local server is stopped.");
+                return;
+            }
+
+            EnsureServerReady();
+            status("Local server, Daily Rewards page and account registration are ready.");
+        }
+
+        private void RequireStartedServer()
+        {
+            if (!IsRunning)
+                throw new InvalidOperationException("Press Start server before creating an account or playing.");
+
+            EnsureServerReady();
+        }
+
+        private void EnsureServerReady()
+        {
+            foreach (string name in new[] { "MySQL", "WorldEngine", "ChatEngine", "LoginEngine", "ZoneEngine_New", PackageTopology.DailyPhp, "AccountBroker" })
+            {
+                OwnedProcess item = owned.SingleOrDefault(process => process.Name == name);
+                if (item == null || item.Process.HasExited)
+                    throw new InvalidOperationException("The local server is only partially running (" + name + " is unavailable). Press Stop server, inspect Logs, then start again.");
+
+                VerifyOwnership(item);
+                if (name != "AccountBroker")
+                {
+                    WaitForPorts(item, PackageTopology.Ports(name, state.DatabasePort), 2000);
+                }
+            }
+
+            WaitForWorld(true, 2000);
+            VerifyDailyPhp();
+            var request = (HttpWebRequest)WebRequest.Create("http://127.0.0.1:7510/health");
+            request.Proxy = null;
+            request.Timeout = 2000;
+            using (var response = (HttpWebResponse)request.GetResponse())
+            {
+                if (response.StatusCode != HttpStatusCode.OK)
+                    throw new InvalidOperationException("Local account registration is unavailable. Stop the local server and inspect Logs.");
+            }
+        }
+
+        internal void Stop()
+        {
+            LastStopWasClean = false;
+            Exception failure = null;
+            bool forced = false;
+            bool abnormalExit = false;
+            foreach (string name in PackageTopology.StopOrder(owned.Select(item => item.Name)))
+            {
+                OwnedProcess item = owned.Single(process => process.Name == name);
+                bool forcedThisProcess = false;
+                bool drainedDaily = false;
+                try
+                {
+                    if (item.Process.HasExited)
+                    {
+                        RecordShutdown(item, false, "already-exited");
+                        abnormalExit |= item.Name == PackageTopology.DailyPhp || item.Name != "AccountBroker" && item.Process.ExitCode != 0;
+                        owned.Remove(item);
+                        SaveOwnedProcesses();
+                        item.Process.Dispose();
+                        continue;
+                    }
+
+                    VerifyOwnership(item);
+                    status("Stopping " + item.Name + "...");
+                    if (item.Name == "MySQL")
+                    {
+                        StopDatabase(item);
+                    }
+                    else if (item.Name == PackageTopology.DailyPhp)
+                    {
+                        StopDailyPhp(item);
+                        drainedDaily = true;
+                    }
+                    else
+                    {
+                        if (item.ShutdownFile != null)
+                        {
+                            File.WriteAllText(item.ShutdownFile, "stop");
+                        }
+                        else
+                        {
+                            item.Process.CloseMainWindow();
+                        }
+
+                        if (!item.Process.WaitForExit(item.ShutdownFile == null ? 5000 : 45000))
+                        {
+                            VerifyOwnership(item);
+                            // The stateless account broker has no graceful shutdown hook.
+                            forced |= item.Name != "AccountBroker";
+                            forcedThisProcess = true;
+                            item.Process.Kill();
+                            if (!item.Process.WaitForExit(10000))
+                                throw new InvalidOperationException(item.Name + " has not exited.");
+                        }
+                    }
+
+                    RecordShutdown(item, forcedThisProcess, drainedDaily ? "drained-then-terminated" : "stopped");
+                    abnormalExit |= !drainedDaily && item.Name != "AccountBroker" && item.Process.ExitCode != 0;
+                    owned.Remove(item);
+                    SaveOwnedProcesses();
+                    item.Process.Dispose();
+                }
+                catch (Exception exception)
+                {
+                    RecordShutdown(item, forcedThisProcess, "failure=" + exception.GetType().Name);
+                    failure = failure ?? exception;
+                    // The local HTTP helper never writes the database. A failed drain must not strand the game engines.
+                    if (item.Name == PackageTopology.DailyPhp)
+                        continue;
+                    // Do not shut down the database while a gameplay process could still save.
+                    break;
+                }
+            }
+
+            if (failure != null)
+                throw failure;
+
+            LastStopWasClean = !forced && !abnormalExit;
+            status(forced || abnormalExit ? "Local server stopped. A service did not shut down cleanly; inspect Logs before starting again."
+                : "Local server stopped. Your local database remains in data.");
+        }
+
+        private void RecordShutdown(OwnedProcess item, bool forced, string outcome)
+        {
+            string exit = item.Process.HasExited
+                ? item.Process.ExitCode.ToString(CultureInfo.InvariantCulture) + " (0x"
+                    + unchecked((uint)item.Process.ExitCode).ToString("X8", CultureInfo.InvariantCulture) + ")"
+                : "running";
+            string message = "SERVICE_STOP name=" + item.Name + " pid=" + item.Process.Id.ToString(CultureInfo.InvariantCulture)
+                + " exit=" + exit + " forced=" + forced.ToString(CultureInfo.InvariantCulture) + " outcome=" + outcome;
+            status(message);
+            try
+            {
+                File.AppendAllText(PathOf("logs/launcher-lifecycle.log"), DateTime.UtcNow.ToString("O") + " " + message + Environment.NewLine);
+            }
+            catch (Exception exception) when (exception is IOException || exception is UnauthorizedAccessException)
+            {
+                status("Shutdown diagnostics could not be saved; the measured result is shown above.");
+            }
+        }
+
+        private void EnsurePackage()
+        {
+            if (verified)
+                return;
+
+            status("Verifying the Windows package...");
+            VerifyPackage(root);
+            verified = true;
+        }
+
+        private void InitializeUserFiles()
+        {
+            SafePath(root, "data");
+            SafePath(root, "logs");
+            state.Save(root);
+            Directory.CreateDirectory(PathOf("logs"));
+            Directory.CreateDirectory(PathOf("data/config"));
+            Directory.CreateDirectory(PathOf("data/zone"));
+            Directory.CreateDirectory(PathOf("data/daily-login/claims"));
+            string config = PathOf("data/config/Config.xml");
+            if (!File.Exists(config))
+            {
+                File.Copy(PathOf("config/Config.xml"), config);
+            }
+
+            ValidateConfig(PackageState.ReadXml(config));
+        }
+
+        private void SelectDatabasePort()
+        {
+            var unavailable = new HashSet<int>(IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners().Select(listener => listener.Port));
+            unavailable.UnionWith(PackageTopology.FixedPorts);
+            for (int attempt = 0; attempt < 5; attempt++)
+            {
+                int requested = attempt == 0 ? state.DatabasePort : 0;
+                if (requested != 0 && unavailable.Contains(requested))
+                    continue;
+
+                var reservation = new TcpListener(IPAddress.Loopback, requested);
+                reservation.ExclusiveAddressUse = true;
+                try
+                {
+                    try
+                    {
+                        reservation.Start();
+                    }
+                    catch (SocketException exception) when (exception.SocketErrorCode == SocketError.AddressAlreadyInUse
+                        || exception.SocketErrorCode == SocketError.AccessDenied)
+                    {
+                        continue;
+                    }
+
+                    int selected = ((IPEndPoint)reservation.LocalEndpoint).Port;
+                    if (unavailable.Contains(selected))
+                        continue;
+
+                    state.DatabasePort = selected;
+                    state.Save(root);
+                    return;
+                }
+                finally
+                {
+                    reservation.Stop();
+                }
+            }
+
+            throw new InvalidOperationException("Windows could not assign an available local database port. No other processes were changed.");
+        }
+
+        private void StartDatabase()
+        {
+            status("Starting the private local MySQL instance...");
+            string data = PathOf("data/mysql");
+            bool fresh = !Directory.Exists(data) || !Directory.EnumerateFileSystemEntries(data).Any();
+            if (fresh)
+            {
+                if (state.SetupComplete)
+                    throw new InvalidDataException("The local database files are missing. Restore your data backup before continuing.");
+
+                // An initial native-loader failure can leave an empty directory; retry only that empty state.
+                state.OwnsDataDirectory = true;
+                state.Save(root);
+                Directory.CreateDirectory(data);
+            }
+            else if (!state.OwnsDataDirectory || !File.Exists(Path.Combine(data, "auto.cnf")))
+            {
+                throw new InvalidDataException("The data/mysql directory is unrecognized or incompletely initialized. No existing files were changed.");
+            }
+
+            string options = PathOf("data/mysql.ini");
+            File.WriteAllText(options, "[mysqld]\r\nbasedir=\"" + PathOf("mysql").Replace('\\', '/')
+                + "\"\r\ndatadir=\"" + data.Replace('\\', '/') + "\"\r\nport=" + state.DatabasePort.ToString(CultureInfo.InvariantCulture)
+                + "\r\nbind-address=127.0.0.1\r\nmysqlx=0\r\nskip-log-bin\r\nlocal-infile=0\r\n");
+            string arguments = "--defaults-file=" + Quote(options);
+            if (fresh)
+            {
+                status("Initializing your dedicated local database...");
+                RunExecutable("mysql/bin/mysqld.exe", arguments + " --initialize-insecure --console", 180000,
+                    "database-initialize", BaseEnvironment(), null);
+            }
+
+            OwnedProcess process = Launch("MySQL", "mysql/bin/mysqld.exe", arguments + " --no-monitor --console", null, BaseEnvironment());
+            WaitForPorts(process, new[] { state.DatabasePort }, 60000);
+            adminPasswordInUse = state.AdminPassword;
+            if (!CanConnectAdmin(state.AdminPassword))
+            {
+                if (state.AdminPassword != PackageState.DefaultPassword && CanConnectAdmin(PackageState.DefaultPassword))
+                {
+                    // Recover if a previous password update succeeded before local settings were saved.
+                    adminPasswordInUse = PackageState.DefaultPassword;
+                    return;
+                }
+
+                if (state.SetupComplete || !state.OwnsDataDirectory || !CanConnectAdmin(string.Empty))
+                    throw new InvalidOperationException("The local database credentials could not be verified. Restore matching data and credentials from backup.");
+
+                adminPasswordInUse = string.Empty;
+            }
+        }
+
+        private bool CanConnectAdmin(string password)
+        {
+            var environment = BaseEnvironment();
+            environment["MYSQL_PWD"] = password;
+            return RunExecutable("mysql/bin/mysql.exe", MysqlArguments() + " --execute=\"SELECT 1;\"", 15000, "database-connect",
+                environment, null, false) == 0;
+        }
+
+        private void ApplyLocalSqlLogin()
+        {
+            if (state.AdminPassword == PackageState.DefaultPassword && state.RuntimePassword == PackageState.DefaultPassword)
+                return;
+
+            status("Applying the local SQL login...");
+            var environment = BaseEnvironment();
+            environment["AO_REBIRTH_MIGRATION_CONNECTION"] = AdminConnection(adminPasswordInUse);
+            environment["AO_REBIRTH_MYSQL_ADMIN_PASSWORD"] = PackageState.DefaultPassword;
+            environment["AO_REBIRTH_MYSQL_CONNECTION"] = RuntimeConnection(PackageState.DefaultPassword);
+            RunExecutable("runtime/dotnet.exe", Quote(PathOf("tools/DatabaseSetup/DatabaseSetup.dll"))
+                + " set-passwords --root " + Quote(root) + " --port " + state.DatabasePort.ToString(CultureInfo.InvariantCulture),
+                60000, "database-login-update", environment, null);
+            state.AdminPassword = PackageState.DefaultPassword;
+            state.RuntimePassword = PackageState.DefaultPassword;
+            adminPasswordInUse = PackageState.DefaultPassword;
+            state.Save(root);
+        }
+
+        private static void StopDatabase(OwnedProcess item)
+        {
+            string pid = item.Process.Id.ToString(CultureInfo.InvariantCulture);
+            // MySQL 8.4 sql/mysqld.cc uses these case-sensitive names with and without its monitor.
+            // https://github.com/mysql/mysql-server/blob/mysql-8.4.11/sql/mysqld.cc#L8159
+            string[] eventNames = { "MYSQLShutdown" + pid, "mysqld" + pid + "_shutdown" };
+            var timer = Stopwatch.StartNew();
+            while (timer.ElapsedMilliseconds < 30000)
+            {
+                if (item.Process.HasExited)
+                    return;
+
+                VerifyOwnership(item);
+                foreach (string eventName in eventNames)
+                {
+                    EventWaitHandle shutdownEvent;
+                    if (!EventWaitHandle.TryOpenExisting(eventName, EventWaitHandleRights.Modify, out shutdownEvent))
+                        continue;
+
+                    using (shutdownEvent)
+                    {
+                        VerifyOwnership(item);
+                        if (item.Process.HasExited)
+                            return;
+
+                        if (!shutdownEvent.Set())
+                            throw new InvalidOperationException("MySQL's graceful shutdown request failed. Its ownership record was preserved.");
+
+                        if (!item.Process.WaitForExit(30000))
+                            throw new InvalidOperationException("MySQL did not stop cleanly. Keep the launcher open and inspect the logs.");
+
+                        return;
+                    }
+                }
+
+                Thread.Sleep(250);
+            }
+
+            throw new InvalidOperationException("MySQL's graceful shutdown event is unavailable. MySQL was left running and its ownership record was preserved.");
+        }
+
+        private string MysqlArguments()
+        {
+            return "--no-defaults --protocol=TCP --host=127.0.0.1 --port=" + state.DatabasePort.ToString(CultureInfo.InvariantCulture)
+                + " --user=root --batch --skip-column-names --connect-timeout=5";
+        }
+
+        private void StartEngine(string name, int[] ports)
+        {
+            status("Starting " + name + "...");
+            string signal = ShutdownSignalPath(name, Guid.NewGuid().ToString("N") + ".signal");
+            string dll = PathOf("server/" + name + "/" + name + ".dll");
+            var environment = BaseEnvironment();
+            if (name == "ZoneEngine_New")
+                environment["AO_REBIRTH_DAILY_LOGIN_ISOLATED_ROOTS"] = "1";
+            OwnedProcess process = Launch(name, "runtime/dotnet.exe",
+                Quote(dll) + " /autostart /headless /shutdown-file " + Quote(signal), signal, environment);
+            WaitForPorts(process, ports, 120000);
+            if (name == "WorldEngine")
+                WaitForWorld(false, 10000);
+        }
+
+        private void WaitForWorld(bool requireRegistrations, int timeout)
+        {
+            timeout = RemainingStartupTimeout(timeout);
+            var timer = Stopwatch.StartNew();
+            OwnedProcess world = owned.SingleOrDefault(item => item.Name == "WorldEngine");
+            if (world == null)
+                throw new InvalidOperationException("The local WorldEngine is unavailable.");
+
+            while (timer.ElapsedMilliseconds < timeout)
+            {
+                if (world.Process.HasExited)
+                    throw new InvalidOperationException("WorldEngine exited during readiness checks. Open Logs for details.");
+                VerifyOwnership(world);
+                try
+                {
+                    var request = (HttpWebRequest)WebRequest.Create("http://127.0.0.1:7601/status");
+                    request.Proxy = null;
+                    request.Timeout = Math.Min(2000, RemainingStartupTimeout(2000));
+                    request.ReadWriteTimeout = request.Timeout;
+                    using (var response = (HttpWebResponse)request.GetResponse())
+                    using (var reader = new StreamReader(response.GetResponseStream()))
+                    {
+                        if (response.StatusCode == HttpStatusCode.OK && PackageTopology.IsWorldReady(reader.ReadToEnd(), requireRegistrations))
+                            return;
+                    }
+                }
+                catch (WebException)
+                {
+                    // The coordinator may still be binding or completing its recovery window.
+                }
+                Thread.Sleep(250);
+            }
+
+            throw new InvalidOperationException("WorldEngine did not report a ready coordinator and current Chat/Zone registrations. Open Logs for details.");
+        }
+
+        private int RemainingStartupTimeout(int timeout)
+        {
+            if (startupTimer == null)
+                return timeout;
+            long remaining = StartupTimeoutMilliseconds - startupTimer.ElapsedMilliseconds;
+            if (remaining <= 0)
+                throw new TimeoutException("Local server startup exceeded its 15-minute limit. Owned services will be stopped; existing data is preserved.");
+            return (int)Math.Min(timeout, remaining);
+        }
+
+        private string ShutdownSignalPath(string name, string suffix)
+        {
+            string directory = name == PackageTopology.DailyPhp ? "data/daily-login" : "data";
+            return PathOf(directory + "/stop-" + name + "-" + suffix);
+        }
+
+        private void StartDailyPhp()
+        {
+            status("Starting the local Daily Rewards page...");
+            string web = PathOf("web");
+            string phpStateRoot = PathOf("data/daily-login");
+            if (web.IndexOf(';') >= 0 || phpStateRoot.IndexOf(';') >= 0)
+                throw new InvalidDataException("Daily Rewards requires an installation path without semicolons.");
+
+            string temporary = PathOf("data/daily-login/tmp");
+            string emptyIniScan = PathOf("data/daily-login/empty-ini-scan");
+            Directory.CreateDirectory(temporary);
+            Directory.CreateDirectory(emptyIniScan);
+            if (Directory.EnumerateFileSystemEntries(emptyIniScan).Any())
+                throw new InvalidDataException("Daily Rewards requires an empty supplemental PHP configuration directory.");
+
+            string windows = Environment.GetFolderPath(Environment.SpecialFolder.Windows);
+            string signal = ShutdownSignalPath(PackageTopology.DailyPhp, Guid.NewGuid().ToString("N") + ".signal");
+            var environment = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["SystemRoot"] = windows, ["WINDIR"] = windows, ["PATH"] = Path.Combine(windows, "System32"),
+                ["TEMP"] = temporary, ["TMP"] = temporary, ["PHP_INI_SCAN_DIR"] = emptyIniScan,
+                ["AO_REBIRTH_DAILY_LOGIN_CLAIMS_ROOTS"] = PathOf("data/daily-login/claims"),
+                ["AOREBIRTH_LOCAL_DAILY_WEB_ROOT"] = web.Replace('\\', '/'),
+                ["AOREBIRTH_LOCAL_DAILY_STATE_ROOT"] = phpStateRoot.Replace('\\', '/'),
+                ["AOREBIRTH_LOCAL_DAILY_STOP_FILE"] = signal
+            };
+            string endpoint = PackageTopology.DailyBindAddress + ":" + PackageTopology.DailyPort.ToString(CultureInfo.InvariantCulture);
+            OwnedProcess process = Launch(PackageTopology.DailyPhp, "php/php.exe", "-c " + Quote(PathOf("web/daily.php.ini"))
+                + " -S " + endpoint + " -t " + Quote(PathOf("web/daily")) + " " + Quote(PathOf("web/daily-router.php")),
+                signal, environment);
+            WaitForPorts(process, PackageTopology.Ports(PackageTopology.DailyPhp, state.DatabasePort), 30000);
+        }
+
+        private static HttpWebRequest DailyRequest(string path, string method, int timeout)
+        {
+            var request = (HttpWebRequest)WebRequest.Create("http://" + PackageTopology.DailyBindAddress + ":"
+                + PackageTopology.DailyPort.ToString(CultureInfo.InvariantCulture) + path);
+            request.Host = PackageTopology.DailyHost;
+            request.Proxy = null;
+            request.AllowAutoRedirect = false;
+            request.Method = method;
+            request.Timeout = timeout;
+            request.ReadWriteTimeout = timeout;
+            return request;
+        }
+
+        private static bool HasMediaType(HttpWebResponse response, string expected)
+        {
+            return string.Equals((response.ContentType ?? string.Empty).Split(';')[0].Trim(), expected, StringComparison.OrdinalIgnoreCase);
+        }
+
+        private void VerifyDailyPhp()
+        {
+            using (var response = (HttpWebResponse)DailyRequest("/index.app", "GET", RemainingStartupTimeout(3000)).GetResponse())
+            using (var reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
+            {
+                if (response.StatusCode != HttpStatusCode.OK || !HasMediaType(response, "text/html")
+                    || reader.ReadToEnd() != File.ReadAllText(PathOf("web/daily/index.app")))
+                    throw new InvalidOperationException("The local Daily Rewards page did not return its packaged index.");
+            }
+
+            // The actual handler refuses a POST without a character routing hint before writing any request.
+            const string token = "launcher-readiness";
+            var request = DailyRequest("/claim.php", "POST", RemainingStartupTimeout(3000));
+            byte[] body = Encoding.UTF8.GetBytes("{\"claimToken\":\"" + token + "\"}");
+            request.ContentType = "application/json";
+            request.ContentLength = body.Length;
+            using (Stream input = request.GetRequestStream())
+                input.Write(body, 0, body.Length);
+            using (var response = (HttpWebResponse)request.GetResponse())
+            using (var reader = new StreamReader(response.GetResponseStream(), Encoding.UTF8))
+            {
+                var serializer = new JavaScriptSerializer { MaxJsonLength = 32768 };
+                var result = serializer.Deserialize<Dictionary<string, object>>(reader.ReadToEnd());
+                object ok;
+                object armed;
+                object echoed;
+                if (response.StatusCode != HttpStatusCode.OK || !HasMediaType(response, "application/json") || result == null
+                    || !result.TryGetValue("ok", out ok) || !Equals(ok, false)
+                    || !result.TryGetValue("armed", out armed) || !Equals(armed, false)
+                    || !result.TryGetValue("claimToken", out echoed) || !Equals(echoed, token))
+                    throw new InvalidOperationException("The local Daily Rewards claim handler did not return its safe no-character response.");
+            }
+        }
+
+        private static void StopDailyPhp(OwnedProcess item)
+        {
+            File.WriteAllText(item.ShutdownFile, "stop");
+            var timer = Stopwatch.StartNew();
+            while (timer.ElapsedMilliseconds < 30000)
+            {
+                if (item.Process.HasExited)
+                    throw new InvalidOperationException("Daily Rewards exited before its requests drained.");
+                VerifyOwnership(item);
+                int owner;
+                if (!ReadListenerOwners(new[] { PackageTopology.DailyPort }).TryGetValue(PackageTopology.DailyPort, out owner))
+                {
+                    Thread.Sleep(250);
+                    continue;
+                }
+                if (owner != item.Process.Id)
+                    throw new InvalidOperationException("Daily Rewards does not own its HTTP listener. No request or stop was sent to the other process.");
+                bool drained = false;
+                try
+                {
+                    using (DailyRequest("/index.app", "GET", 1000).GetResponse()) { }
+                }
+                catch (WebException exception)
+                {
+                    using (var response = exception.Response as HttpWebResponse)
+                    {
+                        drained = response != null && response.StatusCode == HttpStatusCode.ServiceUnavailable
+                            && response.Headers["X-AORebirth-Daily-Drained"] == "1";
+                    }
+                }
+                if (drained)
+                {
+                    // Windows PHP CLI serves one request at a time. The router now refuses all new requests.
+                    if (!ReadListenerOwners(new[] { PackageTopology.DailyPort }).TryGetValue(PackageTopology.DailyPort, out owner)
+                        || owner != item.Process.Id)
+                        throw new InvalidOperationException("The Daily Rewards drain response did not come from the owned listener.");
+                    VerifyOwnership(item);
+                    item.Process.Kill();
+                    if (!item.Process.WaitForExit(10000))
+                        throw new InvalidOperationException("The drained Daily Rewards process did not exit.");
+                    return;
+                }
+                Thread.Sleep(250);
+            }
+            throw new InvalidOperationException("Daily Rewards did not finish its current request. Its owned process record was preserved.");
+        }
+
+        private void StartBroker()
+        {
+            status("Starting local account registration...");
+            AccountUrlReservation.EnsureForCurrentUser();
+            var environment = BaseEnvironment();
+            environment["AOREBIRTH_ACCOUNT_BROKER_URL"] = "http://127.0.0.1:7510/";
+            OwnedProcess process = Launch("AccountBroker", "tools/AccountBroker/AORebirth.AccountBroker.Service.exe",
+                string.Empty, null, environment);
+            // HttpListener uses HTTP.sys, whose listener PID is System rather than the broker PID.
+            var timer = Stopwatch.StartNew();
+            int timeout = RemainingStartupTimeout(30000);
+            while (timer.ElapsedMilliseconds < timeout)
+            {
+                if (process.Process.HasExited)
+                    throw new InvalidOperationException("Local account registration exited. Open Logs for details.");
+
+                VerifyOwnership(process);
+                try
+                {
+                    var request = (HttpWebRequest)WebRequest.Create("http://127.0.0.1:7510/health");
+                    request.Proxy = null;
+                    request.Timeout = 1000;
+                    using (var response = (HttpWebResponse)request.GetResponse())
+                    {
+                        if (response.StatusCode == HttpStatusCode.OK)
+                            return;
+                    }
+                }
+                catch (WebException)
+                {
+                    Thread.Sleep(250);
+                }
+            }
+
+            throw new InvalidOperationException("Local account registration did not become ready.");
+        }
+
+        private void RunDotnet(string dll, string arguments, int timeout, string log)
+        {
+            RunExecutable("runtime/dotnet.exe", Quote(PathOf(dll)) + " " + arguments, timeout, log, BaseEnvironment(), null);
+        }
+
+        private int RunExecutable(string relative, string arguments, int timeout, string log,
+            Dictionary<string, string> environment, string input, bool throwOnFailure = true)
+        {
+            timeout = RemainingStartupTimeout(timeout);
+            using (Process process = NewProcess(relative, arguments, environment))
+            {
+                process.StartInfo.RedirectStandardInput = input != null;
+                if (!process.Start())
+                    throw new InvalidOperationException("Unable to start " + log + ".");
+
+                var identity = new OwnedProcess(log, process, PathOf(relative), null);
+                CaptureOutput(process, log);
+                if (input != null)
+                {
+                    process.StandardInput.Write(input);
+                    process.StandardInput.Close();
+                }
+
+                if (!process.WaitForExit(timeout))
+                {
+                    VerifyOwnership(identity);
+                    process.Kill();
+                    process.WaitForExit(10000);
+                    throw new InvalidOperationException(log + " timed out. Inspect logs before retrying.");
+                }
+
+                process.WaitForExit();
+                if (throwOnFailure && process.ExitCode != 0)
+                    throw new InvalidOperationException(log + " failed (exit " + process.ExitCode + "). Open Logs for details.");
+
+                return process.ExitCode;
+            }
+        }
+
+        private OwnedProcess Launch(string name, string executable, string arguments, string signal,
+            Dictionary<string, string> environment)
+        {
+            Process process = NewProcess(executable, arguments, environment);
+            if (!process.Start())
+                throw new InvalidOperationException("Unable to start " + name + ".");
+
+            var item = new OwnedProcess(name, process, PathOf(executable), signal);
+            owned.Add(item);
+            SaveOwnedProcesses();
+            CaptureOutput(process, name);
+            return item;
+        }
+
+        private void RecoverOwnedProcesses()
+        {
+            string recordPath = PathOf("data/owned-processes.xml");
+            if (!File.Exists(recordPath))
+                return;
+
+            XElement document = PackageState.ReadXml(recordPath);
+            if (document.Name != "OwnedProcesses")
+                throw new InvalidDataException("The saved process ownership document is invalid. No processes were stopped.");
+
+            var names = new HashSet<string>(StringComparer.Ordinal);
+            var pids = new HashSet<int>();
+            foreach (XElement entry in document.Elements())
+            {
+                string name = (string)entry.Attribute("name");
+                if (entry.Name != "Process" || name == null || !names.Add(name))
+                    throw new InvalidDataException("The saved process ownership document contains an unknown or duplicate component.");
+
+                string expected = ExpectedExecutable(name);
+                string executable = (string)entry.Attribute("executable");
+                if (executable == null || !Path.GetFullPath(executable).Equals(expected, StringComparison.OrdinalIgnoreCase))
+                    throw new InvalidDataException("A saved process executable is outside the expected package component. No processes were stopped.");
+
+                int pid = (int?)entry.Attribute("pid") ?? 0;
+                long ticks = (long?)entry.Attribute("startedUtcTicks") ?? 0;
+                if (pid <= 0 || !pids.Add(pid) || ticks <= 0)
+                    throw new InvalidDataException("A saved process identity is invalid.");
+
+                string signal = (string)entry.Attribute("shutdownFile");
+                bool usesSignal = PackageTopology.IsEngine(name) || name == PackageTopology.DailyPhp;
+                if (usesSignal)
+                {
+                    string prefix = ShutdownSignalPath(name, string.Empty);
+                    if (signal == null || !Path.GetFullPath(signal).StartsWith(prefix, StringComparison.OrdinalIgnoreCase)
+                        || !Path.GetDirectoryName(Path.GetFullPath(signal)).Equals(Path.GetDirectoryName(prefix), StringComparison.OrdinalIgnoreCase)
+                        || !signal.EndsWith(".signal", StringComparison.OrdinalIgnoreCase))
+                        throw new InvalidDataException("A saved shutdown signal does not belong to this package's protected data directory.");
+
+                    string relative = Path.GetFullPath(signal).Substring(root.TrimEnd('\\').Length + 1);
+                    signal = PathOf(relative);
+                }
+                else if (!string.IsNullOrEmpty(signal))
+                {
+                    throw new InvalidDataException("A saved non-engine process has an unexpected shutdown signal.");
+                }
+
+                Process process;
+                try
+                {
+                    process = Process.GetProcessById(pid);
+                }
+                catch (ArgumentException)
+                {
+                    // The original process has exited. A stale record has no authority over another process.
+                    continue;
+                }
+
+                try
+                {
+                    if (process.Handle == IntPtr.Zero)
+                        throw new InvalidOperationException("Windows could not retain the saved process identity.");
+
+                    if (process.HasExited || process.StartTime.ToUniversalTime().Ticks != ticks)
+                    {
+                        process.Dispose();
+                        continue;
+                    }
+
+                    var item = new OwnedProcess(name, process, expected, signal);
+                    VerifyOwnership(item);
+                    owned.Add(item);
+                }
+                catch (Exception exception) when ((exception is Win32Exception || exception is InvalidOperationException)
+                    && IsRecordedProcessGone(pid, ticks))
+                {
+                    process.Dispose();
+                    // A bounded second lookup proves exit or PID reuse; it never adopts or stops the replacement.
+                }
+                catch
+                {
+                    process.Dispose();
+                    throw;
+                }
+            }
+
+            if (owned.Count > 0 && state.AdminPassword == null)
+                throw new InvalidDataException("Local credentials for recovered services are missing. Restore the matching protected data backup before continuing.");
+
+            SaveOwnedProcesses();
+        }
+
+        private static bool IsRecordedProcessGone(int pid, long expectedTicks)
+        {
+            try
+            {
+                using (Process current = Process.GetProcessById(pid))
+                {
+                    return current.HasExited || current.StartTime.ToUniversalTime().Ticks != expectedTicks;
+                }
+            }
+            catch (ArgumentException)
+            {
+                return true;
+            }
+            catch (Win32Exception)
+            {
+                return false;
+            }
+            catch (InvalidOperationException)
+            {
+                return false;
+            }
+        }
+
+        private string ExpectedExecutable(string name)
+        {
+            if (name == "MySQL")
+                return PathOf("mysql/bin/mysqld.exe");
+
+            if (name == "AccountBroker")
+                return PathOf("tools/AccountBroker/AORebirth.AccountBroker.Service.exe");
+
+            if (name == PackageTopology.DailyPhp)
+                return PathOf("php/php.exe");
+
+            if (PackageTopology.IsEngine(name))
+                return PathOf("runtime/dotnet.exe");
+
+            throw new InvalidDataException("The saved process ownership document contains an unknown component.");
+        }
+
+        private void SaveOwnedProcesses()
+        {
+            string path = PathOf("data/owned-processes.xml");
+            if (owned.Count == 0)
+            {
+                if (File.Exists(path))
+                {
+                    File.Delete(path);
+                }
+
+                return;
+            }
+
+            var document = new XElement("OwnedProcesses", owned.Select(item => new XElement("Process",
+                new XAttribute("name", item.Name),
+                new XAttribute("pid", item.Process.Id),
+                new XAttribute("startedUtcTicks", item.StartedUtc.Ticks),
+                new XAttribute("executable", item.Executable),
+                item.ShutdownFile == null ? null : new XAttribute("shutdownFile", item.ShutdownFile))));
+            PackageState.AtomicWrite(path, Encoding.UTF8.GetBytes(document.ToString()));
+        }
+
+        private Process NewProcess(string relative, string arguments, Dictionary<string, string> environment)
+        {
+            string executable = PathOf(relative);
+            var info = new ProcessStartInfo(executable, arguments)
+            {
+                WorkingDirectory = root,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                WindowStyle = ProcessWindowStyle.Hidden,
+                RedirectStandardOutput = true,
+                RedirectStandardError = true
+            };
+            if (relative == "php/php.exe")
+                info.EnvironmentVariables.Clear();
+            foreach (string key in info.EnvironmentVariables.Keys.Cast<string>().ToArray())
+            {
+                if (key.StartsWith("AO_REBIRTH_", StringComparison.OrdinalIgnoreCase)
+                    || key.StartsWith("AOREBIRTH_", StringComparison.OrdinalIgnoreCase)
+                    || key.StartsWith("MYSQL_", StringComparison.OrdinalIgnoreCase))
+                {
+                    info.EnvironmentVariables.Remove(key);
+                }
+            }
+
+            foreach (var entry in environment)
+            {
+                info.EnvironmentVariables[entry.Key] = entry.Value;
+            }
+
+            return new Process { StartInfo = info };
+        }
+
+        private Dictionary<string, string> BaseEnvironment()
+        {
+            return new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase)
+            {
+                ["DOTNET_ROOT"] = PathOf("runtime"),
+                ["DOTNET_ROOT_X64"] = PathOf("runtime"),
+                ["DOTNET_MULTILEVEL_LOOKUP"] = "0",
+                ["AO_REBIRTH_MYSQL_CONNECTION"] = RuntimeConnection(state.RuntimePassword),
+                ["AO_REBIRTH_EXPECTED_DATABASE"] = "cellao_codex_clean",
+                ["AO_REBIRTH_CONFIG_PATH"] = PathOf("data/config/Config.xml"),
+                ["AO_REBIRTH_GAMEDATA_PATH"] = PathOf("GameData"),
+                ["AO_REBIRTH_ZONE_STATE_DIR"] = PathOf("data/zone"),
+                ["AO_REBIRTH_DAILY_LOGIN_CLAIMS_ROOTS"] = PathOf("data/daily-login/claims"),
+                ["AO_REBIRTH_BIND_MODE"] = "Loopback",
+                ["AO_REBIRTH_ISCOM_LISTEN_IP"] = "127.0.0.1",
+                ["AO_REBIRTH_CHAT_LISTEN_IP"] = "127.0.0.1",
+                ["AO_REBIRTH_WORLD_TOKEN"] = state.WorldToken
+            };
+        }
+
+        private string RuntimeConnection(string password)
+        {
+            return "Server=127.0.0.1;Port=" + state.DatabasePort.ToString(CultureInfo.InvariantCulture)
+                + ";Database=cellao_codex_clean;User ID=aorebirth_local;Password=" + password + ";AllowPublicKeyRetrieval=True;";
+        }
+
+        private string AdminConnection(string password)
+        {
+            return "Server=127.0.0.1;Port=" + state.DatabasePort.ToString(CultureInfo.InvariantCulture)
+                + ";Database=cellao_codex_clean;User ID=root;Password=" + password + ";AllowPublicKeyRetrieval=True;";
+        }
+
+        private void CaptureOutput(Process process, string name)
+        {
+            object gate = new object();
+            bool logFailed = false;
+            DataReceivedEventHandler write = (sender, args) =>
+            {
+                if (args.Data == null)
+                    return;
+
+                string line = args.Data;
+                foreach (string secret in new[] { state.AdminPassword, state.RuntimePassword, state.WorldToken })
+                {
+                    if (!string.IsNullOrEmpty(secret))
+                    {
+                        line = line.Replace(secret, "[redacted]");
+                    }
+                }
+
+                lock (gate)
+                {
+                    if (logFailed)
+                        return;
+
+                    try
+                    {
+                        File.AppendAllText(PathOf("logs/" + name + ".log"), DateTime.UtcNow.ToString("O") + " " + line + Environment.NewLine);
+                    }
+                    catch (Exception exception) when (exception is IOException || exception is UnauthorizedAccessException)
+                    {
+                        logFailed = true;
+                        status("Log output could not be saved. Check available disk space and folder permissions.");
+                    }
+                }
+            };
+            process.OutputDataReceived += write;
+            process.ErrorDataReceived += write;
+            process.BeginOutputReadLine();
+            process.BeginErrorReadLine();
+        }
+
+        private static void RequireFreePorts(params int[] ports)
+        {
+            foreach (IPEndPoint listener in IPGlobalProperties.GetIPGlobalProperties().GetActiveTcpListeners())
+            {
+                if (ports.Contains(listener.Port))
+                    throw new InvalidOperationException(listener.Port == PackageTopology.DailyPort
+                        ? "Local Daily Rewards requires port 80, which is already in use. The other application was left alone."
+                        : "Local port " + listener.Port + " is already in use. Close the other server first. No processes were stopped.");
+            }
+        }
+
+        private void WaitForPorts(OwnedProcess item, int[] ports, int timeout)
+        {
+            timeout = RemainingStartupTimeout(timeout);
+            var timer = Stopwatch.StartNew();
+            while (timer.ElapsedMilliseconds < timeout)
+            {
+                if (item.Process.HasExited)
+                    throw new InvalidOperationException(item.Name + " exited during startup. Open Logs for details.");
+
+                VerifyOwnership(item);
+                IDictionary<int, int> listeners = ReadListenerOwners(ports);
+                if (ports.All(port => listeners.ContainsKey(port) && listeners[port] == item.Process.Id))
+                    return;
+
+                foreach (int port in ports)
+                {
+                    int actualOwner;
+                    if (listeners.TryGetValue(port, out actualOwner) && actualOwner != item.Process.Id)
+                        throw new InvalidOperationException(item.Name + " port " + port.ToString(CultureInfo.InvariantCulture)
+                            + " belongs to PID " + actualOwner.ToString(CultureInfo.InvariantCulture)
+                            + "; expected PID " + item.Process.Id.ToString(CultureInfo.InvariantCulture)
+                            + ". No unrelated process was stopped.");
+                }
+
+                Thread.Sleep(250);
+            }
+
+            throw new InvalidOperationException(item.Name + " did not become ready. Open Logs for details.");
+        }
+
+        private static IDictionary<int, int> ReadListenerOwners(int[] ports)
+        {
+            int size = 0;
+            GetExtendedTcpTable(IntPtr.Zero, ref size, false, 2, 3, 0);
+            IntPtr buffer = Marshal.AllocHGlobal(size);
+            try
+            {
+                if (GetExtendedTcpTable(buffer, ref size, false, 2, 3, 0) != 0)
+                    throw new InvalidOperationException("Windows could not verify local listener ownership.");
+
+                int count = Marshal.ReadInt32(buffer);
+                var owners = new Dictionary<int, int>();
+                for (int index = 0; index < count; index++)
+                {
+                    IntPtr row = IntPtr.Add(buffer, 4 + index * 24);
+                    byte first = Marshal.ReadByte(row, 8);
+                    byte second = Marshal.ReadByte(row, 9);
+                    int port = first * 256 + second;
+                    if (!ports.Contains(port))
+                        continue;
+
+                    int pid = Marshal.ReadInt32(row, 20);
+                    if (owners.ContainsKey(port) && owners[port] != pid)
+                        throw new InvalidOperationException("Multiple processes own a local port.");
+
+                    owners[port] = pid;
+                }
+
+                return owners;
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(buffer);
+            }
+        }
+
+        [DllImport("iphlpapi.dll", SetLastError = true)]
+        private static extern uint GetExtendedTcpTable(IntPtr table, ref int size, bool order, int family, int tableClass, uint reserved);
+
+        private static void VerifyOwnership(OwnedProcess item)
+        {
+            if (item.Process.HasExited)
+                return;
+
+            if (item.Process.StartTime.ToUniversalTime() != item.StartedUtc
+                || !Path.GetFullPath(item.Process.MainModule.FileName).Equals(item.Executable, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidOperationException("Process ownership could not be verified for " + item.Name + ". No stop was attempted.");
+        }
+
+        private static XElement ReadClient(string root)
+        {
+            XElement client = PackageState.ReadXml(SafePath(root, "config/client.xml"));
+            Uri url;
+            if (client.Name != "Client" || !Uri.TryCreate((string)client.Attribute("downloadUrl"), UriKind.Absolute, out url)
+                || url.Scheme != Uri.UriSchemeHttps || url.Host != "ao-rebirth.com"
+                || string.IsNullOrWhiteSpace((string)client.Attribute("executable"))
+                || (client.Attribute("archiveSha256") != null && !IsHash((string)client.Attribute("archiveSha256")))
+                || ((long?)client.Attribute("archiveLength") ?? 0) <= 0
+                || !IsHash((string)client.Attribute("executableSha256")))
+                throw new InvalidDataException("The approved client download configuration is missing or invalid.");
+
+            SafePath(root, (string)client.Attribute("executable"));
+            return client;
+        }
+
+        private static bool IsHash(string value)
+        {
+            return value != null && value.Length == 64 && value.All(character => Uri.IsHexDigit(character));
+        }
+
+        private static void VerifyHash(string path, string expected, string description)
+        {
+            using (var hash = SHA256.Create())
+            using (var stream = File.OpenRead(path))
+            {
+                if (!BitConverter.ToString(hash.ComputeHash(stream)).Replace("-", string.Empty).Equals(expected, StringComparison.OrdinalIgnoreCase))
+                    throw new InvalidDataException(description + " does not match the approved AORebirth download.");
+            }
+        }
+
+        private static void VerifyClientExecutable(string executable, XElement client)
+        {
+            VerifyHash(executable, (string)client.Attribute("executableSha256"), "Client executable");
+        }
+
+        private static void VerifyArchive(string archive, XElement client)
+        {
+            if (new FileInfo(archive).Length != (long)client.Attribute("archiveLength"))
+                throw new InvalidDataException("The client archive is incomplete or does not match the approved download length.");
+
+            string hash = (string)client.Attribute("archiveSha256");
+            if (hash != null)
+            {
+                VerifyHash(archive, hash, "Client archive");
+            }
+        }
+
+        private static string FindClientFolder(string directory, XElement client)
+        {
+            string relative = ((string)client.Attribute("executable")).Replace('/', '\\');
+            var matches = Directory.EnumerateFiles(directory, Path.GetFileName(relative), SearchOption.AllDirectories)
+                .Where(file => file.EndsWith("\\" + relative, StringComparison.OrdinalIgnoreCase)).ToArray();
+            if (matches.Length != 1)
+                throw new InvalidDataException("The verified archive does not contain one unambiguous client executable.");
+
+            return matches[0].Substring(0, matches[0].Length - relative.Length).TrimEnd('\\');
+        }
+
+        private void SetExtractedClient(string directory, XElement client)
+        {
+            SetClientFolder(FindClientFolder(directory, client));
+        }
+
+        private static void ValidateConfig(XElement config)
+        {
+            foreach (var value in new Dictionary<string, string>
+            {
+                ["SQLType"] = "MySql", ["ChatIP"] = "127.0.0.1", ["ZoneIP"] = "127.0.0.1",
+                ["ChatPort"] = "7012", ["ZonePort"] = "7501", ["LoginPort"] = "7500"
+            })
+            {
+                if (!string.Equals((string)config.Element(value.Key), value.Value, StringComparison.Ordinal))
+                    throw new InvalidDataException("Local package configuration must retain " + value.Key + "=" + value.Value + ".");
+            }
+
+            XElement world = config.Element("World");
+            if (config.Elements("World").Skip(1).Any())
+                throw new InvalidDataException("Local package configuration must contain at most one World section.");
+            if (world == null)
+                return;
+            foreach (var value in new Dictionary<string, string>
+            {
+                ["ListenIP"] = "127.0.0.1", ["Port"] = "7600", ["StatusPort"] = "7601",
+                ["Url"] = "http://127.0.0.1:7600", ["InstanceName"] = "zone-7501"
+            })
+            {
+                string actual = (string)world.Element(value.Key);
+                if (!string.IsNullOrWhiteSpace(actual) && !string.Equals(actual.Trim(), value.Value, StringComparison.Ordinal))
+                    throw new InvalidDataException("Local package World configuration must retain " + value.Key + "=" + value.Value + ".");
+            }
+        }
+
+        private string PathOf(string relative) { return SafePath(root, relative); }
+
+        private static string SafePath(string root, string relative)
+        {
+            if (string.IsNullOrWhiteSpace(relative) || Path.IsPathRooted(relative) || relative.IndexOf(':') >= 0)
+                throw new InvalidDataException("A package path is invalid.");
+
+            string fullRoot = Path.GetFullPath(root).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
+            string path = Path.GetFullPath(Path.Combine(fullRoot, relative.Replace('/', '\\')));
+            if (!path.StartsWith(fullRoot, StringComparison.OrdinalIgnoreCase))
+                throw new InvalidDataException("A package path leaves the installation folder.");
+
+            string current = path;
+            while (current.Length >= fullRoot.Length - 1)
+            {
+                if ((File.Exists(current) || Directory.Exists(current))
+                    && (File.GetAttributes(current) & FileAttributes.ReparsePoint) != 0)
+                    throw new InvalidDataException("Package and client folders must not contain filesystem links.");
+
+                current = Path.GetDirectoryName(current);
+                if (current == null)
+                    break;
+            }
+
+            return path;
+        }
+
+        private static string Quote(string value)
+        {
+            if (value.IndexOf('"') >= 0 || value.IndexOf('\r') >= 0 || value.IndexOf('\n') >= 0)
+                throw new InvalidDataException("The installation path contains unsupported characters.");
+
+            return "\"" + value.TrimEnd('\\') + "\"";
+        }
+
+        private sealed class OwnedProcess
+        {
+            internal readonly string Name;
+            internal readonly Process Process;
+            internal readonly string Executable;
+            internal readonly string ShutdownFile;
+            internal readonly DateTime StartedUtc;
+
+            internal OwnedProcess(string name, Process process, string executable, string shutdownFile)
+            {
+                Name = name;
+                Process = process;
+                Executable = executable;
+                ShutdownFile = shutdownFile;
+                StartedUtc = process.StartTime.ToUniversalTime();
+            }
+        }
+    }
+}

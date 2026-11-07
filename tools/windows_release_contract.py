@@ -1716,6 +1716,11 @@ def run_feature_validation(root, profile, child):
     project = feature_command(root, child)
     source_only_dao = (project == Path(root) / "Tools/MissionDaoValidation/MissionDaoValidation.csproj"
                        and len(child) == 5 and Path(child[3]).name.lower() == "run_mission_dao_validation.cmd")
+    source_only_windows_package = (
+        project == Path(root) / "Tools/WindowsLocalPackage/Tests/WindowsLocalPackageValidation/WindowsLocalPackageValidation.csproj"
+        and len(child) >= 7 and child[1:3] == ["run", "--project"]
+        and child[4:7] == ["--configuration", "Release", "--"])
+    source_only_tool = source_only_dao or source_only_windows_package
     source = feature_source(root)
     rows, states = inventory(profile["CANONICAL_GAMEDATA_ROOT"])
     current, directories = content_states(profile["CANONICAL_GAMEDATA_ROOT"])
@@ -1741,11 +1746,11 @@ def run_feature_validation(root, profile, child):
         if result.returncode == 0:
             if feature_source(root) != source or content_states(profile["CANONICAL_GAMEDATA_ROOT"]) != (states, directories):
                 raise ValueError("Feature source or selected content changed during validation")
-            if source_only_dao and not (active.parent / "build-observations").exists():
+            if source_only_tool and not (active.parent / "build-observations").exists():
                 observations = {"WRAPPER_ENTERED": False, "PRODUCT_HOOKS": []}
             else:
                 observations = collect_build_observations(active)
-            if not observations["PRODUCT_HOOKS"] and not source_only_dao:
+            if not observations["PRODUCT_HOOKS"] and not source_only_tool:
                 raise ValueError("Feature validation did not observe the product compiler guard")
             if project is None and (not observations["WRAPPER_ENTERED"] or not
                     {"ChatEngine.WinNet10", "LoginEngine.WinNet10", "WorldEngine", "ZoneEngine_New"} <= set(observations["PRODUCT_HOOKS"])):
@@ -1753,15 +1758,19 @@ def run_feature_validation(root, profile, child):
             outputs = {checked(root, name) for name in OUTPUTS if (Path(root) / name).is_file()}
             if project is not None and (project.parent / "bin").is_dir():
                 outputs.update(path for path in (project.parent / "bin").rglob(project.stem + ".dll") if path.is_file())
-            if source_only_dao:
-                tool = checked(root, "Tools/MissionDaoValidation/bin/Release/net10.0/MissionDaoValidation.dll")
+            if source_only_tool:
+                tool = checked(root, "Tools/MissionDaoValidation/bin/Release/net10.0/MissionDaoValidation.dll"
+                    if source_only_dao else
+                    "Tools/WindowsLocalPackage/Tests/WindowsLocalPackageValidation/bin/Release/net48/WindowsLocalPackageValidation.exe")
                 state = file_state(tool)
                 tool_hash = digest(tool.read_bytes())
                 if not state[2] or file_state(tool) != state:
                     raise ValueError("Source-only validation assembly changed during measurement")
                 attempt["SOURCE_ONLY_VALIDATION_TOOL"] = {"path": tool.relative_to(root).as_posix(),
                     "bytes": state[2], "sha256": tool_hash,
-                    "METHOD": "EXISTING_CHESTS_ONLY_WRAPPER_COMPILES_LINKED_PERSISTENCE_SOURCES"}
+                    "METHOD": ("EXISTING_CHESTS_ONLY_WRAPPER_COMPILES_LINKED_PERSISTENCE_SOURCES"
+                               if source_only_dao else "EXACT_WINDOWS_PACKAGE_TOOL_COMPILES_OFFLINE_VALIDATION_SOURCES")}
+                outputs.add(tool)
             attempt["AVAILABLE_OUTPUTS_POST_COMMAND"] = [{"path": path.relative_to(root).as_posix(),
                     "bytes": path.stat().st_size, "sha256": digest(path.read_bytes())} for path in sorted(outputs)]
             attempt.update(VALIDATION_RESULT="PASS", PRODUCT_COMPILER_HOOKS=observations["PRODUCT_HOOKS"])
