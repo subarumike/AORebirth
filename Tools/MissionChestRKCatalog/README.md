@@ -11,8 +11,9 @@ metadata exporter. Supply `--gamedata-root` and `--output-root`. It reads
 `items.dat` using the existing `ItemsDatReader` and exports identities, stored
 quality, current flags/stats, ordered criteria, function argument evidence and
 decoded shop stock lines. The receipt binds the export to its source SHA-256.
-Nullable integer function arguments mean that the argument was not an integer;
-the export does not claim to decode arbitrary expressions or other value types.
+Integer and string argument arrays keep their original positions. A null means
+the argument was not of that array's type. The export does not claim to decode
+arbitrary expressions or other value types.
 
 `cache_review_source.py` accepts `--url` and `--output` to cache one bounded
 public source with its URL, HTTP result and content hash. It reuses a matching
@@ -100,3 +101,45 @@ observations are deduplicated by their complete evidence. Capture observations
 append acquisition evidence without changing origin, exclusions, approvals,
 rarity or QL policy. Keep the lookup, input records, source manifest and merged
 evidence outside canonical GameData and public Git.
+
+## RK dynaboss corpse reconciliation
+
+Pass a completed gameplay directory with `--raw-capture-dir` for offline
+decoding on private working copies, or use `--decoded-capture-dir` for an
+already decoded batch. `--capture-dir` also accepts reviewed
+rk-corpse-inventories.csv and rk-dyna-item-observations.csv inputs. Repeat the
+input options to merge retained batches by packet and slot identity.
+
+From the checkout root, export metadata from the GameData selected for the
+review, then pass its receipt and the reviewed batch to the offline tools.
+
+```cmd
+cmd /d /c Tools\export-mission-chest-rk-metadata.cmd --gamedata-root GameData --output-root Captures\reviewed-rk-dyna\item-metadata
+python -B Tools\reconcile_rk_dyna_loot.py --decoded-capture-dir Captures\reviewed-rk-dyna --game-data GameData --item-metadata Captures\reviewed-rk-dyna\item-metadata --output-dir Captures\reviewed-rk-dyna\reconciliation
+python -B Tools\reconstruct_rk_dyna_loot.py --reconciliation Captures\reviewed-rk-dyna\reconciliation --item-metadata Captures\reviewed-rk-dyna\item-metadata --output Captures\reviewed-rk-dyna\reconstruction
+```
+
+The generator writes an offline overlay with supporting slots, QL bounds,
+provisional weights and unresolved assignments. Its ordered equipment model
+admits full profiles and independently supported short-profile assignments.
+Review the reports and apply only the scoped overlay rows to the private
+ItemTemplates.json. Existing item families, shops, mission and ordinary loot
+keep their generic lookup rules.
+
+The finalized RK provisional weighting uses `--smooth-root AABC --smooth-root ARMO --smooth-root OUDY`
+when regenerating the overlay. These roots add one to each supported slot
+count. The generator rejects a proposal that drops an installed family or
+narrows its supported center range. Include all retained supporting batches
+when proposing updates.
+
+`Tools/audit_rk_dyna_residual_loot.py` checks unresolved inventories against
+the original packet sinks and reports every compatible ordered alignment.
+`Tools/audit_rk_dyna_loot_weights.py` separates observed support, requested-QL
+eligibility, expected occurrence, and held-out weighting comparisons. Both
+tools write private reports and treat their source inputs as read-only.
+
+To compare an overlay against a pre-install snapshot, pass both files to the
+simulator with `--overlay` and `--base-item-templates`. Its `--evidence-root`
+uses the reviewed corpse and item CSVs, with `--item-metadata` pointing to the
+metadata export. Keep capture inputs, exports, snapshots and reports outside
+canonical GameData and public Git.

@@ -4,6 +4,8 @@ namespace ZoneEngine_New.Core.GameData
     using System.Collections.Generic;
     using System.Text.Json;
 
+    public readonly record struct EquipmentLootMember(HashInstance Family, int Weight, int MinCenter, int MaxCenter);
+
     /// <summary>
     /// ItemTemplates.json: a hash with Templates is a leaf item family; a hash with Children is a category.
     /// Parents never have template ids. Leaves never have children.
@@ -21,6 +23,7 @@ namespace ZoneEngine_New.Core.GameData
         readonly Dictionary<string, HashInstance> _instances;
         readonly Dictionary<(int LowId, int HighId), string?> _assignedHashes;
         readonly HashSet<string> _spawnAll;
+        readonly Dictionary<string, IReadOnlyList<EquipmentLootMember>> _equipmentLoot = new(StringComparer.Ordinal);
         readonly Random _random;
 
         public HashItemCatalog(
@@ -49,6 +52,7 @@ namespace ZoneEngine_New.Core.GameData
         {
             var categories = new Dictionary<string, string[]>(StringComparer.Ordinal);
             var instances = new Dictionary<string, HashInstance>(StringComparer.Ordinal);
+            var equipmentOnly = new Dictionary<string, HashInstance>(StringComparer.Ordinal);
             var spawnAll = new HashSet<string>(StringComparer.Ordinal);
             if (string.IsNullOrWhiteSpace(json))
                 return new HashItemCatalog(categories, instances, random, spawnAll);
@@ -64,7 +68,14 @@ namespace ZoneEngine_New.Core.GameData
                 if (string.IsNullOrEmpty(hash) || pair.Value == null)
                     continue;
 
+                if (pair.Value.EquipmentLoot != null)
+                    continue;
+
                 string[]? children = pair.Value.Children;
+                if (pair.Value.EquipmentLootOnly && (children is { Length: > 0 } || pair.Value.SpawnAll
+                    || pair.Value.Templates is not { Length: > 0 } || Array.Exists(pair.Value.Templates, id => id <= 0)))
+                    throw new FormatException("Invalid equipment-only item family: " + hash);
+
                 if (children != null && children.Length > 0)
                 {
                     categories[hash] = children;
@@ -87,11 +98,38 @@ namespace ZoneEngine_New.Core.GameData
                 if (ids.Count == 0)
                     continue;
 
-                instances.TryAdd(hash, new HashInstance(hash, ids.ToArray()));
+                (pair.Value.EquipmentLootOnly ? equipmentOnly : instances).Add(hash, new HashInstance(hash, ids.ToArray()));
             }
 
-            return new HashItemCatalog(categories, instances, random, spawnAll);
+            var catalog = new HashItemCatalog(categories, instances, random, spawnAll);
+            foreach ((string hash, HashItemRow row) in records)
+            {
+                if (row?.EquipmentLoot is not { } policy)
+                    continue;
+                if (string.IsNullOrEmpty(hash) || row.EquipmentLootOnly || row.SpawnAll || row.Templates is { Length: > 0 }
+                    || row.Children is not { Length: > 0 } children || children.Length != policy.Count)
+                    throw new FormatException("Invalid equipment loot pool: " + hash);
+
+                var members = new List<EquipmentLootMember>(children.Length);
+                var seen = new HashSet<string>(StringComparer.Ordinal);
+                foreach (string child in children)
+                {
+                    if (string.IsNullOrEmpty(child) || !seen.Add(child) || !policy.TryGetValue(child, out EquipmentLootSettings? settings)
+                        || settings == null || settings.Weight <= 0 || settings.MinCenter <= 0 || settings.MaxCenter < settings.MinCenter
+                        || (!instances.TryGetValue(child, out HashInstance? family) && !equipmentOnly.TryGetValue(child, out family)))
+                        throw new FormatException($"Invalid equipment loot member {child} in {hash}");
+
+                    members.Add(new EquipmentLootMember(family, settings.Weight, settings.MinCenter, settings.MaxCenter));
+                }
+
+                catalog._equipmentLoot.Add(hash, members.AsReadOnly());
+            }
+
+            return catalog;
         }
+
+        public IReadOnlyList<EquipmentLootMember>? GetEquipmentLootMembers(string hash)
+            => _equipmentLoot.GetValueOrDefault(hash);
 
         public bool TryGetCategory(string hash, out IReadOnlyList<string> childHashes)
         {
@@ -430,6 +468,19 @@ namespace ZoneEngine_New.Core.GameData
             public int[]? Templates { get; set; }
 
             public bool SpawnAll { get; set; }
+
+            public bool EquipmentLootOnly { get; set; }
+
+            public Dictionary<string, EquipmentLootSettings>? EquipmentLoot { get; set; }
+        }
+
+        sealed class EquipmentLootSettings
+        {
+            public int Weight { get; set; }
+
+            public int MinCenter { get; set; }
+
+            public int MaxCenter { get; set; }
         }
     }
 }

@@ -142,6 +142,73 @@ namespace ZoneEngine_New.Core.Inventory
             return true;
         }
 
+        internal bool HasScalingFamily(string hash)
+            => Array.Exists(_leafRanges.GetOrAdd(hash, BuildLeafRanges), static leaf => leaf.Min < leaf.Max);
+
+        internal IReadOnlyList<EquipmentLootMember>? GetEquipmentLootMembers(string hash)
+            => _gameData.GetEquipmentLootMembers(hash);
+
+        internal bool HasScalingFamily(IReadOnlyList<EquipmentLootMember> members)
+        {
+            foreach (EquipmentLootMember member in members)
+            {
+                FamilySpan span = GetFamilySpan(member.Family);
+                if (span.AllTemplatesPresent && span.Min < span.Max)
+                    return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>Choose among eligible reconstructed families before resolving the selected family's IDs and QL.</summary>
+        internal bool TryRollEquipmentLoot(IReadOnlyList<EquipmentLootMember> members, int center, int desiredQuality,
+            Random random, out int lowId, out int highId, out int quality)
+        {
+            lowId = 0;
+            highId = 0;
+            quality = 0;
+            long totalWeight = 0;
+            foreach (EquipmentLootMember member in members)
+            {
+                if (EquipmentLootQuality(member, center, desiredQuality) > 0)
+                    totalWeight += member.Weight;
+            }
+
+            if (totalWeight == 0)
+                return false;
+
+            long ticket = random.NextInt64(totalWeight);
+            foreach (EquipmentLootMember member in members)
+            {
+                int itemQuality = EquipmentLootQuality(member, center, desiredQuality);
+                if (itemQuality == 0)
+                    continue;
+
+                ticket -= member.Weight;
+                if (ticket >= 0)
+                    continue;
+
+                quality = itemQuality;
+                return HashItemCatalog.TrySelectIds(member.Family, quality, CatalogQuality, out lowId, out highId);
+            }
+
+            return false;
+        }
+
+        int EquipmentLootQuality(EquipmentLootMember member, int center, int desiredQuality)
+        {
+            if (center < member.MinCenter || center > member.MaxCenter)
+                return 0;
+
+            FamilySpan span = GetFamilySpan(member.Family);
+            if (!span.AllTemplatesPresent)
+                return 0;
+            if (span.Min == span.Max)
+                return span.Min;
+
+            return desiredQuality < span.Min ? 0 : Math.Min(desiredQuality, span.Max);
+        }
+
         LeafRange[] BuildLeafRanges(string hash)
         {
             var instances = new List<HashInstance>();
@@ -315,20 +382,22 @@ namespace ZoneEngine_New.Core.Inventory
             int min = int.MaxValue;
             int max = int.MinValue;
             bool special = false;
+            bool allTemplatesPresent = true;
             int[] ids = instance.TemplateIds;
             for (int i = 0; i < ids.Length; i++)
             {
                 if (ids[i] <= 0)
                     continue;
 
-                int ql = CatalogQuality(ids[i]);
+                bool exists = _catalog.TryGet(ids[i], out ItemTemplate template);
+                int ql = exists ? Math.Max(1, template.Quality) : 1;
                 min = Math.Min(min, ql);
                 max = Math.Max(max, ql);
-                special |= _catalog.TryGet(ids[i], out ItemTemplate template)
-                    && ((ItemFlags)template.Flags & ItemFlags.Special) != 0;
+                special |= exists && ((ItemFlags)template.Flags & ItemFlags.Special) != 0;
+                allTemplatesPresent &= exists;
             }
 
-            return new FamilySpan(min, max, special);
+            return new FamilySpan(min, max, special, allTemplatesPresent);
         }
 
         /// <summary>Every leaf item family reachable from <paramref name="hash"/>.</summary>
@@ -433,7 +502,7 @@ namespace ZoneEngine_New.Core.Inventory
 
         readonly record struct QualitySpan(int Min, int Max);
 
-        readonly record struct FamilySpan(int Min, int Max, bool Special);
+        readonly record struct FamilySpan(int Min, int Max, bool Special, bool AllTemplatesPresent);
 
         readonly record struct LeafRange(HashInstance Instance, int Min, int Max);
 

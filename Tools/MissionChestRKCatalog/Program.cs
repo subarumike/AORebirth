@@ -60,7 +60,8 @@ using (var writer = new StreamWriter(partial, false, new UTF8Encoding(false)))
                 functions.Add(function.FunctionType);
                 functionDetails.Add(new { Event = ev.EventType.ToString(), Function = function.FunctionType,
                     FunctionName = Enum.GetName((FunctionType)function.FunctionType), function.Target,
-                    IntegerArguments = (function.Arguments?.Values ?? []).Select(value => value.IsTypeOf<int>() == true ? (int?)value.AsInt32() : null) });
+                    IntegerArguments = (function.Arguments?.Values ?? []).Select(value => value.IsTypeOf<int>() == true ? (int?)value.AsInt32() : null),
+                    StringArguments = (function.Arguments?.Values ?? []).Select(value => value.IsTypeOf<string>() == true ? value.AsString() : null) });
                 if (function.FunctionType == (int)FunctionType.UploadNano
                     && function.Arguments?.Values is { Count: > 0 } arguments
                     && arguments[0].IsTypeOf<int>() == true && arguments[0].AsInt32() > 0)

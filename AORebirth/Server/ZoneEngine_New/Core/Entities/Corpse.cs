@@ -74,6 +74,7 @@ namespace ZoneEngine_New.Core.Entities
                 ItemTable = npc.MobTemplate?.ItemTable;
                 CarriedItems = npc.TakeCarriedLoot();
                 LootEquipment = new List<Inventory.Item>(npc.Equipment.Content.Values);
+                ShareScalingEquipmentQuality = npc.SharesEquipmentLootQuality;
                 CorpseFullUpdateTemplate = CopyCorpseFullUpdateTemplate(npc.MobTemplate?.CorpseFullUpdateTemplate);
             }
 
