@@ -33,6 +33,58 @@ flowchart LR
 - Messaging: AOtomation N3 messages and serializers.
 - Tools: capture, replay, smoke tests, client hook/injector experiments, and historical utilities.
 
+## Data-oriented gameplay
+
+Retail evidence establishes content and protocol behavior. Editable GameData
+holds the selected gameplay definitions, reference pools and tunable policies.
+Loaders validate inputs and resolve their references. Runtime components use the
+validated definitions through typed interfaces and existing item, persistence,
+combat and network services. Preserve hot-path costs by reusing validated data
+and eligibility indexes. Fail with a specific diagnostic when a required input
+is missing, invalid or unsupported.
+
+Mission offer construction, destination selection, objective resolution, quest
+persistence and dungeon materialization have separate owners. Offers use the
+typed `Missions/MissionOffers.json` definitions and the existing AO serializers.
+Capture evidence and raw wire bodies belong in offline analysis or test fixtures.
+An accepted offer may still retain its own serialized representation for durable
+reconstruction. That representation comes from the generated offer.
+
+`DungeonGeneration.json` supplies new dungeon profiles, objective and NPC pools,
+and chest rules. Its `ContentCoverage` describes gaps by role. A provisional
+entry names the missing evidence in `Gap`. A completeness claim requires
+supporting `Evidence` and an eligible pool beyond the single-choice prototypes.
+Keep evidence limits visible in content review and validation reports.
+
+The exact version 1/2 seed-only layout parameters are compatibility inputs for
+accepted missions. They originate in commit
+`8f517d711f6208c3308c06c68b414fd59a1316df`. The guard checks the values, version
+gate and references to those fields. The architecture mutation tests reject
+changes that broaden the gate. `ProceduralDungeonFoundationTests.PreviouslyAcceptedV2SeedsKeepExactGeneratorPayloadAndSpawnBits`
+checks version 2 against `Fixtures/ProceduralDungeonV2Golden.json`.
+
+The existing Roslyn runtime content guard provides two proposed-change modes.
+On Windows, run `Tools/run_newengine_content_architecture_guard.cmd --doa-self-test`
+for focused mutation cases and `Tools/run_newengine_content_architecture_guard.cmd
+--enforce <base-sha>` for the change check. Supply the exact Git base of the
+proposal. Optionally add `--catalog-root <GameData>` for authoritative mission
+item and NPC family resolution and `--output <report>` for structured findings.
+Keep private catalog output in the owning ignored workspace.
+
+The CI workflow applies the source graph and public catalog checks on pull
+requests and relevant pushes. The check rejects new findings and newly
+unresolved project inputs. It inventories inherited findings separately by
+path, rule, syntax fingerprint and occurrence count. A moved, edited or copied
+violation cannot reuse an inherited occurrence. Treat inherited findings as
+remediation work. The existing full-inventory modes retain their report contract.
+
+Public CI can check catalog structure, recorded payload fields and declarations
+of coverage. Authoritative private hash references require the selected
+GameData. Production loaders and targeted tests validate the actual item
+definitions and typed protocol fields. The Roslyn checks cover documented source
+patterns and the existing project graph inventory. Semantic review remains
+required for new APIs and indirect flows outside those patterns.
+
 ## Data Flow
 
 Typical login/playfield flow:

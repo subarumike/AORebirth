@@ -1,0 +1,49 @@
+name: Runtime data architecture
+
+on:
+  pull_request:
+  push:
+    branches:
+      - master
+      - 'codex/**'
+
+permissions:
+  contents: read
+
+jobs:
+  content-boundary:
+    runs-on: windows-latest
+    timeout-minutes: 12
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: '10.0.x'
+      - name: Verify proposed runtime and catalog changes
+        shell: pwsh
+        env:
+          PR_BASE: ${{ github.event.pull_request.base.sha }}
+          PUSH_BASE: ${{ github.event.before }}
+        run: |
+          $baseline = $env:PR_BASE
+          if (-not $baseline) {
+            if ($env:GITHUB_REF -eq 'refs/heads/master') {
+              $baseline = $env:PUSH_BASE
+            } else {
+              $baseline = git merge-base origin/master HEAD
+              if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+            }
+          }
+          if ($baseline -notmatch '^[0-9a-f]{40}$' -or $baseline -match '^0+$') {
+            throw 'The exact proposed-change base is unavailable.'
+          }
+          dotnet build Tools/NewEngineRuntimeContentGuard/NewEngineRuntimeContentGuard.csproj --configuration Release
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $guard = 'Tools/NewEngineRuntimeContentGuard/bin/Release/net10.0/NewEngineRuntimeContentGuard.dll'
+          dotnet $guard --doa-self-test .
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet $guard --enforce . $baseline
+          exit $LASTEXITCODE

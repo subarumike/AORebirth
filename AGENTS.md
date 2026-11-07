@@ -343,13 +343,23 @@ explicitly establishes the test or fixture as an authoritative contract.
 
 ## Gameplay content boundary
 
-Gameplay and content data must remain data-driven. NPC-specific data, stats,
-appearances, IDs, dialogue, quests, rewards, vendor stock, spawn bindings, and
-similar game content must not be hard-coded into reusable runtime C# merely to
-make behavior work.
+AORebirth preserves retail Anarchy Online. Runtime C# owns mechanics, protocol,
+validation and execution. Select NPCs, items, loot, objectives, rewards,
+generation profiles and tunable policy from validated editable GameData.
+Resolve references before use. Missing, invalid or unsupported definitions fail
+explicitly. Keep incomplete evidence coverage marked provisional, with its
+specific gap recorded alongside the affected policy.
 
-Runtime C# implements reusable mechanics, services, loaders, and validation;
-individual content definitions belong in the appropriate editable data source.
+Give gameplay components independent responsibilities and typed contracts.
+Use existing item, persistence, combat and network services. Centralize
+immutable AO protocol identifiers in typed protocol definitions. Historical
+compatibility requires versioned scope, exact evidence and regression tests.
+Keep recorded packet payloads in offline evidence and test fixtures. Runtime
+offer generation uses validated typed definitions and reusable eligibility data.
+
+The [runtime data architecture check](docs/project/ARCHITECTURE.md#data-oriented-gameplay)
+runs against proposed changes in CI. A new violation blocks validation even when
+compilation succeeds. Inherited findings stay visible as open remediation work.
 
 ## Development authority
 

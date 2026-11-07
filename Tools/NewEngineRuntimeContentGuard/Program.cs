@@ -2,15 +2,20 @@ using System.Diagnostics;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using System.Text.RegularExpressions;
 using System.Xml.Linq;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 
-if (args.Length < 2 || args[0] is not ("--write" or "--check" or "--baseline" or "--self-test")) return 64;
+if (args.Length < 2) return 64;
 string mode = args[0], root = Path.GetFullPath(args[1]);
+if (mode == "--enforce") return DoaEnforcement.Run(root, args);
+if (mode == "--doa-self-test") return DoaMutationTests.Run(root);
+if (mode is not ("--write" or "--check" or "--baseline" or "--self-test")) return 64;
 if (mode == "--self-test") return GuardMutationTests.Run(root);
+bool doaInventory = args.Contains("--doa-inventory", StringComparer.Ordinal);
 string? revision = mode == "--baseline" ? (args.Length > 2 ? args[2] : "HEAD") : null;
 string Normalize(string value) => value.Replace('\\', '/');
 string Rel(string value) => Normalize(Path.GetRelativePath(root, value));
@@ -41,6 +46,7 @@ var projects = new SortedSet<string>(StringComparer.Ordinal);
 var sourceFiles = new SortedSet<string>(StringComparer.Ordinal);
 var unresolved = new SortedSet<string>(StringComparer.Ordinal);
 var graphNotes = new SortedSet<string>(StringComparer.Ordinal);
+var dependencyFindings = new List<Finding>();
 IEnumerable<string> FilesUnder(string dir, string pattern = "*.cs") => revision != null ? tracked.Where(p => p.StartsWith(dir + "/", StringComparison.Ordinal))
     : Directory.EnumerateFiles(Path.Combine(root, dir), pattern, SearchOption.AllDirectories).Select(Rel);
 string Resolve(string document, string value)
@@ -92,7 +98,12 @@ void ReadItems(string document, HashSet<string> visited, HashSet<string> project
         }
         if (item.Name.LocalName == "ProjectReference" && item.Attribute("Include") is { } reference)
             foreach (string project in Expand(document, reference.Value))
+            {
+                if (doaInventory && DoaRules.IsForbiddenRuntimeProjectReference(project))
+                    dependencyFindings.Add(DoaRules.DataFinding(document, project, "DOA_MODULE_DEPENDENCY",
+                        "Runtime project graph references an executable sibling engine, offline tool or test project.", project));
                 if (Exists(project)) AddProject(project); else unresolved.Add("Missing project reference: " + project);
+            }
     }
 }
 void AddProject(string project)
@@ -158,6 +169,7 @@ foreach (string file in sourceFiles.Where(IsSource))
     var syntax = CSharpSyntaxTree.ParseText(source, new CSharpParseOptions(LanguageVersion.Preview,
         preprocessorSymbols: ["DEBUG", "TRACE", "AOREBIRTH_WIN_NET10"]), path: file).GetRoot();
     var found = new List<Finding>();
+    var recordedSpans = new HashSet<(int Start, int Length, string Rule)>();
     bool protocol = file.Contains("/AOtomation/") || file.Contains("/msgpack-cli/") || file.Contains("/Cell.Core/") || file.Contains("/Cell.Util/");
     void Add(SyntaxNode node, string rule, string basis)
     {
@@ -165,11 +177,15 @@ foreach (string file in sourceFiles.Where(IsSource))
         string symbol = member switch { MethodDeclarationSyntax m => m.Identifier.Text, TypeDeclarationSyntax t => t.Identifier.Text,
             PropertyDeclarationSyntax p => p.Identifier.Text, FieldDeclarationSyntax f => string.Join(",", f.Declaration.Variables.Select(v => v.Identifier.Text)), _ => string.Empty };
         int line = node.GetLocation().GetLineSpan().StartLinePosition.Line + 1;
-        if (found.Any(f => f.Line == line && f.Rule == rule)) return;
+        if (doaInventory ? !recordedSpans.Add((node.SpanStart, node.Span.Length, rule))
+            : found.Any(f => f.Line == line && f.Rule == rule)) return;
         string excerpt = node.ToString().Replace("\r", " ").Replace("\n", " ");
         found.Add(new(file, line, symbol, Category(file + " " + symbol + " " + node), rule, basis,
-            excerpt[..Math.Min(180, excerpt.Length)]));
+            excerpt[..Math.Min(180, excerpt.Length)], doaInventory ? DoaRules.SourceFingerprint(node) : null));
     }
+    if (doaInventory)
+        foreach (var issue in DoaRules.SourceIssues(file, syntax))
+            Add(issue.Node, issue.Rule, issue.Basis);
     foreach (var member in syntax.DescendantNodes().OfType<MemberDeclarationSyntax>())
     {
         string name = member switch { TypeDeclarationSyntax t => t.Identifier.Text, MethodDeclarationSyntax m => m.Identifier.Text, _ => "" };
@@ -223,6 +239,12 @@ foreach (string file in sourceFiles.Where(IsSource))
             : new[] { protocol || syntax.DescendantNodes().OfType<EnumDeclarationSyntax>().Any() ? "GENERIC_PROTOCOL_CONSTANT" : "GENERIC_RUNTIME_LOGIC" },
         candidateCount = found.Count, reviewBasis = "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory." });
 }
+if (doaInventory)
+{
+    findings.AddRange(dependencyFindings.Distinct());
+    findings.AddRange(DoaRules.CatalogIssues(
+        relative => Exists("AORebirth/GameData/" + relative) ? Read("AORebirth/GameData/" + relative) : null));
+}
 findings = findings.OrderBy(f => f.Path, StringComparer.Ordinal).ThenBy(f => f.Line).ThenBy(f => f.Rule, StringComparer.Ordinal).ToList();
 var report = new { schemaVersion = 2, scope = "Conservative static NewEngine project-reference source graph including SDK default files, explicit imported Compile items, linked shared and library sources; tests/tools are not runtime.",
     sourceRevision = revision, runtimeCSharpFilesAudited = files.Count, totalRuntimeContentViolations = findings.Count,
@@ -251,7 +273,8 @@ Console.WriteLine($"NEWENGINE_RUNTIME_CONTENT_VIOLATIONS={findings.Count}");
 Console.WriteLine($"UNRESOLVED_PROJECT_INPUTS={unresolved.Count}");
 return revision != null ? 0 : findings.Count == 0 && unresolved.Count == 0 ? 0 : 1;
 
-internal sealed record Finding(string Path, int Line, string Symbol, string Classification, string Rule, string Basis, string Excerpt);
+internal sealed record Finding(string Path, int Line, string Symbol, string Classification, string Rule, string Basis,
+    string Excerpt, [property: JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)] string? Fingerprint = null);
 
 internal static class GuardMutationTests
 {
