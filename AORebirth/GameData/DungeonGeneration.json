@@ -45,6 +45,14 @@
     "FeedbackStartingKill": 5,
     "FeedbackMessageId": 79979934
   },
+  "ContentCoverage": {
+    "FindItem": { "Status": "Provisional", "Gap": "The retained pickup capture supports URSE. Other objective items, quality ranges and selection weights remain unverified." },
+    "ReturnItem": { "Status": "Provisional", "Gap": "The supported return flow uses COSE. Eligible retail items, quality ranges and selection weights remain unverified." },
+    "RepairMachine": { "Status": "Provisional", "Gap": "The completed repair capture supports one exact tool and machine pair. Other pairings and their eligibility by mission quality remain unverified." },
+    "KillPerson": { "Status": "Provisional", "Gap": "The existing MFPB family is an AORebirth test policy. The retail target families and their selection weights remain unverified." },
+    "FindPerson": { "Status": "Provisional", "Gap": "Retail inspection behavior is captured. The retail target families and their selection weights remain unverified." },
+    "Population": { "Status": "Provisional", "Gap": "Six existing families match retained observations. Additional family bindings, upper quality coverage and retail distributions remain unverified." }
+  },
   "FindItem": {
     "_comment": "AORebirth pickup-objective policy referencing the existing ItemTemplates catalog. URSE is the Urgent Sensitive Information item observed in the completed Find Item capture. QuestInstanceStat is the captured world-item marker; it is not a generated quest ID or a reward. Selection is configurable policy, not a retail probability claim.",
     "ItemHashes": ["URSE"],
