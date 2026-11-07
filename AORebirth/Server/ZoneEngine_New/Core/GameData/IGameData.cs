@@ -124,6 +124,9 @@ namespace ZoneEngine_New.Core.GameData
         /// <summary>Appends every leaf item family reachable from <paramref name="hash"/>.</summary>
         void CollectHashLeafInstances(string hash, List<HashInstance> into);
 
+        /// <summary>Reconstructed families scoped to modifier equipment on outdoor Rubi-Ka bosses.</summary>
+        IReadOnlyList<EquipmentLootMember>? GetEquipmentLootMembers(string hash) => null;
+
         /// <summary>Shop stock table for a vending machine template id.</summary>
         bool TryGetVendingMachine(int templateId, out VendingMachineDefinition definition);
 

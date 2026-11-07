@@ -106,6 +106,9 @@ namespace ZoneEngine_New.Tests
         public void CollectHashLeafInstances(string hash, List<HashInstance> into)
             => _hashItems.CollectLeafInstances(hash, into);
 
+        public IReadOnlyList<EquipmentLootMember>? GetEquipmentLootMembers(string hash)
+            => _hashItems.GetEquipmentLootMembers(hash);
+
         public bool TryGetVendingMachine(int templateId, out VendingMachineDefinition definition)
             => _machines.TryGetValue(templateId, out definition!);
 

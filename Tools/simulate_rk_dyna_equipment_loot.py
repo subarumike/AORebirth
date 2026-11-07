@@ -1,8 +1,9 @@
-"""Compare independent and shared equipment loot QL offline using reviewed RK dyna observations."""
+"""Compare current and reconstructed RK dyna equipment loot against reviewed observations."""
 from __future__ import annotations
 
 import argparse
 from collections import Counter, defaultdict
+from functools import cache
 import json
 from pathlib import Path
 from random import Random
@@ -37,53 +38,152 @@ def representative_equipment(bands, names, modifiers):
     return next(iter(variants.items()))
 
 
-def simulate(cases, pools, variance, trials, seed):
-    coverage = {item_hash: pools.pool(item_hash) for spells in cases for item_hash, _ in spells}
-    scaling_hashes = {item_hash for item_hash, leaves in coverage.items()
+def level_band(level):
+    return next(label for limit, label in ((24, "1-24"), (49, "25-49"), (99, "50-99"),
+                                           (149, "100-149"), (199, "150-199"), (float("inf"), "200+"))
+                if level <= limit)
+
+
+def endpoint_key(low, high):
+    return f"{low}:{high}"
+
+
+def record_scaling_agreement(counts, qualities):
+    if len(qualities) >= 2:
+        counts["AllScalingItemsAtSameQl" if len(set(qualities)) == 1 else "MixedScalingQl"] += 1
+
+
+def equipment_rules(pools, roots):
+    rules = {}
+    for root in roots:
+        record = pools.records.get(root, {})
+        if "EquipmentLoot" not in record:
+            continue
+        children = record.get("Children", [])
+        authored = record["EquipmentLoot"]
+        if not children or len(children) != len(set(children)) or set(children) != set(authored):
+            raise ValueError(f"EquipmentLoot rules must correspond to every unique child of {root}")
+        rules[root] = []
+        for child in children:
+            leaves, issues = pools.inspect(child, equipment=True)
+            rule = authored[child]
+            weight, low, high = (rule[field] for field in ("Weight", "MinCenter", "MaxCenter"))
+            if (issues or len(leaves) != 1 or leaves[0].path != (child,)
+                    or any(type(value) is not int for value in (weight, low, high))
+                    or weight < 1 or not 1 <= low <= high):
+                raise ValueError(f"Invalid EquipmentLoot family {root}/{child}")
+            rules[root].append((leaves[0], weight, low, high))
+    return rules
+
+
+def weighted_families(rules, center, desired):
+    return tuple((leaf, min(desired, leaf.maximum) if leaf.minimum < leaf.maximum else leaf.minimum, weight)
+                 for leaf, weight, low, high in rules
+                 if low <= center <= high and (leaf.minimum == leaf.maximum or leaf.minimum <= desired))
+
+
+def roll_family(families, random):
+    total = sum(weight for _, _, weight in families)
+    if total == 0:
+        return None
+    roll = random.randrange(total)
+    for leaf, quality, weight in families:
+        if roll < weight:
+            return leaf, quality
+        roll -= weight
+    raise AssertionError("Weighted family roll exceeded its total")
+
+
+def simulate(cases, pools, variance, trials, seed, *, shared):
+    roots = {item_hash for spells, _, _ in cases for item_hash, _ in spells}
+    rules = equipment_rules(pools, roots) if shared else {}
+    coverage = {item_hash: pools.inspect(item_hash, equipment=item_hash in rules) for item_hash in sorted(roots)}
+    scaling_hashes = {item_hash for item_hash, (leaves, _) in coverage.items()
                       if any(leaf.minimum < leaf.maximum for leaf in leaves)}
-    results = {}
-    for shared in (False, True):
-        rng = Random(seed)
-        counts = Counter()
-        scaling_qls = Counter()
-        results_by_hash = defaultdict(Counter)
-        for spells in cases:
-            for _ in range(trials):
-                shared_rolls = {}
-                reached_scaling = []
-                count = 0
-                for item_hash, center in spells:
-                    if shared and item_hash in scaling_hashes and center in shared_rolls:
-                        desired = shared_rolls[center]
-                    else:
-                        low, high = quality_window(center, variance)
-                        desired = rng.randint(low, high)
-                        if shared and item_hash in scaling_hashes:
-                            shared_rolls[center] = desired
-                    winners = pools.highest(item_hash, desired)
-                    if not winners:
-                        continue
-                    # All tied leaves reach the same quality, so family tie-breaking cannot affect these metrics.
-                    quality = winners[0][1]
-                    if all(leaf.minimum < quality < leaf.maximum for leaf, _ in winners):
-                        reached_scaling.append(quality)
-                    results_by_hash[item_hash][quality] += 1
-                    count += 1
-                counts[count] += 1
-                if len(reached_scaling) >= 2:
-                    scaling_qls["AllScalingItemsAtSameQl" if len(set(reached_scaling)) == 1 else "MixedScalingQl"] += 1
-        results["AfterSharedQl" if shared else "BeforeIndependentQl"] = {
-            "ItemCountHistogram": dict(counts),
-            "CorpsesWithMultipleUnclampedScalingDrops": sum(scaling_qls.values()),
-            "UnclampedScalingQlAgreement": dict(scaling_qls),
-            "PerHashItemQlHistogram": {key: dict(value) for key, value in results_by_hash.items()},
-        }
-    results["PoolCoverage"] = {
-        key: {"KnownLeaves": len({leaf.path[-1] for leaf in leaves}),
-              "HasScalingLeaf": key in scaling_hashes, "CatalogIssues": pools.inspect(key)[1]}
-        for key, leaves in coverage.items()
+
+    @cache
+    def candidates(item_hash, center, desired):
+        if item_hash in rules:
+            return weighted_families(rules[item_hash], center, desired)
+        return tuple((leaf, quality, 1) for leaf, quality in pools.highest(item_hash, desired))
+
+    quality_random = Random(seed)
+    family_random = Random(seed + 1)
+    counts = Counter()
+    counts_by_modifier = defaultdict(Counter)
+    counts_by_level = defaultdict(Counter)
+    scaling_qls = Counter()
+    item_qls = Counter()
+    item_qls_by_level = defaultdict(Counter)
+    results_by_hash = defaultdict(Counter)
+    endpoint_occurrences = Counter()
+    endpoint_corpses = Counter()
+    endpoint_sources = defaultdict(Counter)
+    family_occurrences = Counter()
+    roll_opportunities = Counter()
+    for spells, modifier, level in cases:
+        band = level_band(level)
+        for _ in range(trials):
+            shared_rolls = {}
+            reached_scaling = []
+            corpse_endpoints = set()
+            count = 0
+            for item_hash, center in spells:
+                if shared and item_hash in scaling_hashes and center in shared_rolls:
+                    desired = shared_rolls[center]
+                else:
+                    low, high = quality_window(center, variance)
+                    desired = quality_random.randint(low, high)
+                    if shared and item_hash in scaling_hashes:
+                        shared_rolls[center] = desired
+                context = (item_hash, center, desired)
+                roll_opportunities[context] += 1
+                selected = roll_family(candidates(*context), family_random)
+                if selected is None:
+                    continue
+                leaf, quality = selected
+                if leaf.minimum < quality < leaf.maximum:
+                    reached_scaling.append(quality)
+                endpoints = endpoint_key(*leaf.ids_at(quality))
+                family = f"{item_hash}/{leaf.path[-1]}"
+                endpoint_occurrences[endpoints] += 1
+                endpoint_sources[endpoints][family] += 1
+                corpse_endpoints.add(endpoints)
+                family_occurrences[family] += 1
+                results_by_hash[item_hash][quality] += 1
+                item_qls[quality] += 1
+                item_qls_by_level[band][quality] += 1
+                count += 1
+            counts[count] += 1
+            counts_by_modifier[modifier][count] += 1
+            counts_by_level[band][count] += 1
+            endpoint_corpses.update(corpse_endpoints)
+            record_scaling_agreement(scaling_qls, reached_scaling)
+
+    eligible_families = Counter()
+    for (item_hash, center, desired), occurrences in roll_opportunities.items():
+        for leaf, _, _ in candidates(item_hash, center, desired):
+            eligible_families[f"{item_hash}/{leaf.path[-1]}"] += occurrences
+
+    return {
+        "ItemCountHistogram": counts,
+        "ItemCountHistogramByModifier": counts_by_modifier,
+        "ItemCountHistogramByLevelBand": counts_by_level,
+        "CorpsesWithMultipleUnclampedScalingDrops": sum(scaling_qls.values()),
+        "UnclampedScalingQlAgreement": scaling_qls,
+        "ItemQlHistogram": item_qls,
+        "ItemQlHistogramByLevelBand": item_qls_by_level,
+        "PerHashItemQlHistogram": results_by_hash,
+        "PerEndpointPairSlots": endpoint_occurrences,
+        "PerEndpointPairCorpses": endpoint_corpses,
+        "PerEndpointPairSources": endpoint_sources,
+        "PerHashFamilySlots": family_occurrences,
+        "PerHashFamilyEligibleRolls": eligible_families,
+        "PoolCoverage": {key: {"KnownLeaves": len({leaf.path[-1] for leaf in leaves}),
+                               "HasScalingLeaf": key in scaling_hashes, "CatalogIssues": issues,
+                               "UsesWeightedEquipmentPolicy": key in rules}
+                         for key, (leaves, issues) in coverage.items()},
     }
-    return results
 
 
 def synthetic_control(trials, seed):
@@ -97,26 +197,51 @@ def synthetic_control(trials, seed):
     qualities = {1: 1, 2: 100, 3: 20, 4: 1, 5: 25}
     pools = HashPools(records, qualities, {})
     spells = [("ROOT", 40), ("GEAR", 40), ("FIXD", 40), ("CAPD", 40)]
-    return simulate([spells], pools, 25, trials, seed)
+    cases = [(spells, "Synthetic", 40)]
+    return {"BeforeIndependentQl": simulate(cases, pools, 25, trials, seed, shared=False),
+            "AfterSharedQl": simulate(cases, pools, 25, trials, seed, shared=True)}
 
 
-def observed_distribution(corpses, drops, qualities, variance):
+def observed_distribution(corpses, modifiers, drops, qualities, variance):
     scaling_agreement = Counter()
+    endpoint_occurrences = Counter()
+    endpoint_corpses = Counter()
+    counts_by_modifier = defaultdict(Counter)
+    counts_by_level = defaultdict(Counter)
+    item_qls = Counter()
+    item_qls_by_level = defaultdict(Counter)
     above_window = 0
-    for corpse, observation in corpses.items():
+    for (corpse, observation), modifier in zip(corpses.items(), modifiers, strict=True):
         scaling_qls = []
-        _, high = quality_window(int(observation["NpcLevel"]), variance)
+        level = int(observation["NpcLevel"])
+        band = level_band(level)
+        _, high = quality_window(level, variance)
+        corpse_endpoints = set()
         for row in drops[corpse]:
             low_id, high_id, quality = (int(row[key]) for key in ("LowId", "HighId", "Ql"))
             above_window += quality > high
+            endpoints = endpoint_key(low_id, high_id)
+            endpoint_occurrences[endpoints] += 1
+            corpse_endpoints.add(endpoints)
+            item_qls[quality] += 1
+            item_qls_by_level[band][quality] += 1
             if qualities[low_id] < quality < qualities[high_id]:
                 scaling_qls.append(quality)
-        if len(scaling_qls) >= 2:
-            scaling_agreement["AllScalingItemsAtSameQl" if len(set(scaling_qls)) == 1 else "MixedScalingQl"] += 1
+        count = len(drops[corpse])
+        counts_by_modifier[modifier][count] += 1
+        counts_by_level[band][count] += 1
+        endpoint_corpses.update(corpse_endpoints)
+        record_scaling_agreement(scaling_agreement, scaling_qls)
 
     return {"Corpses": len(corpses), "ItemSlots": sum(len(drops[key]) for key in corpses),
             "ItemSlotsAboveLevelWindow": above_window,
             "ItemCountHistogram": dict(Counter(int(row["ItemSlots"]) for row in corpses.values())),
+            "ItemCountHistogramByModifier": counts_by_modifier,
+            "ItemCountHistogramByLevelBand": counts_by_level,
+            "ItemQlHistogram": item_qls,
+            "ItemQlHistogramByLevelBand": item_qls_by_level,
+            "PerEndpointPairSlots": endpoint_occurrences,
+            "PerEndpointPairCorpses": endpoint_corpses,
             "CorpsesWithMultipleUnclampedScalingDrops": sum(scaling_agreement.values()),
             "UnclampedScalingQlAgreement": dict(scaling_agreement)}
 
@@ -124,14 +249,15 @@ def observed_distribution(corpses, drops, qualities, variance):
 def run(args):
     evidence = args.evidence_root.resolve(strict=True)
     output = args.output.resolve()
-    if output.parent != evidence or output.name != "rk-dyna-equipment-simulation.json":
-        raise ValueError("Use rk-dyna-equipment-simulation.json directly in the private evidence root")
+    name = "rk-dyna-reconstruction-simulation.json" if args.overlay else "rk-dyna-equipment-simulation.json"
+    if output.parent != evidence or output.name != name:
+        raise ValueError(f"Use {name} directly in the private evidence root")
     data = args.gamedata_root.resolve(strict=True)
     if evidence.is_relative_to(data):
         raise ValueError("The evidence root must be outside canonical GameData")
 
     metadata_dir = args.item_metadata.resolve(strict=True)
-    item_path = data / "ItemTemplates.json"
+    item_path = args.base_item_templates or data / "ItemTemplates.json"
     all_corpses, drops, capture_inputs = load_captures([evidence])
     corpses = {key: row for key, row in sorted(all_corpses.items()) if row["Cohort"] == BOSS_COHORT}
     if not corpses:
@@ -170,14 +296,14 @@ def run(args):
                 spells.extend((item_hash, center) for _, item_hash, center in equipment.functions_at(source_pair, level))
             elif spawn_args.get(pair[0]) or spawn_args.get(pair[1]):
                 raise ValueError(f"Missing equipped SpawnItem evidence for {pair}")
-        cases.append(spells)
+        cases.append((spells, modifier, level))
 
     config = read_json(args.gameplay_config)
     variance = config["loot"]["qualityVariancePercent"]
     inputs = [metadata_dir / "item-metadata-source.json", item_path, args.gameplay_config, *npc_inputs]
     levels = [int(row["NpcLevel"]) for row in observations]
     report = {
-        "SchemaVersion": 1,
+        "SchemaVersion": 2,
         "Model": "Offline equipment-only simulation. Exact retail pool membership and roll weights are unverified.",
         "Sampling": "One case per reviewed capture, conditioned on its NPC level and matching aura. NPC template is a canonical equipment candidate.",
         "Seed": args.seed,
@@ -186,14 +312,36 @@ def run(args):
         "CaptureInputs": capture_inputs,
         "InputsSha256": {path.name if path.name != "Spawns.json" else f"Playfields/{path.parent.name}/Spawns.json": sha256(path)
                          for path in inputs},
-        "Observed": observed_distribution(corpses, drops, qualities, variance),
+        "Observed": observed_distribution(corpses, matched_modifiers, drops, qualities, variance),
         "ObservedNpcLevelRange": [min(levels), max(levels)],
         "ObservedModifierCounts": dict(modifier_counts),
         "CanonicalCandidateBands": [{"Hash": key, "Level": level} for key, level in band_keys],
-        "CanonicalPools": simulate(cases, pools, variance, args.trials, args.seed),
         "SyntheticControl": {"Model": "Synthetic nested scaling, fixed-QL and clamped drops, independent of RK pool membership.",
                              **synthetic_control(args.trials, args.seed)},
     }
+    before = simulate(cases, pools, variance, args.trials, args.seed, shared=True)
+    if args.overlay:
+        overlay = read_json(args.overlay)
+        if not isinstance(overlay, dict) or not overlay or item_records.keys() & overlay.keys():
+            raise ValueError("The replacement overlay must add keys to an unchanged base catalog")
+        reconstructed = HashPools({**item_records, **overlay}, qualities, flags)
+        after = simulate(cases, reconstructed, variance, args.trials, args.seed, shared=True)
+        observed = set(report["Observed"]["PerEndpointPairSlots"])
+        outside_observed = sorted(after["PerEndpointPairSlots"].keys() - observed)
+        report["ReconstructionComparison"] = {
+            "OverlaySha256": sha256(args.overlay),
+            "BeforeSharedQl": before,
+            "AfterReconstructed": after,
+            "ObservedEndpointPairs": len(observed),
+            "ObservedEndpointPairsSeenInBeforeTrials": len(observed & before["PerEndpointPairSlots"].keys()),
+            "ObservedEndpointPairsSeenInAfterTrials": len(observed & after["PerEndpointPairSlots"].keys()),
+            "AfterTrialEndpointPairsOutsideObserved": outside_observed,
+            "AfterTrialEndpointPairsOutsideObservedSources": {pair: after["PerEndpointPairSources"][pair]
+                                                               for pair in outside_observed},
+        }
+    else:
+        report["CanonicalPools"] = {"AfterSharedQl": before,
+                                    "BeforeIndependentQl": simulate(cases, pools, variance, args.trials, args.seed, shared=False)}
     partial = output.with_suffix(".json.partial")
     partial.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     partial.replace(output)
@@ -202,6 +350,8 @@ def run(args):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--gamedata-root", type=Path, default=Path("GameData"))
+    parser.add_argument("--base-item-templates", type=Path, help="Original catalog for comparison after applying an overlay")
+    parser.add_argument("--overlay", type=Path, help="Additive reconstructed item catalog definitions")
     parser.add_argument("--gameplay-config", type=Path, default=Path("AORebirth/Config/Gameplay.json"))
     parser.add_argument("--evidence-root", type=Path, required=True)
     parser.add_argument("--item-metadata", type=Path, required=True)

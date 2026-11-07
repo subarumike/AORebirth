@@ -2,6 +2,7 @@ namespace ZoneEngine_New.Tests;
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -23,6 +24,20 @@ using ZoneEngine_New.Core.Playfield;
 [TestClass]
 public sealed class EquipmentLootTests
 {
+    const string ReconstructedJson = """
+        {
+            "GEAR": {"Templates":[1,2]},
+            "PRIVATE_FIXED": {"Templates":[3],"EquipmentLootOnly":true},
+            "PRIVATE_BAD": {"Templates":[4,999],"EquipmentLootOnly":true},
+            "FIRST": {"Children":["GEAR","PRIVATE_FIXED","PRIVATE_BAD"],"EquipmentLoot":{
+                "GEAR":{"Weight":5,"MinCenter":10,"MaxCenter":200},
+                "PRIVATE_FIXED":{"Weight":2,"MinCenter":40,"MaxCenter":80},
+                "PRIVATE_BAD":{"Weight":1,"MinCenter":1,"MaxCenter":300}
+            }},
+            "SECOND": {"Children":["GEAR"],"EquipmentLoot":{"GEAR":{"Weight":1,"MinCenter":1,"MaxCenter":300}}}
+        }
+        """;
+
     // Synthetic families exercise all referenced hashes without supplying retail pool membership.
     const string CatalogJson = """
         {
@@ -171,6 +186,133 @@ public sealed class EquipmentLootTests
         StringAssert.Contains(string.Join("\n", report), "Items: 3 (3 per corpse)");
     }
 
+    [TestMethod]
+    public void ReconstructedPoolsKeepOrdinaryLookupsAndFamiliesIsolated()
+    {
+        HashItemCatalog data = HashItemCatalog.Parse(ReconstructedJson);
+        Assert.AreEqual(1, data.InstanceCount);
+        Assert.AreEqual(0, data.CategoryCount);
+        Assert.IsTrue(data.TryGetAssignedHash(1, 2, out string assigned));
+        Assert.AreEqual("GEAR", assigned);
+        Assert.IsFalse(data.TryResolveInstance("FIRST", out _));
+        Assert.IsFalse(data.TryGetAssignedHash(3, 3, out _));
+        Assert.IsFalse(data.TryGetInstance("PRIVATE_FIXED", out _));
+        Assert.AreEqual(3, data.GetEquipmentLootMembers("FIRST")!.Count);
+    }
+
+    [TestMethod]
+    [DataRow(0, 1, 2, 63)]
+    [DataRow(4, 1, 2, 63)]
+    [DataRow(5, 3, 3, 100)]
+    [DataRow(6, 3, 3, 100)]
+    public void WeightedPickerAdmitsFixedAboveDesiredQlAndRejectsMissingTemplates(
+        int ticket, int lowId, int highId, int expectedQl)
+    {
+        HashItemMinter minter = ReconstructedMinter();
+        Item[] equipment = [Wear("Modifier", ("FIRST", 60), ("SECOND", 60))];
+        var drops = new List<(int, int, int)>();
+        var random = new WeightedDraws(63, (ticket, 7), (0, 1));
+
+        EquipmentLoot.Roll(equipment, minter, 20, 25, drops, true, random);
+
+        CollectionAssert.AreEqual(new[] { (lowId, highId, expectedQl), (1, 2, 63) }, drops);
+        Assert.AreEqual(0, random.Remaining);
+        drops.Clear();
+        EquipmentLoot.Roll(equipment, minter, 20, 0, drops, false, new Random(1));
+        Assert.AreEqual(0, drops.Count);
+    }
+
+    [TestMethod]
+    public void ReconstructedPickerRespectsCenterLimitsAndScalingCap()
+    {
+        var minter = ReconstructedMinter();
+        var members = minter.GetEquipmentLootMembers("FIRST")!;
+        var random = new WeightedDraws(0, (0, 5));
+
+        Assert.IsFalse(minter.TryRollEquipmentLoot(members, 30, 4, random, out _, out _, out _));
+        Assert.IsFalse(minter.TryRollEquipmentLoot(members, 201, 220, random, out _, out _, out _));
+        Assert.IsTrue(minter.TryRollEquipmentLoot(members, 100, 115, random, out int low, out int high, out int quality));
+        Assert.AreEqual((1, 2, 100), (low, high, quality));
+    }
+
+    [TestMethod]
+    public void CorpseAndGmSimulationBothUseReconstructedEquipmentAndCapacity()
+    {
+        var data = new StubGameData(HashItemCatalog.Parse(ReconstructedJson));
+        var catalog = new StubCatalog().Add(1, 5).Add(2, 100).Add(3, 100).Add(4, 1);
+        var minter = new HashItemMinter(data, catalog, new StubItemBuilder());
+        var settings = new GameplaySettings { Loot = new GameplayLoot { QualityVariancePercent = 0 } };
+        using var services = new ServiceCollection().AddSingleton(settings).BuildServiceProvider();
+        var npc = CreateNpc(services, new PlayfieldMetaData());
+        npc.Equipment.Remove(0);
+        npc.Equipment.Add(0, Wear("Boss Modifier Item (Fixture)", ("FIRST", 100), ("SECOND", 100)));
+        var corpse = new Corpse(new Identity { Type = IdentityType.Corpse, Instance = 2 }, npc, data);
+
+        corpse.ResolveLoot(minter, 0);
+        CollectionAssert.AreEqual(new[] { (1, 2, 100), (1, 2, 100) },
+            corpse.Loot.EnumerateSlots().Select(x => (x.Value.LowId, x.Value.HighId, x.Value.Quality)).ToArray());
+
+        var command = new NpcCommand(data, catalog, minter);
+        MethodInfo simulate = typeof(NpcCommand).GetMethod("SimulateLoot", BindingFlags.Instance | BindingFlags.NonPublic)!;
+        var report = (IReadOnlyList<string>)simulate.Invoke(command, [npc, 1])!;
+        StringAssert.Contains(string.Join("\n", report), "Items: 2 (2 per corpse)");
+    }
+
+    [TestMethod]
+    public void MalformedEquipmentPolicyFailsClosed()
+    {
+        Assert.ThrowsExactly<FormatException>(() => HashItemCatalog.Parse(
+            """{"BAD":{"Children":["MISSING"],"EquipmentLoot":{"MISSING":{"Weight":1,"MinCenter":1,"MaxCenter":99}}}}"""));
+        Assert.ThrowsExactly<FormatException>(() => HashItemCatalog.Parse(
+            """{"BAD":{"Children":["LEAF"],"EquipmentLoot":{"LEAF":{"Weight":0,"MinCenter":1,"MaxCenter":99}}},"LEAF":{"Templates":[1]}}"""));
+    }
+
+    [TestMethod]
+    public void CanonicalReconstructedPoolsLoadAndMintThroughTheExistingItemBuilder()
+    {
+        string? root = Environment.GetEnvironmentVariable("AO_REBIRTH_RK_DYNA_TEST_GAMEDATA");
+        if (string.IsNullOrEmpty(root))
+        {
+            Assert.Inconclusive("Set AO_REBIRTH_RK_DYNA_TEST_GAMEDATA for the private catalog check.");
+            return;
+        }
+
+        HashItemCatalog hashes = HashItemCatalog.Parse(File.ReadAllText(Path.Combine(root, "ItemTemplates.json")));
+        Assert.IsTrue(hashes.TryGetCategory("CLOH", out _));
+        Assert.IsTrue(hashes.TryGetCategory("COOH", out _));
+        var data = new StubGameData(hashes, rootPath: root);
+        var catalog = new ItemTemplateCatalog(data, new StubLogger());
+        var minter = new HashItemMinter(data, catalog, new ItemBuilder(catalog, new StubInstanceIdAllocator(), new StubLogger()));
+        foreach (string hash in new[] { "AABC", "ARMO", "DIST", "INDI", "ITDC", "MELE", "OUDY" })
+        {
+            var members = hashes.GetEquipmentLootMembers(hash);
+            Assert.IsNotNull(members, hash);
+            Assert.IsFalse(hashes.CanResolveItem(hash), hash);
+            foreach (EquipmentLootMember member in members)
+            {
+                foreach (int id in member.Family.TemplateIds)
+                {
+                    Assert.IsTrue(catalog.TryGet(id, out _), $"{hash}/{member.Family.Hash}/{id}");
+                }
+            }
+
+            int center = members[0].MinCenter;
+            var drops = new List<(int, int, int)>();
+            EquipmentLoot.Roll([Wear("Modifier", (hash, center))], minter, 1, 25, drops, true, new QualityDraws(int.MaxValue));
+            Assert.AreEqual(1, drops.Count, hash);
+            var drop = drops[0];
+            Item item = minter.CreateWithNewInstance(drop.Item1, drop.Item2, drop.Item3, ItemSource.Loot);
+            Assert.AreEqual(drop, (item.LowId, item.HighId, item.Quality), hash);
+        }
+    }
+
+    static HashItemMinter ReconstructedMinter()
+    {
+        var data = new StubGameData(HashItemCatalog.Parse(ReconstructedJson));
+        var catalog = new StubCatalog().Add(1, 5).Add(2, 100).Add(3, 100).Add(4, 1);
+        return new HashItemMinter(data, catalog, new StubItemBuilder());
+    }
+
     static NpcCharacter CreateNpc(IServiceProvider services, PlayfieldMetaData metadata)
     {
         var playfield = (Playfield)RuntimeHelpers.GetUninitializedObject(typeof(Playfield));
@@ -209,8 +351,26 @@ public sealed class EquipmentLootTests
         public override int Next(int minValue, int maxValue)
         {
             int result = _draws.Dequeue();
+            if (result == int.MaxValue)
+                return maxValue - 1;
             Assert.IsTrue(result >= minValue && result < maxValue);
             return result;
+        }
+    }
+
+    sealed class WeightedDraws(int requestedQuality, params (long Ticket, long Total)[] draws) : Random
+    {
+        readonly Queue<(long Ticket, long Total)> _draws = new(draws);
+
+        public int Remaining => _draws.Count;
+
+        public override int Next(int minValue, int maxValue) => requestedQuality;
+
+        public override long NextInt64(long maxValue)
+        {
+            (long ticket, long total) = _draws.Dequeue();
+            Assert.AreEqual(total, maxValue);
+            return ticket;
         }
     }
 

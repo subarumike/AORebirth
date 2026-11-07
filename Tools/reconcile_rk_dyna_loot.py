@@ -73,17 +73,20 @@ def add_unique(target, identity, row, fields):
         raise ValueError(f"Conflicting evidence for {identity}")
 
 
-def load_captures(batch_dirs):
+def load_captures(batch_dirs, projected=()):
     corpses = {}
     slots = {}
     inputs = []
+    batches = list(projected)
     for batch in batch_dirs:
         corpse_path = batch / "rk-corpse-inventories.csv"
         item_path = batch / "rk-dyna-item-observations.csv"
-        inputs.extend(provenance(p) for p in (corpse_path, item_path))
-        for row in read_csv(corpse_path):
+        batches.append((read_csv(corpse_path), read_csv(item_path), [corpse_path, item_path]))
+    for corpse_rows, item_rows, paths in batches:
+        inputs.extend(provenance(p) for p in paths)
+        for row in corpse_rows:
             add_unique(corpses, key(row), row, BOSS_FIELDS + ("ItemSlots", "Descriptors"))
-        for row in read_csv(item_path):
+        for row in item_rows:
             if row["Cohort"] != BOSS_COHORT:
                 raise ValueError(f"Unreviewed row in confirmed item input: {key(row)}")
             add_unique(slots, (*key(row), int(row["Slot"])), row, BOSS_FIELDS + ITEM_FIELDS)
@@ -191,7 +194,7 @@ class HashPools:
         self.flags = flags
 
     @cache
-    def inspect(self, root):
+    def inspect(self, root, equipment=False):
         leaves = []
         issues = set()
 
@@ -203,6 +206,8 @@ class HashPools:
             entry = self.records.get(node)
             if not entry:
                 issues.add("missing:" + "/".join(path))
+                return
+            if not equipment and (entry.get("EquipmentLoot") or entry.get("EquipmentLootOnly")):
                 return
             children = entry.get("Children") or []
             if children:
@@ -545,7 +550,9 @@ def slot_explanations(pools, sources, low_id, high_id, quality):
     unresolved = set()
     for source in sources:
         root = source["hash"]
-        leaves, issues = pools.inspect(root)
+        equipment = source["mechanism"] == "equipment"
+        policies = (pools.records.get(root) or {}).get("EquipmentLoot") if equipment else None
+        leaves, issues = pools.inspect(root, bool(policies))
         if not leaves or issues:
             unresolved.add(root)
         for leaf in leaves:
@@ -555,15 +562,37 @@ def slot_explanations(pools, sources, low_id, high_id, quality):
             minimum, maximum = source["window"]
             result = {**source, "path": leaf.path, "familyQl": (leaf.minimum, leaf.maximum),
                       "fixedQl": leaf.minimum == leaf.maximum}
-            if not leaf.minimum <= quality <= leaf.maximum:
+            selected_ids = leaf.ids_at(quality) if leaf.minimum <= quality <= leaf.maximum else None
+            exact_pair = selected_ids == (low_id, high_id)
+            exact_endpoint = low_id == high_id and selected_ids and low_id in selected_ids and (quality, low_id) in leaf.bands
+            if selected_ids is None:
                 result["qlStatus"] = "OUTSIDE_FAMILY_RANGE"
-            elif leaf.ids_at(quality) != (low_id, high_id):
-                result["qlStatus"] = ("UPPER_ENDPOINT_WIRE_ALTERNATIVE" if low_id == high_id and
-                                      leaf.ids_at(quality)[1] == high_id and any(band == (quality, high_id) for band in leaf.bands)
+            elif policies and (exact_pair or exact_endpoint):
+                policy = policies.get(leaf.path[-1])
+                if policy is None or policy["Weight"] <= 0:
+                    result["qlStatus"] = "NO_POSITIVE_RECONSTRUCTED_WEIGHT"
+                elif not policy["MinCenter"] <= source["center"] <= policy["MaxCenter"]:
+                    result["qlStatus"] = "OUTSIDE_RECONSTRUCTED_CENTER_WINDOW"
+                elif leaf.minimum == leaf.maximum:
+                    result["qlStatus"] = ("ELIGIBLE_RECONSTRUCTED_FIXED" if exact_pair
+                                          else "RECONSTRUCTED_FAMILY_QL_EQUIVALENCE")
+                    if not exact_pair:
+                        result["desiredQl"] = list(range(minimum, maximum + 1))
+                else:
+                    desired = [target for target in range(max(minimum, leaf.minimum), maximum + 1)
+                               if min(target, leaf.maximum) == quality]
+                    if desired:
+                        result["qlStatus"] = ("ELIGIBLE_RECONSTRUCTED_SCALING" if exact_pair
+                                              else "RECONSTRUCTED_FAMILY_QL_EQUIVALENCE")
+                        result["desiredQl"] = desired
+                    else:
+                        result["qlStatus"] = "RECONSTRUCTED_SCALING_QL_CONFLICT"
+            elif not exact_pair:
+                result["qlStatus"] = ("UPPER_ENDPOINT_WIRE_ALTERNATIVE" if not policies and exact_endpoint and selected_ids[1] == high_id
                                       else "ENDPOINT_PAIR_NOT_SELECTED_AT_QL")
             elif source["mechanism"] == "item-table" and pools.table_reaches(leaf, source["window"], quality):
                 result["qlStatus"] = "ELIGIBLE_ITEM_TABLE"
-            elif source["mechanism"] == "equipment":
+            elif equipment:
                 desired = [target for target in range(max(minimum, quality), maximum + 1)
                            if any(other.path[-1] == leaf.path[-1] and reached == quality
                                   for other, reached in pools.highest(root, target))]
@@ -578,6 +607,8 @@ def slot_explanations(pools, sources, low_id, high_id, quality):
                 result["qlStatus"] = "NOT_ITEM_TABLE_ELIGIBLE_IN_WINDOW"
             bad_leaf = any(template not in pools.qualities for _, template in leaf.bands) or (
                 "equal-ql-sort-unverified:" + "/".join(leaf.path) in issues)
+            if bad_leaf and result["qlStatus"] == "RECONSTRUCTED_FAMILY_QL_EQUIVALENCE":
+                result["qlStatus"] = "UNVERIFIED_LEAF_ENDPOINTS"
             if result["qlStatus"].startswith("ELIGIBLE_") and not bad_leaf:
                 eligible.append(result)
             else:
@@ -591,7 +622,7 @@ def reconcile(corpses, slots, pools, npcs, equipment, bindings, variance):
 
     family_index = defaultdict(set)
     for family, record in pools.records.items():
-        if not record.get("Children"):
+        if not record.get("Children") and not record.get("EquipmentLootOnly"):
             for item_id in record.get("Templates") or []:
                 family_index[item_id].add(family)
 
@@ -623,7 +654,10 @@ def reconcile(corpses, slots, pools, npcs, equipment, bindings, variance):
             if len(eligible) > 1:
                 status = "AMBIGUOUS_SOURCES"
             elif eligible:
-                status = "COMPATIBLE_REVIEWED_SOURCE" if binding else "COMPATIBLE_CANDIDATE_SOURCE"
+                status = ("INFERRED_RECONSTRUCTION_ELIGIBLE" if eligible[0]["qlStatus"].startswith("ELIGIBLE_RECONSTRUCTED_")
+                          else "COMPATIBLE_REVIEWED_SOURCE" if binding else "COMPATIBLE_CANDIDATE_SOURCE")
+            elif any(source["qlStatus"] == "RECONSTRUCTED_FAMILY_QL_EQUIVALENCE" for source in members):
+                status = "RECONSTRUCTED_FAMILY_QL_EQUIVALENT"
             elif members:
                 status = "KNOWN_MEMBERSHIP_NOT_RUNTIME_ELIGIBLE"
             else:
@@ -639,13 +673,23 @@ def reconcile(corpses, slots, pools, npcs, equipment, bindings, variance):
 
 
 def main(argv=None):
+    from rk_dyna_capture_evidence import (corpus_item_catalog, item_details, occurrence_evidence,
+                                          project_session, projected_sessions, stage_and_decode)
+
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--capture-dir", action="append", type=Path, required=True,
+    parser.add_argument("--capture-dir", action="append", type=Path, default=[],
                         help="Private batch containing reviewed corpse and item CSVs. Repeat to reconcile multiple batches.")
+    parser.add_argument("--decoded-capture-dir", action="append", type=Path, default=[],
+                        help="Folder of offline-decoded Live sessions, or one session. May be repeated.")
+    parser.add_argument("--raw-capture-dir", action="append", type=Path, default=[],
+                        help="Folder of raw Live sessions, or one session. Runs documented offline decoders on private working copies.")
+    parser.add_argument("--decoder-timeout-seconds", type=int, default=120, help="Maximum seconds per offline decoder process.")
     parser.add_argument("--game-data", type=Path, required=True)
     parser.add_argument("--output-dir", type=Path, required=True, help="Private report destination outside GameData.")
     parser.add_argument("--equipment-functions", type=Path, help="Exact OnWear SpawnItem export; defaults to first batch.")
     parser.add_argument("--item-metadata", type=Path, help="items.dat metadata export directory; defaults to first batch.")
+    parser.add_argument("--prior-observed-catalog", type=Path,
+                        help="Prior observed-item-catalog.csv to identify new wire pairs and families.")
     parser.add_argument("--authoritative-definitions", type=Path,
                         help="Reviewed JSON rows (hash, definition, sourceFile, sourceSha256, sourceLocator). Offline overlay only.")
     parser.add_argument("--npc-bindings", type=Path,
@@ -653,7 +697,10 @@ def main(argv=None):
     parser.add_argument("--gameplay-config", type=Path,
                         default=Path(__file__).resolve().parents[1] / "AORebirth" / "Config" / "Gameplay.json")
     args = parser.parse_args(argv)
-    batch = args.capture_dir[0]
+    batches = args.capture_dir + args.decoded_capture_dir + args.raw_capture_dir
+    if not batches or args.decoder_timeout_seconds <= 0:
+        parser.error("Supply a capture input and a positive per-decoder timeout")
+    batch = batches[0]
     game_data = args.game_data.resolve()
     output = args.output_dir.resolve()
     if output.is_relative_to(game_data):
@@ -665,7 +712,6 @@ def main(argv=None):
     legacy_equipment_path = batch / "equipment-functions.json"
     item_metadata = args.item_metadata or batch / "item-metadata"
 
-    corpses, slots, inputs = load_captures(args.capture_dir)
     records = read_json(item_templates)
     equipment_rows = read_json(equipment_path) if equipment_path else []
     spawn_args = {}
@@ -680,17 +726,37 @@ def main(argv=None):
     proposals = apply_reviewed_definitions(records, args.authoritative_definitions, qualities, flags)
     pools = HashPools(records, qualities, flags)
     equipment = Equipment(equipment_rows, qualities, names, casts, spawn_args, records)
+    sessions = {session.resolve() for folder in args.decoded_capture_dir for session in projected_sessions(folder)}
+    raw_inputs = []
+    for folder in args.raw_capture_dir:
+        decoded, paths = stage_and_decode(folder, output, args.decoder_timeout_seconds)
+        sessions.update(decoded)
+        raw_inputs.extend(paths)
+    projected = [project_session(session, equipment.match_auras) for session in sorted(sessions)]
+    corpses, slots, inputs = load_captures(args.capture_dir, projected)
+    inputs.extend(provenance(path) for path in sorted(set(raw_inputs)))
     npcs = NpcSources(read_json(npc_templates), equipment, game_data / "Playfields")
     bindings = load_bindings(args.npc_bindings)
     variance = read_json(args.gameplay_config)["loot"]["qualityVariancePercent"]
     if not isinstance(variance, int) or not 0 <= variance <= 100:
         raise ValueError("Expected loot.qualityVariancePercent from 0 to 100")
     bosses, items, excluded, root_corpses, root_slots = reconcile(corpses, slots, pools, npcs, equipment, bindings, variance)
+    observed_ids = {int(row[field]) for row in items for field in ("LowId", "HighId")}
+    details, flag_values = item_details(item_metadata, observed_ids)
+    item_catalog, catalog_by_pair, discrepancies = corpus_item_catalog(items, pools, details, flag_values)
+    occurrences, frequencies, membership = occurrence_evidence(bosses, items, catalog_by_pair, pools)
+    previous = read_csv(args.prior_observed_catalog) if args.prior_observed_catalog else []
+    prior_pairs = {(int(row["WireLowId"]), int(row["WireHighId"])) for row in previous}
+    prior_families = {row["FamilyKey"] for row in previous}
+    for row in item_catalog:
+        row["WirePairNewSincePrior"] = (row["WireLowId"], row["WireHighId"]) not in prior_pairs if args.prior_observed_catalog else ""
+        row["FamilyNewSincePrior"] = row["FamilyKey"] not in prior_families if args.prior_observed_catalog else ""
 
     coverage = []
     for root in sorted({row["Arguments"][0] for row in equipment_rows} | root_corpses.keys()):
-        leaves, issues = pools.inspect(root)
-        coverage.append({"Hash": root, "DefinitionStatus": ("REVIEWED_PROPOSAL" if root in proposals else
+        reconstructed = bool((records.get(root) or {}).get("EquipmentLoot"))
+        leaves, issues = pools.inspect(root, reconstructed)
+        coverage.append({"Hash": root, "DefinitionStatus": ("RECONSTRUCTED" if reconstructed else "REVIEWED_PROPOSAL" if root in proposals else
                                                            "UNRESOLVED" if not leaves else "PARTIALLY_RESOLVED" if issues else "RESOLVED"),
                          "ReferencedCorpseCount": root_corpses[root], "CompatibleSlotCount": root_slots[root],
                          "DirectChildren": json_cell((records.get(root) or {}).get("Children") or []),
@@ -702,7 +768,10 @@ def main(argv=None):
     source_paths = [item_templates, npc_templates, items_dat, args.gameplay_config,
                     item_metadata / "item-metadata-source.json", item_metadata / "item-metadata.jsonl"]
     source_paths.extend(sorted(npcs.placement_inputs))
-    source_paths.extend(path for path in (equipment_path, args.authoritative_definitions, args.npc_bindings) if path)
+    source_paths.extend(path for path in (equipment_path, args.authoritative_definitions, args.npc_bindings,
+                                         args.prior_observed_catalog) if path)
+    if (item_metadata / "metadata-enums.json").is_file():
+        source_paths.append(item_metadata / "metadata-enums.json")
     inputs.extend(provenance(path) for path in source_paths)
     ambiguities = [row for row in items if row["Status"] == "AMBIGUOUS_SOURCES"]
     unexplained = [row for row in items if row["Status"] in ("UNEXPLAINED", "KNOWN_MEMBERSHIP_NOT_RUNTIME_ELIGIBLE")]
@@ -721,11 +790,19 @@ def main(argv=None):
         for source in json.loads(row["LootSources"]):
             cohort_roots[source["mechanism"]].add(source["hash"])
     summary = {
-        "schemaVersion": 1, "inputs": inputs, "corpseCohorts": dict(Counter(row["Cohort"] for row in corpses.values())),
+        "schemaVersion": 2, "inputs": sorted({(row["path"], row["sha256"]): row for row in inputs}.values(), key=lambda row: row["path"]),
+        "corpseCohorts": dict(Counter(row["Cohort"] for row in corpses.values())),
         "confirmedCorpses": len(bosses), "confirmedItemSlots": len(items), "excludedInventories": len(excluded),
-        "unclassifiedInventories": sum(row["Cohort"] in ("UNLINKED", "NO_PRIOR_SCFU") for row in excluded),
+        "unclassifiedInventories": sum(row["Cohort"] != "SIGNATURE_CLEAR" for row in excluded),
         "confirmedItemCountDistribution": dict(Counter(int(row["ItemSlots"]) for row in bosses)),
         "slotStatuses": dict(Counter(row["Status"] for row in items)), "distinctObservedEndpointPairs": len(observed),
+        "distinctObservedFamilies": len({row["FamilyKey"] for row in item_catalog}),
+        "observedRdbEndpointCount": len(details),
+        "incompleteObservedRdbEndpoints": sorted(observed_ids - {item_id for item_id, row in details.items()
+                                                                 if row.get("RdbPresent") and row.get("ReadComplete")}),
+        "upperEndpointDiscrepancySlots": len({(row["Session"], row["InventorySequence"], row["CorpseIdentity"], row["Slot"])
+                                              for row in discrepancies if row["SelectionEvidence"] == "UPPER_ENDPOINT_WIRE_ALTERNATIVE"}),
+        "reconstructedFamilyQlEquivalentSlots": sum(row["Status"] == "RECONSTRUCTED_FAMILY_QL_EQUIVALENT" for row in items),
         "equipmentTemplateIdsInExport": len(equipment_ids), "lootQualityVariancePercent": variance,
         "referencedCohortHashes": sorted(root_corpses),
         "referencedCohortEquipmentHashes": sorted(cohort_roots["equipment"]),
@@ -734,8 +811,25 @@ def main(argv=None):
         "proposedItemTemplatesDefinitions": proposals,
     }
 
+    additional_reports = (
+        ("observed-item-catalog.csv", item_catalog, ("WireLowId", "WireHighId", "FamilyKey", "FamilyEvidence", "Endpoints",
+         "CanonicalFamilyCandidates", "ObservedQls", "ObservedSlots", "ObservedUnits", "FirstCapturedUtc", "FirstSession",
+         "WirePairNewSincePrior", "FamilyNewSincePrior")),
+        ("endpoint-discrepancies.csv", discrepancies, ("Session", "CapturedUtc", "InventorySequence", "CorpseIdentity", "Slot",
+         "WireLowId", "WireHighId", "Ql", "CandidatePool", "CandidatePath", "SelectorLowId", "SelectorHighId",
+         "EndpointTemplateVerified", "SelectionEvidence", "ScopedCenter", "DesiredQls", "Classification")),
+        ("occurrence-matrix.csv", occurrences, ("Session", "CapturedUtc", "InventorySequence", "CorpseIdentity", "NpcIdentity",
+         "NpcLevel", "Playfield", "Slot", "WireLowId", "WireHighId", "Ql", "FamilyKey", "FamilyEvidence", "EquipmentSignature",
+         "EquipmentFunctions", "ExactEligibleRoots", "ReconstructedEligibleRoots", "UpperEndpointEquivalentRoots",
+         "ReconstructedFamilyEquivalentRoots", "UnresolvedPoolEvidence")),
+        ("family-frequencies.csv", frequencies, ("FamilyKey", "EquipmentSignature", "ObservedSlots", "ObservedCorpses", "CohortSlots",
+         "CohortCorpses", "SlotShare", "ObservedCorpseFrequency", "ObservedCorpseWilson95Low", "ObservedCorpseWilson95High",
+         "ConditionalWeight", "WeightStatus")),
+        ("hash-membership-evidence.csv", membership, ("FamilyKey", "CandidateHash", "ObservedFamilySlots", "CandidateRootOnCorpses",
+         "ExactEligibleSlots", "PotentialUnresolvedSlots", "CommonAcrossObservedSlots", "EvidenceClass", "AssignmentStatus")),
+    )
     report_names = ("bosses.csv", "items.csv", "ambiguities.csv", "unexplained.csv", "excluded-inventories.csv",
-                    "observed-item-families.csv", "hash-coverage.csv", "summary.json")
+                    "observed-item-families.csv", "hash-coverage.csv", "summary.json", *(name for name, _, _ in additional_reports))
     for name in report_names:
         if (output / name).resolve() != output / name:
             raise ValueError(f"Report path leaves report destination: {name}")
@@ -754,6 +848,8 @@ def main(argv=None):
                                                      "FirstCaptureSession", "Slots", "ObservedQls"), observed)
     write_csv(output / "hash-coverage.csv", ("Hash", "DefinitionStatus", "ReferencedCorpseCount", "CompatibleSlotCount",
                                               "DirectChildren", "LeafCount", "LeafPaths", "Issues"), coverage)
+    for name, rows, fields in additional_reports:
+        write_csv(output / name, fields, rows)
     (output / "summary.json").write_text(json.dumps(summary, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     print(f"Reconciled {len(items)} slots on {len(bosses)} confirmed corpses from {len(corpses)} inventories")
 

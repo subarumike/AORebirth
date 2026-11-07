@@ -5,6 +5,7 @@ namespace ZoneEngine_New.Core.Entities
 
     using AORebirth.Enums;
 
+    using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
 
     /// <summary>
@@ -61,8 +62,11 @@ namespace ZoneEngine_New.Core.Entities
                     if (!TryReadSpawn(spell, out string hash, out int quality))
                         continue;
 
+                    IReadOnlyList<EquipmentLootMember>? reconstructed = sharedByCentre != null
+                        ? minter.GetEquipmentLootMembers(hash) : null;
                     int requestedQuality;
-                    if (sharedByCentre != null && minter.HasScalingFamily(hash))
+                    if (sharedByCentre != null && (reconstructed == null
+                        ? minter.HasScalingFamily(hash) : minter.HasScalingFamily(reconstructed)))
                     {
                         if (!sharedByCentre.TryGetValue(quality, out requestedQuality))
                         {
@@ -75,10 +79,11 @@ namespace ZoneEngine_New.Core.Entities
                         requestedQuality = RollQuality(quality, qualityVariancePercent, random);
                     }
 
-                    if (!minter.TryRollHighestUpTo(hash, requestedQuality, out int lowId, out int highId, out int rolledQuality))
-                        continue;
-
-                    into.Add((lowId, highId, rolledQuality));
+                    bool rolled = reconstructed == null
+                        ? minter.TryRollHighestUpTo(hash, requestedQuality, out int lowId, out int highId, out int rolledQuality)
+                        : minter.TryRollEquipmentLoot(reconstructed, quality, requestedQuality, random, out lowId, out highId, out rolledQuality);
+                    if (rolled)
+                        into.Add((lowId, highId, rolledQuality));
                 }
             }
         }

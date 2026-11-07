@@ -8,6 +8,7 @@ import unittest
 
 
 TOOL = Path(__file__).resolve().parents[1] / "reconcile_rk_dyna_loot.py"
+sys.path.insert(0, str(TOOL.parent))
 SPEC = importlib.util.spec_from_file_location("reconcile_rk_dyna_loot", TOOL)
 loot = importlib.util.module_from_spec(SPEC)
 sys.modules[SPEC.name] = loot

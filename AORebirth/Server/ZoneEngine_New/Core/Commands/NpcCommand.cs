@@ -552,6 +552,7 @@ namespace ZoneEngine_New.Core.Commands
             var rows = new List<string>();
             var instances = new List<HashInstance>();
             int itemCount = 0;
+            bool useReconstructedPools = npc.SharesEquipmentLootQuality;
 
             // What the equipment spawns onto the corpse (EquipmentLoot), ahead of the item table.
             foreach (Item worn in npc.Equipment.Content.Values)
@@ -561,18 +562,33 @@ namespace ZoneEngine_New.Core.Commands
                     if (!EquipmentLoot.TryReadSpawn(spell, out string hash, out int quality))
                         continue;
 
+                    IReadOnlyList<EquipmentLootMember>? reconstructed = useReconstructedPools
+                        ? _gameData.GetEquipmentLootMembers(hash) : null;
                     if (rows.Count > 0)
                         rows.Add(string.Empty);
                     rows.Add(
                         string.Format(
                             CultureInfo.InvariantCulture,
-                            "{0} spawns {1} up to QL {2}",
+                            reconstructed == null ? "{0} spawns {1} up to QL {2}" : "{0} rolls reconstructed {1} around QL {2}",
                             (worn.Name ?? ItemName(worn.LowId)).Replace('"', '\''),
                             hash.Replace('"', '\''),
                             quality));
 
                     instances.Clear();
-                    _gameData.CollectHashLeafInstances(hash, instances);
+                    if (reconstructed == null)
+                    {
+                        _gameData.CollectHashLeafInstances(hash, instances);
+                    }
+                    else
+                    {
+                        foreach (EquipmentLootMember member in reconstructed)
+                        {
+                            if (quality >= member.MinCenter && quality <= member.MaxCenter)
+                            {
+                                instances.Add(member.Family);
+                            }
+                        }
+                    }
                     var spawnNames = new SortedSet<string>(StringComparer.OrdinalIgnoreCase);
                     for (int i = 0; i < instances.Count; i++)
                         spawnNames.Add(LootItemName(instances[i]));

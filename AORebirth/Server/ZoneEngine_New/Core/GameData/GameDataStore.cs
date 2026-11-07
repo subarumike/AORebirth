@@ -239,6 +239,9 @@ namespace ZoneEngine_New.Core.GameData
         public void CollectHashLeafInstances(string hash, List<HashInstance> into)
             => _hashItems.CollectLeafInstances(hash, into);
 
+        public IReadOnlyList<EquipmentLootMember>? GetEquipmentLootMembers(string hash)
+            => _hashItems.GetEquipmentLootMembers(hash);
+
         public bool TryGetVendingMachine(int templateId, out VendingMachineDefinition definition)
         {
             if (templateId <= 0)

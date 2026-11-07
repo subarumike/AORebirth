@@ -104,26 +104,30 @@ evidence outside canonical GameData and public Git.
 
 ## RK dynaboss corpse reconciliation
 
-Use the capture decoder and review workflow in docs/ai/WORKFLOW.md to prepare
-the private corpse and item observations. The batch must contain
-rk-corpse-inventories.csv and rk-dyna-item-observations.csv with packet identity,
-the prior NPC full update and aura IDs, and the original inventory descriptors
-and slots. Retain inventories without sufficient identity evidence in the
-corpse input so the report can account for their exclusion.
+Pass a completed gameplay directory with `--raw-capture-dir` for offline
+decoding on private working copies, or use `--decoded-capture-dir` for an
+already decoded batch. `--capture-dir` also accepts reviewed
+rk-corpse-inventories.csv and rk-dyna-item-observations.csv inputs. Repeat the
+input options to merge retained batches by packet and slot identity.
 
 From the checkout root, export metadata from the GameData selected for the
 review, then pass its receipt and the reviewed batch to the offline tools.
 
 ```cmd
 cmd /d /c Tools\export-mission-chest-rk-metadata.cmd --gamedata-root GameData --output-root Captures\reviewed-rk-dyna\item-metadata
-python -B Tools\reconcile_rk_dyna_loot.py --capture-dir Captures\reviewed-rk-dyna --game-data GameData --item-metadata Captures\reviewed-rk-dyna\item-metadata --output-dir Captures\reviewed-rk-dyna\reconciliation
-python -B Tools\simulate_rk_dyna_equipment_loot.py --evidence-root Captures\reviewed-rk-dyna --item-metadata Captures\reviewed-rk-dyna\item-metadata --output Captures\reviewed-rk-dyna\rk-dyna-equipment-simulation.json
+python -B Tools\reconcile_rk_dyna_loot.py --decoded-capture-dir Captures\reviewed-rk-dyna --game-data GameData --item-metadata Captures\reviewed-rk-dyna\item-metadata --output-dir Captures\reviewed-rk-dyna\reconciliation
+python -B Tools\reconstruct_rk_dyna_loot.py --reconciliation Captures\reviewed-rk-dyna\reconciliation --item-metadata Captures\reviewed-rk-dyna\item-metadata --output Captures\reviewed-rk-dyna\reconstruction
 ```
 
-Repeat `--capture-dir` to reconcile multiple reviewed batches. The reports
-separate candidate NPC and equipment sources, reachable family membership,
-the runtime's QL and ID selection, and unresolved hashes. For a source-backed
-proposal, `--authoritative-definitions` accepts a reviewed manifest with an
-exact source record and SHA-256. It evaluates the proposal offline. Keep
-capture inputs, metadata exports, and generated reports outside canonical
-GameData and public Git.
+The generator writes an offline overlay with supporting slots, QL bounds,
+provisional weights and unresolved assignments. Its ordered equipment model
+admits full profiles and independently supported short-profile assignments.
+Review the reports and apply only the scoped overlay rows to the private
+ItemTemplates.json. Existing item families, shops, mission and ordinary loot
+keep their generic lookup rules.
+
+To compare an overlay against a pre-install snapshot, pass both files to the
+simulator with `--overlay` and `--base-item-templates`. Its `--evidence-root`
+uses the reviewed corpse and item CSVs, with `--item-metadata` pointing to the
+metadata export. Keep capture inputs, exports, snapshots and reports outside
+canonical GameData and public Git.
