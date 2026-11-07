@@ -1251,11 +1251,31 @@ def validate_supplemental_content(bundle, value, actual, portable=False):
 def reconcile_plan(root, profile, bundle, public_sha, dump_sha, baseline, before_rows, resolutions=None, generated_receipt=None, surfaces_receipt=None):
     resolutions = resolutions or {}
     canonical = Path(profile["CANONICAL_GAMEDATA_ROOT"]).resolve(strict=True)
+    prior, prior_link = None, None
+    if baseline.get("APPLIED_RECONCILIATION_BUNDLE"):
+        state_root = Path(profile["STATE_ROOT"]).resolve()
+        previous = Path(baseline["APPLIED_RECONCILIATION_BUNDLE"])
+        if not previous.resolve().is_relative_to(state_root):
+            raise ValueError("Prior reconciliation escaped local release state")
+        prior_file = previous / "reconciliation.json"
+        prior_bytes = prior_file.read_bytes()
+        prior_hash = digest(prior_bytes)
+        if prior_hash != baseline["APPLIED_RECONCILIATION_SHA256"]:
+            raise ValueError("Prior applied reconciliation was changed")
+        prior = json.loads(prior_bytes.decode("utf-8-sig"), object_pairs_hook=pairs)
+        validate_reconciliation(previous, prior)
+        if any(prior[key] != baseline[key] for key in TUPLE):
+            raise ValueError("Canonical baseline differs from its applied reconciliation")
+        prior_link = {"STATE_ROOT": str(state_root), "RECONCILIATION": {
+            "PATH": prior_file.relative_to(state_root).as_posix(), "SHA256": prior_hash}}
     snapshots, records, projected = {}, [], {}
     for authority, base_sha, target_sha in (
             ("PRIVATE_CONTENT_UPSTREAM", baseline["CONTENT_DUMP_SHA"], dump_sha),
             ("PUBLIC_PRODUCT_DATA", baseline["PUBLIC_MASTER_SHA"], public_sha)):
         old = tree_files(root, profile, authority, base_sha)
+        if (authority == "PRIVATE_CONTENT_UPSTREAM" and prior is not None
+                and old != prior["SOURCE_SNAPSHOTS"][authority]["AFTER"]):
+            raise ValueError("Configured private content baseline projection differs from the applied checkpoint")
         new = tree_files(root, profile, authority, target_sha)
         snapshots[authority] = {"BASE_SHA": base_sha, "CURRENT_SHA": target_sha, "BEFORE": old, "AFTER": new}
         for path, action in changes(old, new):
@@ -1442,21 +1462,8 @@ def reconcile_plan(root, profile, bundle, public_sha, dump_sha, baseline, before
     if surface_proof:
         plan.update(GENERATED_SURFACES_PROVENANCE=surface_proof, GENERATED_SURFACES_ADOPTIONS=surface_adoptions,
                     GENERATED_SURFACES_LOCAL_RECEIPT=surface_local_receipt)
-    if baseline.get("APPLIED_RECONCILIATION_BUNDLE"):
-        previous = Path(baseline["APPLIED_RECONCILIATION_BUNDLE"])
-        if not previous.resolve().is_relative_to(Path(profile["STATE_ROOT"]).resolve()):
-            raise ValueError("Prior reconciliation escaped local release state")
-        prior_file = previous / "reconciliation.json"
-        if digest(prior_file.read_bytes()) != baseline["APPLIED_RECONCILIATION_SHA256"]:
-            raise ValueError("Prior applied reconciliation was changed")
-        prior = read_json(prior_file)
-        validate_reconciliation(previous, prior)
-        if (prior["WINDOWS_GAMEDATA_MANIFEST"] != baseline["WINDOWS_GAMEDATA_MANIFEST"]
-                or any(prior[key] != baseline[key] for key in ("PUBLIC_MASTER_SHA", "CONTENT_DUMP_SHA"))):
-            raise ValueError("Canonical baseline differs from its applied reconciliation")
-        state_root = Path(profile["STATE_ROOT"]).resolve()
-        plan["PRIOR_LOCAL_RECONCILIATION"] = {"STATE_ROOT": str(state_root),
-                    "RECONCILIATION": descriptor(state_root, prior_file)}
+    if prior_link:
+        plan["PRIOR_LOCAL_RECONCILIATION"] = prior_link
     write_json(bundle / "manifest.json", after_rows)
     plan["CANONICAL_MANIFEST"] = descriptor(bundle, bundle / "manifest.json")
     write_json(bundle / "reconciliation.json", plan)

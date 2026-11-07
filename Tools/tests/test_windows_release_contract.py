@@ -720,6 +720,70 @@ class ReleaseContractTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             gate.validate_reconciliation(bundle, report)
 
+    def test_private_authority_rebinding_requires_applied_baseline_projection(self):
+        canonical = self.root / "canonical"
+        canonical.mkdir()
+        catalog = "ItemTemplates.json"
+        prior_upstream = b'{"drop":1}'
+        new_upstream = b'{"drop":2}'
+        prior_canonical = b'{"drop":1,"private":true}'
+        quest = b'{"unchanged":true}'
+        (canonical / catalog).write_bytes(prior_canonical)
+        (canonical / "Quests.json").write_bytes(quest)
+        (canonical / "items.dat").write_bytes(b"independently generated")
+        rows, _ = gate.inventory(canonical)
+        authority = "PRIVATE_CONTENT_UPSTREAM"
+        profile = {"CANONICAL_GAMEDATA_ROOT": str(canonical), "STATE_ROOT": str(self.root),
+                   "PRIVATE_CONTENT_REPOSITORY": "fixture/replacement", "PRIVATE_CONTENT_PREFIX": "Output",
+                   "PROTECTED_GENERATED_FILES": ["items.dat"]}
+        old_files = {catalog: prior_upstream, "Quests.json": quest}
+        old_projection = {path: {"blob": gate.blob(data), "size": len(data)} for path, data in old_files.items()}
+        baseline = {"PUBLIC_MASTER_SHA": PUBLIC, "CONTENT_DUMP_SHA": DUMP,
+                    "WINDOWS_GAMEDATA_MANIFEST": gate.validate_manifest(rows)}
+        prior_bundle = self.root / "applied"
+        prior_bundle.mkdir()
+        gate.write_json(prior_bundle / "before-manifest.json", rows)
+        with mock.patch.object(gate, "tree_files", side_effect=[old_projection, old_projection, {}, {}]):
+            gate.reconcile_plan(self.root, profile, prior_bundle, PUBLIC, DUMP, baseline, rows)
+        baseline.update(APPLIED_RECONCILIATION_BUNDLE=str(prior_bundle),
+                        APPLIED_RECONCILIATION_SHA256=gate.digest((prior_bundle / "reconciliation.json").read_bytes()))
+        target = "d" * 40
+
+        def github_tree(selected, endpoint):
+            self.assertEqual(selected["PRIVATE_CONTENT_REPOSITORY"], "fixture/replacement")
+            if endpoint == f"git/trees/{DUMP}?recursive=1":
+                files = old_files
+            else:
+                self.assertEqual(endpoint, f"git/trees/{target}?recursive=1")
+                files = {**old_files, catalog: new_upstream}
+            entries = {**{"Output/" + path: data for path, data in files.items()}, "Raw/" + catalog: b'{"unrelated":true}'}
+            return {"truncated": False, "tree": [{"path": path, "type": "blob", "mode": "100644",
+                    "sha": gate.blob(data), "size": len(data)} for path, data in entries.items()]}
+
+        rejected = self.root / "rejected-plan"
+        rejected.mkdir()
+        gate.write_json(rejected / "before-manifest.json", rows)
+        wrong_prefix = {**profile, "PRIVATE_CONTENT_PREFIX": "Raw"}
+        with mock.patch.object(gate, "gh", side_effect=github_tree) as gh, mock.patch.object(gate, "source_blob") as fetch_blob:
+            with self.assertRaisesRegex(ValueError, "baseline projection differs from the applied checkpoint"):
+                gate.reconcile_plan(self.root, wrong_prefix, rejected, PUBLIC, target, baseline, rows)
+            gh.assert_called_once_with(wrong_prefix, f"git/trees/{DUMP}?recursive=1")
+            fetch_blob.assert_not_called()
+            self.assertFalse((rejected / "reconciliation.json").exists())
+
+        accepted = self.root / "replacement-plan"
+        accepted.mkdir()
+        gate.write_json(accepted / "before-manifest.json", rows)
+        blobs = {gate.blob(data): data for data in (prior_upstream, new_upstream)}
+        with mock.patch.object(gate, "gh", side_effect=github_tree), mock.patch.object(gate, "git", return_value=b""), \
+                mock.patch.object(gate, "source_blob", side_effect=lambda root, profile, role, identity: blobs[identity]) as fetch_blob:
+            plan, projected = gate.reconcile_plan(self.root, profile, accepted, PUBLIC, target, baseline, rows)
+            self.assertEqual(fetch_blob.call_args_list, [mock.call(self.root, profile, authority, identity) for identity in blobs])
+        self.assertEqual(set(projected), {catalog})
+        self.assertEqual(json.loads(projected[catalog]), {"drop": 2, "private": True})
+        self.assertEqual(gate.inventory(canonical)[0], rows)
+        gate.summarize_reconciliation(accepted, plan)
+
     def test_approved_physical_add_modify_remove_replays_and_preserves_coexisting_content(self):
         canonical = self.root / "canonical"
         canonical.mkdir()
