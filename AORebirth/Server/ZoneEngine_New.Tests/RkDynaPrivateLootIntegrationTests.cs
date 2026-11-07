@@ -13,6 +13,7 @@ using AORebirth.Enums;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SmokeLounge.AOtomation.Messaging.GameData;
+using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using Vector3 = AORebirth.Core.Vector.Vector3;
 
 using ZoneEngine_New.Core.Characters;
@@ -23,6 +24,8 @@ using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.GameData;
 using ZoneEngine_New.Core.Inventory;
 using ZoneEngine_New.Core.Knubot;
+using ZoneEngine_New.Core.MessageHandlers;
+using ZoneEngine_New.Core.Missions;
 using ZoneEngine_New.Core.Mobs;
 using ZoneEngine_New.Core.Playfield;
 using ZoneEngine_New.Core.Playfield.Locality;
@@ -119,6 +122,87 @@ public sealed class RkDynaPrivateLootIntegrationTests
             StringAssert.Contains(string.Join("\n", report), $"Items: {drops.Length} ({drops.Length} per corpse)");
             Assert.AreEqual(allocatedBeforeGm, world.Ids.Count, "The GM preview does not mint items.");
         }
+    }
+
+    [TestMethod]
+    [DataRow(605, 153, "The Collector")]
+    [DataRow(570, 250, "Critical Hit Boss")]
+    public void CanonicalBossCorpseOpensAndMovesOneExistingInstanceThroughTheClientHandlers(
+        int playfieldId, int level, string modifier)
+    {
+        using var world = new LootWorld(Canonical.Value, playfieldId);
+        NpcCharacter npc = world.Spawn(level, modifier, militaryBoss: playfieldId == 570);
+        Corpse corpse = world.Spawns.SpawnCorpse(npc);
+        int initialCount = corpse.Loot.Content.Count;
+        var first = corpse.Loot.EnumerateSlots().First();
+        Item item = first.Value;
+        Assert.IsFalse(item.IsPersisted);
+
+        using var inventory = new InventoryActionTests.World();
+        Player player = inventory.Player;
+        world.PlaceLooter(player, corpse.Position);
+        var open = new GenericCmdMessageHandler(new StubInventoryRepository(), world.Items,
+            (AuthoredQuestService)RuntimeHelpers.GetUninitializedObject(typeof(AuthoredQuestService)));
+        open.Handle(new GenericCmdMessage
+        {
+            Action = GenericCmdAction.Use, Identity = player.Identity, User = player.Identity, Target = [corpse.Identity]
+        }, inventory.Session);
+
+        Assert.AreEqual(player.Identity, corpse.OpenerIdentity);
+        Assert.IsTrue(corpse.InventoryHandle > 0);
+        InventoryUpdateMessage contents = inventory.Session.Messages.OfType<InventoryUpdateMessage>().Single();
+        Assert.AreEqual(corpse.Identity, contents.BagIdentity);
+        Assert.AreEqual(corpse.InventoryHandle, contents.SlotnumberInMainInventory);
+        Assert.AreEqual(initialCount, contents.Entries.Length);
+        var entry = contents.Entries.Single(slot => slot.Slotnumber == first.Key);
+        Assert.AreEqual((item.LowId, item.HighId, item.Quality, item.StackCount),
+            (entry.LowId, entry.HighId, entry.Quality, entry.Unknown1));
+        GenericCmdMessage opened = inventory.Session.Messages.OfType<GenericCmdMessage>().Single();
+        Assert.AreEqual(1, opened.Temp1);
+        Assert.AreEqual(corpse.Identity, opened.Target.Single());
+
+        inventory.Session.Messages.Clear();
+        int placement = player.Inventory.Inventory.Offset;
+        var take = new ClientMoveItemToInventoryMessageHandler(
+            new InventoryMoveService(new StubLogger(), inventory.Flush, inventory.Actions));
+        var source = new Identity { Type = IdentityType.Backpack, Instance = (corpse.InventoryHandle << 16) | first.Key };
+        var request = new ClientMoveItemToInventoryMessage
+        {
+            Identity = player.Identity, SourceContainer = source, TargetPlacement = placement
+        };
+        inventory.Persistence.BeforeCommit = batch =>
+        {
+            Assert.AreEqual(0, inventory.Session.Messages.Count, "The take is acknowledged after persistence.");
+            Assert.AreSame(item, corpse.Loot.Content[first.Key]);
+            Assert.AreEqual(item.InstanceId, batch.Inserts.Single().InstanceId);
+        };
+        int mintCount = world.Ids.Count;
+        take.Handle(request, inventory.Session);
+
+        Assert.AreEqual(initialCount - 1, corpse.Loot.Content.Count);
+        Assert.IsFalse(corpse.Loot.Content.ContainsKey(first.Key));
+        Assert.AreSame(item, player.Inventory.Inventory.Content[placement]);
+        Assert.IsTrue(item.IsPersisted);
+        ItemInstanceRecord row = inventory.Persistence.Rows.Values.Single();
+        Assert.AreEqual((item.InstanceId, item.LowId, item.HighId, item.Quality, item.StackCount),
+            (row.InstanceId, row.LowId, row.HighId, row.Quality, row.StackCount));
+        Assert.AreEqual((int)IdentityType.Inventory, row.ContainerType);
+        Assert.AreEqual(player.Identity.Instance, row.ContainerInstance);
+        Assert.AreEqual(placement, row.ContainerPlacement);
+        ContainerAddItemMessage taken = inventory.Session.Messages.OfType<ContainerAddItemMessage>().Single();
+        Assert.AreEqual(source, taken.SourceContainer);
+        Assert.AreEqual(player.Identity, taken.Target);
+        Assert.AreEqual(placement, taken.TargetPlacement);
+
+        inventory.Session.Messages.Clear();
+        request.TargetPlacement++;
+        take.Handle(request, inventory.Session);
+        Assert.AreEqual(1, inventory.Persistence.Calls, "A repeated take from the now-empty source is a no-op.");
+        Assert.AreEqual(1, player.Inventory.Inventory.Content.Count);
+        Assert.AreEqual(initialCount - 1, corpse.Loot.Content.Count);
+        Assert.IsFalse(inventory.Session.Messages.OfType<ContainerAddItemMessage>().Any());
+        Assert.AreEqual(0, inventory.Ids.Calls);
+        Assert.AreEqual(mintCount, world.Ids.Count);
     }
 
     [TestMethod]
@@ -282,6 +366,7 @@ public sealed class RkDynaPrivateLootIntegrationTests
                 .AddSingleton(Registry)
                 .AddSingleton<IGameData>(catalogs.Data)
                 .AddSingleton<IInventoryRepository>(new StubInventoryRepository())
+                .AddSingleton(Blank<QuestPropService>())
                 .AddSingleton(new WorldSimulationAccess())
                 .AddSingleton(new PlayfieldLocality(playfieldId, metadata))
                 .AddSingleton(settings)
@@ -312,6 +397,14 @@ public sealed class RkDynaPrivateLootIntegrationTests
             }
 
             throw new AssertFailedException($"No qualifying level {level} boss for {modifier} in playfield {_playfield.ResourceId}.");
+        }
+
+        public void PlaceLooter(Player player, Vector3 position)
+        {
+            player.Position = position;
+            player.Playfield = _playfield;
+            Registry.Register(player);
+            _services.GetRequiredService<PlayfieldLocality>().RegisterDynel(player);
         }
 
         void SetField<T>(string name, T value)

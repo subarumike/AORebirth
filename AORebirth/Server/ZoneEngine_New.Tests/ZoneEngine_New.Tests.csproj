@@ -173,6 +173,7 @@
     <Compile Include="TestDoubles.cs" />
     <Compile Include="EquipmentLootTests.cs" />
     <Compile Include="HashItemCatalogTests.cs" />
+    <Compile Include="InventoryActionTests.cs" />
     <Compile Include="MissionChestLootTests.cs" />
     <Compile Include="RkDynaPrivateLootIntegrationTests.cs" />
   </ItemGroup>
