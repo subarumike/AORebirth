@@ -32,6 +32,7 @@ namespace ZoneEngine_New
     using ZoneEngine_New.Core.Mobs;
     using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Network;
+    using ZoneEngine_New.Core.Organizations;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
     using ZoneEngine_New.Core.Quests.Dungeons;
@@ -279,6 +280,8 @@ namespace ZoneEngine_New
             services.AddSingleton<INanoLineLockRepository, MySqlNanoLineLockRepository>();
             services.AddSingleton<IPetNameRepository, MySqlPetNameRepository>();
             services.AddSingleton<IOrganizationRepository, MySqlOrganizationRepository>();
+            services.AddSingleton<OrgLockoutClock>();
+            services.AddSingleton<OrgMembershipService>();
             services.AddSingleton<ICharacterCoalesceCommit, MySqlCharacterCoalesceCommit>();
             services.AddSingleton<IItemInstanceIdAllocator, ItemInstanceIdAllocator>();
             services.AddSingleton<IItemTemplateCatalog, ItemTemplateCatalog>();

@@ -28,16 +28,21 @@ namespace ZoneEngine_New.Core.MessageHandlers
         readonly IOrganizationRepository _organizations;
         readonly IZoneLogger _logger;
         readonly IChatEngineLink _chat;
+        readonly OrgLockoutClock _lockouts;
+        readonly OrgMembershipService _memberships;
 
         // Lazy: PlayfieldManager depends on the message router, which depends on the handlers.
         public OrgClientMessageHandler(IGameData gameData, Lazy<PlayfieldManager> playfieldManager,
-            IOrganizationRepository organizations, IZoneLogger logger, IChatEngineLink chat)
+            IOrganizationRepository organizations, IZoneLogger logger, IChatEngineLink chat,
+            OrgLockoutClock lockouts, OrgMembershipService memberships)
         {
             _gameData = gameData;
             _playfieldManager = playfieldManager;
             _organizations = organizations;
             _logger = logger;
             _chat = chat;
+            _lockouts = lockouts;
+            _memberships = memberships;
         }
 
         public Type MessageBodyType => typeof(OrgClientMessage);
@@ -80,6 +85,16 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 case OrgClientCommand.Join:
                     HandleInviteJoin(message, session, player);
                     return;
+                case OrgClientCommand.Leave:
+                    HandleLeave(message, session, player);
+                    return;
+                case OrgClientCommand.Disband:
+                    HandleDisband(message, session, player);
+                    return;
+                case OrgClientCommand.Unknown2:
+                case OrgClientCommand.Kick:
+                    HandleKick(message, session, player);
+                    return;
                 default:
                     // Commands not implemented yet stay silent for members; non-members get the captured refusal
                     // for the commands the captures proved answer "not in an organization".
@@ -91,11 +106,10 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
         static bool AnswersNotInOrganization(OrgClientCommand command) => command is
             OrgClientCommand.Debt or OrgClientCommand.VoteInfo or OrgClientCommand.Vote or OrgClientCommand.StartVote
-            or OrgClientCommand.StopVote or OrgClientCommand.Unknown2 or OrgClientCommand.Kick
+            or OrgClientCommand.StopVote
             or OrgClientCommand.BankAdd or OrgClientCommand.BankRemove or OrgClientCommand.Name
             or OrgClientCommand.Description or OrgClientCommand.Objective or OrgClientCommand.History
-            or OrgClientCommand.GoverningForm or OrgClientCommand.Disband or OrgClientCommand.Leave
-            or OrgClientCommand.Invite;
+            or OrgClientCommand.GoverningForm or OrgClientCommand.Invite;
 
         static void SendRef(IZoneSession session, Player player, string text)
             => session.Send(OrgChatText.Message(player.Identity, text));

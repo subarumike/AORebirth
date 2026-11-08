@@ -207,6 +207,27 @@
       },
       "additionalProperties": false
     },
+    "org": {
+      "type": "object",
+      "properties": {
+        "leaveLockoutSeconds": {
+          "type": "number"
+        },
+        "kickLockoutSeconds": {
+          "type": "number"
+        },
+        "sideChangeLockoutSeconds": {
+          "type": "number"
+        },
+        "anarchistLeaderKickLockoutSeconds": {
+          "type": "number"
+        },
+        "disbandLockoutSeconds": {
+          "type": "number"
+        }
+      },
+      "additionalProperties": false
+    },
     "worldClock": {
       "type": "object",
       "properties": {

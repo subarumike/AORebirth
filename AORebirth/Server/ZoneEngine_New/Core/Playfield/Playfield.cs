@@ -527,6 +527,13 @@ namespace ZoneEngine_New.Core.Playfield
             return TryEnqueue(new PlayfieldActionInboundItem { Action = action });
         }
 
+        /// <summary>Queues <paramref name="action"/> for the next drain even on the tick, so it runs after the current stat write.</summary>
+        internal bool PostAction(Action action)
+        {
+            ArgumentNullException.ThrowIfNull(action);
+            return TryEnqueue(new PlayfieldActionInboundItem { Action = action });
+        }
+
         // Team projections may originate on another playfield. Never enter the
         // recipient tick lock synchronously while the caller owns another tick.
         public void DispatchPlayerProjection(Player player, Action projection)
@@ -921,6 +928,8 @@ namespace ZoneEngine_New.Core.Playfield
                 services.AddSingleton(_playfieldManager.Knubot.Catalog);
             if (_playfieldManager.NpcScripts != null)
                 services.AddSingleton(_playfieldManager.NpcScripts);
+            if (_playfieldManager.OrgMembership != null)
+                services.AddSingleton(_playfieldManager.OrgMembership);
             if (_playfieldManager.Gameplay != null)
                 services.AddSingleton(_playfieldManager.Gameplay);
             if (_playfieldManager.ModuleEvents != null)

@@ -56,6 +56,13 @@
     "ownerAlwaysOnHateList": true,
     "ownerSharesPetEngageRange": true
   },
+  "org": {
+    "leaveLockoutSeconds": 21600,
+    "kickLockoutSeconds": 21600,
+    "sideChangeLockoutSeconds": 21600,
+    "anarchistLeaderKickLockoutSeconds": 43200,
+    "disbandLockoutSeconds": 43200
+  },
   "worldClock": {
     "epochUtc": "2026-01-01T00:00:00Z",
     "dayAtEpoch": 185408,

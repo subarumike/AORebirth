@@ -691,6 +691,16 @@ namespace ChatEngine.CoreServer
         }
 
         /// <summary>
+        /// Removes the client from Org Msg when it leaves its organization. The organization channel itself is
+        /// removed by the bridge, which also closes the client's tab.
+        /// </summary>
+        internal void LeaveOrgMsgChannel(Client client)
+        {
+            this.orgMsgChannel.RemoveClient(client);
+            client.Channels.Remove(this.orgMsgChannel);
+        }
+
+        /// <summary>
         /// </summary>
         /// <param name="packet">
         /// </param>

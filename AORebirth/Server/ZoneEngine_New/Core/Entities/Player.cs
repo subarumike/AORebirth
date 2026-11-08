@@ -754,6 +754,9 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>Organization row loaded at login for the Clan stat; null when the character has no organization.</summary>
         public ZoneEngine_New.Core.Data.OrganizationRecord? Organization { get; set; }
 
+        /// <summary>Raised after a real change of the Side stat (not hydration); organization membership reacts to it.</summary>
+        public event Action<Player>? SideChanged;
+
         /// <summary>Login: the stored progress, minus any tier already trained (a crash between the two writes).</summary>
         public void LoadResearch(IEnumerable<ResearchProgressRecord> rows)
         {
@@ -1010,10 +1013,12 @@ namespace ZoneEngine_New.Core.Entities
                 if (Stats.GetOrZero(CharacterStat.ShadowBreedTemplate, StatDetail.Base) != _wornShadowBreedItemId)
                     OnTrainedPerksChanged(null);
             }
-            else if (stat == CharacterStat.Side && !isInitialSet && previous != next
-                && Stats.GetOrZero(CharacterStat.ShadowBreedTemplate, StatDetail.Base) != 0)
+            else if (stat == CharacterStat.Side && !isInitialSet && previous != next)
             {
-                Stats.Set(CharacterStat.ShadowBreedTemplate, 0, StatDetail.Base, dirty: true);
+                if (Stats.GetOrZero(CharacterStat.ShadowBreedTemplate, StatDetail.Base) != 0)
+                    Stats.Set(CharacterStat.ShadowBreedTemplate, 0, StatDetail.Base, dirty: true);
+
+                SideChanged?.Invoke(this);
             }
         }
 

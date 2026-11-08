@@ -23,11 +23,11 @@ Rules are **declared**, confirmed where indicated by captures. Packet evidence a
 
 ## 3. Leader-only commands (rank 0)
 
-- `/org name`, `description`, `objective`, `history` (255 chars for the last three), `governingform`, `tax <n>`, `bank remove`, `startvote`, `stopvote`, `disband`. A GM may also disband / start a vote.
+A GM may also disband the organization of a targeted leader (Org Msg 119220807, client notice 508/28601677 to online members, disband lockout not applied to the GM) / start a vote.
 - Governing form change resets everybody except the president to the lowest rank. Re-applying the SAME form is accepted and also resets the ranks (a way to rebuild the hierarchy).
 - Tax: shows the value; non-leaders cannot change it. The "leave the org?" dialog (OrgServer 0x0008) is sent ONLY when the new tax is greater than the old one; a lower or equal tax is applied silently. Collected every 2 hours of played time from connected members; a member without enough credits drops to 0 and the shortfall becomes debt (`/org debt`); credits given with `bank add` reduce the debt.
 - Bank: view refused to the lowest rank (except anarchism); `bank add` by anyone who owns the amount; org bank capped at 4,000,000,000 (excess is lost); `bank remove` limited by the org balance and by the toon limit of 1,000,000,000. Tested with 1 credit.
-- Disband needs a client dialog; every member gets an 11 h lock.
+- Disband needs a client dialog; every member gets a 12 h lock (`disbandLockoutSeconds` 43200 in Gameplay.json).
 
 ## 4. Promote / demote / ranks
 
@@ -39,7 +39,7 @@ Rules are **declared**, confirmed where indicated by captures. Packet evidence a
 
 - Invite: selected target in sight, same side, not in an org, not locked; the inviter must be at least 3 ranks above the lowest rank (rank 2 left of the lowest). Anarchism is exempt. The inviter sees nothing unless the target is another side or already in an org. Refusing the dialog produces nothing.
 - Leave: client dialog, then 6 h lock; leaver sees "You've left the organization.", members see "<name> just left your organization."
-- Kick: the leader kicks every rank; any other rank kicks only members at least 3 ranks below its own (kicker rank <= kicked rank - 3; anarchism exempt; matches the `$3*4s` refusal text); applies immediately, no confirmation, no selection or line of sight needed (by name also works for offline characters). A non-eligible rank gets `$3*4s`; self-kick and non-member have their own messages. Kicked characters get a 6 h lock (anarchist leader 11 h).
+Kicked characters get a 6 h lock (anarchist leader 12 h).
 - Locks are cumulative: each new lock is added to the remaining one (6 h x 2 minus elapsed online time). Time only elapses while online.
 
 ## 6. Votes
@@ -54,7 +54,7 @@ All sentences are consolidated in the catalog of the scenario document (sections
 
 ## 8. Suggested implementation order (for the next step)
 
-1. Data: ref/sentence catalog JSON, lock durations (base 6 h, disband/anarchist 11 h), vote limits, tax/bank caps.
+1. Data: ref/sentence catalog JSON, lock durations (base 6 h, disband 12 h, anarchist leader kick 12 h), vote limits, tax/bank caps.
 2. Read-only commands: ranks, tax, bank, debt, vote info.
 3. Create (GM-locked), invite/join, leave, kick, promote/demote.
 4. Leader commands, bank, tax, then votes and disband.

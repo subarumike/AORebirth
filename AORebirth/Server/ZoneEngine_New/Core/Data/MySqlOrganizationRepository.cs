@@ -1,6 +1,7 @@
 namespace ZoneEngine_New.Core.Data
 {
     using AORebirth.Interfaces.Persistence.Characters;
+    using SmokeLounge.AOtomation.Messaging.GameData;
     using static SharedCharacterPersistence;
 
     /// <summary>Reads <c>organizations</c> through the shared character persistence DAO.</summary>
@@ -43,5 +44,34 @@ namespace ZoneEngine_New.Core.Data
 
         public AORebirth.Interfaces.Persistence.Characters.PersistedOrgLockoutData GetLockout(int characterId)
             => Run(() => _persistence.LoadOrgLockout(characterId));
+
+        public void SaveLockout(int characterId, string characterName, long secondsRemaining)
+            => Run(() => _persistence.SaveOrgLockout(characterId, characterName, secondsRemaining));
+
+        public void ClearMembership(int characterId)
+            => Run(() => _persistence.ClearOrganizationMembership(characterId));
+
+        public System.Collections.Generic.IList<int> GetMemberIds(int organizationId)
+            => Run(() => _persistence.LoadOrganizationMemberIds(organizationId));
+
+        public void Disband(int organizationId)
+            => Run(() => _persistence.DisbandOrganization(organizationId));
+
+        public int GetStoredRank(int characterId)
+            => Run(() => ReadStoredRank(_persistence.LoadStats(characterId)));
+
+        public int GetOrganizationIdOf(int characterId)
+            => Run(() => _persistence.LoadOrganizationId(characterId));
+
+        static int ReadStoredRank(System.Collections.Generic.IList<CharacterStatData> stats)
+        {
+            foreach (CharacterStatData stat in stats)
+            {
+                if (stat.StatId == (int)CharacterStat.ClanLevel)
+                    return stat.StatValue;
+            }
+
+            return 0;
+        }
     }
 }

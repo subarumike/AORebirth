@@ -28,5 +28,23 @@ namespace ZoneEngine_New.Core.Data
 
         /// <summary>Organization invite lockout for this character, or null when none exists.</summary>
         AORebirth.Interfaces.Persistence.Characters.PersistedOrgLockoutData GetLockout(int characterId);
+
+        /// <summary>Stores the remaining organization lockout seconds of one character.</summary>
+        void SaveLockout(int characterId, string characterName, long secondsRemaining);
+
+        /// <summary>Removes the membership of one character (leave, kick, side change).</summary>
+        void ClearMembership(int characterId);
+
+        /// <summary>Character ids that are members of the organization (stored Clan stat).</summary>
+        System.Collections.Generic.IList<int> GetMemberIds(int organizationId);
+
+        /// <summary>Clears every member and deletes the organization.</summary>
+        void Disband(int organizationId);
+
+        /// <summary>Stored rank (ClanLevel) of one character, 0 when none is stored.</summary>
+        int GetStoredRank(int characterId);
+
+        /// <summary>Organization id (stored Clan stat) of one character, 0 when orgless.</summary>
+        int GetOrganizationIdOf(int characterId);
     }
 }

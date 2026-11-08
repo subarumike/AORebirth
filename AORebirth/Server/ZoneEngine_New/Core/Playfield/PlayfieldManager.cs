@@ -90,12 +90,14 @@ namespace ZoneEngine_New.Core.Playfield
             ZoneEngine_New.Core.Chat.VicinityChatRelay? vicinity = null,
             ZoneEngine_New.Core.World.WorldLink? world = null,
             ZoneEngine_New.Core.World.CrossInstanceTransfer? crossInstance = null,
-            ZoneEngine_New.Core.NpcScripts.NpcScriptCatalog? npcScripts = null)
+            ZoneEngine_New.Core.NpcScripts.NpcScriptCatalog? npcScripts = null,
+            ZoneEngine_New.Core.Organizations.OrgMembershipService? orgMembership = null)
         {
             World = world;
             _crossInstance = crossInstance;
             Vicinity = vicinity;
             NpcScripts = npcScripts;
+            OrgMembership = orgMembership;
             QuestDungeons = questDungeons;
             Knubot = knubot;
             Gameplay = gameplay;
@@ -161,6 +163,9 @@ namespace ZoneEngine_New.Core.Playfield
 
         /// <summary>NPC scripts (GameData/NpcScripts), handed to every playfield's services so spawns can bind to them.</summary>
         public ZoneEngine_New.Core.NpcScripts.NpcScriptCatalog? NpcScripts { get; }
+
+        /// <summary>Organization leave, kick and side-change handling, forwarded into every playfield container.</summary>
+        public ZoneEngine_New.Core.Organizations.OrgMembershipService? OrgMembership { get; }
 
         public IItemTemplateCatalog ItemTemplates { get; }
 

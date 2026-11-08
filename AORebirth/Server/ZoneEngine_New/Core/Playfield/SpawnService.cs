@@ -969,6 +969,7 @@ namespace ZoneEngine_New.Core.Playfield
             _playfieldManager.Teams.RefreshPlayer(player, preserveRoster: command.Envelope?.Team != null);
 
             Metrics.TickStallWatch.Stage("arrive.visibility", characterId);
+            _playfield.GetService<Organizations.OrgMembershipService>()?.Attach(player);
             TryEnsureMissionChests();
             // Visibility must activate even when journal/quest restore fails; otherwise nearby
             // hash-spawns never send SCFU and the client cannot see or tab NPCs.
@@ -1074,6 +1075,7 @@ namespace ZoneEngine_New.Core.Playfield
             bool freshClient = !player.ZoneReconnectPending;
             player.ZoneReconnectPending = false;
 
+            _playfield.GetService<Organizations.OrgMembershipService>()?.Attach(player);
             TryEnsureMissionChests();
             _playfield.GetRequiredService<PlayfieldLocality>().ActivatePlayerVisibility(player);
             TryRestorePostSpawnContent(player);
@@ -1274,6 +1276,7 @@ namespace ZoneEngine_New.Core.Playfield
 
             // Zoning ends a /terminate countdown.
             player.CancelSelfTermination();
+            _playfield.GetService<Organizations.OrgMembershipService>()?.Detach(player);
 
             // Pets zone with their owner, as the same NPCs: they leave here and arrive with it.
             _playfield.GetRequiredService<Pets.PetService>().LeaveWithOwner(player);
@@ -1439,8 +1442,9 @@ namespace ZoneEngine_New.Core.Playfield
             player.Playfield = _playfield;
             player.Logger = _logger;
             _registry.Register(player);
+            _playfield.GetService<Organizations.OrgMembershipService>()?.Attach(player);
             _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(player);
-            // Buffs with a playshift requirement the character no longer meets here end on arrival, before the
+            // Buffs with a playshift
             // FullCharacter the client gets lists its NCU.
             Nanos.NanoRuntime.StripPlayshiftFailures(player);
             // Worn items go ineffective (or work again) by the same requirements.
@@ -1632,6 +1636,7 @@ namespace ZoneEngine_New.Core.Playfield
         {
             int characterId = player.Identity.Instance;
             player.CancelSelfTermination();
+            _playfield.GetService<Organizations.OrgMembershipService>()?.Detach(player);
             // Logging out leaves the player's pets waiting here for it to come back (retail: 30 seconds).
             // Charmed NPCs stay here, their own again, and do not turn on a player who is gone.
             _playfield.GetRequiredService<Pets.PetService>().AwaitOwnerReturn(player);

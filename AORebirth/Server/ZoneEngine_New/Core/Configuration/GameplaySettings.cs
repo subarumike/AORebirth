@@ -76,6 +76,9 @@ namespace ZoneEngine_New.Core.Configuration
         /// <summary>Where a shop's stock list comes from.</summary>
         public GameplayShops Shops { get; init; } = new();
 
+        /// <summary>Organization leave, kick and side-change lockouts.</summary>
+        public GameplayOrg Org { get; init; } = new();
+
         /// <summary>Corpse loot rolls.</summary>
         public GameplayLoot Loot { get; init; } = new();
 
@@ -200,6 +203,9 @@ namespace ZoneEngine_New.Core.Configuration
                 throw new InvalidDataException(path + ": socialAggro.maxHelpers must be 0 (no limit) or more.");
             if (Pets == null || !float.IsFinite(Pets.OwnerThreatSharePercent) || Pets.OwnerThreatSharePercent < 0)
                 throw new InvalidDataException(path + ": pets.ownerThreatSharePercent must be a finite, non-negative percent.");
+            if (Org == null || Org.LeaveLockoutSeconds < 0 || Org.KickLockoutSeconds < 0 || Org.SideChangeLockoutSeconds < 0
+                || Org.AnarchistLeaderKickLockoutSeconds < 0 || Org.DisbandLockoutSeconds < 0)
+                throw new InvalidDataException(path + ": org lockout seconds must be 0 or more.");
             if (WorldClock == null || !WorldClock.TryGetEpoch(out _) || WorldClock.DayAtEpoch < 0
                 || WorldClock.TimeOfDayAtEpochSeconds < 0 || WorldClock.TimeOfDayAtEpochSeconds >= Network.GameClock.SecondsPerDay)
                 throw new InvalidDataException(path + ": worldClock needs an ISO 8601 epochUtc, dayAtEpoch 0 or more, and "
@@ -363,6 +369,25 @@ namespace ZoneEngine_New.Core.Configuration
         /// of the shorter range a bystander must be within. An owner standing back behind their pet is in the fight.
         /// </summary>
         public bool OwnerSharesPetEngageRange { get; init; } = true;
+    }
+
+    /// <summary>Organization lockouts, in seconds. A lockout blocks joining until it has run out; online time counts down.</summary>
+    public sealed class GameplayOrg
+    {
+        /// <summary>Lockout after a member leaves (/org leave).</summary>
+        public long LeaveLockoutSeconds { get; init; } = 21600;
+
+        /// <summary>Lockout after a member is kicked.</summary>
+        public long KickLockoutSeconds { get; init; } = 21600;
+
+        /// <summary>Lockout after a member leaves the organization through a side change.</summary>
+        public long SideChangeLockoutSeconds { get; init; } = 21600;
+
+        /// <summary>Lockout after an Anarchism leader is kicked by the member quorum.</summary>
+        public long AnarchistLeaderKickLockoutSeconds { get; init; } = 43200;
+
+        /// <summary>Lockout after an organization is disbanded (applied to every former member, as after leave).</summary>
+        public long DisbandLockoutSeconds { get; init; } = 43200;
     }
 
     /// <summary>

@@ -132,11 +132,10 @@ namespace ZoneEngine_New.Core.MessageHandlers
             if (org is null)
                 return;
 
-            // Check if the player is under an invite lockout.
-            PersistedOrgLockoutData? lockout = _organizations.GetLockout(player.Identity.Instance);
-            if (lockout is not null && lockout.SecondsRemaining > 0)
+            // Check if the player is under an org lockout (leave, kick or side change).
+            long remaining = _lockouts.Remaining(player.Identity.Instance);
+            if (remaining > 0)
             {
-                long remaining = lockout.SecondsRemaining;
                 ClientFeedback.SendFormattedInCategory(player, ClientFeedback.LockoutCategory, ClientFeedback.LockoutAbleIn,
                     (int)(remaining / 3600), (int)(remaining % 3600 / 60), (int)(remaining % 60));
                 return;

@@ -239,6 +239,62 @@ namespace AORebirth.Database.Domain.Characters
             return rows.Count == 0 ? null : rows[0];
         }
 
+        public void SaveOrgLockout(int characterId, string characterName, long secondsRemaining)
+        {
+            if (characterId <= 0) throw new ArgumentOutOfRangeException(nameof(characterId));
+            if (secondsRemaining < 0) throw new ArgumentOutOfRangeException(nameof(secondsRemaining));
+            long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            Transaction((c, t) => Execute(c, t, "INSERT INTO org_lockout (char_id,char_name,seconds_remaining,last_updated) "
+                + "VALUES (@CharId,@Name,@Seconds,@Now) ON DUPLICATE KEY UPDATE char_name=VALUES(char_name), "
+                + "seconds_remaining=VALUES(seconds_remaining), last_updated=VALUES(last_updated)",
+                "@CharId", characterId, "@Name", characterName ?? string.Empty, "@Seconds", secondsRemaining, "@Now", now));
+        }
+
+        public void ClearOrganizationMembership(int characterId)
+        {
+            if (characterId <= 0) throw new ArgumentOutOfRangeException(nameof(characterId));
+            Transaction<int>((c, t) =>
+            {
+                // An orgless character has no Clan or ClanLevel row: a stored rank 0 would read as leader.
+                Execute(c, t, "DELETE FROM stats WHERE Type=@Type AND Instance=@Id AND (StatId=@Clan OR StatId=@Level)",
+                    "@Type", (int)IdentityType.CanbeAffected, "@Id", characterId,
+                    "@Clan", (int)CharacterStat.Clan, "@Level", (int)CharacterStat.ClanLevel);
+                return 0;
+            });
+        }
+
+        public IList<int> LoadOrganizationMemberIds(int organizationId)
+        {
+            if (organizationId <= 0) return new List<int>();
+            return Query("SELECT Instance FROM stats WHERE Type=@Type AND StatId=@Clan AND StatValue=@Id",
+                r => r.GetInt32(0), "@Type", (int)IdentityType.CanbeAffected, "@Clan", (int)CharacterStat.Clan, "@Id", organizationId);
+        }
+
+        public int LoadOrganizationId(int characterId)
+        {
+            IList<int> ids = Query("SELECT StatValue FROM stats WHERE Type=@Type AND Instance=@Id AND StatId=@Clan",
+                r => r.GetInt32(0), "@Type", (int)IdentityType.CanbeAffected, "@Id", characterId, "@Clan", (int)CharacterStat.Clan);
+            return ids.Count > 0 ? ids[0] : 0;
+        }
+
+        public void DisbandOrganization(int organizationId)
+        {
+            if (organizationId <= 0) throw new ArgumentOutOfRangeException(nameof(organizationId));
+            Transaction<int>((c, t) =>
+            {
+                // Members become orgless: their ClanLevel and Clan rows are removed, not zeroed.
+                Execute(c, t, "DELETE r FROM stats r JOIN stats m ON m.Type=r.Type AND m.Instance=r.Instance "
+                    + "AND m.StatId=@Clan AND m.StatValue=@Id "
+                    + "WHERE r.Type=@Type AND r.StatId=@Level",
+                    "@Clan", (int)CharacterStat.Clan, "@Id", organizationId,
+                    "@Type", (int)IdentityType.CanbeAffected, "@Level", (int)CharacterStat.ClanLevel);
+                Execute(c, t, "DELETE FROM stats WHERE Type=@Type AND StatId=@Clan AND StatValue=@Id",
+                    "@Type", (int)IdentityType.CanbeAffected, "@Clan", (int)CharacterStat.Clan, "@Id", organizationId);
+                Execute(c, t, "DELETE FROM organizations WHERE Id=@Id", "@Id", organizationId);
+                return 0;
+            });
+        }
+
         public void SaveOrganizationGoverningForm(int organizationId, int governingForm, int leaderId, int lowestRank)
         {
             if (organizationId <= 0) throw new ArgumentOutOfRangeException(nameof(organizationId));

@@ -155,7 +155,7 @@ Create refusals (Feedback CategoryId 501, MessageId -> sentence):
 - Accepting an invitation: joiner sends OrgClient 0x0F (target `0xDEAA:<org>`, Unknown1=0); about 0.12 s later the server answers `$;EJ2` + OrgInfo + Stats Clan/ClanLevel (observed for Nykorgtest2, Testou, Totoe5).
 - Refusing or ignoring: no outgoing packet.
 - Invited character under lock (Hazorgtest): the server still sends OrgServer 0x0005 (identical to a normal invitation). The CLIENT then shows "Unable to perform action, able in HH:MM:SS" to the invited; the inviter sees nothing (declared).
-- Leave lock: 6 hours, and locks CUMULATE (Hazorgtest observed 6 -> 12 -> 18 -> 24 h); `/org create` ignores the lock. Other locks: kicked character 6 h, anarchist leader kicked 11 h, disbanded org 11 h for everyone. Locks decrease only while online.
+anarchist leader kicked 12 h, disbanded org 12 h for everyone (`disbandLockoutSeconds` 43200).
 - **OPEN:** the packet/stat that tells the client the remaining lock time was not identified (the leave reply carries only Feedback 508, empty OrgInfo and Stats `Clan=0`, SocialStatus 1). The AOR implementation must either find it (compare Hazorgtest's login stats) or reproduce the retail behavior with a dedicated capture.
 
 ## 8. Amounts

@@ -30,6 +30,16 @@ namespace AORebirth.Interfaces.Persistence.Characters
         void SaveOrganizationLeader(int organizationId, int leaderId);
         /// <summary>Organization invite lockout for this character, or null when none exists.</summary>
         PersistedOrgLockoutData LoadOrgLockout(int characterId);
+        /// <summary>Inserts or updates the organization lockout row of this character.</summary>
+        void SaveOrgLockout(int characterId, string characterName, long secondsRemaining);
+        /// <summary>Clears Clan and ClanLevel and sets SocialStatus to the orgless value for one character.</summary>
+        void ClearOrganizationMembership(int characterId);
+        /// <summary>Character ids whose Clan stat equals the organization id.</summary>
+        IList<int> LoadOrganizationMemberIds(int organizationId);
+        /// <summary>Organization id of one character (stored Clan stat), 0 when orgless.</summary>
+        int LoadOrganizationId(int characterId);
+        /// <summary>Clears the membership of every member and deletes the organizations row in one transaction.</summary>
+        void DisbandOrganization(int organizationId);
         IList<PersistedItemData> LoadCarriedItems(int characterId);
         IList<PersistedItemData> LoadBankItems(int characterId);
         IList<PersistedItemData> LoadContainerItems(int containerInstanceId);

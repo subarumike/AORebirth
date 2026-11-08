@@ -232,6 +232,19 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>Drops a single dirty flag without emitting a StatMessage for it.</summary>
         public void ClearDirty(CharacterStat stat) => _dirty.Remove(stat);
 
+        /// <summary>
+        /// Removes a stat entirely, so it is neither saved nor sent. Used where a stored zero would still be a value
+        /// (an orgless character has no Clan or ClanLevel).
+        /// </summary>
+        public void Remove(CharacterStat stat)
+        {
+            if (!_values.Remove(stat))
+                return;
+
+            _dirty.Remove(stat);
+            BaseChanged?.Invoke(stat);
+        }
+
         static int GetDetail(StatValue statValue, StatDetail detail) => detail switch
         {
             StatDetail.Base => statValue.Base,

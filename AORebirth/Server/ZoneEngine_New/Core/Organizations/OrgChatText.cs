@@ -38,6 +38,7 @@ namespace ZoneEngine_New.Core.Organizations
         public const string InviteRankTooLow = "$I:N3";
         public const string InviteAlreadyInOrganization = "\"Y^0o";
         public const string InviteOtherSide = "%`cZp";
+        public const string OrganizationDisbanded = "%.Neo";
 
     }
 
@@ -104,6 +105,26 @@ namespace ZoneEngine_New.Core.Organizations
         /// <summary>Refusal for invite when the target is already in another organization.</summary>
         public static string InviteAlreadyInOrgRefusal(string targetName)
             => Wrap(OrgChatRefs.InviteAlreadyInOrganization + "s" + (char)(targetName.Length + 1) + targetName);
+
+        /// <summary>Org Msg after a rank kick (Text.json 37093479, rules.txt "was kicked by"). Plain text: no ref captured.</summary>
+        public static string RankKickedOrgMessage(string kicker, string kicked)
+            => kicker + " kicked " + kicked + " from your organization.";
+
+        /// <summary>Org Msg after a side-change kick (Text.json 181448347). Plain text: no ref captured.</summary>
+        public static string SideChangeKickedOrgMessage(string kicked)
+            => kicked + " kicked from organization (alignment changed).";
+
+        /// <summary>Org Msg after a GM kick (Text.json 33183704). Plain text: no ref captured.</summary>
+        public static string GmKickedOrgMessage(string kicked)
+            => "GM kicked " + kicked + " from your organization.";
+
+        /// <summary>Org Msg after a GM disbands an organization by id (Text.json 119220807). Plain text: no ref captured.</summary>
+        public static string GmDisbandedOrgMessage(string gmName)
+            => "Org Message: The GM " + gmName + " has disbanded your organization.";
+
+        /// <summary>Org Msg after three members remove the leader (Text.json 33408158). Plain text: no ref captured.</summary>
+        public static string QuorumLeaderKickedOrgMessage(string first, string second, string third, string leaderName)
+            => first + ", " + second + " and " + third + " kicked " + leaderName + " from the organization.";
 
         /// <summary>The plain-text confirmation retail sends to every online member after a name/description/objective/history change.</summary>
         public static ChatTextMessage InfoUpdated(Identity recipient) => new()
