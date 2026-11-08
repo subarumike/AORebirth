@@ -49,6 +49,7 @@ RUNTIME_MISSION_FILES = frozenset("""Locations.json Text.json RollPolicy.json Ro
 MissionOffers.json Keys.json RewardObservations.json RareLoot.json RareLootChancePercent.json
 Source/MissionLevels.csv Source/MissionLevelRules.json Destinations/MissionDestinations.json
 Destinations/MissionEntrancePlacements.json""".split())
+RETIRED_MISSION_PACKET_CATALOGS = frozenset(("Missions/RollBodies.json", "Missions/RollTemplate.json"))
 RUNTIME_PLAYFIELD_FILES = frozenset("""metadata.json Districts.json Rooms.json Spawns.json
 Collision.dat Surfaces.dat Dynels.dat Walls.dat Doors.dat Destinations.dat Water.dat Navmesh.dat
 GNDA.png DCGA.png""".split())
@@ -1126,9 +1127,21 @@ def validate_private_catalog_adoptions(bundle, value, actual, portable=False):
         actual[path] = after
 
 
-def validate_runtime_exclusions(bundle, value, actual, portable=False):
-    # Absence preserves validation of historical receipts; every new plan supplies the list.
+def validate_runtime_exclusions(bundle, value, actual, portable=False, *, historical_checkpoint=False):
+    def admitted(path):
+        if runtime_content_path(path):
+            return True
+        if portable or not historical_checkpoint or path not in RETIRED_MISSION_PACKET_CATALOGS:
+            return False
+        # A linked prior checkpoint can contain the exact files its public source still supplied.
+        published = value["SOURCE_SNAPSHOTS"]["PUBLIC_PRODUCT_DATA"]["AFTER"].get(path)
+        row = actual.get(path)
+        return row is not None and published == {"blob": row["blob"], "size": row["size"]}
+
+    # Older receipts predate general runtime admission, but the retired catalogs still need source proof.
     if "RUNTIME_EXCLUSIONS" not in value:
+        if any(not admitted(path) for path in RETIRED_MISSION_PACKET_CATALOGS.intersection(actual)):
+            raise ValueError("Canonical runtime admission is incomplete")
         return
     rows = value["RUNTIME_EXCLUSIONS"]
     if not isinstance(rows, list):
@@ -1140,7 +1153,7 @@ def validate_runtime_exclusions(bundle, value, actual, portable=False):
             raise ValueError("Runtime exclusion schema differs")
         path = row["PATH"]
         relative(path)
-        if runtime_content_path(path) or path in seen or row["REASON"] != "DENIED_ADMISSION":
+        if admitted(path) or path in seen or row["REASON"] != "DENIED_ADMISSION":
             raise ValueError("Runtime exclusion does not identify a denied path")
         seen.append(path)
         identities = {}
@@ -1156,11 +1169,11 @@ def validate_runtime_exclusions(bundle, value, actual, portable=False):
                 or identities["EXCLUDED_CONTENT"] != actual.get(path)):
             raise ValueError("Runtime exclusion does not preserve complete before/projected identities")
         actual.pop(path)
-    if seen != sorted(seen) or any(not runtime_content_path(path) for path in actual):
+    if seen != sorted(seen) or any(not admitted(path) for path in actual):
         raise ValueError("Canonical runtime admission is incomplete")
 
 
-def validate_supplemental_content(bundle, value, actual, portable=False):
+def validate_supplemental_content(bundle, value, actual, portable=False, *, historical_checkpoint=False):
     """Replay restorations, private policies, generated items and runtime exclusions."""
     catalogs = required_catalogs(value.get("REQUIRED_CURRENT_CATALOGS", []))
     expected, seen = {}, set()
@@ -1217,7 +1230,7 @@ def validate_supplemental_content(bundle, value, actual, portable=False):
     if not proof:
         if adoption or value.get("GENERATED_ITEMS_LOCAL_RECEIPT"):
             raise ValueError("Generated adoption lacks measured provenance")
-        validate_runtime_exclusions(bundle, value, actual, portable)
+        validate_runtime_exclusions(bundle, value, actual, portable, historical_checkpoint=historical_checkpoint)
         return
     output = validate_generated_items_provenance(proof, value["PUBLIC_MASTER_SHA"])
     if "items.dat" not in value["PROTECTED_GENERATED_FILES"]:
@@ -1245,7 +1258,7 @@ def validate_supplemental_content(bundle, value, actual, portable=False):
         actual["items.dat"] = after
     if actual.get("items.dat") != output:
         raise ValueError("Canonical items.dat differs from current generated provenance")
-    validate_runtime_exclusions(bundle, value, actual, portable)
+    validate_runtime_exclusions(bundle, value, actual, portable, historical_checkpoint=historical_checkpoint)
 
 
 def reconcile_plan(root, profile, bundle, public_sha, dump_sha, baseline, before_rows, resolutions=None, generated_receipt=None, surfaces_receipt=None):
@@ -1263,7 +1276,7 @@ def reconcile_plan(root, profile, bundle, public_sha, dump_sha, baseline, before
         if prior_hash != baseline["APPLIED_RECONCILIATION_SHA256"]:
             raise ValueError("Prior applied reconciliation was changed")
         prior = json.loads(prior_bytes.decode("utf-8-sig"), object_pairs_hook=pairs)
-        validate_reconciliation(previous, prior)
+        validate_reconciliation(previous, prior, historical_checkpoint=True)
         if any(prior[key] != baseline[key] for key in TUPLE):
             raise ValueError("Canonical baseline differs from its applied reconciliation")
         prior_link = {"STATE_ROOT": str(state_root), "RECONCILIATION": {
@@ -1382,7 +1395,7 @@ def reconcile_plan(root, profile, bundle, public_sha, dump_sha, baseline, before
                 or digest(prior_file.read_bytes()) != baseline["APPLIED_RECONCILIATION_SHA256"]):
             raise ValueError("Prior generated items provenance was changed")
         prior = read_json(prior_file)
-        validate_reconciliation(previous, prior)
+        validate_reconciliation(previous, prior, historical_checkpoint=True)
         candidate = prior.get("GENERATED_ITEMS_PROVENANCE")
         if candidate:
             receipt_bundle, receipt_value = previous, prior
@@ -1470,7 +1483,7 @@ def reconcile_plan(root, profile, bundle, public_sha, dump_sha, baseline, before
     return plan, projected
 
 
-def validate_reconciliation(bundle, reconciliation):
+def validate_reconciliation(bundle, reconciliation, *, historical_checkpoint=False):
     before = read_json(load_descriptor(bundle, reconciliation["BEFORE_MANIFEST"]))
     after = read_json(load_descriptor(bundle, reconciliation["CANONICAL_MANIFEST"]))
     if validate_manifest(before) != reconciliation["CANONICAL_BEFORE_MANIFEST"]:
@@ -1482,7 +1495,7 @@ def validate_reconciliation(bundle, reconciliation):
             raise ValueError("Local replay history escaped ignored release state")
         prior_path = load_descriptor(state_root, prior_local["RECONCILIATION"])
         prior = read_json(prior_path)
-        validate_reconciliation(prior_path.parent, prior)
+        validate_reconciliation(prior_path.parent, prior, historical_checkpoint=True)
         if prior["WINDOWS_GAMEDATA_MANIFEST"] != reconciliation["CANONICAL_BEFORE_MANIFEST"]:
             raise ValueError("Approved reconciliation history does not bind the canonical baseline")
         snapshots = reconciliation["SOURCE_SNAPSHOTS"]
@@ -1531,7 +1544,7 @@ def validate_reconciliation(bundle, reconciliation):
         previous_results[path] = result
     if actual_changes != expected_changes:
         raise ValueError("Approved upstream additions/modifications/removals are incomplete")
-    validate_supplemental_content(bundle, reconciliation, actual)
+    validate_supplemental_content(bundle, reconciliation, actual, historical_checkpoint=historical_checkpoint)
     if sorted(actual.values(), key=lambda row: row["path"]) != after:
         raise ValueError("Canonical manifest loses or changes unrelated private content")
     if validate_manifest(after) != reconciliation["WINDOWS_GAMEDATA_MANIFEST"]:

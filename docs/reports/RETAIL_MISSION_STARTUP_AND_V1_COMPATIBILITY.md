@@ -68,7 +68,7 @@ The existing capture evidence in `AORebirth/GameData/Missions/Layouts.json` (Git
 | Repair Machine | 341 | 1 | 17 | 17 | e75f1326a72db6d42ddb5ebd72320338148193e6469e70b1c30b2d8a0f6d1926 |
 | Return Item | 341 | 1 | 20 | 21 | f7f00e3344bd12f2d7d302761403c9c5b083fc8a181417c7f2c9748da501ff59 |
 
-`V1_RESULT`
+All five captured generator payloads round-tripped byte for byte in the offline replay. The fixture verified 90 door connections and used the captured Return Item door height of 5.0 where the shared builder derives 2.8 from the owner room. The replay used synthetic saved bindings around the original captured identities and preserved the supplied exterior destinations.
 
 At runtime, a version 1 seed-only record stays readable, and the layout generator reports the missing captured-layout binding instead of building version 2 geometry. The existing safe exterior return for a character saved in an old captured PF2 remains in place. There were no changes to player records, keys, generated mission schemas, or the version 2 and version 3 generators. Reactivating a specific historical accepted mission requires its matching persisted bundle and offer, runtime object identities and state, and a verified path to materialize them without rerolling. No matching historical player-instance snapshot was identified in the reviewed evidence. Static capture equality alone does not establish live reconstruction.
 

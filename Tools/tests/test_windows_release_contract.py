@@ -192,6 +192,67 @@ class ReleaseContractTests(unittest.TestCase):
         for path in ("Missions/RollBodies.json", "Missions/RollTemplate.json"):
             self.assertFalse(gate.runtime_content_path(path), path)
 
+    def test_hash_bound_prior_checkpoint_can_replay_and_retire_mission_packet_catalogs(self):
+        retired = ("Missions/RollBodies.json", "Missions/RollTemplate.json")
+        replacement = ("Missions/Keys.json", "Missions/MissionOffers.json")
+        old_data = {path: gate.encoded({"historical": path}) for path in retired}
+        new_data = {path: gate.encoded({"typed": path}) for path in replacement}
+        canonical = self.root / "canonical"
+        (canonical / "Missions").mkdir(parents=True)
+        for path, payload in old_data.items():
+            (canonical / path).write_bytes(payload)
+        (canonical / "items.dat").write_bytes(b"independent runtime data")
+        rows, _ = gate.inventory(canonical)
+        old_index = gate.validate_manifest(rows)
+        prior = self.root / "prior"
+        prior.mkdir()
+        gate.write_json(prior / "before-manifest.json", rows)
+        gate.write_json(prior / "manifest.json", rows)
+
+        def source_index(data):
+            return {path: {"blob": gate.blob(payload), "size": len(payload)} for path, payload in data.items()}
+
+        old_source, new_source = source_index(old_data), source_index(new_data)
+        old_plan = {"FORMAT_VERSION": 1, "PUBLIC_MASTER_SHA": PUBLIC, "CONTENT_DUMP_SHA": DUMP,
+                    "CANONICAL_BEFORE_MANIFEST": old_index, "WINDOWS_GAMEDATA_MANIFEST": old_index,
+                    "BEFORE_MANIFEST": gate.descriptor(prior, prior / "before-manifest.json"),
+                    "CANONICAL_MANIFEST": gate.descriptor(prior, prior / "manifest.json"),
+                    "SOURCE_SNAPSHOTS": {
+                        "PRIVATE_CONTENT_UPSTREAM": {"BASE_SHA": DUMP, "CURRENT_SHA": DUMP, "BEFORE": {}, "AFTER": {}},
+                        "PUBLIC_PRODUCT_DATA": {"BASE_SHA": PUBLIC, "CURRENT_SHA": PUBLIC,
+                                                "BEFORE": old_source, "AFTER": old_source}},
+                    "CHANGES": [], "PROTECTED_GENERATED_FILES": ["items.dat"], "RUNTIME_EXCLUSIONS": []}
+        gate.write_json(prior / "reconciliation.json", old_plan)
+        baseline = {**{key: old_plan[key] for key in gate.TUPLE},
+                    "APPLIED_RECONCILIATION_BUNDLE": str(prior),
+                    "APPLIED_RECONCILIATION_SHA256": gate.digest((prior / "reconciliation.json").read_bytes())}
+
+        for historical in (old_plan, {key: value for key, value in old_plan.items() if key != "RUNTIME_EXCLUSIONS"}):
+            with self.assertRaisesRegex(ValueError, "Canonical runtime admission is incomplete"):
+                gate.validate_reconciliation(prior, historical)
+            self.assertEqual(gate.validate_reconciliation(prior, historical, historical_checkpoint=True), rows)
+            wrong_source = copy.deepcopy(historical)
+            for index in ("BEFORE", "AFTER"):
+                wrong_source["SOURCE_SNAPSHOTS"]["PUBLIC_PRODUCT_DATA"][index][retired[0]]["blob"] = "c" * 40
+            with self.assertRaisesRegex(ValueError, "Canonical runtime admission is incomplete"):
+                gate.validate_reconciliation(prior, wrong_source, historical_checkpoint=True)
+
+        target = "d" * 40
+        bundle = self.root / "current"
+        bundle.mkdir()
+        gate.write_json(bundle / "before-manifest.json", rows)
+        blobs = {gate.blob(payload): payload for payload in (old_data | new_data).values()}
+        with mock.patch.object(gate, "tree_files", side_effect=[{}, {}, old_source, new_source]), \
+                mock.patch.object(gate, "source_blob", side_effect=lambda r, p, a, identity: blobs[identity]):
+            plan, projected = gate.reconcile_plan(self.root,
+                {"STATE_ROOT": str(self.root), "CANONICAL_GAMEDATA_ROOT": str(canonical),
+                 "PROTECTED_GENERATED_FILES": ["items.dat"]}, bundle, target, DUMP, baseline, rows)
+        self.assertEqual(projected, {**dict.fromkeys(retired), **new_data})
+        after = gate.validate_reconciliation(bundle, plan)
+        self.assertEqual({row["path"] for row in after}, {*replacement, "items.dat"})
+        self.assertEqual(gate.validate_reconciliation_summary(bundle, gate.summarize_reconciliation(bundle, plan)), after)
+        self.assertEqual(gate.inventory(canonical)[0], rows)
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.root = Path(self.temp.name)
