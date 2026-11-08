@@ -764,24 +764,34 @@ public sealed class QuestDungeonDestinationTests
         internal Fixture(IMissionDao? completionDao = null, IItemBuilder? items = null, Func<DateTime>? now = null,
             CharacterSnapshotService? snapshots = null, IItemTemplateCatalog? templates = null,
             IInventoryRepository? inventory = null, IItemInstanceIdAllocator? ids = null, int playerId = 77,
-            bool enableMissionPopulationPersistence = false)
+            bool enableMissionPopulationPersistence = false, GeneratedMissionOffer? rolledOffer = null)
         {
             Player = TestWorld.CreatePlayer(playerId);
             _templates = templates ?? new StubCatalog();
             _ids = ids ?? new StubInstanceIdAllocator();
             _items = items ?? new StubItemBuilder();
-            Entrance = Catalog.Value.Placements.First(row => row.IdentityInstance > int.MaxValue && Catalog.Value.TryGetWorldPosition(row.Identity, out _));
-            Assert.IsTrue(Catalog.Value.TryGetWorldPosition(Entrance.Identity, out var worldPos));
-            Offer = new GeneratedMissionOffer
+            if (rolledOffer != null)
             {
-                OwnerId = Player.Identity.Instance, OfferType = 0xDAC3, OfferInstance = 100,
-                State = GeneratedMissionState.Offered, ExpiresAtUtcTicks = DateTime.UtcNow.AddHours(1).Ticks,
-                EntranceType = unchecked((int)Entrance.IdentityType), EntranceInstance = unchecked((int)Entrance.IdentityInstance),
-                DestinationType = unchecked((int)worldPos.PlayfieldIdentityType), DestinationInstance = Entrance.PlayfieldId,
-                DestinationPlayfield = Entrance.PlayfieldId, DestinationX = Entrance.LocalX, DestinationY = Entrance.LocalY, DestinationZ = Entrance.LocalZ,
-                EntranceLow = worldPos.WorldOffsetX, EntranceHigh = worldPos.WorldOffsetZ,
-                MissionType = 1, Quality = 10, Title = "Destination fixture", Description = "Destination integration test"
-            };
+                Assert.AreEqual(Player.Identity.Instance, rolledOffer.OwnerId);
+                Assert.IsTrue(QuestDungeonService.TryResolveOfferEntrance(Catalog.Value, rolledOffer, out var selected));
+                Entrance = selected;
+                Offer = rolledOffer;
+            }
+            else
+            {
+                Entrance = Catalog.Value.Placements.First(row => row.IdentityInstance > int.MaxValue && Catalog.Value.TryGetWorldPosition(row.Identity, out _));
+                Assert.IsTrue(Catalog.Value.TryGetWorldPosition(Entrance.Identity, out var worldPos));
+                Offer = new GeneratedMissionOffer
+                {
+                    OwnerId = Player.Identity.Instance, OfferType = 0xDAC3, OfferInstance = 100,
+                    State = GeneratedMissionState.Offered, ExpiresAtUtcTicks = DateTime.UtcNow.AddHours(1).Ticks,
+                    EntranceType = unchecked((int)Entrance.IdentityType), EntranceInstance = unchecked((int)Entrance.IdentityInstance),
+                    DestinationType = unchecked((int)worldPos.PlayfieldIdentityType), DestinationInstance = Entrance.PlayfieldId,
+                    DestinationPlayfield = Entrance.PlayfieldId, DestinationX = Entrance.LocalX, DestinationY = Entrance.LocalY, DestinationZ = Entrance.LocalZ,
+                    EntranceLow = worldPos.WorldOffsetX, EntranceHigh = worldPos.WorldOffsetZ,
+                    MissionType = 1, Quality = 10, Title = "Destination fixture", Description = "Destination integration test"
+                };
+            }
             Offers.Offer = Offer;
             Store.Offer = Offer;
             var lazyManager = new Lazy<PlayfieldManager>(() => Manager ?? throw new InvalidOperationException("Fixture manager is not initialized."));

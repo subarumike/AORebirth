@@ -12,10 +12,17 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using AORebirth.Enums;
 using AORebirth.Interfaces.Persistence.Missions;
 using SmokeLounge.AOtomation.Messaging.GameData;
+using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+using Utility.GameData.Missions;
+using ZoneEngine.Core.Missions;
+using ZoneEngine_New.Core.Characters;
 using ZoneEngine_New.Core.Data;
 using ZoneEngine_New.Core.Entities;
+using ZoneEngine_New.Core.GameData;
 using ZoneEngine_New.Core.Inventory;
+using ZoneEngine_New.Core.Missions;
 using ZoneEngine_New.Core.Playfield;
+using ZoneEngine_New.Core.Playfield.Locality;
 using ZoneEngine_New.Core.Quests;
 using ZoneEngine_New.Core.Quests.Dungeons;
 using AoVector3 = AORebirth.Core.Vector.Vector3;
@@ -25,6 +32,10 @@ using Fixture = QuestDungeonDestinationTests.Fixture;
 [DoNotParallelize]
 public sealed class MissionChestObjectiveIntegrationTests
 {
+    const int RolledOwner = 111;
+    const int RollLevel = 60;
+    const int RollOrigin = 800;
+
     public TestContext TestContext { get; set; } = null!;
 
     [TestMethod]
@@ -239,6 +250,175 @@ public sealed class MissionChestObjectiveIntegrationTests
         Assert.AreEqual(0, run.Dao.Items[binding.Instance].ContainerType);
     }
 
+    [TestMethod]
+    [TestCategory("MissionObjectiveFullLifecycle")]
+    [DataRow(0)]
+    [DataRow(1)]
+    [DataRow(2)]
+    [DataRow(3)]
+    [DataRow(4)]
+    public void RolledObjectiveCompletesFromActualContentAndPaysOnceBeforeCleanup(int missionType)
+    {
+        using var run = new ObjectiveRun(missionType, fromRoll: true);
+        var f = run.Fixture;
+        var quest = run.Quest;
+        var accepted = f.Parameters();
+        Assert.AreEqual(DungeonLayoutGenerator.CurrentVersion, accepted.GeneratorVersion);
+        Assert.AreEqual(MissionLevelRuntime.GetMissionQuality(RollLevel, 1), accepted.Quality);
+        Assert.AreEqual(GeneratedMissionState.Active, f.Offer.State);
+        AssertObjectiveBinding(run.World, accepted);
+        AssertObjectivePolicy(f, quest, accepted);
+
+        int key = f.Store.Links.Single().Key;
+        var player = f.Player;
+        var world = run.World;
+        var registry = world.GetRequiredService<DynelRegistry>();
+        if (!quest.Template.IsReturnItem)
+        {
+            f.Manager.RegisterPlayer(player);
+        }
+        Assert.IsTrue(OnWorld(world, () =>
+        {
+            if (accepted.ObjectiveNpc is { } npcBinding)
+            {
+                Assert.IsTrue(registry.TryGet(npcBinding.Identity, out var actor));
+                var npc = (NpcCharacter)actor!;
+                player.Position = npc.Position;
+                if (quest.Template.IsKill)
+                {
+                    registry.Register(player);
+                    try
+                    {
+                        Assert.IsTrue(npc.ApplyDamage(player, npc.Stats.GetOrZero(CharacterStat.Health), HitType.Normal));
+                    }
+                    finally
+                    {
+                        Assert.IsTrue(registry.UnregisterExact(player));
+                    }
+                    Assert.IsTrue(npc.IsDead);
+                    Assert.IsTrue(MissionTokenProgress.IsObjectiveKilled(run.Dao, quest.QuestId, quest.AssignedAtUtc.Ticks));
+                }
+                else
+                {
+                    f.Quests.OnNpcInspected(player, npc);
+                }
+            }
+            else
+            {
+                var itemBinding = accepted.ObjectiveItem!;
+                Assert.IsTrue(registry.TryGet(itemBinding.Identity, out var target));
+                var item = (MissionObjectiveItem)target!;
+                player.Position = item.Position;
+                if (accepted.ObjectiveTool is { } tool)
+                {
+                    Assert.IsTrue(f.Quests.TryUseGeneratedMissionItem(player, HeldSlot(player, tool.Identity), item.Identity, out bool handled));
+                    Assert.IsTrue(handled);
+                    Assert.AreEqual(0, run.Dao.Items[tool.Instance].ContainerType);
+                }
+                else
+                {
+                    Assert.IsTrue(item.TryPickup(player));
+                }
+            }
+            return true;
+        }));
+
+        if (quest.Template.IsReturnItem)
+        {
+            Assert.AreEqual(1, quest.Progress);
+            Assert.IsFalse(quest.IsRewardPending);
+            f.SetExteriorIdentity(accepted.OriginPlayfield);
+            player.Playfield = run.Exterior;
+            player.Position = run.Terminal.Position;
+            Assert.IsTrue(f.Quests.TryUseGeneratedMissionItem(player, HeldSlot(player, accepted.ObjectiveItem!.Identity),
+                accepted.OriginTerminal, out bool handled));
+            Assert.IsTrue(handled);
+            Assert.AreEqual(0, run.Dao.Items[accepted.ObjectiveItem.Instance].ContainerType);
+        }
+
+        Assert.AreEqual(quest.RequiredCount, run.Dao.CharacterQuest!.Progress);
+        Assert.IsTrue(quest.IsRewardPending);
+        Assert.AreEqual(MissionRewardStatus.Pending, run.Dao.Rewards.Values.Single().Status);
+        int beforeCash = player.Stats.GetOrZero(CharacterStat.Cash);
+        int beforeXp = player.Stats.GetOrZero(CharacterStat.XP);
+        if (quest.Template.IsReturnItem)
+        {
+            f.Quests.RetryPendingRewards(player, force: true);
+        }
+        else
+        {
+            Assert.IsTrue(OnWorld(world, () =>
+            {
+                f.Quests.RetryPendingRewards(player, force: true);
+                return true;
+            }));
+            player.Playfield = run.Exterior;
+        }
+
+        f.AssertNoErrors();
+        Assert.AreEqual(QuestState.Completed, quest.State);
+        Assert.AreEqual((int)QuestState.Completed, run.Dao.CharacterQuest.State);
+        Assert.AreEqual(MissionRewardStatus.Applied, run.Dao.Rewards.Values.Single().Status);
+        int expectedCash = beforeCash + f.Offer.CashReward;
+        Assert.AreEqual(expectedCash, player.Stats.GetOrZero(CharacterStat.Cash));
+        Assert.AreEqual((long)expectedCash, run.Dao.Stats[(int)CharacterStat.Cash]);
+        Assert.IsTrue(f.Session.Sent.OfType<StatMessage>().Any(message => message.Stats.Any(stat =>
+            stat.Value1 == CharacterStat.Cash && stat.Value2 == (uint)expectedCash)));
+        Assert.IsTrue(player.Stats.GetOrZero(CharacterStat.XP) > beforeXp);
+        Assert.AreEqual(1, run.Dao.Items.Values.Count(row => row.LowId == f.Offer.RewardLowId
+            && row.HighId == f.Offer.RewardHighId && row.Quality == f.Offer.RewardQuality && row.ContainerType == (int)IdentityType.Inventory));
+        Assert.AreEqual(0, f.Store.Links.Count);
+        CollectionAssert.Contains(f.Store.RetiredKeys, key);
+        f.Service.RestoreKeys(player);
+        Assert.IsFalse(player.Inventory.EnumerateHeldItems().Any(item => item.InstanceId == key));
+        Assert.AreEqual((int)IdentityType.None, run.Dao.Items[key].ContainerType);
+        Assert.IsTrue(f.Manager.TryReleaseQuestDungeon(accepted.DungeonPlayfield, quest.QuestId));
+        Assert.IsFalse(f.Manager.TryGetQuestDungeon(accepted.DungeonPlayfield, out _));
+        int durableItems = run.Dao.Items.Count;
+        int completedCash = player.Stats.GetOrZero(CharacterStat.Cash);
+        f.Quests.RetryPendingRewards(player, force: true);
+        Assert.AreEqual(durableItems, run.Dao.Items.Count);
+        Assert.AreEqual(completedCash, player.Stats.GetOrZero(CharacterStat.Cash));
+        f.AssertNoErrors();
+        TestContext.WriteLine($"MISSION_OBJECTIVE_FULL_LIFECYCLE type={missionType} destination={accepted.EntrancePlayfield} quality={accepted.Quality} objective={quest.Template.Objective.Npc ?? quest.Template.Objective.WorldItem} reward={f.Offer.RewardLowId}/{f.Offer.RewardHighId}QL{f.Offer.RewardQuality} completion=APPLIED keyCleanup=APPLIED persistence=IN_MEMORY");
+    }
+
+    static Identity HeldSlot(Player player, Identity item)
+        => new() { Type = IdentityType.Inventory, Instance = player.Inventory.Inventory.Content.Single(pair => pair.Value.Identity == item).Key };
+
+    static void AssertObjectivePolicy(Fixture fixture, PlayerQuest quest, QuestDungeonParameters accepted)
+    {
+        if (accepted.ObjectiveNpc is { } npc)
+        {
+            var policy = fixture.Layouts.NpcObjectivePolicy!;
+            CollectionAssert.Contains(quest.Template.IsKill ? policy.NpcHashes : policy.FindPersonNpcHashes, npc.NpcHash);
+            Assert.AreEqual(npc.NpcHash, quest.Template.Objective.Npc);
+            Assert.IsTrue(fixture.GameData.TryResolveMobTemplate(npc.NpcHash, npc.Quality, out var template));
+            Assert.IsFalse(template.UnresolvedPlaceholder);
+            return;
+        }
+
+        var selected = quest.Template.IsFindItem ? fixture.Layouts.FindItemPolicy
+            : quest.Template.IsReturnItem ? fixture.Layouts.ReturnItemPolicy : fixture.Layouts.RepairMachinePolicy!.Target;
+        AssertItemPolicy(accepted.ObjectiveItem!, quest.Template.Objective.WorldItem, selected!);
+        if (accepted.ObjectiveTool is { } tool)
+        {
+            AssertItemPolicy(tool, quest.Template.Objective.SpecItem, fixture.Layouts.RepairMachinePolicy!.Source!);
+        }
+
+        void AssertItemPolicy(MissionItemObjectiveBinding item, string? hash, DungeonFindItemPolicy policy)
+        {
+            Assert.IsNotNull(hash);
+            CollectionAssert.Contains(policy.ItemHashes, hash);
+            Assert.AreEqual(policy.Quality, item.Quality);
+            var families = new List<HashInstance>();
+            fixture.GameData.CollectHashLeafInstances(hash, families);
+            Assert.IsTrue(families.Any(family => family.TemplateIds.Contains(item.LowId) && family.TemplateIds.Contains(item.HighId)));
+            Assert.IsTrue(MissionChestPlacementTests.Templates.Value.TryGet(item.LowId, out _));
+            Assert.IsTrue(MissionChestPlacementTests.Templates.Value.TryGet(item.HighId, out _));
+        }
+    }
+
     static int PlannedMetric(string message, string key)
         => int.Parse(message.Split(' ').Single(part => part.StartsWith(key + "=", StringComparison.Ordinal))[(key.Length + 1)..],
             CultureInfo.InvariantCulture);
@@ -374,34 +554,73 @@ public sealed class MissionChestObjectiveIntegrationTests
         internal readonly Playfield Exterior;
         internal readonly MissionTerminal Terminal;
         readonly ServiceProvider _exteriorServices;
+        readonly CharacterSnapshotService? _snapshots;
         internal PlayerQuest Quest => Fixture.Quests.GetLog(Fixture.Player).Quests[Fixture.Store.Generated!.QuestId];
 
-        internal ObjectiveRun(int missionType)
+        internal ObjectiveRun(int missionType, bool fromRoll = false)
         {
             var ids = new StubInstanceIdAllocator();
             IItemTemplateCatalog templates = MissionChestPlacementTests.Templates.Value;
+            (GeneratedMissionOffer Offer, MissionTerminal Terminal)? roll = fromRoll ? RollOffer(missionType, templates) : null;
+            if (fromRoll)
+            {
+                var store = new ObjectiveSnapshotStore(Dao);
+                _snapshots = new CharacterSnapshotService(store, store, new StubLogger());
+            }
             Fixture = new Fixture(Dao, new ItemBuilder(templates, ids, new StubLogger()),
-                templates: templates, inventory: new ObjectiveInventory(Dao), ids: ids, playerId: 111,
-                enableMissionPopulationPersistence: true);
+                snapshots: _snapshots, templates: templates, inventory: new ObjectiveInventory(Dao), ids: ids, playerId: RolledOwner,
+                enableMissionPopulationPersistence: true, rolledOffer: roll?.Offer);
             Assert.IsTrue(Fixture.Layouts.ChestPolicy?.RoomDensity > 0);
             ConfigureRepresentativeSoloProfile(Fixture.Layouts);
-            Fixture.Offer.MissionType = missionType;
-            Fixture.Offer.Quality = 125;
-            Fixture.Offer.IssuingTerminalType = MissionTerminal.LiveIdentityType;
-            Fixture.Offer.IssuingTerminalInstance = 123456;
-            Fixture.Offer.IssuingTerminalPlayfield = Fixture.Entrance.PlayfieldId;
-            Fixture.Player.Stats.Set(CharacterStat.Level, 125);
             Exterior = Fixture.Player.Playfield!;
-            Terminal = new MissionTerminal(new Identity { Type = (IdentityType)MissionTerminal.LiveIdentityType, Instance = 123456 },
-                new ItemTemplate { Id = 1, Quality = 1 })
+            if (roll is { } fromCatalog)
             {
-                Playfield = Exterior, Position = new AoVector3(0, 0, 0)
-            };
+                Terminal = fromCatalog.Terminal;
+                Terminal.Playfield = Exterior;
+                Fixture.Player.Stats.Set(CharacterStat.Level, RollLevel);
+                Assert.IsTrue(Fixture.GameData.TryGetXpLevel(RollLevel, out var level));
+                Fixture.Player.Stats.Set(CharacterStat.XP, level.FloorXp);
+                Fixture.Player.Stats.Set(CharacterStat.Side, (int)Side.Omni);
+                Fixture.Player.Stats.Set(CharacterStat.Cash, 100_000);
+            }
+            else
+            {
+                Fixture.Offer.MissionType = missionType;
+                Fixture.Offer.Quality = 125;
+                Fixture.Offer.IssuingTerminalType = MissionTerminal.LiveIdentityType;
+                Fixture.Offer.IssuingTerminalInstance = 123456;
+                Fixture.Offer.IssuingTerminalPlayfield = Fixture.Entrance.PlayfieldId;
+                Fixture.Player.Stats.Set(CharacterStat.Level, 125);
+                Terminal = new MissionTerminal(new Identity { Type = (IdentityType)MissionTerminal.LiveIdentityType, Instance = 123456 },
+                    new ItemTemplate { Id = 1, Quality = 1 })
+                {
+                    Playfield = Exterior, Position = new AoVector3(0, 0, 0)
+                };
+            }
             var registry = new DynelRegistry();
             registry.Register(Terminal);
-            _exteriorServices = new ServiceCollection().AddSingleton(registry).BuildServiceProvider();
+            int origin = Fixture.Offer.IssuingTerminalPlayfield;
+            var locality = new PlayfieldLocality(origin, Fixture.GameData.GetPlayfieldMetaData(origin));
+            _exteriorServices = new ServiceCollection().AddSingleton(registry).AddSingleton(locality)
+                .AddSingleton<IGameData>(Fixture.GameData).BuildServiceProvider();
             typeof(Playfield).GetField("_serviceProvider", BindingFlags.Instance | BindingFlags.NonPublic)!
                 .SetValue(Exterior, _exteriorServices);
+            if (fromRoll)
+            {
+                Fixture.SetExteriorIdentity(Fixture.Offer.IssuingTerminalPlayfield);
+                Fixture.Player.Position = Terminal.Position;
+                Fixture.Persistence.BeforeMutation = batch =>
+                {
+                    var retired = batch.Locations.Single();
+                    Assert.AreEqual(Fixture.Store.Keys.Single().InstanceId, retired.InstanceId);
+                    Assert.AreEqual((int)IdentityType.None, retired.ContainerType);
+                    Assert.AreEqual(Fixture.Player.Identity.Instance, retired.ContainerInstance);
+                    var item = Dao.Items[retired.InstanceId];
+                    item.ContainerType = retired.ContainerType;
+                    item.ContainerInstance = retired.ContainerInstance;
+                    item.ContainerPlacement = retired.ContainerPlacement;
+                };
+            }
             Assert.IsNull(Fixture.Accept());
             var row = Fixture.Store.Character!;
             var generated = Fixture.Store.Generated!;
@@ -423,9 +642,49 @@ public sealed class MissionChestObjectiveIntegrationTests
                     Quality = record.Quality, StackCount = record.StackCount, Source = (byte)record.Source
                 });
             }
+            if (fromRoll)
+            {
+                Fixture.SetExteriorIdentity(Fixture.Entrance.PlayfieldId);
+                Fixture.Player.Position = new AoVector3(Fixture.Entrance.LocalX, Fixture.Entrance.LocalY, Fixture.Entrance.LocalZ);
+            }
             Assert.IsTrue(Fixture.Service.TryEnter(Fixture.Player, Fixture.Target));
             World = (QuestDungeonPlayfield)Fixture.Session.Transfers.Single().World;
             Fixture.Player.Playfield = World;
+        }
+
+        static (GeneratedMissionOffer Offer, MissionTerminal Terminal) RollOffer(int missionType, IItemTemplateCatalog templates)
+        {
+            var data = MissionChestPlacementTests.Data.Value;
+            var destinations = MissionDestinationCatalog.Load(data.RootPath);
+            var placed = data.GetPlayfieldGeometry(RollOrigin).Dynels!.Dynels.First(dynel => dynel.IdentityType == MissionTerminal.LiveIdentityType);
+            var owner = new Identity { Type = IdentityType.CanbeAffected, Instance = RolledOwner };
+            var terminalIdentity = new Identity { Type = (IdentityType)placed.IdentityType, Instance = placed.IdentityInstance };
+            var request = new QuestAlternativeMessage { Identity = owner, MissionTerminalIdentity = terminalIdentity, VersionId = 4, LevelSlider = 1 };
+            DateTime now = DateTime.UtcNow;
+            for (int seed = 0; seed < 64; seed++)
+            {
+                int offerId = 100 + seed * MissionOfferCatalog.OfferCount;
+                var response = GeneratedMissionRollService.Shared.Roll(request, owner, RollLevel, RollOrigin, 1_201_445_827,
+                    seed, seed, () => offerId++, destinations, out var entrances);
+                Assert.AreEqual(MissionOfferCatalog.OfferCount, response.QuestInfos.Length);
+                var batch = GeneratedMissionRollProjection.Create(request, response, RollOrigin, MissionRollPolicy.Current.Fee(RollLevel),
+                    seed, seed, now, entrances);
+                var selected = batch.Offers.FirstOrDefault(offer => offer.MissionType == missionType
+                    && templates.TryGet(offer.RewardLowId, out var item) && (item.Flags & (int)ItemFlags.Null) == 0);
+                if (selected == null)
+                    continue;
+
+                // Match the DAO's ReadOffers join, which projects the issuing terminal from the batch.
+                selected.IssuingTerminalType = batch.TerminalType;
+                selected.IssuingTerminalInstance = batch.TerminalInstance;
+                selected.IssuingTerminalPlayfield = batch.TerminalPlayfield;
+                var terminal = new MissionTerminal(terminalIdentity, templates.Require(placed.TemplateId))
+                {
+                    Position = new AoVector3(placed.Position.X, placed.Position.Y, placed.Position.Z)
+                };
+                return (selected, terminal);
+            }
+            throw new AssertFailedException($"No supported offer with a material reward was produced for mission type {missionType} in 64 rolls.");
         }
 
         internal Player OtherPlayer()
@@ -445,8 +704,30 @@ public sealed class MissionChestObjectiveIntegrationTests
         public void Dispose()
         {
             Fixture.Dispose();
+            _snapshots?.Dispose();
             _exteriorServices.Dispose();
         }
+    }
+
+    sealed class ObjectiveSnapshotStore(AuthoredMissionTestDao dao) : ICharacterRepository, IStatRepository
+    {
+        public bool SaveOnlineCheckpoint(int characterId, CharacterRecord? location, IReadOnlyList<StatRecord> stats)
+        {
+            Assert.AreEqual(RolledOwner, characterId);
+            foreach (var stat in stats)
+            {
+                dao.Stats[stat.StatId] = stat.StatValue;
+            }
+            return true;
+        }
+
+        public CharacterRecord? GetById(int characterId) => throw new NotSupportedException();
+        public void SetOnline(int characterId) => throw new NotSupportedException();
+        public void SetOffline(int characterId) => throw new NotSupportedException();
+        public void SaveLocation(CharacterRecord character, int online) => throw new NotSupportedException();
+        public void SaveSnapshot(CharacterRecord character, int online, IReadOnlyList<StatRecord> stats) => throw new NotSupportedException();
+        public IReadOnlyList<StatRecord> GetForCharacter(int characterId) => throw new NotSupportedException();
+        public void UpsertForCharacter(int characterId, IReadOnlyList<StatRecord> stats) => throw new NotSupportedException();
     }
 
     sealed class ObjectiveInventory(AuthoredMissionTestDao dao) : IInventoryRepository
@@ -525,5 +806,40 @@ internal sealed partial class AuthoredMissionTestDao : ICharacterQuestCompletion
         => new() { Status = status, Quest = CloneCharacterQuest(CharacterQuest)! };
 
     public CharacterQuestCompletionResult TryCompleteCharacterQuest(CharacterQuestCompletionRequest request)
-        => throw new NotSupportedException("These integration tests stop at durable objective earning; reward delivery has separate coverage.");
+    {
+        var row = ReadCharacterQuest(request.QuestId);
+        Assert.AreEqual(row.AssignedAtUtcTicks, request.AssignedAtUtcTicks);
+        Assert.AreEqual(row.DefinitionJson, request.ExpectedDefinitionJson);
+        Assert.AreEqual(row.AcgBuildingGeneratorJson, request.ExpectedAcgBuildingGeneratorJson);
+        var stage = Rewards.Values.Single(reward => reward.QuestId == row.QuestId);
+        if (stage.Status == MissionRewardStatus.Applied)
+            return ObjectiveResult(CharacterQuestCompletionStatus.AlreadyApplied);
+
+        Assert.AreEqual(MissionRewardStatus.Pending, stage.Status);
+        Assert.AreEqual(row.RequiredCount, row.Progress);
+        foreach (var expected in request.ExpectedStatValues)
+        {
+            Assert.AreEqual(expected.Value, Stats.GetValueOrDefault(expected.StatId));
+        }
+        ApplyInventoryMutation(request.Grants, []);
+        foreach (var mutation in request.StatMutations)
+        {
+            Assert.AreEqual(MissionStatMutationKind.Set, mutation.Kind);
+            Stats[mutation.StatId] = mutation.Value;
+        }
+        CharacterQuest!.State = (int)QuestState.Completed;
+        CharacterQuest.UpdatedAtUtcTicks = request.NowUtcTicks;
+        stage.Status = MissionRewardStatus.Applied;
+        stage.AppliedAtUtcTicks = request.NowUtcTicks;
+        stage.Version++;
+        return new CharacterQuestCompletionResult
+        {
+            Status = CharacterQuestCompletionStatus.Applied,
+            Quest = CloneCharacterQuest(CharacterQuest)!,
+            StatValues = request.StatMutations.Select(mutation => new MissionStatValueData
+            {
+                StatIdentityType = mutation.StatIdentityType, StatId = mutation.StatId, Value = mutation.Value
+            }).ToArray()
+        };
+    }
 }
