@@ -104,9 +104,12 @@ internal static class DoaMutationTests
         string source = File.ReadAllText(Path.Combine(root, DoaRules.LayoutPath));
         Require(DoaRules.IsHistoricalLayoutContract(Parse(source)));
         Require(!DoaRules.SourceIssues(DoaRules.LayoutPath, Parse(source)).Any(issue => issue.Rule == "DOA_FIXED_MISSION_POLICY"));
-        string changed = source.Replace("version != 2 &&", "version != 3 &&", StringComparison.Ordinal);
-        Require(!DoaRules.IsHistoricalLayoutContract(Parse(changed)));
-        Require(DoaRules.SourceIssues(DoaRules.LayoutPath, Parse(changed)).Any(issue => issue.Rule == "DOA_FIXED_MISSION_POLICY"));
+        foreach (int otherVersion in new[] { 1, 3 })
+        {
+            string changed = source.Replace("version != 2 ||", $"(version != 2 && version != {otherVersion}) ||", StringComparison.Ordinal);
+            Require(!DoaRules.IsHistoricalLayoutContract(Parse(changed)));
+            Require(DoaRules.SourceIssues(DoaRules.LayoutPath, Parse(changed)).Any(issue => issue.Rule == "DOA_FIXED_MISSION_POLICY"));
+        }
     }
 
     private static void CheckCoverage()

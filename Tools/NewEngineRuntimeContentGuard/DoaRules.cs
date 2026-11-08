@@ -115,8 +115,7 @@ internal static class DoaRules
     internal static bool IsHistoricalLayoutContract(SyntaxNode syntax)
     {
         var declarations = syntax.DescendantNodes().OfType<VariableDeclaratorSyntax>().ToArray();
-        var values = HistoricalLayoutFields.Append(new KeyValuePair<string, int>("RetiredCapturedVersion", 1));
-        foreach (var field in values)
+        foreach (var field in HistoricalLayoutFields)
         {
             VariableDeclaratorSyntax[] matches = declarations.Where(node => node.Identifier.ValueText == field.Key).ToArray();
             if (matches.Length != 1 || matches[0].Initializer?.Value is not LiteralExpressionSyntax number
@@ -129,10 +128,10 @@ internal static class DoaRules
             .Where(method => method.Identifier.ValueText == "TryGenerate" && method.ParameterList.Parameters.Count == 4
                 && method.ParameterList.Parameters[1].Identifier.ValueText == "version").ToArray();
         if (methods.Length != 1 || methods[0].Body?.Statements.Skip(1).FirstOrDefault() is not IfStatementSyntax guard
-            || Tokens(guard) != Tokens(SyntaxFactory.ParseStatement("if ((version != 2 && version != RetiredCapturedVersion) || _generator == null) return false;")))
+            || Tokens(guard) != Tokens(SyntaxFactory.ParseStatement("if (version != 2 || _generator == null) return false;")))
             return false;
         return syntax.DescendantNodes().OfType<IdentifierNameSyntax>()
-            .Where(name => HistoricalLayoutFields.ContainsKey(name.Identifier.ValueText) || name.Identifier.ValueText == "RetiredCapturedVersion")
+            .Where(name => HistoricalLayoutFields.ContainsKey(name.Identifier.ValueText))
             .All(name => name.Ancestors().Contains(methods[0]));
     }
 

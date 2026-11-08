@@ -34,6 +34,7 @@ namespace ZoneEngine_New
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
+    using ZoneEngine_New.Core.Quests.Dungeons;
     using ZoneEngine_New.Core.Trade;
     using ZoneEngine_New.Core.DebugMcp;
     using ZoneEngine_New.Core.Teams;
@@ -48,6 +49,7 @@ namespace ZoneEngine_New
         private static ZoneNetworkHost? networkHost;
         private static DebugMcpHost? debugMcp;
         private static PlayfieldManager? playfieldManager;
+        private static QuestDungeonService? questDungeons;
         private static IChatEngineLink? chatEngineLink;
         private static WorldLink? worldLink;
         private static ZoneEngine_New.Core.Modules.ZoneModuleHost? modules;
@@ -103,6 +105,7 @@ namespace ZoneEngine_New
                         gameData.HashTemplateCount,
                         gameData.HashInstanceCount,
                         gameData.MonsterDataCount));
+                IItemTemplateCatalog itemTemplates = rootServices.GetRequiredService<IItemTemplateCatalog>();
                 // NPC scripts compile now, so a bad program is reported at startup rather than at the first spawn.
                 rootServices.GetRequiredService<ZoneEngine_New.Core.NpcScripts.NpcScriptCatalog>();
                 var missionOffers = rootServices.GetRequiredService<GeneratedMissionRollService>().OfferCatalog;
@@ -110,7 +113,8 @@ namespace ZoneEngine_New
                 _ = MissionLevelRuntime.SupportedQualities;
                 MissionRollEvidenceCatalog.ValidateCatalog();
                 MissionRewardEvidenceModel.ValidateCatalog();
-                MissionRollRewardItems.ValidateCatalog(rootServices.GetRequiredService<IItemTemplateCatalog>());
+                MissionRollRewardItems.ValidateCatalog(itemTemplates);
+                _ = rootServices.GetRequiredService<MissionKeyPolicy>();
                 _ = MissionTextContent.Current;
                 _ = MissionGeographyContent.Current;
                 logger.Info($"Mission offers ready sha256={missionOffers.Sha256} sourceSha256={missionOffers.SourceSha256} responses={missionOffers.ResponseCount} definitions={missionOffers.DefinitionCount}");
@@ -128,7 +132,7 @@ namespace ZoneEngine_New
                 _ = rootServices.GetRequiredService<GmCommandDispatcher>();
                 _ = rootServices.GetRequiredService<InventoryFlushService>();
                 // Subscribes to quest endings and starts the dungeon expiry and idle-release sweep.
-                _ = rootServices.GetRequiredService<ZoneEngine_New.Core.Quests.Dungeons.QuestDungeonService>();
+                questDungeons = rootServices.GetRequiredService<QuestDungeonService>();
                 // Starts the sweep that removes characters of accounts suspended or banned since they logged in.
                 _ = rootServices.GetRequiredService<ZoneEngine_New.Core.Accounts.AccountSanctionService>();
                 networkHost = rootServices.GetRequiredService<ZoneNetworkHost>();
@@ -523,12 +527,14 @@ namespace ZoneEngine_New
             debugMcp = null;
             Cleanup(() => networkHost?.DisposeAsync().AsTask().GetAwaiter().GetResult());
             networkHost = null;
-            Cleanup(() => rootServices?.GetService<ZoneEngine_New.Core.Quests.Dungeons.QuestDungeonService>()?.Dispose());
+            Cleanup(() => questDungeons?.Dispose());
+            questDungeons = null;
             Cleanup(() => playfieldManager?.Dispose());
             playfieldManager = null;
             Cleanup(() => modules?.Shutdown());
             modules = null;
-            Cleanup(() => rootServices?.GetRequiredService<TeamService>().Shutdown());
+            if (worldLink != null)
+                Cleanup(() => rootServices?.GetRequiredService<TeamService>().Shutdown());
             Cleanup(() => chatEngineLink?.Dispose());
             chatEngineLink = null;
             // After every logout: their lease releases go out before the link closes.

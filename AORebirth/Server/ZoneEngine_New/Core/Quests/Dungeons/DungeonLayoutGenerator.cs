@@ -53,8 +53,8 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
     /// <summary>
     /// Builds a quest dungeon's ACG building generator from its stored seed and frozen layout plan. The same plan, seed, generator version and
     /// building identity always give the same layout, so a dungeon released while empty comes back identical.
-    /// Layouts are built procedurally with AORebirth.DungeonGenerator. Version 1 (captured layouts picked by seed)
-    /// was removed; quests stored with it build procedurally too.
+    /// Layouts are built procedurally with AORebirth.DungeonGenerator. Historical captured missions require
+    /// their original persisted bundle binding and cannot be reconstructed from a seed-only record.
     /// </summary>
     public sealed class DungeonLayoutGenerator
     {
@@ -63,10 +63,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
         public const int CurrentVersion = 3;
         public const string GenerationFileName = "DungeonGeneration.json";
 
-        /// <summary>The removed captured-layout version; its stored seeds now build procedurally.</summary>
-        const int RetiredCapturedVersion = 1;
-
-        // Immutable version-1/2 compatibility contract for already accepted seed-only records.
+        // Immutable version-2 compatibility contract for already accepted seed-only records.
         // New missions select their style and dimensions from editable GameData.
         const int TemporaryStyle = 324;
         const int TemporaryFloors = 2;
@@ -249,9 +246,15 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
         public bool TryGenerate(QuestDungeonParameters parameters, out DungeonLayout layout)
         {
             ArgumentNullException.ThrowIfNull(parameters);
-            if (parameters.GeneratorVersion is 1 or 2)
+            if (parameters.GeneratorVersion == 2)
                 return TryGenerate(parameters.Seed, parameters.GeneratorVersion, parameters.EntranceInstance, out layout);
             layout = null!;
+            if (parameters.GeneratorVersion == 1)
+            {
+                _logger.Warn(FormattableString.Invariant(
+                    $"Cannot reconstruct version 1 mission playfield {parameters.DungeonPlayfield}: the stored seed has no verified captured-layout bundle binding."));
+                return false;
+            }
             DungeonLayoutPlan? plan = parameters.LayoutPlan;
             if (parameters.GeneratorVersion != CurrentVersion || _generator == null || plan?.IsValid != true
                 || parameters.IsTeam != plan.BossFloor) return false;
@@ -288,7 +291,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
         public bool TryGenerate(int seed, int version, int buildingInstance, out DungeonLayout layout)
         {
             layout = null!;
-            if ((version != 2 && version != RetiredCapturedVersion) || _generator == null)
+            if (version != 2 || _generator == null)
                 return false;
 
             if (!_built.TryGetValue((seed, buildingInstance), out Built? built))
