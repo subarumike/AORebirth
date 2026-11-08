@@ -151,19 +151,24 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
             // Recover the inviter name from pending invites.
             string inviterName = "Member";
+            int inviterId = 0;
             lock (PendingInvites)
             {
                 if (PendingInvites.TryGetValue(player.Identity.Instance, out var pending))
                 {
                     inviterName = pending.InviterName;
+                    inviterId = pending.InviterId;
                     PendingInvites.Remove(player.Identity.Instance);
                 }
             }
 
             // Update player organization and rank. Both stats must be dirty, otherwise FlushDirtyStats never sends them.
             player.Organization = org;
+            // Retail sends SocialStatus 4 to a freshly joined member (capture invite 20261108).
+            const int OrgJoinSocialStatus = 4;
             void ApplyClan()
             {
+                player.Stats.Set(CharacterStat.SocialStatus, OrgJoinSocialStatus, StatDetail.Base, dirty: true);
                 player.Stats.Set(CharacterStat.Clan, org.Id, StatDetail.Base, dirty: true);
                 player.Stats.Set(CharacterStat.ClanLevel, lowestRank, StatDetail.Base, dirty: true);
                 player.FlushDirtyStats();
@@ -177,30 +182,44 @@ namespace ZoneEngine_New.Core.MessageHandlers
             _organizations.SaveMembership(player.Identity.Instance, org.Id);
             _organizations.SaveRank(player.Identity.Instance, lowestRank);
 
-            // Send join success: $;EJ2 + OrgInfo.
+            // Chat resolves the Clan stat to the organization channel only at login; join it now (also Org Msg).
+            _chat.SendChatCommand(player.Identity.Instance, "#aorebirth-org-join " + org.Id);
+
+            // Send join success
             session.Send(OrgChatText.Message(player.Identity, OrgChatText.Wrap(OrgChatRefs.JoinedOrganization)));
-            session.Send(new OrgInfoMessage
-            {
-                Identity = player.Identity,
-                Organization = new Identity { Type = IdentityType.Organization, Instance = org.Id },
-                OrganizationName = org.Name ?? string.Empty,
-                Description = org.Description ?? string.Empty,
-                Objective = org.Objective ?? string.Empty,
-                History = org.History ?? string.Empty,
-                GoverningForm = forms.GetFormName(org.GovernmentForm),
-                LeaderName = org.LeaderName ?? string.Empty,
-                Rank = forms.GetRankName(org.GovernmentForm, lowestRank),
-                Unknown3 = Array.Empty<object>()
-            });
+            session.Send(BuildOrgInfoPacket(player.Identity, org));
+            NotifyInviterOfJoin(inviterId, player, org, lowestRank);
 
             // Broadcast to Org Msg: "<inviter> invited <joiner> to your organization."
             // Now using the recovered inviter name from PendingInvites (recorded at invite time).
             _chat.SendOrganizationMessage(org.Id, OrgChatText.InviteNotice(inviterName, player.Name ?? string.Empty));
+        }
 
-            // TODO: Join the Org Msg channel mid-session (not at login).
-            // This requires a ChatEngine command bridge (similar to TeamChatBridge) to handle #aorebirth-org-join commands.
-            // For now, this is unimplemented; the player will see Org Msg but only at next login.
-            // _chat.SendChatCommand(player.Identity.Instance, "#aorebirth-org-join");
+        // Retail sends OrgInfoPacket (org id and name, identity = joiner) after accepting, not the full OrgInfo (capture invite 20261108).
+        static OrgInfoPacketMessage BuildOrgInfoPacket(Identity joiner, Data.OrganizationRecord org)
+            => new OrgInfoPacketMessage
+            {
+                Identity = joiner,
+                OrganizationId = org.Id,
+                Name = org.Name ?? string.Empty
+            };
+
+        // Retail refreshes the joiner for the inviter: its org info and Clan stats are sent to the inviter's client.
+        void NotifyInviterOfJoin(int inviterId, Player joiner, Data.OrganizationRecord org, int rank)
+        {
+            if (inviterId <= 0 || !_playfieldManager.Value.FindPlayer(inviterId, out Player? inviter) || inviter is null)
+                return;
+
+            inviter.Session?.Send(BuildOrgInfoPacket(joiner.Identity, org));
+            inviter.Session?.Send(new StatMessage
+            {
+                Identity = joiner.Identity,
+                Stats =
+                [
+                    new GameTuple<CharacterStat, uint> { Value1 = CharacterStat.Clan, Value2 = (uint)org.Id },
+                    new GameTuple<CharacterStat, uint> { Value1 = CharacterStat.ClanLevel, Value2 = (uint)rank }
+                ]
+            });
         }
     }
 }

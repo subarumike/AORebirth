@@ -25,13 +25,17 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         public OrgInfoPacketMessage()
         {
             this.N3MessageType = N3MessageType.OrgInfoPacket;
+            this.Unknown = 0x00;
         }
 
         #endregion
 
         #region AoMember Properties
 
-        [AoMember(0, SerializeSize = ArraySizeType.Int16)]
+        [AoMember(0)]
+        public int OrganizationId { get; set; }
+
+        [AoMember(1, SerializeSize = ArraySizeType.Int16)]
         public string Name { get; set; }
 
         #endregion

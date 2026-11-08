@@ -13,7 +13,7 @@ namespace ChatEngine.Lists
     using ChatEngine.Packets;
 
     /// <summary>
-    /// ZoneEngine → ChatEngine team/raid channel wiring (capture 20260902-073932).
+    /// ZoneEngine → ChatEngine team, raid and organization channel wiring (capture 20260902-073932).
     /// </summary>
     internal static class TeamChatBridge
     {
@@ -22,6 +22,8 @@ namespace ChatEngine.Lists
         public const string RaidConvertPrefix = "#aorebirth-raid-convert";
 
         public const string TeamLeavePrefix = "#aorebirth-team-leave";
+
+        public const string OrgJoinPrefix = "#aorebirth-org-join";
 
         /// <summary>ChatEngine → ZoneEngine: this character's chat logged in; resend its team join.</summary>
         public const string ChatOnlineCommand = "#aorebirth-chat-online";
@@ -49,13 +51,18 @@ namespace ChatEngine.Lists
                 return HandleTeamLeave(server, chatCommand, text);
             }
 
+            if (text.StartsWith(OrgJoinPrefix, StringComparison.Ordinal))
+            {
+                return HandleOrgJoin(server, chatCommand, text);
+            }
+
             return false;
         }
 
         private static bool HandleTeamJoin(ChatServer server, ChatCommand chatCommand, string text)
         {
             uint teamId;
-            if (!TryParseTeamId(text, out teamId))
+            if (!TryParseId(text, out teamId))
             {
                 return true;
             }
@@ -83,7 +90,7 @@ namespace ChatEngine.Lists
         private static bool HandleRaidConvert(ChatServer server, ChatCommand chatCommand, string text)
         {
             uint teamId;
-            if (!TryParseTeamId(text, out teamId))
+            if (!TryParseId(text, out teamId))
             {
                 return true;
             }
@@ -102,7 +109,7 @@ namespace ChatEngine.Lists
         private static bool HandleTeamLeave(ChatServer server, ChatCommand chatCommand, string text)
         {
             uint teamId;
-            if (!TryParseTeamId(text, out teamId))
+            if (!TryParseId(text, out teamId))
             {
                 return true;
             }
@@ -118,9 +125,27 @@ namespace ChatEngine.Lists
             return true;
         }
 
-        private static bool TryParseTeamId(string text, out uint teamId)
+        private static bool HandleOrgJoin(ChatServer server, ChatCommand chatCommand, string text)
         {
-            teamId = 0;
+            uint orgId;
+            if (!TryParseId(text, out orgId))
+            {
+                return true;
+            }
+
+            Client client = ResolveClient(server, chatCommand.CharacterId);
+            if (client == null)
+            {
+                return true;
+            }
+
+            server.JoinOrganizationChannels(client, unchecked((int)orgId));
+            return true;
+        }
+
+        private static bool TryParseId(string text, out uint id)
+        {
+            id = 0;
             string[] parts = text.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries);
             if (parts.Length < 2)
             {
@@ -133,7 +158,7 @@ namespace ChatEngine.Lists
                 return false;
             }
 
-            teamId = unchecked((uint)parsed);
+            id = unchecked((uint)parsed);
             return true;
         }
 

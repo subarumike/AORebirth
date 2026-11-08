@@ -658,25 +658,36 @@ namespace ChatEngine.CoreServer
 
             if (orgId > 0)
             {
-                var org = OrganizationDao.Instance.Get(orgId);
-                if (org != null)
-                {
-                    ChannelBase orgChannel;
-                    lock (this.Channels)
-                    {
-                        orgChannel = this.Channels.FirstOrDefault(
-                            x => x is OrganizationChannel && x.ChannelId == (uint)orgId);
-                        if (orgChannel == null)
-                        {
-                            orgChannel = new OrganizationChannel(orgId);
-                            this.Channels.Add(orgChannel);
-                        }
-                    }
+                JoinOrganizationChannels(client, orgId);
+            }
+        }
 
-                    orgChannel.AddClient(client);
-                    this.orgMsgChannel.AddClient(client);
+        /// <summary>
+        /// Joins the organization channel and Org Msg. Login uses it for stored membership; the zone uses it when a
+        /// member joins mid-session, so the client can resolve the Clan stat to the organization name.
+        /// </summary>
+        internal void JoinOrganizationChannels(Client client, int orgId)
+        {
+            var org = OrganizationDao.Instance.Get(orgId);
+            if (org == null)
+            {
+                return;
+            }
+
+            ChannelBase orgChannel;
+            lock (this.Channels)
+            {
+                orgChannel = this.Channels.FirstOrDefault(
+                    x => x is OrganizationChannel && x.ChannelId == (uint)orgId);
+                if (orgChannel == null)
+                {
+                    orgChannel = new OrganizationChannel(orgId);
+                    this.Channels.Add(orgChannel);
                 }
             }
+
+            orgChannel.AddClient(client);
+            this.orgMsgChannel.AddClient(client);
         }
 
         /// <summary>
