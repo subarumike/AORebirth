@@ -171,6 +171,12 @@ namespace AORebirth.Interfaces.Persistence.Characters
         public int RemainingXp { get; set; }
     }
 
+    /// <summary>Organization invite lockout: remaining seconds, decremented only while the character is online.</summary>
+    public sealed class PersistedOrgLockoutData
+    {
+        public long SecondsRemaining { get; set; }
+    }
+
     public sealed class CharacterActiveNanoData
     {
         public int CharacterId { get; set; }

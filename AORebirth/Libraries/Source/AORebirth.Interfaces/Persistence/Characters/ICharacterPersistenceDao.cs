@@ -25,7 +25,11 @@ namespace AORebirth.Interfaces.Persistence.Characters
         /// </summary>
         void SaveOrganizationGoverningForm(int organizationId, int governingForm, int leaderId, int lowestRank);
         void SaveOrganizationRank(int characterId, int rank);
+        /// <summary>Stores the organization membership (Clan stat) of one character, inserting the stat row when missing.</summary>
+        void SaveOrganizationMembership(int characterId, int organizationId);
         void SaveOrganizationLeader(int organizationId, int leaderId);
+        /// <summary>Organization invite lockout for this character, or null when none exists.</summary>
+        PersistedOrgLockoutData LoadOrgLockout(int characterId);
         IList<PersistedItemData> LoadCarriedItems(int characterId);
         IList<PersistedItemData> LoadBankItems(int characterId);
         IList<PersistedItemData> LoadContainerItems(int containerInstanceId);

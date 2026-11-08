@@ -76,6 +76,10 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 case OrgClientCommand.Demote:
                     HandleRankChange(message, session, player, promote: false);
                     return;
+                case OrgClientCommand.Invite:
+                case OrgClientCommand.Join:
+                    HandleInviteJoin(message, session, player);
+                    return;
                 default:
                     // Commands not implemented yet stay silent for members; non-members get the captured refusal
                     // for the commands the captures proved answer "not in an organization".
@@ -90,7 +94,8 @@ namespace ZoneEngine_New.Core.MessageHandlers
             or OrgClientCommand.StopVote or OrgClientCommand.Unknown2 or OrgClientCommand.Kick
             or OrgClientCommand.BankAdd or OrgClientCommand.BankRemove or OrgClientCommand.Name
             or OrgClientCommand.Description or OrgClientCommand.Objective or OrgClientCommand.History
-            or OrgClientCommand.GoverningForm or OrgClientCommand.Disband or OrgClientCommand.Leave;
+            or OrgClientCommand.GoverningForm or OrgClientCommand.Disband or OrgClientCommand.Leave
+            or OrgClientCommand.Invite;
 
         static void SendRef(IZoneSession session, Player player, string text)
             => session.Send(OrgChatText.Message(player.Identity, text));

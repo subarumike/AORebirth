@@ -208,8 +208,18 @@ namespace AORebirth.Database.Domain.Characters
         public void SaveOrganizationRank(int characterId, int rank)
         {
             if (characterId <= 0) throw new ArgumentOutOfRangeException(nameof(characterId));
-            Transaction((c, t) => Execute(c, t, "UPDATE stats SET StatValue=@Rank WHERE Type=@Type AND Instance=@Id AND StatId=@Level",
+            Transaction((c, t) => Execute(c, t, "INSERT INTO stats (Type,Instance,StatId,StatValue) VALUES (@Type,@Id,@Level,@Rank) "
+                + "ON DUPLICATE KEY UPDATE StatValue=VALUES(StatValue)",
                 "@Rank", rank, "@Type", (int)IdentityType.CanbeAffected, "@Id", characterId, "@Level", (int)CharacterStat.ClanLevel));
+        }
+
+        public void SaveOrganizationMembership(int characterId, int organizationId)
+        {
+            if (characterId <= 0) throw new ArgumentOutOfRangeException(nameof(characterId));
+            if (organizationId <= 0) throw new ArgumentOutOfRangeException(nameof(organizationId));
+            Transaction((c, t) => Execute(c, t, "INSERT INTO stats (Type,Instance,StatId,StatValue) VALUES (@Type,@Id,@Clan,@Org) "
+                + "ON DUPLICATE KEY UPDATE StatValue=VALUES(StatValue)",
+                "@Type", (int)IdentityType.CanbeAffected, "@Id", characterId, "@Clan", (int)CharacterStat.Clan, "@Org", organizationId));
         }
 
         public void SaveOrganizationLeader(int organizationId, int leaderId)
@@ -218,6 +228,15 @@ namespace AORebirth.Database.Domain.Characters
             if (leaderId <= 0) throw new ArgumentOutOfRangeException(nameof(leaderId));
             Transaction((c, t) => Execute(c, t, "UPDATE organizations SET LeaderId=@Leader WHERE Id=@Id",
                 "@Leader", leaderId, "@Id", organizationId));
+        }
+
+        public PersistedOrgLockoutData LoadOrgLockout(int characterId)
+        {
+            if (characterId <= 0) return null;
+            var rows = Query("SELECT seconds_remaining FROM org_lockout WHERE char_id=@CharId LIMIT 1",
+                r => new PersistedOrgLockoutData { SecondsRemaining = r.GetInt64(0) },
+                "@CharId", characterId);
+            return rows.Count == 0 ? null : rows[0];
         }
 
         public void SaveOrganizationGoverningForm(int organizationId, int governingForm, int leaderId, int lowestRank)

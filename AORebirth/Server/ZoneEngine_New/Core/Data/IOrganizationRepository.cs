@@ -20,7 +20,13 @@ namespace ZoneEngine_New.Core.Data
         /// <summary>Stores the rank of one member (promote and demote).</summary>
         void SaveRank(int characterId, int rank);
 
+        /// <summary>Stores the organization membership of one character (join).</summary>
+        void SaveMembership(int characterId, int organizationId);
+
         /// <summary>Stores the new leader (presidency transfer).</summary>
         void SaveLeader(int organizationId, int leaderId);
+
+        /// <summary>Organization invite lockout for this character, or null when none exists.</summary>
+        AORebirth.Interfaces.Persistence.Characters.PersistedOrgLockoutData GetLockout(int characterId);
     }
 }

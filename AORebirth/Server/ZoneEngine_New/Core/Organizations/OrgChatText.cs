@@ -34,6 +34,10 @@ namespace ZoneEngine_New.Core.Organizations
         public const string DemoteInvalidTarget = "#M?Vc";
         public const string LeadershipGivenOrg = "%UKqG";
         public const string LeadershipGivenTarget = "\"lW;a";
+        public const string JoinedOrganization = "$;EJ2";
+        public const string InviteRankTooLow = "$I:N3";
+        public const string InviteAlreadyInOrganization = "\"Y^0o";
+        public const string InviteOtherSide = "%`cZp";
 
     }
 
@@ -92,6 +96,14 @@ namespace ZoneEngine_New.Core.Organizations
 
         public static string GoverningFormNotice(string leaderName, string formName)
             => Wrap("#Y8r9s" + (char)(leaderName.Length + 1) + leaderName + "s" + (char)(formName.Length + 1) + formName);
+
+        /// <summary>Org Msg broadcast to all members after a successful join: "<inviter> invited <joiner> to your organization."</summary>
+        public static string InviteNotice(string inviterName, string joinerName)
+            => Wrap("$<Tm_s" + (char)(inviterName.Length + 1) + inviterName + "s" + (char)(joinerName.Length + 1) + joinerName);
+
+        /// <summary>Refusal for invite when the target is already in another organization.</summary>
+        public static string InviteAlreadyInOrgRefusal(string targetName)
+            => Wrap(OrgChatRefs.InviteAlreadyInOrganization + "s" + (char)(targetName.Length + 1) + targetName);
 
         /// <summary>The plain-text confirmation retail sends to every online member after a name/description/objective/history change.</summary>
         public static ChatTextMessage InfoUpdated(Identity recipient) => new()

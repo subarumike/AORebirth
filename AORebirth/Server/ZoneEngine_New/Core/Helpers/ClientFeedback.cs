@@ -147,6 +147,12 @@ namespace ZoneEngine_New.Core.Helpers
         /// <summary>text.mdb category of the client's skill and stat names (id = stat id, e.g. 155 "Evade-ClsC").</summary>
         public const int StatNameCategory = 2003;
 
+        /// <summary>Catalogue category of <see cref="LockoutAbleIn"/>.</summary>
+        public const int LockoutCategory = 1000;
+
+        /// <summary>"Unable to perform action, able in %02d:%02d:%02d" (category <see cref="LockoutCategory"/>): hours, minutes, seconds.</summary>
+        public const int LockoutAbleIn = 2158542;
+
         /// <summary>"evaded" (category 110), the verb live puts in <see cref="TargetVerbYourAction"/>.</summary>
         public const int Evaded = 114064052;
 
@@ -243,6 +249,22 @@ namespace ZoneEngine_New.Core.Helpers
         public static void SendFormatted(Character character, int messageId, params object[] args)
             => SendFormattedWithUnknown1(character, 0, messageId, args);
 
+        /// <summary><see cref="SendFormatted"/> for a message of any catalogue category.</summary>
+        public static void SendFormattedInCategory(Character character, int category, int messageId, params object[] args)
+        {
+            if (character is not Player player || player.Session == null)
+                return;
+
+            player.Session.Send(new FormatFeedbackMessage
+            {
+                Identity = player.Identity,
+                Unknown = 1,
+                Unknown1 = 0,
+                Unknown2 = 0,
+                FormattedMessage = FormatTextInCategory(category, messageId, args)
+            });
+        }
+
         /// <summary><see cref="SendFormatted"/> with the FormatFeedback Unknown1 live uses for that message.</summary>
         public static void SendFormattedWithUnknown1(Character character, int unknown1, int messageId, params object[] args)
         {
@@ -264,8 +286,12 @@ namespace ZoneEngine_New.Core.Helpers
         /// <see cref="SendFormatted"/> sends it. The chat server carries the same text (a loot line).
         /// </summary>
         public static string FormatText(int messageId, params object[] args)
+            => FormatTextInCategory(CategoryId, messageId, args);
+
+        /// <summary><see cref="FormatText"/> for a message of any catalogue category.</summary>
+        public static string FormatTextInCategory(int category, int messageId, params object[] args)
         {
-            var text = new StringBuilder("~&").Append(Base85(CategoryId)).Append(Base85(messageId));
+            var text = new StringBuilder("~&").Append(Base85(category)).Append(Base85(messageId));
             foreach (object arg in args)
             {
                 if (arg is int number)

@@ -35,7 +35,13 @@ namespace ZoneEngine_New.Core.Data
         public void SaveRank(int characterId, int rank)
             => Run(() => _persistence.SaveOrganizationRank(characterId, rank));
 
+        public void SaveMembership(int characterId, int organizationId)
+            => Run(() => _persistence.SaveOrganizationMembership(characterId, organizationId));
+
         public void SaveLeader(int organizationId, int leaderId)
             => Run(() => _persistence.SaveOrganizationLeader(organizationId, leaderId));
+
+        public AORebirth.Interfaces.Persistence.Characters.PersistedOrgLockoutData GetLockout(int characterId)
+            => Run(() => _persistence.LoadOrgLockout(characterId));
     }
 }
