@@ -1,16 +1,21 @@
 namespace ZoneEngine_New.Tests;
 
 using System;
+using System.Buffers.Binary;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
 using AORebirth.Core.GameData;
 using AORebirth.DungeonGenerator;
+using AORebirth.Interfaces.Persistence.Missions;
 using AORebirth.World.Collision;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using SmokeLounge.AOtomation.Messaging.GameData;
 using ZoneEngine_New.Core.GameData;
 using ZoneEngine_New.Core.Quests.Dungeons;
+using Quaternion = System.Numerics.Quaternion;
+using Vector3 = System.Numerics.Vector3;
 
 [TestClass]
 [DoNotParallelize]
@@ -128,6 +133,128 @@ public sealed class ProceduralDungeonFoundationTests
         Assert.IsTrue(generator.TryGenerate(42, 2, parameters.EntranceInstance, out DungeonLayout original));
         CollectionAssert.AreEqual(original.GeneratorPayload, restored.GeneratorPayload);
     }
+
+    [TestMethod]
+    public void HistoricalV1SeedOnlyParametersStayReadableWithoutSubstitutingV2Geometry()
+    {
+        string stored = "{\"Seed\":42,\"GeneratorVersion\":1,\"DungeonPlayfield\":"
+            + (QuestDungeonIds.FirstPlayfield + 101) + ",\"EntranceInstance\":-1073741319}";
+        Assert.IsTrue(QuestDungeonParameters.TryParse(stored, out QuestDungeonParameters parameters));
+        string normalized = parameters.ToJson();
+        var generator = new DungeonLayoutGenerator(RuntimeData.Value, new StubLogger());
+        Assert.IsFalse(generator.TryGenerate(parameters, out DungeonLayout layout));
+        Assert.IsNull(layout);
+        Assert.IsFalse(generator.TryGenerate(parameters.Seed, parameters.GeneratorVersion, parameters.EntranceInstance, out _));
+        Assert.AreEqual(normalized, parameters.ToJson());
+    }
+
+    [TestMethod]
+    [DataRow(0, 341, 10, 11)]
+    [DataRow(1, 351, 13, 14)]
+    [DataRow(2, 321, 24, 27)]
+    [DataRow(3, 341, 17, 17)]
+    [DataRow(4, 341, 20, 21)]
+    public void HistoricalV1ExactBindingReplaysCapturedRoomsAndDoorLinks(int missionType, int style, int rooms, int doors)
+    {
+        using JsonDocument evidence = LoadHistoricalV1Evidence();
+        JsonElement original = OriginalV1Bundle(evidence, missionType);
+        GeneratedMissionBinding binding = ExampleV1Binding(original, missionType);
+        var replay = HistoricalMissionV1Replay.Reconstruct(evidence.RootElement, binding, RuntimeRoot());
+
+        Assert.AreEqual(style, replay.Generator.Style);
+        Assert.AreEqual(rooms, replay.Generator.Rooms.Length);
+        Assert.AreEqual(rooms, replay.Geometry.Rooms.Count);
+        Assert.IsTrue(replay.Geometry.Collision.HasCollision);
+        byte[] generator = replay.Generator.ToByteArray();
+        byte[] fullPayload = new byte[generator.Length + 8];
+        generator.CopyTo(fullPayload, 0);
+        BinaryPrimitives.WriteInt32BigEndian(fullPayload.AsSpan(generator.Length), replay.PlayfieldX);
+        BinaryPrimitives.WriteInt32BigEndian(fullPayload.AsSpan(generator.Length + 4), replay.PlayfieldZ);
+        CollectionAssert.AreEqual(original.GetProperty("generatorPayload").EnumerateArray().Select(value => value.GetByte()).ToArray(), fullPayload);
+
+        Assert.AreEqual(doors, replay.Doors.Length);
+        Assert.AreEqual(doors, replay.Geometry.Doors.Count);
+        for (int i = 0; i < doors; i++)
+        {
+            var captured = replay.Doors[i];
+            DungeonDoorPlacement reconstructed = replay.Geometry.Doors[i];
+            Assert.AreEqual((int)captured.Room, reconstructed.Room, $"Door {i} owner room");
+            Assert.AreEqual((int)captured.LinkedRoom, reconstructed.LinkedRoom, $"Door {i} linked room");
+            Assert.AreEqual(captured.Placement.Position, reconstructed.Position, $"Door {i} exact captured position");
+            var yaw = Quaternion.CreateFromAxisAngle(Vector3.UnitY, reconstructed.YawDegrees * MathF.PI / 180f);
+            Assert.IsTrue(MathF.Abs(Quaternion.Dot(yaw, captured.Placement.Heading)) > 0.9999f, $"Door {i} heading");
+
+            DungeonDoorPlacement styleDoor = replay.StyleDoors[i];
+            if (missionType == 4 && i == 2)
+            {
+                Assert.AreEqual(2.8f, styleDoor.Position.Y, 0.00001f);
+                Assert.AreEqual(5f, reconstructed.Position.Y);
+                Assert.AreEqual(replay.Geometry.Placements[styleDoor.Room].Placed.Y, styleDoor.Position.Y);
+                Assert.AreEqual(replay.Geometry.Placements[styleDoor.LinkedRoom].Placed.Y, reconstructed.Position.Y);
+            }
+            else
+                Assert.IsTrue(Vector3.Distance(reconstructed.Position, styleDoor.Position) < 0.01f, $"Door {i} style position");
+        }
+
+        Assert.AreEqual(replay.Exit, replay.Doors.Single(door => door.Room == -1).Placement);
+        Assert.IsTrue(replay.Geometry.Rooms[0].Contains(replay.Entry));
+        Assert.IsTrue(replay.Geometry.Rooms.Any(room => room.Contains(replay.Objective.Position)));
+        Assert.AreEqual(binding.LivePlayfield, replay.LivePlayfield);
+        Assert.AreNotEqual(replay.Exit.SourcePlayfield, replay.LivePlayfield);
+        Assert.AreEqual(binding.Offer.DestinationPlayfield, replay.ExteriorPlayfield);
+        Assert.AreEqual(new Vector3(binding.Offer.DestinationX, binding.Offer.DestinationY, binding.Offer.DestinationZ), replay.ExteriorPosition);
+        TestContext.WriteLine($"V1 capture {binding.BundleId}, generator SHA-256 {binding.BundleSha256}, rooms={rooms}, doors={doors}.");
+    }
+
+    [TestMethod]
+    [DataRow("bundle")]
+    [DataRow("hash")]
+    [DataRow("building")]
+    [DataRow("owner")]
+    [DataRow("offer")]
+    [DataRow("playfield")]
+    [DataRow("objective")]
+    public void HistoricalV1ReplayRejectsMismatchedOriginalBindings(string mismatch)
+    {
+        using JsonDocument evidence = LoadHistoricalV1Evidence();
+        JsonElement original = OriginalV1Bundle(evidence, 4);
+        GeneratedMissionBinding binding = ExampleV1Binding(original, 4);
+        switch (mismatch)
+        {
+            case "bundle": binding.BundleId = string.Empty; break;
+            case "hash": binding.BundleSha256 = string.Empty; break;
+            case "building": binding.BuildingInstance++; break;
+            case "owner": binding.OwnerId++; break;
+            case "offer": binding.Offer.MissionType = 0; break;
+            case "playfield": binding.LivePlayfield = original.GetProperty("SourcePlayfield2").GetInt32(); break;
+            case "objective": binding.ObjectiveTemplateId++; break;
+        }
+        Assert.ThrowsExactly<InvalidDataException>(() => HistoricalMissionV1Replay.Reconstruct(evidence.RootElement, binding, RuntimeRoot()));
+    }
+
+    static JsonDocument LoadHistoricalV1Evidence() => JsonDocument.Parse(File.ReadAllText(
+        Path.Combine(RepositoryRoot(), "AORebirth", "GameData", "Missions", "Layouts.json")));
+
+    static JsonElement OriginalV1Bundle(JsonDocument evidence, int missionType) => evidence.RootElement.EnumerateArray().Single(
+        layout => layout.GetProperty("CompatibleMissionTypes").EnumerateArray().Single().GetInt32() == missionType);
+
+    static GeneratedMissionBinding ExampleV1Binding(JsonElement bundle, int missionType) => new()
+    {
+        // Synthetic saved-row identifiers around actual captured layout identity and SHA. No player database is used.
+        OwnerId = 1, QuestType = (int)IdentityType.Mission, QuestInstance = 2, KeyInstance = 3,
+        OfferType = (int)IdentityType.Mission, OfferInstance = 4, LivePlayfield = 0x16EEEE,
+        AcceptedAtUtcTicks = 10, ExpiresAtUtcTicks = 20,
+        BundleId = bundle.GetProperty("LayoutId").GetString()!,
+        BundleSha256 = bundle.GetProperty("ExpectedGeneratorPayloadSha256").GetString()!,
+        BuildingType = bundle.GetProperty("BuildingIdentity").GetProperty("Type").GetInt32(),
+        BuildingInstance = bundle.GetProperty("BuildingIdentity").GetProperty("Instance").GetInt32(),
+        ObjectiveTemplateId = bundle.GetProperty("ObjectiveSlots")[0].GetProperty("TemplateId").GetInt32(),
+        Offer = new GeneratedMissionOffer
+        {
+            OwnerId = 1, OfferType = (int)IdentityType.Mission, OfferInstance = 4, MissionType = missionType, Quality = 10,
+            DestinationPlayfield = 100, DestinationX = 101f, DestinationY = 102f, DestinationZ = 103f
+        }
+    };
 
     static string RepositoryRoot()
     {

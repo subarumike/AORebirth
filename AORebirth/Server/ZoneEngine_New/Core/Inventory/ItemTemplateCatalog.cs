@@ -21,10 +21,10 @@ namespace ZoneEngine_New.Core.Inventory
             ArgumentNullException.ThrowIfNull(gameData);
             ArgumentNullException.ThrowIfNull(logger);
             string path = Path.Combine(gameData.RootPath, GameDataPaths.ItemsFileName);
-            _templates = LoadItemsDat(path);
+            _templates = LoadItemsDat(path, out int loadedCount);
 
             logger.Info(string.Format(CultureInfo.InvariantCulture,
-                "Loaded {0} item templates from {1}", _templates.Count, path));
+                "Loaded {0} item templates from {1}", loadedCount, path));
             logger.Info(string.Format(CultureInfo.InvariantCulture,
                 "ItemTemplateCatalog ready with {0} templates", _templates.Count));
         }
@@ -43,7 +43,7 @@ namespace ZoneEngine_New.Core.Inventory
                 string.Format(CultureInfo.InvariantCulture, "Item template {0} not found", aoid));
         }
 
-        private static Dictionary<int, ItemTemplate> LoadItemsDat(string path)
+        private static Dictionary<int, ItemTemplate> LoadItemsDat(string path, out int loadedCount)
         {
             try
             {
@@ -56,11 +56,10 @@ namespace ZoneEngine_New.Core.Inventory
                 {
                     if (dat == null)
                         throw new InvalidDataException("The catalog contains a null item template.");
-                    ItemTemplate template = DatItemMapper.ToTemplate(dat, dat.Name ?? string.Empty);
-                    if (!templates.TryAdd(dat.ID, template))
-                        throw new InvalidDataException($"Duplicate item template ID {dat.ID}.");
+                    templates[dat.ID] = DatItemMapper.ToTemplate(dat, dat.Name ?? string.Empty);
                 }
 
+                loadedCount = loaded.Count;
                 return templates;
             }
             catch (Exception exception) when (exception is IOException or UnauthorizedAccessException
