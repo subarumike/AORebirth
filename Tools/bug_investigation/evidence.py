@@ -10,7 +10,8 @@ import subprocess
 SOURCE_PATHS = (
     *(
         f":(glob){root}/**/*.cs" for root in (
-            "AORebirth/Server/ZoneEngine_New", "AORebirth/Server/ChatEngine",
+            "AORebirth/Server/ZoneEngine_New", "AORebirth/Server/ZoneEngine_New.Tests",
+            "AORebirth/Server/ChatEngine",
             "AORebirth/Server/LoginEngine", "AORebirth/Server/WorldEngine",
             "AORebirth/Libraries/Source/AORebirth.Core",
             "AORebirth/Libraries/Source/AORebirth.Database",
@@ -30,6 +31,8 @@ server should some than that the their them then there this time two used was we
 what when where which while will with would you your
 """.split())
 PRIVATE_TEXT_TYPES = {".csv", ".json", ".log", ".md", ".tsv", ".txt", ".xml"}
+PRIVATE_NAME = re.compile(r"password|credential|token|secret|raw[-_]packets|packets\.hex", re.I)
+PRIVATE_LINE = re.compile(r"\b(?:authorization|password|api[_ -]?key|secret|token)\b[\"']?\s*[:=]", re.I)
 
 
 def keywords(report):
@@ -53,6 +56,10 @@ def score(text, terms):
     return sum(weight for word, weight in terms.items() if word in text)
 
 
+def display_line(line):
+    return "[credential-like line redacted]" if PRIVATE_LINE.search(line) else line[:320]
+
+
 def excerpts(path, lines, terms):
     scored = [(score(line, terms), i) for i, line in enumerate(lines)]
     ranked = sorted((-rank, i) for rank, i in scored if rank)
@@ -61,7 +68,7 @@ def excerpts(path, lines, terms):
         for i in range(max(0, index - 3), min(len(lines), index + 12))
     )
     return {"path": path, "excerpt": "\n".join(
-        f"{i + 1}: {lines[i][:320]}" for i in indices
+        f"{i + 1}: {display_line(lines[i])}" for i in indices
     )[:3400]}
 
 
@@ -109,6 +116,9 @@ def tracked_evidence(source, commit, terms):
                         for path in related_owners[:2])
     result = []
     for path, excerpt_terms in selected.items():
+        size = git(source, "cat-file", "-s", f"{commit}:{path}")
+        if size.returncode or int(size.stdout) > 1_048_576:
+            continue
         blob = git(source, "show", f"{commit}:{path}")
         if blob.returncode == 0:
             lines = blob.stdout.decode("utf-8", "replace").splitlines()
@@ -130,7 +140,7 @@ def private_evidence(roots, terms):
                     break
                 path = directory / name
                 if (path.suffix.lower() not in PRIVATE_TEXT_TYPES or name.startswith(".")
-                        or re.search(r"password|credential|token|secret", name, re.I)):
+                        or PRIVATE_NAME.search(name)):
                     continue
                 try:
                     if (is_reparse_point(path) or not path.is_file()
@@ -150,7 +160,8 @@ def private_evidence(roots, terms):
                     del candidates[4:]
             if checked > 2000:
                 break
-    return [excerpts(str(path), text.splitlines(), terms) for _, path, text in candidates]
+    result = [excerpts(str(path), text.splitlines(), terms) for _, path, text in candidates]
+    return [item for item in result if item["excerpt"]]
 
 
 def is_reparse_point(path):
@@ -168,3 +179,82 @@ def collect_evidence(source, source_commit, evidence_dirs, report):
     if not terms:
         return []
     return tracked_evidence(source, source_commit, terms) + private_evidence(evidence_dirs, terms)
+
+def source_path_allowed(name):
+    for spec in SOURCE_PATHS:
+        prefix, marker, suffix = spec.removeprefix(":(glob)").partition("/**/*")
+        if (marker and name.startswith(prefix + "/") and name.endswith(suffix)) or name == spec:
+            return True
+    return False
+
+
+def requested_file(source, commit, roots, request, known_private):
+    match = re.fullmatch(r"(.+):([1-9][0-9]{0,6})(?:-([1-9][0-9]{0,6}))?", request)
+    raw, first, last = request, 1, 90
+    if match:
+        raw, first = match[1], int(match[2])
+        last = int(match[3]) if match[3] else first + 24
+    if last < first or last - first >= 100:
+        return None
+    path = Path(raw)
+    if path.is_absolute():
+        if (path not in known_private or ".." in path.parts
+                or not any(path.is_relative_to(root) for root in roots)):
+            return None
+        resolved = path.resolve()
+        if (not any(resolved.is_relative_to(root) for root in roots)
+                or path != resolved or not path.is_file() or is_reparse_point(path)
+                or path.suffix.lower() not in PRIVATE_TEXT_TYPES
+                or PRIVATE_NAME.search(path.name)):
+            return None
+        with path.open("rb") as stream:
+            data = stream.read(1_048_577)
+        name = str(path)
+    else:
+        name = path.as_posix()
+        if (not re.fullmatch(r"[A-Za-z0-9_. /-]+", name)
+                or any(part in {".", ".."} for part in raw.replace("\\", "/").split("/"))
+                or not source_path_allowed(name)
+                or PRIVATE_NAME.search(path.name)):
+            return None
+        entry = git(source, "ls-tree", commit, "--", name)
+        if entry.returncode or not re.match(rb"100(?:644|755) blob ", entry.stdout):
+            return None
+        blob_size = git(source, "cat-file", "-s", f"{commit}:{name}")
+        if blob_size.returncode or int(blob_size.stdout) > 1_048_576:
+            return None
+        blob = git(source, "show", f"{commit}:{name}")
+        if blob.returncode:
+            return None
+        data = blob.stdout
+    if len(data) > 1_048_576 or b"\0" in data:
+        return None
+    lines = data.decode("utf-8", "replace").splitlines()
+    if first > len(lines):
+        return None
+    return {"path": name, "excerpt": "\n".join(
+        f"{i + 1}: {display_line(lines[i])}" for i in range(first - 1, min(last, len(lines)))
+    )[:8_000]}
+
+
+def requested_evidence(source, source_commit, evidence_dirs, requests, *, known_paths=()):
+    """Resolve bounded requests against the pinned tree and approved local evidence."""
+    result = []
+    terms = {}
+    known_private = {Path(path) for path in known_paths if Path(path).is_absolute()}
+    for request in dict.fromkeys(requests[:6]):
+        if request.startswith("file:"):
+            try:
+                item = requested_file(source, source_commit, evidence_dirs, request[5:], known_private)
+            except (OSError, ValueError):
+                item = None
+            if item:
+                result.append(item)
+        elif request.startswith("search:"):
+            term = request[7:].strip()
+            if re.fullmatch(r"[A-Za-z0-9_ .-]{4,80}", term):
+                terms[term.lower()] = 10
+    if terms:
+        result.extend(tracked_evidence(source, source_commit, terms)[:4])
+        result.extend(private_evidence(evidence_dirs, terms)[:2])
+    return result
