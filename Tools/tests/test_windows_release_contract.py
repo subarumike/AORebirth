@@ -697,6 +697,9 @@ class ReleaseContractTests(unittest.TestCase):
         gate.explicit_mike_acceptance(human, expected)
         gate.explicit_mike_acceptance({**human, "TEXT": "works on Windows, update Linux, rebuild and deploy to live"}, expected)
         gate.explicit_mike_acceptance({**human, "TEXT": "I accept this Windows build. Do not deploy yet."}, expected)
+        gate.explicit_mike_acceptance({**human, "TEXT": "I explicitly accept this Windows build. Do not deploy yet."}, expected)
+        with self.assertRaises(ValueError):
+            gate.explicit_mike_acceptance({**human, "TEXT": "I do not explicitly accept this Windows build."}, expected)
         bad = {**human, "WINDOWS_GAMEDATA_MANIFEST": "e" * 64}
         with self.assertRaises(ValueError):
             gate.explicit_mike_acceptance(bad, expected)
