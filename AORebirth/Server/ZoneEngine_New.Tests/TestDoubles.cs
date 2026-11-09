@@ -174,6 +174,8 @@ namespace ZoneEngine_New.Tests
     {
         readonly Dictionary<int, ItemTemplate> _templates = new();
 
+        public IReadOnlyCollection<ItemTemplate> Templates => _templates.Values;
+
         public StubCatalog Add(int id, int quality, int price = 0, int flags = 0, int multipleCount = 0)
         {
             var stats = new Dictionary<CharacterStat, int> { [CharacterStat.Value] = price };

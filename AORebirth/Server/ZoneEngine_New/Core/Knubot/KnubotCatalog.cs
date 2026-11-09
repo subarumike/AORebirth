@@ -58,7 +58,7 @@ public sealed class KnubotCatalog
         OverrideRoot = string.IsNullOrWhiteSpace(overrideRoot) ? null : Path.GetFullPath(overrideRoot.Trim());
         _load = new KnubotLoadContext(quests, gameData, items);
         _logger = logger;
-        _byNpc = Build().ByNpc;
+        _byNpc = Build(_load).ByNpc;
     }
 
     /// <summary>The <see cref="OverrideVariable"/> folder, or null when it is not set.</summary>
@@ -149,21 +149,45 @@ public sealed class KnubotCatalog
         Dictionary<string, KnubotScript> previous;
         lock (_reloadLock)
         {
-            result = Build();
+            result = Build(_load);
             previous = _byNpc;
             _byNpc = result.ByNpc;
         }
 
+        NotifyReloaded(previous, result.ByNpc);
+        return result;
+    }
+
+    /// <summary>Prepares scripts against a proposed item snapshot before either catalog can be replaced.</summary>
+    internal KnubotLoadResult WithItemTemplates(HashItemCatalog current, HashItemCatalog items, Action? installItems)
+    {
+        KnubotLoadResult result;
+        Dictionary<string, KnubotScript> previous;
+        lock (_reloadLock)
+        {
+            _load.Quests.RequireCompatibleItemTemplates(current, items);
+            result = Build(_load.WithItemTemplates(items));
+            if (installItems is null || result.Problems.Count != 0)
+                return result;
+            previous = _byNpc;
+            installItems();
+            _byNpc = result.ByNpc;
+        }
+
+        NotifyReloaded(previous, result.ByNpc);
+        return result;
+    }
+
+    void NotifyReloaded(Dictionary<string, KnubotScript> previous, Dictionary<string, KnubotScript> next)
+    {
         try
         {
-            Reloaded?.Invoke(new KnubotMapChange(previous, result.ByNpc));
+            Reloaded?.Invoke(new KnubotMapChange(previous, next));
         }
         catch (Exception exception)
         {
             _logger.Error(exception, "Knubot reload: refreshing spawned NPCs failed.");
         }
-
-        return result;
     }
 
     /// <summary>
@@ -178,7 +202,7 @@ public sealed class KnubotCatalog
         return errors;
     }
 
-    KnubotScript? Parse(string id, string json, List<string> errors)
+    KnubotScript? Parse(string id, string json, List<string> errors, KnubotLoadContext? load = null)
     {
         try
         {
@@ -189,7 +213,7 @@ public sealed class KnubotCatalog
                 return null;
             }
 
-            return Compile(id, file, _load, errors);
+            return Compile(id, file, load ?? _load, errors);
         }
         catch (JsonException exception)
         {
@@ -198,16 +222,16 @@ public sealed class KnubotCatalog
         }
     }
 
-    KnubotLoadResult Build()
+    KnubotLoadResult Build(KnubotLoadContext load)
     {
         var byNpc = new Dictionary<string, KnubotScript>(StringComparer.Ordinal);
         var problems = new List<string>();
         if (!Directory.Exists(_root))
             _logger.Info("No Knubot scripts at " + _root);
-        Dictionary<string, (KnubotScript Script, string Path)> shipped = LoadFolder(_root, problems);
+        Dictionary<string, (KnubotScript Script, string Path)> shipped = LoadFolder(_root, problems, load);
         Dictionary<string, (KnubotScript Script, string Path)> overrides = OverrideRoot == null
             ? new(StringComparer.Ordinal)
-            : LoadFolder(OverrideRoot, problems);
+            : LoadFolder(OverrideRoot, problems, load);
 
         // Overrides claim their NPCs first. A shipped script with the same id is replaced outright; one that shares an
         // NPC with an override gives that NPC up and keeps the rest.
@@ -231,7 +255,7 @@ public sealed class KnubotCatalog
     }
 
     /// <summary>Every script under <paramref name="root"/> that compiles, by id; each failure goes into <paramref name="problems"/>.</summary>
-    Dictionary<string, (KnubotScript Script, string Path)> LoadFolder(string root, List<string> problems)
+    Dictionary<string, (KnubotScript Script, string Path)> LoadFolder(string root, List<string> problems, KnubotLoadContext load)
     {
         var scripts = new Dictionary<string, (KnubotScript, string)>(StringComparer.Ordinal);
         if (!Directory.Exists(root))
@@ -244,7 +268,7 @@ public sealed class KnubotCatalog
             KnubotScript? script = null;
             try
             {
-                script = Parse(id, File.ReadAllText(path), errors);
+                script = Parse(id, File.ReadAllText(path), errors, load);
             }
             catch (IOException exception)
             {

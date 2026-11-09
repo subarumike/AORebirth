@@ -90,6 +90,11 @@
     <Compile Include="GameDataReloadTests.cs" />
     <Compile Include="HalloweenActivationTests.cs" />
   </ItemGroup>
+  <ItemGroup Condition="'$(ItemTemplatesReloadFocusedTests)' == 'true'">
+    <Compile Remove="@(Compile)" />
+    <Compile Include="TestDoubles.cs" />
+    <Compile Include="ItemTemplatesOperatorReloadTests.cs" />
+  </ItemGroup>
   <ItemGroup Condition="'$(FriendlyItemUseFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />
     <Compile Include="TestDoubles.cs" />

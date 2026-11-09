@@ -2,7 +2,9 @@ namespace ZoneEngine_New.Core.GameData
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Text.Json;
+    using System.Text.Json.Serialization;
 
     public readonly record struct EquipmentLootMember(HashInstance Family, int Weight, int MinCenter, int MaxCenter);
 
@@ -14,9 +16,18 @@ namespace ZoneEngine_New.Core.GameData
     /// </summary>
     public sealed class HashItemCatalog
     {
+        // Gameplay traverses category paths recursively, so a new graph must fit a bounded stack.
+        const int MaxCategoryDepth = 256;
+
         static readonly JsonSerializerOptions JsonOptions = new()
         {
             PropertyNameCaseInsensitive = true
+        };
+
+        static readonly JsonSerializerOptions VerifiedJsonOptions = new(JsonOptions)
+        {
+            AllowDuplicateProperties = false,
+            UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow
         };
 
         readonly Dictionary<string, string[]> _categories;
@@ -25,6 +36,10 @@ namespace ZoneEngine_New.Core.GameData
         readonly HashSet<string> _spawnAll;
         readonly Dictionary<string, IReadOnlyList<EquipmentLootMember>> _equipmentLoot = new(StringComparer.Ordinal);
         readonly Random _random;
+        Dictionary<string, HashInstance> _equipmentOnly = new(StringComparer.Ordinal);
+        readonly Dictionary<string, string> _invalidRows = new(StringComparer.Ordinal);
+
+        internal string? Sha256 { get; set; }
 
         public HashItemCatalog(
             Dictionary<string, string[]> categories,
@@ -49,16 +64,15 @@ namespace ZoneEngine_New.Core.GameData
         public IReadOnlyCollection<HashInstance> Instances => _instances.Values;
 
         public static HashItemCatalog Parse(string? json, Random? random = null)
+            => ParseRows(string.IsNullOrWhiteSpace(json) ? null
+                : JsonSerializer.Deserialize<Dictionary<string, HashItemRow>>(json, JsonOptions), random);
+
+        static HashItemCatalog ParseRows(Dictionary<string, HashItemRow>? records, Random? random)
         {
             var categories = new Dictionary<string, string[]>(StringComparer.Ordinal);
             var instances = new Dictionary<string, HashInstance>(StringComparer.Ordinal);
             var equipmentOnly = new Dictionary<string, HashInstance>(StringComparer.Ordinal);
             var spawnAll = new HashSet<string>(StringComparer.Ordinal);
-            if (string.IsNullOrWhiteSpace(json))
-                return new HashItemCatalog(categories, instances, random, spawnAll);
-
-            Dictionary<string, HashItemRow>? records =
-                JsonSerializer.Deserialize<Dictionary<string, HashItemRow>>(json, JsonOptions);
             if (records == null)
                 return new HashItemCatalog(categories, instances, random, spawnAll);
 
@@ -101,9 +115,16 @@ namespace ZoneEngine_New.Core.GameData
                 (pair.Value.EquipmentLootOnly ? equipmentOnly : instances).Add(hash, new HashInstance(hash, ids.ToArray()));
             }
 
-            var catalog = new HashItemCatalog(categories, instances, random, spawnAll);
+            var catalog = new HashItemCatalog(categories, instances, random, spawnAll) { _equipmentOnly = equipmentOnly };
             foreach ((string hash, HashItemRow row) in records)
             {
+                if (string.IsNullOrWhiteSpace(hash) || row is null
+                    || (row.Children is { Length: > 0 } childrenIds
+                        && (row.Templates is { Length: > 0 } || childrenIds.Distinct(StringComparer.Ordinal).Count() != childrenIds.Length))
+                    || (row.Children is not { Length: > 0 } && (row.Templates is not { Length: > 0 } || row.SpawnAll))
+                    || (row.Templates is { } templateIds && Array.Exists(templateIds, id => id <= 0)))
+                    catalog._invalidRows[hash] = JsonSerializer.Serialize(row, JsonOptions);
+
                 if (row?.EquipmentLoot is not { } policy)
                     continue;
                 if (string.IsNullOrEmpty(hash) || row.EquipmentLootOnly || row.SpawnAll || row.Templates is { Length: > 0 }
@@ -126,6 +147,101 @@ namespace ZoneEngine_New.Core.GameData
             }
 
             return catalog;
+        }
+
+        internal static HashItemCatalog ParseVerified(string json, HashItemCatalog previous, Func<int, bool> templateExists)
+        {
+            Dictionary<string, HashItemRow>? records = JsonSerializer.Deserialize<Dictionary<string, HashItemRow>>(json, VerifiedJsonOptions);
+            if (records is not { Count: > 0 })
+                throw new FormatException("ItemTemplates must contain hash definitions.");
+
+            HashItemCatalog next = ParseRows(records, null);
+            foreach ((string hash, string row) in next._invalidRows)
+            {
+                if (!previous._invalidRows.TryGetValue(hash, out string? prior) || row != prior)
+                    throw new FormatException("Invalid hash definition: " + hash);
+            }
+
+            // Other GameData can reference existing hashes independently of this catalog.
+            RequireExistingHashes(previous._categories, next._categories);
+            RequireExistingHashes(previous._instances, next._instances);
+            RequireExistingHashes(previous._equipmentLoot, next._equipmentLoot);
+            foreach ((string parent, string[] children) in next._categories)
+            {
+                foreach (string child in children)
+                {
+                    if (!string.IsNullOrWhiteSpace(child) && next.HasOrdinaryHash(child))
+                        continue;
+                    // Shipped content contains dangling edges. Only keep an unchanged existing finding.
+                    if (previous._categories.TryGetValue(parent, out string[]? oldChildren)
+                        && children.SequenceEqual(oldChildren) && !previous.HasOrdinaryHash(child)
+                        && previous._spawnAll.Contains(parent) == next._spawnAll.Contains(parent))
+                        continue;
+                    throw new FormatException($"Missing item hash {child} referenced by {parent}.");
+                }
+            }
+            next.ValidateAcyclic();
+            foreach ((string hash, string[] children) in next._categories)
+            {
+                if ((!previous._categories.TryGetValue(hash, out string[]? prior) || !children.SequenceEqual(prior))
+                    && !next.CanResolveItem(hash))
+                    throw new FormatException("Item category does not resolve to an item family: " + hash);
+            }
+            ValidateIds(next._instances, previous._instances, templateExists);
+            ValidateIds(next._equipmentOnly, previous._equipmentOnly, templateExists);
+            return next;
+        }
+
+        static void RequireExistingHashes<T>(Dictionary<string, T> previous, Dictionary<string, T> next)
+        {
+            foreach (string hash in previous.Keys)
+                if (!next.ContainsKey(hash))
+                    throw new FormatException("Cannot remove or change the type of an existing hash: " + hash);
+        }
+
+        bool HasOrdinaryHash(string? hash)
+            => !string.IsNullOrWhiteSpace(hash) && (_categories.ContainsKey(hash) || _instances.ContainsKey(hash));
+
+        static void ValidateIds(Dictionary<string, HashInstance> next, Dictionary<string, HashInstance> previous,
+            Func<int, bool> templateExists)
+        {
+            foreach ((string hash, HashInstance family) in next)
+            {
+                foreach (int id in family.TemplateIds)
+                {
+                    if (!templateExists(id) && !(previous.TryGetValue(hash, out HashInstance? prior)
+                        && prior.TemplateIds.AsSpan().SequenceEqual(family.TemplateIds)))
+                        throw new FormatException($"Missing item template {id} in {hash}.");
+                }
+            }
+        }
+
+        void ValidateAcyclic()
+        {
+            var incoming = _categories.Keys.ToDictionary(hash => hash, _ => 0, StringComparer.Ordinal);
+            var depths = _categories.Keys.ToDictionary(hash => hash, _ => 1, StringComparer.Ordinal);
+            foreach (string[] children in _categories.Values)
+                foreach (string child in children)
+                    if (child != null && incoming.ContainsKey(child))
+                        incoming[child]++;
+            var pending = new Queue<string>(incoming.Where(entry => entry.Value == 0).Select(entry => entry.Key));
+            int visited = 0;
+            while (pending.TryDequeue(out string? parent))
+            {
+                visited++;
+                foreach (string child in _categories[parent])
+                {
+                    if (child is null || !incoming.ContainsKey(child))
+                        continue;
+                    depths[child] = Math.Max(depths[child], depths[parent] + 1);
+                    if (depths[child] > MaxCategoryDepth)
+                        throw new FormatException($"Item hash categories exceed {MaxCategoryDepth} levels.");
+                    if (--incoming[child] == 0)
+                        pending.Enqueue(child);
+                }
+            }
+            if (visited != _categories.Count)
+                throw new FormatException("Item hash categories contain a cycle.");
         }
 
         public IReadOnlyList<EquipmentLootMember>? GetEquipmentLootMembers(string hash)

@@ -29,19 +29,29 @@ public sealed class KnubotContext(Player player, NpcCharacter npc, KnubotScript 
 /// <summary>Catalogs a script is resolved against when it loads.</summary>
 public sealed class KnubotLoadContext(QuestCatalog quests, IGameData gameData, IItemTemplateCatalog items)
 {
+    HashItemCatalog? _preparedItems;
     public QuestCatalog Quests { get; } = quests;
     public IGameData GameData { get; } = gameData;
     public IItemTemplateCatalog Items { get; } = items;
+
+    internal KnubotLoadContext WithItemTemplates(HashItemCatalog prepared)
+        => new(Quests, GameData, Items) { _preparedItems = prepared };
+
+    internal bool CanResolveItemHash(string hash)
+        => _preparedItems?.CanResolveItem(hash) ?? GameData.CanResolveItemHash(hash);
 
     /// <summary>Every AOID an item hash can produce, so carried items match whatever QL they were minted at.</summary>
     public bool TryItemTemplates(string hash, out HashSet<int> templateIds)
     {
         templateIds = new HashSet<int>();
-        if (string.IsNullOrEmpty(hash) || !GameData.CanResolveItemHash(hash))
+        if (string.IsNullOrEmpty(hash) || !CanResolveItemHash(hash))
             return false;
 
         var leaves = new List<HashInstance>();
-        GameData.CollectHashLeafInstances(hash, leaves);
+        if (_preparedItems is null)
+            GameData.CollectHashLeafInstances(hash, leaves);
+        else
+            _preparedItems.CollectLeafInstances(hash, leaves);
         foreach (HashInstance leaf in leaves)
             templateIds.UnionWith(leaf.TemplateIds);
 

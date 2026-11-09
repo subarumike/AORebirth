@@ -46,6 +46,7 @@ namespace ZoneEngine_New
         private static ServiceProvider? rootServices;
         private static ZoneNetworkHost? networkHost;
         private static DebugMcpHost? debugMcp;
+        private static ItemTemplatesReloadHost? itemTemplatesReload;
         private static PlayfieldManager? playfieldManager;
         private static IChatEngineLink? chatEngineLink;
         private static WorldLink? worldLink;
@@ -126,6 +127,7 @@ namespace ZoneEngine_New
                 try
                 {
                     debugMcp = DebugMcpHost.Start(rootServices, logger);
+                    itemTemplatesReload = ItemTemplatesReloadHost.Start(rootServices);
                 }
                 catch (Exception)
                 {
@@ -502,6 +504,8 @@ namespace ZoneEngine_New
                     Console.Error.WriteLine("ZONEENGINE_NEW_SHUTDOWN_FAILED type=" + exception.GetType().Name);
                 }
             }
+            Cleanup(() => itemTemplatesReload?.DisposeAsync().AsTask().GetAwaiter().GetResult());
+            itemTemplatesReload = null;
             Cleanup(() => debugMcp?.DisposeAsync().AsTask().GetAwaiter().GetResult());
             debugMcp = null;
             Cleanup(() => networkHost?.DisposeAsync().AsTask().GetAwaiter().GetResult());
