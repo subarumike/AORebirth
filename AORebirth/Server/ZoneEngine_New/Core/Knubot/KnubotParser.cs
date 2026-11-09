@@ -167,7 +167,7 @@ public static class KnubotParser
                 case "spawn":
                     int spawnCount = 1, quality = 0;
                     bool atLevel = words.Length >= 3 && words[2].Equals("level", StringComparison.OrdinalIgnoreCase);
-                    if (words.Length < 3 || words.Length > 4 || !load.GameData.CanResolveItemHash(words[1])
+                    if (words.Length < 3 || words.Length > 4 || !load.CanResolveItemHash(words[1])
                         || (!atLevel && !KnubotCondition.TryPositive(words[2], out quality))
                         || (words.Length == 4 && (!KnubotCondition.TryPositive(words[3], out spawnCount) || spawnCount > MaxItemCount)))
                     {

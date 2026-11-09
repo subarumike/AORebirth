@@ -16,10 +16,15 @@ namespace ZoneEngine_New.Core.Inventory
         readonly IGameData _gameData;
         readonly IItemTemplateCatalog _catalog;
         readonly IItemBuilder _items;
-        readonly ConcurrentDictionary<string, QualitySpan[]> _qualitySpans = new(StringComparer.Ordinal);
-        readonly ConcurrentDictionary<string, LeafRange[]> _leafRanges = new(StringComparer.Ordinal);
-        readonly ConcurrentDictionary<HashInstance, FamilySpan> _familySpans = new(ReferenceEqualityComparer.Instance);
-        readonly ConcurrentDictionary<string, int[]> _ladderTiers = new(StringComparer.Ordinal);
+        volatile CatalogCaches _caches = new();
+
+        sealed class CatalogCaches
+        {
+            public readonly ConcurrentDictionary<string, QualitySpan[]> QualitySpans = new(StringComparer.Ordinal);
+            public readonly ConcurrentDictionary<string, LeafRange[]> LeafRanges = new(StringComparer.Ordinal);
+            public readonly ConcurrentDictionary<HashInstance, FamilySpan> FamilySpans = new(ReferenceEqualityComparer.Instance);
+            public readonly ConcurrentDictionary<string, int[]> LadderTiers = new(StringComparer.Ordinal);
+        }
 
         public HashItemMinter(IGameData gameData, IItemTemplateCatalog catalog, IItemBuilder items)
         {
@@ -35,13 +40,8 @@ namespace ZoneEngine_New.Core.Inventory
         /// Drops every per-hash cache. Called after ItemTemplates.json is reloaded: the caches hold leaf ranges, ladder
         /// tiers and QL spans of the old catalog, so a SpawnItem would otherwise keep minting from the old hash tree.
         /// </summary>
-        public void ClearCaches()
-        {
-            _qualitySpans.Clear();
-            _leafRanges.Clear();
-            _familySpans.Clear();
-            _ladderTiers.Clear();
-        }
+        // In-flight computations can still finish against the old caches, but cannot repopulate the replacements.
+        public void ClearCaches() => _caches = new CatalogCaches();
 
         /// <summary>
         /// Rolls <paramref name="hash"/> into an item carrying a freshly allocated instance id.
@@ -92,7 +92,7 @@ namespace ZoneEngine_New.Core.Inventory
             }
 
             int wanted = desiredQuality < 1 ? 1 : desiredQuality;
-            LeafRange[] leaves = _leafRanges.GetOrAdd(hash, BuildLeafRanges);
+            LeafRange[] leaves = _caches.LeafRanges.GetOrAdd(hash, BuildLeafRanges);
             for (int i = 0; i < leaves.Length; i++)
             {
                 LeafRange leaf = leaves[i];
@@ -112,7 +112,7 @@ namespace ZoneEngine_New.Core.Inventory
                 return false;
 
             int wanted = desiredQuality < 1 ? 1 : desiredQuality;
-            LeafRange[] leaves = _leafRanges.GetOrAdd(hash, BuildLeafRanges);
+            LeafRange[] leaves = _caches.LeafRanges.GetOrAdd(hash, BuildLeafRanges);
             int best = 0;
             int ties = 0;
             HashInstance? picked = null;
@@ -143,7 +143,7 @@ namespace ZoneEngine_New.Core.Inventory
         }
 
         internal bool HasScalingFamily(string hash)
-            => Array.Exists(_leafRanges.GetOrAdd(hash, BuildLeafRanges), static leaf => leaf.Min < leaf.Max);
+            => Array.Exists(_caches.LeafRanges.GetOrAdd(hash, BuildLeafRanges), static leaf => leaf.Min < leaf.Max);
 
         internal IReadOnlyList<EquipmentLootMember>? GetEquipmentLootMembers(string hash)
             => _gameData.GetEquipmentLootMembers(hash);
@@ -331,7 +331,7 @@ namespace ZoneEngine_New.Core.Inventory
         /// </summary>
         bool CanPick(string parent, string child, int min, int max)
         {
-            int[] tiers = _ladderTiers.GetOrAdd(parent, GetLadderTiers);
+            int[] tiers = _caches.LadderTiers.GetOrAdd(parent, GetLadderTiers);
             if (tiers.Length == 0)
                 return CoversWindow(child, min, max);
             if (!_gameData.TryGetHashInstance(child, out HashInstance leaf))
@@ -375,7 +375,7 @@ namespace ZoneEngine_New.Core.Inventory
 
         /// <summary>A leaf family's QL range, and whether any of its templates is Special.</summary>
         FamilySpan GetFamilySpan(HashInstance instance)
-            => _familySpans.GetOrAdd(instance, BuildFamilySpan);
+            => _caches.FamilySpans.GetOrAdd(instance, BuildFamilySpan);
 
         FamilySpan BuildFamilySpan(HashInstance instance)
         {
@@ -433,8 +433,9 @@ namespace ZoneEngine_New.Core.Inventory
         /// </summary>
         bool CoversWindow(string hash, int min, int max)
         {
-            if (!_qualitySpans.TryGetValue(hash, out QualitySpan[]? spans))
-                spans = GetQualitySpans(hash, new HashSet<string>(StringComparer.Ordinal));
+            var cache = _caches.QualitySpans;
+            if (!cache.TryGetValue(hash, out QualitySpan[]? spans))
+                spans = GetQualitySpans(hash, new HashSet<string>(StringComparer.Ordinal), cache);
 
             for (int i = 0; i < spans.Length; i++)
             {
@@ -445,9 +446,9 @@ namespace ZoneEngine_New.Core.Inventory
             return false;
         }
 
-        QualitySpan[] GetQualitySpans(string hash, HashSet<string> visiting)
+        QualitySpan[] GetQualitySpans(string hash, HashSet<string> visiting, ConcurrentDictionary<string, QualitySpan[]> cache)
         {
-            if (_qualitySpans.TryGetValue(hash, out QualitySpan[]? cached))
+            if (cache.TryGetValue(hash, out QualitySpan[]? cached))
                 return cached;
             if (!visiting.Add(hash))
                 return Array.Empty<QualitySpan>();
@@ -466,7 +467,7 @@ namespace ZoneEngine_New.Core.Inventory
                 for (int i = 0; i < children.Count; i++)
                 {
                     if (!string.IsNullOrEmpty(children[i]))
-                        all.AddRange(GetQualitySpans(children[i], visiting));
+                        all.AddRange(GetQualitySpans(children[i], visiting, cache));
                 }
 
                 spans = Merge(all);
@@ -477,7 +478,7 @@ namespace ZoneEngine_New.Core.Inventory
             }
 
             visiting.Remove(hash);
-            _qualitySpans.TryAdd(hash, spans);
+            cache.TryAdd(hash, spans);
             return spans;
         }
 

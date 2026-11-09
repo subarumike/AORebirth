@@ -4,6 +4,8 @@ namespace ZoneEngine_New.Core.GameData
     using System.Collections.Generic;
     using System.Globalization;
     using System.IO;
+    using System.Security.Cryptography;
+    using System.Text;
     using System.Text.Json;
     using System.Threading;
 
@@ -119,6 +121,12 @@ namespace ZoneEngine_New.Core.GameData
         public int HashTemplateCount => _hashItems.CategoryCount;
 
         public int HashInstanceCount => _hashItems.InstanceCount;
+
+        internal string? LoadedHashItemsSha256 => _hashItems.Sha256;
+
+        internal HashItemCatalog LoadedHashItems => _hashItems;
+
+        internal string HashItemsPath => GameDataPaths.ResolveFile(RootPath, GameDataPaths.ItemTemplatesFileName);
 
         public int VendingMachineCount => _vendingMachines.Count;
 
@@ -617,7 +625,7 @@ namespace ZoneEngine_New.Core.GameData
         internal AORebirth.Modules.Content.GameDataReloadResult ReloadHashItems()
         {
             const string name = "ItemTemplates";
-            string path = GameDataPaths.ResolveFile(RootPath, GameDataPaths.ItemTemplatesFileName);
+            string path = HashItemsPath;
             if (!File.Exists(path))
             {
                 _logger.Warn(
@@ -630,15 +638,12 @@ namespace ZoneEngine_New.Core.GameData
 
             try
             {
-                HashItemCatalog loaded = HashItemCatalog.Parse(File.ReadAllText(path));
-                _hashItems = loaded;
-                _logger.Info(
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "GameData hash templates={0} hash instances={1} from {2}",
-                        loaded.CategoryCount,
-                        loaded.InstanceCount,
-                        path));
+                byte[] content = File.ReadAllBytes(path);
+                using var reader = new StreamReader(new MemoryStream(content));
+                HashItemCatalog loaded = HashItemCatalog.Parse(reader.ReadToEnd());
+                if (loaded.InstanceCount > 0)
+                    loaded.Sha256 = Convert.ToHexStringLower(SHA256.HashData(content));
+                InstallHashItems(loaded);
                 return new(name, true, loaded.InstanceCount, []);
             }
             catch (Exception exception)
@@ -651,6 +656,39 @@ namespace ZoneEngine_New.Core.GameData
                         path));
                 return new(name, false, _hashItems.InstanceCount, ["ItemTemplates.json: " + exception.Message]);
             }
+        }
+
+        internal HashItemCatalog PrepareHashItems(string sha256, byte[] content, Func<int, bool> templateExists,
+            HashItemCatalog? rollback)
+        {
+            HashItemCatalog previous = _hashItems;
+            if (previous.Sha256 is null)
+                throw new InvalidDataException("The active ItemTemplates digest is unavailable.");
+            if (Convert.ToHexStringLower(SHA256.HashData(content)) != sha256)
+                throw new InvalidDataException("ItemTemplates bytes differ from the expected SHA-256.");
+            if (rollback?.Sha256 == sha256)
+                return rollback;
+
+            ReadOnlySpan<byte> utf8 = content;
+            if (utf8.StartsWith(Encoding.UTF8.Preamble))
+                utf8 = utf8[Encoding.UTF8.Preamble.Length..];
+            HashItemCatalog next = HashItemCatalog.ParseVerified(
+                new UTF8Encoding(encoderShouldEmitUTF8Identifier: false, throwOnInvalidBytes: true).GetString(utf8),
+                previous, templateExists);
+            next.Sha256 = sha256;
+            return next;
+        }
+
+        internal void InstallHashItems(HashItemCatalog loaded)
+        {
+            _logger.Info(
+                string.Format(
+                    CultureInfo.InvariantCulture,
+                    "GameData hash templates={0} hash instances={1} from {2}",
+                    loaded.CategoryCount,
+                    loaded.InstanceCount,
+                    HashItemsPath));
+            _hashItems = loaded;
         }
 
         private void LoadVendingMachines()

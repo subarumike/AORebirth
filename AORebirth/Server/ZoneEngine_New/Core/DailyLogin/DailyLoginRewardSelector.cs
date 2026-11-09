@@ -12,8 +12,25 @@ using ZoneEngine_New.Core.GameData;
 /// <summary>Recovered selection rules over current item templates, without allocating or granting inventory.</summary>
 public sealed class DailyLoginRewardSelector(IItemTemplateCatalog templates, DailyLoginRewardCatalog rewards, IGameData? gameData = null)
 {
-    readonly Dictionary<int, List<HashInstance>> _familyIndex = IndexFamilies(rewards.QualityFamilies.Concat(gameData?.ItemFamilies ?? []));
-    readonly ConcurrentDictionary<int, HashInstance[]> _familyComponents = new();
+    readonly object _familyLock = new();
+    FamilyCache? _familyCache;
+
+    sealed record FamilyCache(IReadOnlyCollection<HashInstance> Source, Dictionary<int, List<HashInstance>> Index)
+    {
+        internal ConcurrentDictionary<int, HashInstance[]> Components { get; } = new();
+    }
+
+    FamilyCache CurrentFamilies()
+    {
+        lock (_familyLock)
+        {
+            IReadOnlyCollection<HashInstance> source = gameData?.ItemFamilies ?? Array.Empty<HashInstance>();
+            if (_familyCache is null || !ReferenceEquals(_familyCache.Source, source))
+                _familyCache = new FamilyCache(source, IndexFamilies(rewards.QualityFamilies.Concat(source)));
+            return _familyCache;
+        }
+    }
+
     public bool TrySelect(int day, int level, int profession, Random random,
         out DailyLoginRewardSelection? selection, out string error)
     {
@@ -27,6 +44,9 @@ public sealed class DailyLoginRewardSelector(IItemTemplateCatalog templates, Dai
         int itemId;
         int quality;
         bool professionNano = string.Equals(reward.QualityMode, "professionVendorNano", StringComparison.OrdinalIgnoreCase);
+        bool scaled = string.Equals(reward.QualityMode, "characterLevel", StringComparison.OrdinalIgnoreCase)
+            || string.Equals(reward.QualityMode, "characterLevelPlusMinus", StringComparison.OrdinalIgnoreCase);
+        FamilyCache? families = scaled || (!professionNano && reward.RandomItemIds is { Length: > 0 }) ? CurrentFamilies() : null;
         if (professionNano)
         {
             if (!TryPickProfessionNano(reward, level, profession, random, out itemId, out quality))
@@ -34,7 +54,7 @@ public sealed class DailyLoginRewardSelector(IItemTemplateCatalog templates, Dai
         }
         else
         {
-            itemId = PickRandomExistingItem(reward.RandomItemIds, random);
+            itemId = families is null ? 0 : PickRandomExistingItem(reward.RandomItemIds, random, families);
             if (itemId <= 0)
                 itemId = reward.ItemId;
             quality = ResolveQuality(reward, level, random);
@@ -47,11 +67,9 @@ public sealed class DailyLoginRewardSelector(IItemTemplateCatalog templates, Dai
 
         int lowId = itemId;
         int highId = itemId;
-        bool scaled = string.Equals(reward.QualityMode, "characterLevel", StringComparison.OrdinalIgnoreCase)
-            || string.Equals(reward.QualityMode, "characterLevelPlusMinus", StringComparison.OrdinalIgnoreCase);
         if (scaled)
         {
-            if (!TryResolveDataFamily(itemId, quality, out lowId, out highId, out int dataQuality))
+            if (!TryResolveDataFamily(itemId, quality, families!, out lowId, out highId, out int dataQuality))
                 ResolveScalePair(itemId, quality, out lowId, out highId);
             else
                 quality = dataQuality;
@@ -72,7 +90,7 @@ public sealed class DailyLoginRewardSelector(IItemTemplateCatalog templates, Dai
         return true;
     }
 
-    int PickRandomExistingItem(int[]? pool, Random random)
+    int PickRandomExistingItem(int[]? pool, Random random, FamilyCache families)
     {
         if (pool is null || pool.Length == 0)
             return 0;
@@ -84,7 +102,7 @@ public sealed class DailyLoginRewardSelector(IItemTemplateCatalog templates, Dai
                 continue;
             valid.Add(id);
             if (TryGetRelationPair(id, out int low, out _) && id == low
-                || IsDataFamilyLowEndpoint(id))
+                || IsDataFamilyLowEndpoint(id, families))
                 lowEndpoints.Add(id);
         }
         List<int> candidates = lowEndpoints.Count > 0 ? lowEndpoints : valid;
@@ -176,20 +194,20 @@ public sealed class DailyLoginRewardSelector(IItemTemplateCatalog templates, Dai
         }
     }
 
-    bool IsDataFamilyLowEndpoint(int itemId)
+    bool IsDataFamilyLowEndpoint(int itemId, FamilyCache families)
     {
         if (!templates.TryGet(itemId, out ItemTemplate seed))
             return false;
-        int[] qualities = FamilyComponent(itemId).SelectMany(family => family.TemplateIds)
+        int[] qualities = FamilyComponent(itemId, families).SelectMany(family => family.TemplateIds)
             .Distinct().Where(id => templates.TryGet(id, out _)).Select(id => templates.Require(id).Quality).ToArray();
         return qualities.Length > 0 && qualities.Min() < qualities.Max() && seed.Quality == qualities.Min();
     }
 
-    bool TryResolveDataFamily(int itemId, int wanted, out int lowId, out int highId, out int quality)
+    bool TryResolveDataFamily(int itemId, int wanted, FamilyCache cache, out int lowId, out int highId, out int quality)
     {
         lowId = highId = itemId;
         quality = wanted;
-        HashInstance[] families = FamilyComponent(itemId)
+        HashInstance[] families = FamilyComponent(itemId, cache)
             .Where(family => family.TemplateIds.All(id => templates.TryGet(id, out _))).ToArray();
         if (families.Length == 0)
             return false;
@@ -215,8 +233,8 @@ public sealed class DailyLoginRewardSelector(IItemTemplateCatalog templates, Dai
         return found;
     }
 
-    HashInstance[] FamilyComponent(int seed)
-        => _familyComponents.GetOrAdd(seed, id =>
+    static HashInstance[] FamilyComponent(int seed, FamilyCache cache)
+        => cache.Components.GetOrAdd(seed, id =>
         {
             var seen = new HashSet<int> { id };
             var families = new HashSet<HashInstance>();
@@ -224,7 +242,7 @@ public sealed class DailyLoginRewardSelector(IItemTemplateCatalog templates, Dai
             pending.Enqueue(id);
             while (pending.TryDequeue(out int current))
             {
-                if (!_familyIndex.TryGetValue(current, out List<HashInstance>? related))
+                if (!cache.Index.TryGetValue(current, out List<HashInstance>? related))
                     continue;
                 foreach (HashInstance family in related)
                 {

@@ -49,6 +49,28 @@ namespace ZoneEngine_New.Core.Quests
         /// <summary>Every loaded template (read-only after load).</summary>
         public IEnumerable<QuestTemplate> Templates => _templates.Values;
 
+        // The quest loader freezes hash-named start item endpoints into its published templates.
+        internal void RequireCompatibleItemTemplates(HashItemCatalog current, HashItemCatalog proposed)
+        {
+            var before = new List<HashInstance>();
+            var after = new List<HashInstance>();
+            foreach (QuestTemplate template in Templates)
+            {
+                foreach (QuestRewardItem startItem in template.StartItems ?? [])
+                {
+                    if (startItem.Hash is not { Length: > 0 } hash)
+                        continue;
+                    before.Clear();
+                    after.Clear();
+                    current.CollectLeafInstances(hash, before);
+                    proposed.CollectLeafInstances(hash, after);
+                    if (before.Count != after.Count || (before.Count == 1
+                        && !before[0].TemplateIds.AsSpan().SequenceEqual(after[0].TemplateIds)))
+                        throw new InvalidDataException($"Item hash {hash} changes the loaded start item binding for quest {template.Hash}.");
+                }
+            }
+        }
+
         /// <summary>Reads the file (through the GameData override folder) and swaps it in; on any error the old templates stay.</summary>
         public GameDataReloadResult Reload()
         {

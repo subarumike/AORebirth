@@ -2,10 +2,12 @@ namespace ZoneEngine_New.Core.GameData
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Threading;
 
     using AORebirth.Modules.Content;
 
+    using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Knubot;
     using ZoneEngine_New.Core.Mobs;
     using ZoneEngine_New.Core.NpcScripts;
@@ -53,6 +55,38 @@ namespace ZoneEngine_New.Core.GameData
 
         public IReadOnlyList<string> Names { get; }
 
+        internal ItemTemplatesStatus ItemTemplatesStatus()
+        {
+            lock (_reloadLock)
+                return (_byName.GetValueOrDefault("ItemTemplates") as ItemTemplatesReload)?.Status() ?? default;
+        }
+
+        internal GameDataReloadResult VerifyItemTemplates(string sha256, byte[]? validationContent, IItemTemplateCatalog items,
+            out ItemTemplatesStatus status)
+        {
+            lock (_reloadLock)
+            {
+                if (_byName.GetValueOrDefault("ItemTemplates") is not ItemTemplatesReload reload)
+                {
+                    status = default;
+                    return new GameDataReloadResult("ItemTemplates", false, 0, ["ItemTemplates is not reloadable."]);
+                }
+
+                try
+                {
+                    return reload.Verify(sha256, validationContent, items);
+                }
+                catch (Exception exception)
+                {
+                    return new GameDataReloadResult("ItemTemplates", false, reload.Status().Entries, [exception.Message]);
+                }
+                finally
+                {
+                    status = reload.Status();
+                }
+            }
+        }
+
         /// <summary>
         /// Reloads <paramref name="name"/>. An unknown name, or a catalog that throws, reports a problem instead of
         /// throwing. Reads files: never call it on a playfield tick.
@@ -78,6 +112,8 @@ namespace ZoneEngine_New.Core.GameData
             }
         }
     }
+
+    internal readonly record struct ItemTemplatesStatus(string? Sha256, string? Path, int Entries);
 
     /// <summary>MonsterCombatRules.json: NPC features (via NpcTemplates' RuleFeatures), hates and pets.</summary>
     public sealed class MonsterCombatRulesReload(IGameData gameData) : IReloadableGameData
@@ -118,12 +154,59 @@ namespace ZoneEngine_New.Core.GameData
     /// the old catalog, so they are dropped as well.
     /// </summary>
     public sealed class ItemTemplatesReload(IGameData gameData, KnubotCatalog knubot,
-        ZoneEngine_New.Core.Inventory.HashItemMinter minter)
+        HashItemMinter minter)
         : IReloadableGameData
     {
+        internal const int MaxCatalogBytes = 32 * 1024 * 1024;
+        HashItemCatalog? _previousItems;
         public string Name => "ItemTemplates";
 
         public IReadOnlyList<string> Files { get; } = [GameDataPaths.ItemTemplatesFileName];
+
+        internal ItemTemplatesStatus Status() => gameData is GameDataStore store
+            ? new(store.LoadedHashItemsSha256, store.HashItemsPath, store.HashInstanceCount)
+            : default;
+
+        internal GameDataReloadResult Verify(string sha256, byte[]? validationContent, IItemTemplateCatalog items)
+        {
+            if (gameData is not GameDataStore store)
+                return new GameDataReloadResult(Name, false, 0, ["this zone's GameData does not reload ItemTemplates"]);
+            if (items.Templates.Count == 0)
+                throw new InvalidDataException("The active items.dat template index is unavailable.");
+
+            byte[] content;
+            if (validationContent is null)
+            {
+                using FileStream source = File.OpenRead(store.HashItemsPath);
+                if (source.Length is <= 0 or > MaxCatalogBytes)
+                    throw new InvalidDataException("ItemTemplates exceeds the supported file size or is empty.");
+                content = new byte[(int)source.Length];
+                source.ReadExactly(content);
+                if (source.ReadByte() != -1)
+                    throw new InvalidDataException("ItemTemplates changed while being read.");
+            }
+            else
+            {
+                if (validationContent.Length is <= 0 or > MaxCatalogBytes)
+                    throw new InvalidDataException("ItemTemplates exceeds the supported file size or is empty.");
+                content = validationContent;
+            }
+
+            HashItemCatalog current = store.LoadedHashItems;
+            HashItemCatalog prepared = store.PrepareHashItems(sha256, content, id => items.TryGet(id, out _), _previousItems);
+            KnubotLoadResult scripts = knubot.WithItemTemplates(current, prepared, validationContent is null
+                ? () =>
+                {
+                    store.InstallHashItems(prepared);
+                    minter.ClearCaches();
+                    if (current.Sha256 != prepared.Sha256)
+                        _previousItems = current;
+                }
+                : null);
+            return scripts.Problems.Count == 0
+                ? new GameDataReloadResult(Name, true, prepared.InstanceCount, [])
+                : new GameDataReloadResult(Name, false, store.HashInstanceCount, scripts.Problems);
+        }
 
         public GameDataReloadResult Reload()
         {
@@ -134,6 +217,7 @@ namespace ZoneEngine_New.Core.GameData
             if (!items.Ok)
                 return items;
 
+            _previousItems = null;
             minter.ClearCaches();
             KnubotLoadResult scripts = knubot.Reload();
             if (scripts.Problems.Count == 0)
