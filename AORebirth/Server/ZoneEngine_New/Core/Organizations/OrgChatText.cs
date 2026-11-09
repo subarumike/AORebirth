@@ -122,6 +122,10 @@ namespace ZoneEngine_New.Core.Organizations
         public static string GmDisbandedOrgMessage(string gmName)
             => "Org Message: The GM " + gmName + " has disbanded your organization.";
 
+        /// <summary>Org Msg after two members remove a member by quorum (Text.json 169766805). Plain text: no ref captured.</summary>
+        public static string QuorumMemberKickedOrgMessage(string kickers, string kicked)
+            => kickers + " kicked " + kicked + " from your organization.";
+
         /// <summary>Org Msg after three members remove the leader (Text.json 33408158). Plain text: no ref captured.</summary>
         public static string QuorumLeaderKickedOrgMessage(string first, string second, string third, string leaderName)
             => first + ", " + second + " and " + third + " kicked " + leaderName + " from the organization.";

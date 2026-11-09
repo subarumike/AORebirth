@@ -32,6 +32,10 @@ namespace ZoneEngine_New.Core.Data
         /// <summary>Stores the remaining organization lockout seconds of one character.</summary>
         void SaveLockout(int characterId, string characterName, long secondsRemaining);
 
+        /// <summary>Stores one Anarchism kick request under the organization lock; reached quorums consume their requests.</summary>
+        AORebirth.Interfaces.Persistence.Characters.PersistedAnarchistKickResult RecordAnarchistKick(int organizationId,
+            int kickedId, string kickedName, int kickerId, string kickerName, int memberQuorum, int leaderQuorum);
+
         /// <summary>Removes the membership of one character (leave, kick, side change).</summary>
         void ClearMembership(int characterId);
 

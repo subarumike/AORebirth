@@ -19,7 +19,7 @@ namespace ZoneEngine_New.Core.Organizations
 
     /// <summary>
     /// Membership ends outside the join path: leave, disband, kick (GM, rank, anarchist quorum) and side change.
-    /// Notice ids are Text.json ids; the anarchist quorum is kept in memory until its table exists.
+    /// Notice ids are Text.json ids; the anarchist quorum is persisted in org_anar_pend_kick.
     /// </summary>
     public sealed class OrgMembershipService
     {
@@ -28,6 +28,7 @@ namespace ZoneEngine_New.Core.Organizations
         const int KickCategory = 110;
         const int LeaveNotice = 45846567;
         const int MembersDisbandedNotice = 143442663;
+        const int AnarchismKicksRemaining = 233638763;
         const int GmDisbandedNotice = 28601677;
         const int LeaderDisbandedBySideChange = 35204276;
         const int MemberKickedBySideChange = 181448347;
@@ -42,8 +43,6 @@ namespace ZoneEngine_New.Core.Organizations
         const int RankKickGap = 3;
         const string LeaveCommand = "#aorebirth-org-leave ";
 
-        sealed record Requester(int Id, string Name);
-
         sealed record MemberRef(int Id, string Name, Player? Online);
 
         readonly IOrganizationRepository _organizations;
@@ -53,8 +52,6 @@ namespace ZoneEngine_New.Core.Organizations
         readonly Lazy<PlayfieldManager> _playfields;
         readonly IGameData _gameData;
         readonly GameplaySettings _settings;
-        readonly object _gate = new();
-        readonly Dictionary<(int OrgId, int TargetId), List<Requester>> _pendingKicks = new();
 
         // Lazy: PlayfieldManager holds this service, so eager resolution would be a cycle.
         public OrgMembershipService(IOrganizationRepository organizations, OrgLockoutClock lockouts, IChatEngineLink chat,
@@ -147,11 +144,6 @@ namespace ZoneEngine_New.Core.Organizations
                 _chat.SendOrganizationMessage(org.Id, orgMessage);
 
             _organizations.Disband(org.Id);
-            lock (_gate)
-            {
-                foreach (var key in _pendingKicks.Keys.Where(k => k.OrgId == org.Id).ToList())
-                    _pendingKicks.Remove(key);
-            }
 
             foreach (MemberRef member in members)
             {
@@ -232,51 +224,48 @@ namespace ZoneEngine_New.Core.Organizations
 
         void RegisterAnarchismRequest(Player actor, OrganizationRecord org, MemberRef target)
         {
-            int quorum = target.Id == org.LeaderId ? LeaderQuorum : MemberQuorum;
-            var key = (org.Id, target.Id);
-            int actorId = actor.Identity.Instance;
-            List<Requester> reached;
-
-            lock (_gate)
+            // The repository decides under the organization lock; a repeat request by the same kicker is a no-op.
+            PersistedAnarchistKickResult result = _organizations.RecordAnarchistKick(org.Id, target.Id, target.Name,
+                actor.Identity.Instance, actor.Name ?? string.Empty, MemberQuorum, LeaderQuorum);
+            if (result.Outcome == AnarchistKickOutcome.Recorded)
             {
-                if (!_pendingKicks.TryGetValue(key, out List<Requester>? pending))
-                {
-                    pending = new List<Requester>();
-                    _pendingKicks[key] = pending;
-                }
-
-                if (pending.Any(r => r.Id == actorId))
-                    return;
-
-                pending.Add(new Requester(actorId, actor.Name ?? string.Empty));
-                if (pending.Count < quorum)
-                    return;
-
-                _pendingKicks.Remove(key);
-                reached = pending;
+                int required = result.TargetIsLeader ? LeaderQuorum : MemberQuorum;
+                ClientFeedback.SendFormattedInCategory(actor, MemberCategory, AnarchismKicksRemaining,
+                    required - result.Requesters.Count);
+                return;
             }
 
-            if (target.Id == org.LeaderId)
-                KickLeaderByQuorum(org, target, reached);
+            if (result.Outcome != AnarchistKickOutcome.Reached)
+                return;
+
+            if (result.TargetIsLeader)
+                KickLeaderByQuorum(org, target, result.Requesters);
             else
-                KickMember(org, target, _settings.Org.KickLockoutSeconds, KickCategory, KickedByMember, reached[^1].Name);
+            {
+                string last = result.Requesters[result.Requesters.Count - 1].KickerName;
+                string kickers = result.Requesters[0].KickerName + " and " + last;
+                _chat.SendOrganizationMessage(org.Id, OrgChatText.QuorumMemberKickedOrgMessage(kickers, target.Name));
+                KickMember(org, target, _settings.Org.KickLockoutSeconds, KickCategory, KickedByMember, last);
+            }
         }
 
-        void KickLeaderByQuorum(OrganizationRecord org, MemberRef leader, IReadOnlyList<Requester> requesters)
+        void KickLeaderByQuorum(OrganizationRecord org, MemberRef leader, IList<PersistedAnarchistKickerData> requesters)
         {
-            string first = requesters[0].Name;
-            string second = requesters[1].Name;
-            string third = requesters[2].Name;
+            string first = requesters[0].KickerName;
+            string second = requesters[1].KickerName;
+            string third = requesters[2].KickerName;
 
             _chat.SendOrganizationMessage(org.Id, OrgChatText.QuorumLeaderKickedOrgMessage(first, second, third, leader.Name));
             KickMember(org, leader, _settings.Org.AnarchistLeaderKickLockoutSeconds, MemberCategory,
                 QuorumLeaderKickedLeader, first, second, third);
 
-            // The new leader is one of the three members who requested the kick.
-            Requester successor = requesters[Random.Shared.Next(requesters.Count)];
-            _organizations.SaveLeader(org.Id, successor.Id);
+            // The new leader is drawn among the three members who requested the kick.
+            PersistedAnarchistKickerData successor = requesters[Random.Shared.Next(LeaderQuorum)];
+            _organizations.SaveLeader(org.Id, successor.KickerId);
+            _chat.SendOrganizationMessage(org.Id,
+                OrgChatText.Wrap(OrgChatRefs.LeadershipGivenOrg + OrgChatText.TextArg(successor.KickerName)));
 
-            OrganizationRecord updated = org with { LeaderId = successor.Id, LeaderName = successor.Name };
+            OrganizationRecord updated = org with { LeaderId = successor.KickerId, LeaderName = successor.KickerName };
             foreach (Player member in _playfields.Value.SnapshotPlayers())
             {
                 if (member.Organization?.Id == org.Id)
@@ -287,9 +276,6 @@ namespace ZoneEngine_New.Core.Organizations
         void KickMember(OrganizationRecord org, MemberRef target, long lockoutSeconds, int category, int messageId,
             params object[] args)
         {
-            lock (_gate)
-                _pendingKicks.Remove((org.Id, target.Id));
-
             _lockouts.Add(target.Id, target.Name, lockoutSeconds);
             _organizations.ClearMembership(target.Id);
 
