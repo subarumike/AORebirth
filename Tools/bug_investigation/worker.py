@@ -355,17 +355,19 @@ def investigate(db, args, report, fingerprint, previous):
         raise InvestigationError("Could not collect local evidence.") from None
 
 
-def process_pending(db, feed, args):
+def process_pending(db, feed, args, *, selected=None):
     failed = False
+    selected_id = selected[0]["id"] if selected else None
     while True:
         job = db.execute("""
             SELECT id, result FROM jobs WHERE state = 'pending' AND retry_at <= ?
+            AND (? IS NULL OR id = ?)
             ORDER BY retry_at, id LIMIT 1
-        """, (int(time.time()),)).fetchone()
+        """, (int(time.time()), selected_id, selected_id)).fetchone()
         if job is None:
             return failed
         report_id = job["id"]
-        record = feed.detail(report_id)
+        record = selected if selected is not None else feed.detail(report_id)
         if record is None:
             with db:
                 db.execute("UPDATE jobs SET state = 'closed' WHERE id = ?", (report_id,))
@@ -430,15 +432,26 @@ def run(db, args):
     while True:
         try:
             with exclusive_sweep(args.db):
+                selected = None
+                if args.report_id is not None:
+                    selected = feed.detail(args.report_id)
+                    if selected is None:
+                        raise FeedError(f"Report {args.report_id} is not open or accessible.")
                 args.repair_base = prepare(args) if args.repair_plan else None
-                # Sweep from zero to recover reopened or out-of-order reports.
-                for records in feed.pages():
+                if selected is not None:
                     with db:
-                        for report, fingerprint in records:
-                            enqueue(db, report, fingerprint)
-                failed = process_pending(db, feed, args)
+                        enqueue(db, *selected)
+                else:
+                    # Sweep from zero to recover reopened or out-of-order reports.
+                    for records in feed.pages():
+                        with db:
+                            for report, fingerprint in records:
+                                enqueue(db, report, fingerprint)
+                failed = process_pending(db, feed, args, selected=selected)
                 if args.repair_plan:
-                    failed = process_repairs(db, args, feed, propose) or failed
+                    failed = process_repairs(
+                        db, args, feed, propose, selected_id=args.report_id,
+                    ) or failed
         except FeedError as error:
             print(error, file=sys.stderr, flush=True)
             failed = True
@@ -469,6 +482,7 @@ def main():
     polling.add_argument("--evidence-dir", type=Path, action="append", default=[])
     polling.add_argument("--synthetic", action="store_true", help="Allow only a loopback HTTP fixture.")
     polling.add_argument("--repair-plan", type=Path, help="Trusted local JSON plan enabling draft repairs.")
+    polling.add_argument("--report-id", type=positive, help="Retrieve and process only this open report.")
     polling.add_argument("--timeout", type=positive, default=180, help="Codex timeout in seconds.")
     polling.add_argument("--poll-seconds", type=int, default=0, help="Zero runs one sweep.")
     for name in ("show", "requeue"):
@@ -480,6 +494,8 @@ def main():
     if args.command == "run":
         if args.poll_seconds < 0:
             parser.error("--poll-seconds must be nonnegative.")
+        if args.report_id is not None and (not valid_id(args.report_id) or args.poll_seconds):
+            parser.error("--report-id requires a valid website ID and a single sweep.")
         args.source = args.source.resolve(strict=True)
         if not (args.source / "AORebirth/Server/ZoneEngine_New").is_dir():
             raise WorkerError("The source must be an AORebirth checkout with ZoneEngine_New.")

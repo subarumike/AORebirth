@@ -286,9 +286,13 @@ def repair_one(db, args, feed, job, result, state, run_codex):
         print(f"Bug {report_id}: draft {url}", flush=True)
 
 
-def process_repairs(db, args, feed, run_codex):
+def process_repairs(db, args, feed, run_codex, *, selected_id=None):
     failed = False
-    for job in db.execute("SELECT id, fingerprint, result FROM jobs WHERE state = 'done' ORDER BY id").fetchall():
+    jobs = db.execute("""
+        SELECT id, fingerprint, result FROM jobs
+        WHERE state = 'done' AND (? IS NULL OR id = ?) ORDER BY id
+    """, (selected_id, selected_id)).fetchall()
+    for job in jobs:
         result = json.loads(job["result"])
         if result["classification"] not in {"DIRECT_FIX", "ADDITIONAL_IMPLEMENTATION"} or not result.get("repair_ready"):
             continue

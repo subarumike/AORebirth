@@ -2,6 +2,8 @@
 
 Run `python -B Tools/bug_investigation/worker.py --db <private-queue> run --api-url <https-feed> --token-file <private-bearer-file> --poll-seconds 60` after the website feed is deployed. Omit `--poll-seconds` for a single sweep. Use `show <ID>` or `requeue <ID>` with the same `--db`. Repeat `--evidence-dir` for approved local evidence folders.
 
+For the first real report, use `--report-id <website-ID>` in place of `--poll-seconds 60`. This selects the authenticated detail route and limits investigation and optional draft repair to that ID. Rerunning the same ID preserves an unchanged completed result.
+
 Add `--repair-plan <private-json>` to enable draft repairs. Keep the plan, queue, and token in an operator-private directory outside the source and evidence trees.
 
 ```json
