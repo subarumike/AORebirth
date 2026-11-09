@@ -106,10 +106,12 @@ All development work originates on Windows, including:
 - acceptance testing;
 - approval of work for deployment.
 
-All feature work originates in public master through Windows development. Before
-each Windows build, synchronize the local integration checkout to freshly
-fetched public master and reconcile all approved private upstream content
-changes. Windows build/startup readiness stops for Mike's testing; only his
+All feature work originates in public master through Windows development. For
+governed Windows release builds, use freshly fetched master or the exact
+approved ancestor verified by the ZoneEngine-only patch selection contract.
+Check private upstream content and reconcile any approved changes in the
+normal release path. The selected runtime patch requires unchanged GameData.
+Windows build/startup readiness stops for Mike's testing; only his
 explicit acceptance of the exact source/dump/manifest/receipt permits Linux
 release work. Automated readiness does not imply user acceptance.
 

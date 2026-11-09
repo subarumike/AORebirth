@@ -30,8 +30,11 @@ never silently escalates PATCH MODE.
 
 PATCH MODE follows this sequence:
 
-1. Fetch and synchronize current public Windows master; require
-   LOCAL_WINDOWS_SOURCE_SHA == PUBLIC_MASTER_SHA.
+1. Fetch current public master and record its tip. Normally synchronize
+   Windows to the tip. An explicitly approved ZoneEngine-only runtime patch
+   may select an exact ancestor verified against the existing private patch
+   plan, its installed baseline and dependency closure. Require
+   LOCAL_WINDOWS_SOURCE_SHA == PUBLIC_MASTER_SHA for the selected source.
 2. Check the configured PRIVATE_CONTENT_UPSTREAM on every build. Reconcile only
    actual approved GameData additions, modifications and removals; preserve
    legitimate private runtime repairs and generated runtime content.
@@ -129,10 +132,17 @@ deployment-tooling access and publication rules remain in force.
 
 ## Windows preparation and acceptance
 
-1. Fetch public master and record the exact `PUBLIC_MASTER_SHA`.
-2. Synchronize the Windows checkout to that SHA, preserving unrelated work.
-   Before compiling, require `LOCAL_WINDOWS_SOURCE_SHA == PUBLIC_MASTER_SHA`.
-   Uncommitted product/runtime changes are not an accepted substitute.
+1. Fetch public master and record its exact tip. Use that tip as
+   `PUBLIC_MASTER_SHA` for full and ordinary releases.
+2. For an explicitly selected ZoneEngine-only runtime patch, require the
+   approved SHA-256 of the existing private planner JSON. Recompute the plan
+   from the installed baseline, verify the selected source is an ancestor of
+   the fetched tip, and verify the exact Zone-only dependency closure and
+   unchanged content and schema. Record the selected SHA as
+   `PUBLIC_MASTER_SHA` and retain the fetched tip and plan separately.
+   Require `LOCAL_WINDOWS_SOURCE_SHA == PUBLIC_MASTER_SHA` and no unapproved
+   checkout changes before compilation. Record verified reuse of unchanged
+   engine binaries separately from fresh compilation.
 3. Fetch/check `PRIVATE_CONTENT_UPSTREAM` and record `CONTENT_DUMP_SHA` on every
    build/release attempt. Missing access or an unknown current upstream SHA
    fails closed, even when a cached content tree exists.

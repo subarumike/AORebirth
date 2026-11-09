@@ -40,8 +40,12 @@ never silently escalates PATCH MODE.
 
 PATCH MODE follows this sequence:
 
-1. Fetch and synchronize current public Windows master; require
-   LOCAL_WINDOWS_SOURCE_SHA == PUBLIC_MASTER_SHA.
+1. Fetch current public master and record its tip. Normally synchronize
+   Windows to that tip. An explicitly approved ZoneEngine-only runtime patch
+   may use the exact selected ancestor after replaying the existing private
+   patch plan and verifying its dependency closure and unchanged GameData and
+   schema. Require LOCAL_WINDOWS_SOURCE_SHA == PUBLIC_MASTER_SHA, where the
+   latter is the selected source for that patch.
 2. Check the configured PRIVATE_CONTENT_UPSTREAM on every build. Reconcile only
    actual approved GameData additions, modifications and removals; preserve
    legitimate private runtime repairs and generated runtime content.
@@ -162,6 +166,8 @@ root. Source/content changes invalidate that validation. Its receipt is marked
 authorize product publishing, release startup, acceptance or Linux release work.
 Normal production builds still use the existing approved build wrapper and
 require freshly fetched public-master source and reconciled private content.
+The explicitly selected runtime patch path uses the same release contract
+and the verified scoped compilation it authorizes.
 Feature validation never replaces the Windows acceptance and release sequence.
 
 The [build/release contract](docs/project/BUILD_RELEASE_CONTRACT.md) governs
@@ -171,8 +177,11 @@ every build and release. Its mandatory sequence is:
 
 Public GitHub `subarumike/AORebirth` branch `master` is the only product/runtime
 source authority. The local Windows checkout is an integration/build environment,
-not an independent authority. Before every Windows build require
-`LOCAL_WINDOWS_SOURCE_SHA == PUBLIC_MASTER_SHA` for the freshly fetched master.
+not an independent authority. Governed Windows builds require
+`LOCAL_WINDOWS_SOURCE_SHA == PUBLIC_MASTER_SHA`. Full and ordinary releases
+use the freshly fetched master tip. The explicit scoped runtime patch path
+records that tip separately as authority and freezes the verified selected
+ancestor as `PUBLIC_MASTER_SHA`.
 
 Check the configured private content upstream on every build/release attempt;
 unknown or inaccessible upstream content fails closed. Reconcile every approved
