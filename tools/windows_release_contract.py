@@ -2668,7 +2668,7 @@ def explicit_mike_acceptance(evidence, expected):
     if re.search(negative, text) or re.search(r"\breject(?:ed|ing)?\b", text):
         raise ValueError("Human evidence does not explicitly accept this build")
     # Questions and isolated approval vocabulary cannot manufacture a human acceptance.
-    affirmative = r"(?:^|[.!;\n]\s*)(?:i (?:accept|approve)\b|looks good\b|works on windows\b|working on windows\b|windows works\b|(?:this|it|the build|windows build) (?:works|is good|is accepted|is approved)\b)"
+    affirmative = r"(?:^|[.!;\n]\s*)(?:i (?:explicitly )?(?:accept|approve)\b|looks good\b|works on windows\b|working on windows\b|windows works\b|(?:this|it|the build|windows build) (?:works|is good|is accepted|is approved)\b)"
     direct = any("?" not in sentence and re.search(affirmative, sentence)
                  for sentence in re.split(r"(?<=[.!;\n])", text))
     prompted = text in ("yes", "yes.", "accept", "approve") and all(
