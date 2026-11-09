@@ -1260,6 +1260,149 @@ class ReleaseContractTests(unittest.TestCase):
         self.assertLess(script.index("verify-build-token"), script.index("stop-engines.cmd"))
 
 
+class PatchSourceSelectionTests(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory()
+        self.addCleanup(temporary.cleanup)
+        self.parent = Path(temporary.name)
+        self.root = self.parent / "product"
+        self.root.mkdir()
+        self.git("init", "-b", "master")
+        self.git("config", "user.name", "Release gate fixture")
+        self.git("config", "user.email", "fixture@example.invalid")
+        self.git("config", "core.autocrlf", "false")
+        self.tool = self.root / gate.PATCH_TOOL
+        self.tool.parent.mkdir()
+        self.tool.write_bytes(b"old gate\n")
+        self.zone = self.root / "AORebirth/Server/ZoneEngine_New/Zone.cs"
+        self.zone.parent.mkdir(parents=True)
+        self.zone.write_bytes(b"old Zone\n")
+        self.base = self.commit("installed")
+        self.zone.write_bytes(b"selected Zone\n")
+        self.selected = self.commit("selected")
+        self.tool.write_bytes(b"approved gate\n")
+        self.tool_sha = self.commit("reviewed tooling")
+        (self.root / "unrelated.txt").write_bytes(b"later unrelated work\n")
+        self.authority = self.commit("latest master")
+        self.git("checkout", "--detach", self.selected)
+        self.tool.write_bytes(b"approved gate\n")
+        self.path = self.parent / "selection.json"
+        change = {"PATH": self.zone.relative_to(self.root).as_posix(), "BEFORE": ["100644", "blob", "1" * 40],
+                  "AFTER": ["100644", "blob", "2" * 40]}
+        self.selection = {
+            "FORMAT_VERSION": 1, "PATCH_CLASS": "RUNTIME_PATCH", "EXISTING_BUILDER_SCOPE": "ZONE_ONLY",
+            "INSTALLED_BASELINE_SHA256": "1" * 64, "INSTALLED_PUBLIC_SHA": self.base, "INSTALLED_LINUX_SHA": "2" * 40,
+            "INSTALLED_CONTENT_DUMP_SHA": DUMP, "INSTALLED_GAMEDATA_MANIFEST": "3" * 64,
+            "TARGET_PUBLIC_SHA": self.selected, "TARGET_PUBLIC_TREE": self.git("rev-parse", self.selected + "^{tree}"),
+            "TARGET_LINUX_SHA": "4" * 40, "TARGET_CONTENT_DUMP_SHA": DUMP, "TARGET_GAMEDATA_MANIFEST": "3" * 64,
+            "SELECTED_PUBLIC_COMMITS": [self.selected], "SOURCE_CHANGES": [change],
+            "IMPACTED_ENGINES": ["zoneengine"], "REUSED_ENGINES": ["chatengine", "loginengine", "worldengine"],
+            "REQUIRED_MIGRATIONS": [], "SCHEMA_COMPATIBILITY_AND_ROLLBACK_REQUIRED": False,
+            "ENGINE_INPUTS": {
+                name: {"BEFORE_INPUTS_SHA256": "5" * 64, "AFTER_INPUTS_SHA256": ("6" if name == "zoneengine" else "5") * 64,
+                       "CHANGED_INPUTS": [change] if name == "zoneengine" else []}
+                for name in ("zoneengine", "chatengine", "loginengine", "worldengine")
+            },
+        }
+        planner = mock.patch.object(gate, "verify_patch_planner")
+        self.verify_planner = planner.start()
+        self.addCleanup(planner.stop)
+
+    def git(self, *args):
+        return gate.git(self.root, *args).decode().strip()
+
+    def commit(self, message):
+        self.git("add", "--all")
+        self.git("commit", "-m", message)
+        return self.git("rev-parse", "HEAD")
+
+    def store_selection(self):
+        raw = gate.encoded(self.selection) + b"\n"
+        self.path.write_bytes(raw)
+        return gate.digest(raw)
+
+    def verify(self, expected=None):
+        return gate.verify_patch_source(self.root, {}, self.authority, self.path,
+                                        expected if expected is not None else self.store_selection(), self.tool_sha)
+
+    def test_full_release_rejects_ancestor_patch_and_accepts_exact_current_master(self):
+        with self.assertRaisesRegex(ValueError, "LOCAL_WINDOWS_SOURCE_SHA"):
+            gate.source_exact(self.root, self.authority)
+        self.git("checkout", "--force", "--detach", self.authority)
+        gate.source_exact(self.root, self.authority)
+
+    def test_selected_ancestor_stays_valid_when_master_advances(self):
+        expected = self.store_selection()
+        self.assertEqual(self.verify(expected), self.selection)
+        self.git("checkout", "--force", "--detach", self.authority)
+        (self.root / "unrelated.txt").write_bytes(b"another newer tip\n")
+        self.authority = self.commit("more master advancement")
+        self.git("checkout", "--detach", self.selected)
+        self.tool.write_bytes(b"approved gate\n")
+        self.assertEqual(self.verify(expected), self.selection)
+        self.verify_planner.assert_called_with({}, self.path, expected, self.selection, self.authority)
+
+    def test_local_only_commit_outside_master_is_rejected(self):
+        self.zone.write_bytes(b"unpublished Zone\n")
+        local = self.commit("local branch")
+        self.selection.update(TARGET_PUBLIC_SHA=local, TARGET_PUBLIC_TREE=self.git("rev-parse", local + "^{tree}"),
+                              SELECTED_PUBLIC_COMMITS=[local])
+        with self.assertRaisesRegex(ValueError, "outside freshly fetched public master"):
+            self.verify()
+        self.verify_planner.assert_not_called()
+
+    def test_altered_checkout_and_modified_gate_are_rejected(self):
+        self.zone.write_bytes(b"working tree drift\n")
+        with self.assertRaisesRegex(ValueError, "runtime/build source differs"):
+            self.verify()
+        self.git("restore", "--", self.zone.relative_to(self.root).as_posix())
+        self.tool.write_bytes(b"altered gate\n")
+        with self.assertRaisesRegex(ValueError, "tooling differs"):
+            self.verify()
+
+    def test_incorrect_selection_digest_is_rejected(self):
+        self.store_selection()
+        with self.assertRaisesRegex(ValueError, "selection SHA-256 differs"):
+            self.verify("0" * 64)
+
+    def test_unauthorized_game_data_or_schema_paths_are_rejected(self):
+        for path in ("AORebirth/GameData/ItemTemplates.json", "AORebirth/Libraries/Source/AORebirth.Database/Migrations/change.sql"):
+            with self.subTest(path=path):
+                self.selection["SOURCE_CHANGES"][0]["PATH"] = path
+                with self.assertRaisesRegex(ValueError, "unauthorized GameData or schema"):
+                    self.verify()
+
+    def test_unexpected_game_data_or_migrations_are_rejected(self):
+        for key, changed in (("TARGET_GAMEDATA_MANIFEST", "8" * 64), ("REQUIRED_MIGRATIONS", ["new.sql"])):
+            with self.subTest(key=key):
+                old, self.selection[key] = self.selection[key], changed
+                with self.assertRaisesRegex(ValueError, "unchanged GameData and schema"):
+                    self.verify()
+                self.selection[key] = old
+
+    def test_missing_dependency_engine_or_changed_shared_inputs_are_rejected(self):
+        closure = self.selection["ENGINE_INPUTS"]
+        login = closure.pop("loginengine")
+        with self.assertRaisesRegex(ValueError, "Complete patch engine dependency closure"):
+            self.verify()
+        closure["loginengine"] = login
+        login["AFTER_INPUTS_SHA256"] = "7" * 64
+        login["CHANGED_INPUTS"] = self.selection["SOURCE_CHANGES"]
+        with self.assertRaisesRegex(ValueError, "non-Zone patch dependency closure"):
+            self.verify()
+
+    def test_scoped_admission_preserves_only_exact_published_historical_catalogs(self):
+        path = "Missions/RollBodies.json"
+        actual = {path: {"path": path, "size": 3, "sha256": "1" * 64, "blob": "2" * 40}}
+        plan = {"SOURCE_SNAPSHOTS": {"PUBLIC_PRODUCT_DATA": {"AFTER": {path: {"size": 3, "blob": "2" * 40}}}}}
+        with self.assertRaisesRegex(ValueError, "Canonical runtime admission"):
+            gate.validate_runtime_exclusions(self.root, plan, actual, portable=True)
+        gate.validate_runtime_exclusions(self.root, plan, actual, portable=True, selected_patch=True)
+        actual[path]["blob"] = "3" * 40
+        with self.assertRaisesRegex(ValueError, "Canonical runtime admission"):
+            gate.validate_runtime_exclusions(self.root, plan, actual, portable=True, selected_patch=True)
+
+
 @unittest.skipUnless(os.name == "nt", "Real Windows MSBuild regression requires Windows")
 class DeveloperMSBuildTests(unittest.TestCase):
     """Compile one harmless temporary class; never build or start an AORebirth engine."""

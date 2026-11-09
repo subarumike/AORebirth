@@ -19,6 +19,7 @@ import stat
 import struct
 import subprocess
 import sys
+import tempfile
 from datetime import datetime, timezone
 import uuid
 import xml.etree.ElementTree as ET
@@ -35,6 +36,14 @@ PRODUCT_PATHS = ("AORebirth/Server", "AORebirth/Libraries", "AORebirth/Config", 
                  "NewZoneEngineBuild", "Tools/DatabaseMigrationTool", "Directory.Build.targets", "tools/windows_release_contract.py",
                  "tools/windows_release_contract.cmd", "tools/build_aorebirth_debug.cmd", "start-engines.cmd", "start-engines.ps1")
 CONFIG_OVERRIDES = {"AORebirth/Config/Config.xml", "AORebirth/Config/ChatEngine.Config.xml"}
+PATCH_TOOL = "tools/windows_release_contract.py"
+PATCH_ENTRYPOINT = "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj"
+PATCH_ENGINE_PRODUCTS = {"ChatEngine", "ChatEngine.WinNet10", "LoginEngine", "LoginEngine.WinNet10", "WorldEngine"}
+PATCH_REUSED_ENGINES = ["chatengine", "loginengine", "worldengine"]
+PATCH_FORBIDDEN_SOURCE = ("aorebirth/gamedata/", "aorebirth/libraries/source/aorebirth.database/migrations/",
+                          "aorebirth/libraries/source/aorebirth.database/sqltables/",
+                          "aorebirth/libraries/source/aorebirth.database.schema/", "tools/databasemigrationtool/")
+PATCH_OUTPUTS = tuple(path for path in OUTPUTS if "/ZoneEngine_New/" in path)
 PRIVATE_CHEST_CATALOGS = {"Loot/MissionChestRKAllowlist.json", "Loot/MissionChestSeasonalExclusions.json", "Loot/MissionChestSpecialExclusions.json"}
 INDEPENDENT_PRIVATE_CATALOGS = {"QuestRewards.json", "ObjectStateMachines.json"}
 # Named catalog loaders and GameDataPaths; no extension-only root admission.
@@ -281,32 +290,175 @@ def profile_for(root, selected=None):
     return profile
 
 
-def source_exact(root, public_sha, overrides=()):
+def patch_hash(value, length):
+    return isinstance(value, str) and re.fullmatch(rf"[0-9a-f]{{{length}}}", value) is not None
+
+
+def public_ancestor(root, selected, authority):
+    if not patch_hash(selected, 40) or not patch_hash(authority, 40):
+        raise ValueError("Patch source and public authority must be exact commit SHAs")
+    try:
+        git(root, "--no-replace-objects", "merge-base", "--is-ancestor", selected, authority)
+    except ValueError as error:
+        raise ValueError("Patch source is outside freshly fetched public master history") from error
+
+
+def source_exact(root, public_sha, overrides=(), patch_tool_sha=None):
     if git(root, "rev-parse", "HEAD").decode().strip() != public_sha:
         raise ValueError("LOCAL_WINDOWS_SOURCE_SHA differs from PUBLIC_MASTER_SHA")
     if set(overrides) - CONFIG_OVERRIDES:
         raise ValueError("Operational configuration allowlist cannot permit product drift")
-    changed = git(root, "diff", "--name-only", public_sha, "--", *PRODUCT_PATHS).decode().splitlines()
-    untracked = git(root, "ls-files", "--others", "--exclude-standard", "--", *PRODUCT_PATHS).decode().splitlines()
+    paths = () if patch_tool_sha else PRODUCT_PATHS
+    changed = git(root, "diff", "--name-only", public_sha, "--", *paths).decode().splitlines()
+    untracked = git(root, "ls-files", "--others", "--exclude-standard", "--", *paths).decode().splitlines()
+    if patch_tool_sha:
+        exact_tool = git(root, "--no-replace-objects", "show", patch_tool_sha + ":" + PATCH_TOOL)
+        if checked(root, PATCH_TOOL).read_bytes() != exact_tool:
+            raise ValueError("Windows patch tooling differs from its approved public commit")
+        overrides = (*overrides, PATCH_TOOL)
     if any(path not in overrides for path in changed) or untracked:
         raise ValueError("Local Windows runtime/build source differs from public master")
 
 
-def fresh_sources(root, profile):
+def fresh_public(root, profile):
     remote = profile.get("PUBLIC_PRODUCT_REMOTE", "origin")
     url = git(root, "remote", "get-url", remote).decode().strip().removesuffix(".git")
     if url not in ("https://github.com/" + PUBLIC_REPOSITORY, "git@github.com:" + PUBLIC_REPOSITORY):
         raise ValueError("Public product remote is not the configured product authority")
     git(root, "fetch", "--no-tags", remote, "+refs/heads/master:refs/remotes/" + remote + "/master")
-    public_sha = git(root, "rev-parse", "refs/remotes/" + remote + "/master").decode().strip()
+    return git(root, "rev-parse", "refs/remotes/" + remote + "/master^{commit}").decode().strip()
+
+
+def read_patch_selection(path, expected):
+    raw = Path(path).read_bytes()
+    if not patch_hash(expected, 64) or digest(raw) != expected:
+        raise ValueError("Approved patch selection SHA-256 differs")
+    value = json.loads(raw, object_pairs_hook=pairs)
+    if not isinstance(value, dict) or raw != encoded(value) + b"\n":
+        raise ValueError("Canonical private planner selection required")
+    hashes = {"INSTALLED_BASELINE_SHA256": 64, "INSTALLED_PUBLIC_SHA": 40, "INSTALLED_LINUX_SHA": 40,
+              "INSTALLED_CONTENT_DUMP_SHA": 40, "INSTALLED_GAMEDATA_MANIFEST": 64,
+              "TARGET_PUBLIC_SHA": 40, "TARGET_PUBLIC_TREE": 40, "TARGET_LINUX_SHA": 40,
+              "TARGET_CONTENT_DUMP_SHA": 40, "TARGET_GAMEDATA_MANIFEST": 64}
+    if (value.get("FORMAT_VERSION") != 1 or value.get("PATCH_CLASS") != "RUNTIME_PATCH"
+            or any(not patch_hash(value.get(key), length) for key, length in hashes.items())
+            or value.get("EXISTING_BUILDER_SCOPE") != "ZONE_ONLY"
+            or value.get("IMPACTED_ENGINES") != ["zoneengine"] or value.get("REUSED_ENGINES") != PATCH_REUSED_ENGINES
+            or value.get("REQUIRED_MIGRATIONS") != [] or value.get("SCHEMA_COMPATIBILITY_AND_ROLLBACK_REQUIRED") is not False
+            or value["INSTALLED_CONTENT_DUMP_SHA"] != value["TARGET_CONTENT_DUMP_SHA"]
+            or value["INSTALLED_GAMEDATA_MANIFEST"] != value["TARGET_GAMEDATA_MANIFEST"]):
+        raise ValueError("Approved patch must be ZoneEngine-only with unchanged GameData and schema")
+    selected = value.get("SELECTED_PUBLIC_COMMITS")
+    if (not isinstance(selected, list) or not selected or any(not patch_hash(item, 40) for item in selected)
+            or len(set(selected)) != len(selected)):
+        raise ValueError("Exact ordered patch source commits required")
+    closure = value.get("ENGINE_INPUTS", {})
+    if not isinstance(closure, dict) or set(closure) != {"zoneengine", *PATCH_REUSED_ENGINES}:
+        raise ValueError("Complete patch engine dependency closure required")
+    for name, row in closure.items():
+        if (not isinstance(row, dict) or set(row) != {"BEFORE_INPUTS_SHA256", "AFTER_INPUTS_SHA256", "CHANGED_INPUTS"}
+                or not patch_hash(row["BEFORE_INPUTS_SHA256"], 64) or not patch_hash(row["AFTER_INPUTS_SHA256"], 64)
+                or not isinstance(row["CHANGED_INPUTS"], list) or bool(row["CHANGED_INPUTS"]) != (name == "zoneengine")
+                or (row["BEFORE_INPUTS_SHA256"] != row["AFTER_INPUTS_SHA256"]) != bool(row["CHANGED_INPUTS"])):
+            raise ValueError("Incomplete or non-Zone patch dependency closure")
+    changes = value.get("SOURCE_CHANGES")
+    if (not isinstance(changes, list) or not changes or any(
+            not isinstance(row, dict) or set(row) != {"PATH", "BEFORE", "AFTER"}
+            or str(relative(row["PATH"])).casefold().startswith(PATCH_FORBIDDEN_SOURCE) for row in changes)):
+        raise ValueError("Patch includes unauthorized GameData or schema source changes")
+    return value
+
+
+def private_patch_tip(checkout, ref):
+    if not isinstance(ref, str) or not ref or (ref.startswith("refs/") and not ref.startswith("refs/heads/")):
+        raise ValueError("Private patch authority requires an exact branch ref")
+    if not ref.startswith("refs/heads/"):
+        ref = "refs/heads/" + ref
+    git(checkout, "check-ref-format", ref)
+    tracking = "refs/remotes/origin/" + ref.removeprefix("refs/heads/")
+    git(checkout, "fetch", "--no-tags", "origin", "+" + ref + ":" + tracking)
+    return git(checkout, "--no-replace-objects", "rev-parse", tracking + "^{commit}").decode().strip()
+
+
+def verify_patch_planner(profile, path, expected, selection, authority):
+    source = Path(profile["PRIVATE_PATCH_SOURCE_ROOT"]).resolve(strict=True)
+    operations = Path(profile["PRIVATE_PATCH_OPERATIONS_ROOT"]).resolve(strict=True)
+    operations_sha = profile["PRIVATE_PATCH_OPERATIONS_SHA"]
+    repository = profile["PRIVATE_PATCH_REPOSITORY"]
+    if (not patch_hash(operations_sha, 40) or not isinstance(repository, str)
+            or not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository)):
+        raise ValueError("Private patch planner authority binding is invalid")
+    for checkout in (source, operations):
+        remote = git(checkout, "remote", "get-url", "origin").decode().strip().removesuffix(".git")
+        if remote not in ("https://github.com/" + repository, "git@github.com:" + repository):
+            raise ValueError("Private patch planner checkout authority differs")
+    source_head = git(source, "--no-replace-objects", "rev-parse", "HEAD").decode().strip()
+    source_tip = private_patch_tip(source, profile["PRIVATE_PATCH_SOURCE_REF"])
+    operations_tip = private_patch_tip(operations, profile["PRIVATE_PATCH_OPERATIONS_REF"])
+    if git(source, "--no-replace-objects", "rev-parse", source_head + "^{tree}").decode().strip() != git(
+            source, "--no-replace-objects", "rev-parse", source_tip + "^{tree}").decode().strip():
+        raise ValueError("Private installed-source verifier checkout differs from its authoritative branch")
+    try:
+        git(operations, "--no-replace-objects", "merge-base", "--is-ancestor", operations_sha, operations_tip)
+    except ValueError as error:
+        raise ValueError("Private patch planner commit is outside its authoritative operations branch") from error
+    planner_path = "Tools/patch_scope.py"
+    planner = checked(operations, planner_path)
+    if (planner.read_bytes() != git(operations, "--no-replace-objects", "show", operations_sha + ":" + planner_path)
+            or git(source, "diff", "--name-only", "HEAD", "--", "LinuxBuild").strip()
+            or git(source, "ls-files", "--others", "--exclude-standard", "--", "LinuxBuild").strip()):
+        raise ValueError("Private patch verifier or installed source evidence changed")
+    git(source, "fetch", "--no-tags", "https://github.com/" + PUBLIC_REPOSITORY + ".git",
+        "+refs/heads/master:refs/remotes/public/master")
+    current = git(source, "rev-parse", "refs/remotes/public/master^{commit}").decode().strip()
+    public_ancestor(source, authority, current)
+    report = {
+        "PUBLIC_MASTER_SHA": selection["TARGET_PUBLIC_SHA"], "LINUX_SOURCE_SHA": selection["TARGET_LINUX_SHA"],
+        "CONTENT_DUMP_SHA": selection["TARGET_CONTENT_DUMP_SHA"], "PRIVATE_GAMEDATA_MANIFEST": selection["TARGET_GAMEDATA_MANIFEST"],
+        "INSTALLED_BASELINE": {"SHA256": selection["INSTALLED_BASELINE_SHA256"]},
+        "PATCH_SCOPE": {"MODE": "ZONE_ONLY", "CHANGED_ENGINES": ["zoneengine"], "REUSED_ENGINES": PATCH_REUSED_ENGINES},
+    }
+    with tempfile.TemporaryDirectory(prefix="aorebirth-windows-patch-") as temporary:
+        report_path = Path(temporary) / "release-inputs.json"
+        write_json(report_path, report, exclusive=True)
+        result = subprocess.run([sys.executable, "-I", "-B", str(planner), "verify", "--repository-root", str(source),
+                                 "--selection", str(Path(path).resolve()), "--selection-sha256", expected,
+                                 "--release-report", str(report_path)], capture_output=True, check=False, timeout=180,
+                                env=dict(os.environ, GIT_NO_REPLACE_OBJECTS="1", GIT_TERMINAL_PROMPT="0"))
+    if result.returncode != 0 or json.loads(result.stdout).get("PATCH_SELECTION_SHA256") != expected:
+        raise ValueError("Private planner did not independently reproduce the approved patch selection")
+
+
+def verify_patch_source(root, profile, authority, selection_path, selection_sha, tool_sha):
+    selection = read_patch_selection(selection_path, selection_sha)
+    public_sha = selection["TARGET_PUBLIC_SHA"]
+    for commit in (public_sha, selection["INSTALLED_PUBLIC_SHA"], *selection["SELECTED_PUBLIC_COMMITS"], tool_sha):
+        public_ancestor(root, commit, authority)
+    if git(root, "--no-replace-objects", "rev-parse", public_sha + "^{tree}").decode().strip() != selection["TARGET_PUBLIC_TREE"]:
+        raise ValueError("Selected public tree differs from the approved patch selection")
+    source_exact(root, public_sha, profile.get("LOCAL_CONFIG_OVERRIDES", ()), tool_sha)
+    verify_patch_planner(profile, selection_path, selection_sha, selection, authority)
+    return selection
+
+
+def fresh_sources(root, profile, patch=None):
+    authority = fresh_public(root, profile)
     public_fetch = {"ROLE": "PUBLIC_PRODUCT", "METHOD": "GIT_FETCH", "RESULT": "SUCCESS",
-                    "TIP_SHA": public_sha, "FETCHED_AT_UTC": now()}
-    source_exact(root, public_sha, profile.get("LOCAL_CONFIG_OVERRIDES", ()))
+                    "TIP_SHA": authority, "FETCHED_AT_UTC": now()}
+    if patch is None:
+        public_sha = authority
+        source_exact(root, public_sha, profile.get("LOCAL_CONFIG_OVERRIDES", ()))
+    else:
+        selection = verify_patch_source(root, profile, authority, *patch)
+        public_sha = selection["TARGET_PUBLIC_SHA"]
+        public_fetch["SELECTED_SHA"] = public_sha
     commit = gh(profile, "commits/" + profile["PRIVATE_CONTENT_BRANCH"])
     sha = commit.get("sha", "")
     tree_sha = commit.get("commit", {}).get("tree", {}).get("sha", "")
     if not re.fullmatch("[0-9a-f]{40}", sha) or not re.fullmatch("[0-9a-f]{40}", tree_sha):
         raise ValueError("Fresh content-dump SHA/tree is unknown")
+    if patch is not None and sha != selection["TARGET_CONTENT_DUMP_SHA"]:
+        raise ValueError("Fresh content-dump SHA differs from the approved unchanged patch content")
     content_fetch = {"ROLE": "PRIVATE_CONTENT_UPSTREAM", "METHOD": "AUTHENTICATED_GITHUB_API",
                      "RESULT": "SUCCESS", "TIP_SHA": sha, "TREE_SHA": tree_sha, "FETCHED_AT_UTC": now()}
     return public_sha, sha, public_fetch, content_fetch
@@ -1127,11 +1279,11 @@ def validate_private_catalog_adoptions(bundle, value, actual, portable=False):
         actual[path] = after
 
 
-def validate_runtime_exclusions(bundle, value, actual, portable=False, *, historical_checkpoint=False):
+def validate_runtime_exclusions(bundle, value, actual, portable=False, *, historical_checkpoint=False, selected_patch=False):
     def admitted(path):
         if runtime_content_path(path):
             return True
-        if portable or not historical_checkpoint or path not in RETIRED_MISSION_PACKET_CATALOGS:
+        if (not selected_patch and (portable or not historical_checkpoint)) or path not in RETIRED_MISSION_PACKET_CATALOGS:
             return False
         # A linked prior checkpoint can contain the exact files its public source still supplied.
         published = value["SOURCE_SNAPSHOTS"]["PUBLIC_PRODUCT_DATA"]["AFTER"].get(path)
@@ -1173,7 +1325,7 @@ def validate_runtime_exclusions(bundle, value, actual, portable=False, *, histor
         raise ValueError("Canonical runtime admission is incomplete")
 
 
-def validate_supplemental_content(bundle, value, actual, portable=False, *, historical_checkpoint=False):
+def validate_supplemental_content(bundle, value, actual, portable=False, *, historical_checkpoint=False, selected_patch=False):
     """Replay restorations, private policies, generated items and runtime exclusions."""
     catalogs = required_catalogs(value.get("REQUIRED_CURRENT_CATALOGS", []))
     expected, seen = {}, set()
@@ -1230,7 +1382,8 @@ def validate_supplemental_content(bundle, value, actual, portable=False, *, hist
     if not proof:
         if adoption or value.get("GENERATED_ITEMS_LOCAL_RECEIPT"):
             raise ValueError("Generated adoption lacks measured provenance")
-        validate_runtime_exclusions(bundle, value, actual, portable, historical_checkpoint=historical_checkpoint)
+        validate_runtime_exclusions(bundle, value, actual, portable, historical_checkpoint=historical_checkpoint,
+                                    selected_patch=selected_patch)
         return
     output = validate_generated_items_provenance(proof, value["PUBLIC_MASTER_SHA"])
     if "items.dat" not in value["PROTECTED_GENERATED_FILES"]:
@@ -1258,7 +1411,8 @@ def validate_supplemental_content(bundle, value, actual, portable=False, *, hist
         actual["items.dat"] = after
     if actual.get("items.dat") != output:
         raise ValueError("Canonical items.dat differs from current generated provenance")
-    validate_runtime_exclusions(bundle, value, actual, portable, historical_checkpoint=historical_checkpoint)
+    validate_runtime_exclusions(bundle, value, actual, portable, historical_checkpoint=historical_checkpoint,
+                                selected_patch=selected_patch)
 
 
 def reconcile_plan(root, profile, bundle, public_sha, dump_sha, baseline, before_rows, resolutions=None, generated_receipt=None, surfaces_receipt=None):
@@ -1483,7 +1637,7 @@ def reconcile_plan(root, profile, bundle, public_sha, dump_sha, baseline, before
     return plan, projected
 
 
-def validate_reconciliation(bundle, reconciliation, *, historical_checkpoint=False):
+def validate_reconciliation(bundle, reconciliation, *, historical_checkpoint=False, selected_patch=False):
     before = read_json(load_descriptor(bundle, reconciliation["BEFORE_MANIFEST"]))
     after = read_json(load_descriptor(bundle, reconciliation["CANONICAL_MANIFEST"]))
     if validate_manifest(before) != reconciliation["CANONICAL_BEFORE_MANIFEST"]:
@@ -1544,7 +1698,8 @@ def validate_reconciliation(bundle, reconciliation, *, historical_checkpoint=Fal
         previous_results[path] = result
     if actual_changes != expected_changes:
         raise ValueError("Approved upstream additions/modifications/removals are incomplete")
-    validate_supplemental_content(bundle, reconciliation, actual, historical_checkpoint=historical_checkpoint)
+    validate_supplemental_content(bundle, reconciliation, actual, historical_checkpoint=historical_checkpoint,
+                                  selected_patch=selected_patch)
     if sorted(actual.values(), key=lambda row: row["path"]) != after:
         raise ValueError("Canonical manifest loses or changes unrelated private content")
     if validate_manifest(after) != reconciliation["WINDOWS_GAMEDATA_MANIFEST"]:
@@ -1552,16 +1707,77 @@ def validate_reconciliation(bundle, reconciliation, *, historical_checkpoint=Fal
     return after
 
 
-def intake(root, profile, resolutions=None, generated_receipt=None, surfaces_receipt=None):
+def unchanged_patch_content(root, profile, bundle, public_sha, dump_sha, prior, rows):
+    previous = prior["reconciliation"]
+    if rows != prior["manifest"]:
+        raise ValueError("Measured patch GameData differs from the prior accepted complete manifest")
+    snapshots = {}
+    for authority, key, current in (("PUBLIC_PRODUCT_DATA", "PUBLIC_MASTER_SHA", public_sha),
+                                    ("PRIVATE_CONTENT_UPSTREAM", "CONTENT_DUMP_SHA", dump_sha)):
+        old = previous["SOURCE_SNAPSHOTS"][authority]["AFTER"]
+        new = tree_files(root, profile, authority, current)
+        if old != new:
+            raise ValueError("ZoneEngine-only patch would require GameData reconciliation")
+        snapshots[authority] = {"BASE_SHA": previous[key], "CURRENT_SHA": current, "BEFORE": old, "AFTER": new}
+    write_json(bundle / "manifest.json", rows)
+    manifest = validate_manifest(rows)
+    plan = {"FORMAT_VERSION": 1, "PUBLIC_MASTER_SHA": public_sha, "CONTENT_DUMP_SHA": dump_sha,
+            "CANONICAL_BEFORE_MANIFEST": manifest, "WINDOWS_GAMEDATA_MANIFEST": manifest,
+            "SOURCE_SNAPSHOTS": snapshots, "CHANGES": [], "RUNTIME_EXCLUSIONS": [],
+            "PROTECTED_GENERATED_FILES": previous["PROTECTED_GENERATED_FILES"],
+            "BEFORE_MANIFEST": descriptor(bundle, bundle / "before-manifest.json"),
+            "CANONICAL_MANIFEST": descriptor(bundle, bundle / "manifest.json")}
+    accepted_items = previous.get("GENERATED_ITEMS_PROVENANCE")
+    if accepted_items:
+        prior_bundle = prior["descriptors"]["bundle"]
+        prior_raw = checked(prior_bundle, "reconciliation.json")
+        if digest(prior_raw.read_bytes()) != previous["LOCAL_REPLAY_SHA256"]:
+            raise ValueError("Prior measured content replay differs from its accepted hash")
+        raw = read_json(prior_raw)
+        if raw.get("GENERATED_ITEMS_PROVENANCE") != accepted_items:
+            raise ValueError("Prior generated provenance differs from its accepted replay")
+        items = {key: value for key, value in accepted_items.items() if key != "QUALIFIED_REUSE"}
+        original_sha = items["PUBLIC_MASTER_SHA"]
+        original = exporter_source_closure(root, original_sha, verify_working_tree=False)
+        current = exporter_source_closure(root, public_sha)
+        if original != items["EXPORTER_SOURCE_CLOSURE"]:
+            raise ValueError("Accepted generated items do not bind the original public exporter")
+        qualification = qualify_exporter_sources(root, original_sha, public_sha, original, current)
+        if public_sha != original_sha:
+            items["QUALIFIED_REUSE"] = {"REQUESTING_PUBLIC_MASTER_SHA": public_sha,
+                "EXPORTER_SOURCE_CLOSURE_SHA256": digest(encoded(original)), "ORIGINAL_PROVENANCE_SHA256": digest(encoded(items))}
+            if qualification:
+                items["QUALIFIED_REUSE"]["SOURCE_QUALIFICATION"] = qualification
+        plan["GENERATED_ITEMS_PROVENANCE"] = items
+        receipt = load_descriptor(prior_bundle, raw["GENERATED_ITEMS_LOCAL_RECEIPT"])
+        plan["GENERATED_ITEMS_LOCAL_RECEIPT"] = stash(bundle, "generated-items-local-receipt.json", receipt.read_bytes())
+        if previous.get("GENERATED_SURFACES_PROVENANCE"):
+            surfaces = dict(previous["GENERATED_SURFACES_PROVENANCE"], GENERATED_ITEMS_PROVENANCE_SHA256=digest(encoded(items)))
+            receipt = load_descriptor(prior_bundle, raw["GENERATED_SURFACES_LOCAL_RECEIPT"])
+            plan["GENERATED_SURFACES_PROVENANCE"] = surfaces
+            plan["GENERATED_SURFACES_LOCAL_RECEIPT"] = stash(bundle, "generated-surfaces-local-receipt.json", receipt.read_bytes())
+    elif profile.get("REQUIRE_GENERATED_ITEMS") is True:
+        raise ValueError("ZoneEngine-only patch requires the installed generated items provenance")
+    write_json(bundle / "reconciliation.json", plan, exclusive=True)
+    return plan
+
+
+def intake(root, profile, resolutions=None, generated_receipt=None, surfaces_receipt=None, patch=None, reused_context=None):
     attempt_id, started = uuid.uuid4().hex, now()
-    public_sha, dump_sha, public_fetch, dump_fetch = fresh_sources(root, profile)
+    public_sha, dump_sha, public_fetch, dump_fetch = (fresh_sources(root, profile) if patch is None
+                                                    else fresh_sources(root, profile, patch))
     public_fetch["ATTEMPT_ID"] = dump_fetch["ATTEMPT_ID"] = attempt_id
     state_root = Path(profile["STATE_ROOT"])
     state_root.mkdir(parents=True, exist_ok=True)
-    baseline_path = state_root / "canonical-state.json"
-    baseline = read_json(baseline_path if baseline_path.is_file() else profile["INITIAL_PROVENANCE"])
-    if baseline_path.is_file() and not baseline.get("APPLIED_RECONCILIATION_BUNDLE"):
-        raise ValueError("Canonical state lacks an actually applied reconciliation")
+    if patch is None:
+        baseline_path = state_root / "canonical-state.json"
+        baseline = read_json(baseline_path if baseline_path.is_file() else profile["INITIAL_PROVENANCE"])
+        if baseline_path.is_file() and not baseline.get("APPLIED_RECONCILIATION_BUNDLE"):
+            raise ValueError("Canonical state lacks an actually applied reconciliation")
+    else:
+        if reused_context is None or any((resolutions, generated_receipt, surfaces_receipt)):
+            raise ValueError("ZoneEngine-only intake requires an accepted unchanged Windows content checkpoint")
+        baseline = reused_context["acceptance"]
     for key in ("PUBLIC_MASTER_SHA", "CONTENT_DUMP_SHA", "WINDOWS_GAMEDATA_MANIFEST"):
         if not baseline.get(key):
             raise ValueError("Canonical content baseline is unknown")
@@ -1571,8 +1787,11 @@ def intake(root, profile, resolutions=None, generated_receipt=None, surfaces_rec
     bundle = state_root / ("attempt-" + uuid.uuid4().hex)
     bundle.mkdir()
     write_json(bundle / "before-manifest.json", rows)
-    plan, projected = reconcile_plan(root, profile, bundle, public_sha, dump_sha, baseline, rows, resolutions, generated_receipt, surfaces_receipt)
-    validate_reconciliation(bundle, plan)
+    if patch is None:
+        plan, projected = reconcile_plan(root, profile, bundle, public_sha, dump_sha, baseline, rows, resolutions, generated_receipt, surfaces_receipt)
+    else:
+        plan, projected = unchanged_patch_content(root, profile, bundle, public_sha, dump_sha, reused_context, rows), {}
+    validate_reconciliation(bundle, plan, selected_patch=patch is not None)
     attempt = {"FORMAT_VERSION": 1, "PUBLIC_MASTER_SHA": public_sha, "LOCAL_WINDOWS_SOURCE_SHA": public_sha,
                "ATTEMPT_ID": attempt_id, "ATTEMPT_STARTED_UTC": started,
                "CONTENT_DUMP_SHA": dump_sha, "WINDOWS_GAMEDATA_MANIFEST": plan["WINDOWS_GAMEDATA_MANIFEST"],
@@ -1581,6 +1800,16 @@ def intake(root, profile, resolutions=None, generated_receipt=None, surfaces_rec
                "RECONCILIATION": descriptor(bundle, bundle / "reconciliation.json"),
                "CANONICAL_MANIFEST": descriptor(bundle, bundle / "manifest.json"),
                "LAUNCHER_SHA256": digest((Path(root) / "start-engines.ps1").read_bytes())}
+    if patch is not None:
+        path, expected, tooling_sha = patch
+        selection = read_patch_selection(path, expected)
+        if (public_sha != selection["TARGET_PUBLIC_SHA"] or dump_sha != selection["TARGET_CONTENT_DUMP_SHA"]
+                or baseline["WINDOWS_GAMEDATA_MANIFEST"] != selection["INSTALLED_GAMEDATA_MANIFEST"]
+                or plan["WINDOWS_GAMEDATA_MANIFEST"] != selection["TARGET_GAMEDATA_MANIFEST"]
+                or plan["CANONICAL_BEFORE_MANIFEST"] != plan["WINDOWS_GAMEDATA_MANIFEST"] or projected):
+            raise ValueError("Windows patch must retain the approved complete installed GameData")
+        attempt["WINDOWS_PATCH_SELECTION"] = stash(bundle, "patch-selection.json", encoded(selection) + b"\n")
+        attempt["WINDOWS_PATCH_TOOL_SOURCE_SHA"] = tooling_sha
     write_json(bundle / "prepared.json", attempt)
     write_json(state_root / "latest-plan.json", {"BUNDLE": str(bundle), "PLAN_SHA256": digest(encoded(plan))})
     return bundle, attempt, plan, projected, states
@@ -1821,7 +2050,13 @@ def verify_build_token(root, profile, entrypoint=None, product=None, publishing=
         if feature_source(root) != state["FEATURE_SOURCE"]:
             raise ValueError("Feature source changed during validation")
     elif purpose == "PRODUCTION_RELEASE":
-        source_exact(root, state["PUBLIC_MASTER_SHA"], profile.get("LOCAL_CONFIG_OVERRIDES", ()))
+        tooling_sha = state.get("WINDOWS_PATCH_TOOL_SOURCE_SHA")
+        if tooling_sha:
+            if publishing or entrypoint or product in PATCH_ENGINE_PRODUCTS:
+                raise ValueError("ZoneEngine-only Windows patch cannot publish or build another engine")
+            source_exact(root, state["PUBLIC_MASTER_SHA"], profile.get("LOCAL_CONFIG_OVERRIDES", ()), tooling_sha)
+        else:
+            source_exact(root, state["PUBLIC_MASTER_SHA"], profile.get("LOCAL_CONFIG_OVERRIDES", ()))
     else:
         raise ValueError("Unknown build capability purpose")
     canonical = Path(profile["CANONICAL_GAMEDATA_ROOT"])
@@ -1871,23 +2106,82 @@ def collect_build_observations(state_path):
     return {"WRAPPER_ENTERED": wrapper, "PRODUCT_HOOKS": sorted(products)}
 
 
-def run_build(root, profile, child):
-    approved = [os.environ.get("ComSpec", r"C:\Windows\System32\cmd.exe"), "/d", "/c",
-                str(Path(root) / "NewZoneEngineBuild/build.cmd")]
+def measured_binaries(root, names):
+    binaries = []
+    for name in names:
+        output = checked(root, name)
+        before = file_state(output)
+        output_hash = digest(output.read_bytes())
+        if file_state(output) != before:
+            raise ValueError("Windows output changed during final measurement")
+        binaries.append({"path": name, "bytes": before[2], "sha256": output_hash})
+    return binaries
+
+
+def load_windows_patch_baseline(selection, baseline_path, expected):
+    baseline_path = Path(baseline_path).resolve(strict=True)
+    if not patch_hash(expected, 64) or digest(baseline_path.read_bytes()) != expected:
+        raise ValueError("Approved Windows reuse baseline SHA-256 differs")
+    prior = load_accepted_release(baseline_path.parent, baseline_path, selected_checkpoint=True)
+    if digest(baseline_path.read_bytes()) != expected:
+        raise ValueError("Approved Windows reuse baseline changed during validation")
+    accepted = prior["acceptance"]
+    if any(accepted[key] != selection["INSTALLED_" + field] for key, field in
+           (("PUBLIC_MASTER_SHA", "PUBLIC_SHA"), ("CONTENT_DUMP_SHA", "CONTENT_DUMP_SHA"),
+            ("WINDOWS_GAMEDATA_MANIFEST", "GAMEDATA_MANIFEST"))):
+        raise ValueError("Windows reuse baseline differs from the verified installed patch base")
+    return prior
+
+
+def reuse_windows_inputs(root, bundle, prior, baseline_path):
+    unchanged = tuple(name for name in OUTPUTS if name not in PATCH_OUTPUTS)
+    reused = measured_binaries(root, unchanged)
+    if {row["path"]: row for row in reused} != {row["path"]: row for row in prior["build_attempt"]["BINARIES"]
+                                                if row["path"] in unchanged}:
+        raise ValueError("Reused Windows binaries differ from the accepted baseline")
+    return reused, {
+        "ACCEPTANCE": stash(bundle, "reused-windows-acceptance.json", Path(baseline_path).read_bytes()),
+        "BUILD_ATTEMPT": stash(bundle, "reused-windows-build.json", prior["descriptors"]["attempt_path"].read_bytes()),
+        "STARTUP_RECEIPT": stash(bundle, "reused-windows-startup.json", prior["descriptors"]["windows_path"].read_bytes()),
+    }
+
+
+def run_build(root, profile, child, patch=None, reuse=None):
+    if patch is None:
+        approved = [os.environ.get("ComSpec", r"C:\Windows\System32\cmd.exe"), "/d", "/c",
+                    str(Path(root) / "NewZoneEngineBuild/build.cmd")]
+    else:
+        dotnet = Path(os.environ.get("ProgramFiles", r"C:\Program Files")) / "dotnet/dotnet.exe"
+        approved = [str(dotnet), "build", PATCH_ENTRYPOINT, "-c", "Debug", "--no-incremental", "--nologo", "/m:1", "/nr:false"]
     if len(child) != len(approved) or any(os.path.normcase(os.path.normpath(actual)) != os.path.normcase(os.path.normpath(expected))
                                         for actual, expected in zip(child, approved)):
         raise ValueError("run-build may invoke only the tracked approved build entrypoint without overrides")
-    bundle, attempt, plan, projected, states = intake(root, profile)
+    if patch is None:
+        bundle, attempt, plan, projected, states = intake(root, profile)
+    else:
+        if reuse is None:
+            raise ValueError("ZoneEngine-only build requires the approved Windows artifact baseline")
+        selection = read_patch_selection(patch[0], patch[1])
+        prior = load_windows_patch_baseline(selection, *reuse)
+        bundle, attempt, plan, projected, states = intake(root, profile, patch=patch, reused_context=prior)
     if plan["CANONICAL_BEFORE_MANIFEST"] != plan["WINDOWS_GAMEDATA_MANIFEST"]:
         raise ValueError("Approved content A/M/D must be reconciled before Windows build; inspect latest-plan.json")
     current_states, directories = content_states(profile["CANONICAL_GAMEDATA_ROOT"])
     if current_states != states:
         raise ValueError("Canonical file set/state changed before compilation")
+    if patch is not None:
+        reused, reuse_evidence = reuse_windows_inputs(root, bundle, prior, reuse[0])
+        if reuse_evidence["ACCEPTANCE"]["SHA256"] != reuse[1]:
+            raise ValueError("Approved Windows reuse baseline changed before compilation")
+        attempt["WINDOWS_REUSED_OUTPUTS"] = reuse_evidence
     token = uuid.uuid4().hex + uuid.uuid4().hex
     active = bundle / "active.json"
-    write_json(active, {"TOKEN_SHA256": digest(token.encode()), "OWNER_PID": os.getpid(),
-                        "PUBLIC_MASTER_SHA": attempt["PUBLIC_MASTER_SHA"], "FILE_STATES": states,
-                        "DIRECTORY_STATES": directories, "CREATED_UTC": now()}, exclusive=True)
+    capability = {"TOKEN_SHA256": digest(token.encode()), "OWNER_PID": os.getpid(),
+                  "PUBLIC_MASTER_SHA": attempt["PUBLIC_MASTER_SHA"], "FILE_STATES": states,
+                  "DIRECTORY_STATES": directories, "CREATED_UTC": now()}
+    if patch is not None:
+        capability["WINDOWS_PATCH_TOOL_SOURCE_SHA"] = patch[2]
+    write_json(active, capability, exclusive=True)
     env = dict(os.environ, AO_REBIRTH_BUILD_STATE=str(active), AO_REBIRTH_BUILD_TOKEN=token,
                AO_REBIRTH_BUILD_CHILD="1")
     attempt["BUILD_STARTED_UTC"] = now()
@@ -1900,24 +2194,34 @@ def run_build(root, profile, child):
         else:
             observed = collect_build_observations(active)
             required = {"ChatEngine.WinNet10", "LoginEngine.WinNet10", "WorldEngine", "ZoneEngine_New"}
-            if observed.get("WRAPPER_ENTERED") is not True or not required <= set(observed.get("PRODUCT_HOOKS", [])):
-                raise ValueError("Approved wrapper and all four product compiler hooks were not observed")
-            attempt["APPROVED_BUILD_ENTRYPOINT"] = "NewZoneEngineBuild/build.cmd"
+            products = set(observed["PRODUCT_HOOKS"])
+            if patch is None:
+                if observed.get("WRAPPER_ENTERED") is not True or not required <= products:
+                    raise ValueError("Approved wrapper and all four product compiler hooks were not observed")
+                attempt["APPROVED_BUILD_ENTRYPOINT"] = "NewZoneEngineBuild/build.cmd"
+                source_exact(root, attempt["PUBLIC_MASTER_SHA"], profile.get("LOCAL_CONFIG_OVERRIDES", ()))
+            else:
+                if observed.get("WRAPPER_ENTERED") is not False or "ZoneEngine_New" not in products or products & PATCH_ENGINE_PRODUCTS:
+                    raise ValueError("Only the selected ZoneEngine compiler and its dependencies may run")
+                attempt["APPROVED_BUILD_ENTRYPOINT"] = PATCH_ENTRYPOINT
+                source_exact(root, attempt["PUBLIC_MASTER_SHA"], profile.get("LOCAL_CONFIG_OVERRIDES", ()), patch[2])
             attempt["PRODUCT_COMPILER_HOOKS"] = observed["PRODUCT_HOOKS"]
-            source_exact(root, attempt["PUBLIC_MASTER_SHA"], profile.get("LOCAL_CONFIG_OVERRIDES", ()))
             after, _ = inventory(profile["CANONICAL_GAMEDATA_ROOT"])
             if validate_manifest(after) != attempt["WINDOWS_GAMEDATA_MANIFEST"]:
                 raise ValueError("Canonical content mutated during compilation")
-            binaries = []
-            for name in OUTPUTS:
-                output = checked(root, name)
-                before = file_state(output)
-                output_hash = digest(output.read_bytes())
-                if file_state(output) != before:
-                    raise ValueError("Windows output changed during final measurement")
-                binaries.append({"path": name, "bytes": before[2], "sha256": output_hash})
+            binaries = measured_binaries(root, OUTPUTS)
+            if patch is not None:
+                if [row for row in binaries if row["path"] not in PATCH_OUTPUTS] != reused:
+                    raise ValueError("A reused Windows output changed during ZoneEngine compilation")
+                attempt["WINDOWS_BINARY_BUILD_SCOPE"] = {
+                    row["path"]: ("BUILT" if row["path"] in PATCH_OUTPUTS else "REUSED") for row in binaries
+                }
             attempt["BINARIES"] = binaries
-            summary = summarize_reconciliation(bundle, plan)
+            summary = summarize_reconciliation(bundle, plan, selected_patch=patch is not None)
+            if patch is not None:
+                old_summary = prior["reconciliation"]
+                summary["PRIOR_CHECKPOINT"] = {key: old_summary[key] for key in (*TUPLE, "LOCAL_REPLAY_SHA256")}
+                validate_reconciliation_summary(bundle, summary, selected_patch=True)
             write_json(bundle / "reconciliation-summary.json", summary, exclusive=True)
             attempt["RECONCILIATION"] = descriptor(bundle, bundle / "reconciliation-summary.json")
             attempt["WINDOWS_CONTENT_VALIDATION"] = {"METHOD": "LOCAL_GUARDED_REPLAY_AND_WHOLE_TREE_MEASUREMENT",
@@ -1945,9 +2249,9 @@ def content_identity(data, path=None):
     return {"path": path, **result} if path is not None else result
 
 
-def summarize_reconciliation(bundle, reconciliation):
+def summarize_reconciliation(bundle, reconciliation, *, selected_patch=False):
     """Export identities only after the ignored local three-way payload replay succeeds."""
-    validate_reconciliation(bundle, reconciliation)
+    validate_reconciliation(bundle, reconciliation, selected_patch=selected_patch)
     records = []
     for change in reconciliation["CHANGES"]:
         approvals = {}
@@ -2002,11 +2306,11 @@ def summarize_reconciliation(bundle, reconciliation):
         prior_value = read_json(prior_path)
         summary["PRIOR_CHECKPOINT"] = {**{key: prior_value[key] for key in TUPLE},
                                        "LOCAL_REPLAY_SHA256": digest(encoded(prior_value))}
-    validate_reconciliation_summary(bundle, summary)
+    validate_reconciliation_summary(bundle, summary, selected_patch=selected_patch)
     return summary
 
 
-def validate_reconciliation_summary(bundle, summary):
+def validate_reconciliation_summary(bundle, summary, *, selected_patch=False):
     required = {"FORMAT_VERSION", *TUPLE, "CANONICAL_BEFORE_MANIFEST", "SOURCE_SNAPSHOTS",
                 "PROTECTED_GENERATED_FILES", "BEFORE_MANIFEST", "CANONICAL_MANIFEST", "PROOF_KIND",
                 "CHANGES", "LOCAL_REPLAY_SHA256"}
@@ -2093,7 +2397,7 @@ def validate_reconciliation_summary(bundle, summary):
             actual.pop(path, None)
         else:
             actual[path] = change["CANONICAL_AFTER"]
-    validate_supplemental_content(bundle, summary, actual, portable=True)
+    validate_supplemental_content(bundle, summary, actual, portable=True, selected_patch=selected_patch)
     if seen != expected or sorted(actual.values(), key=lambda row: row["path"]) != after:
         raise ValueError("Complete A/M/D or unrelated canonical path preservation differs")
     return after
@@ -2130,7 +2434,49 @@ def export_accepted_bundle(repository_root, bundle, acceptance_path):
     return result
 
 
-def require_successful_attempt(bundle, attempt):
+def attempt_patch_selection(bundle, attempt):
+    selection_item = attempt.get("WINDOWS_PATCH_SELECTION")
+    if selection_item is None:
+        if any(key in attempt for key in ("WINDOWS_PATCH_TOOL_SOURCE_SHA", "WINDOWS_REUSED_OUTPUTS", "WINDOWS_BINARY_BUILD_SCOPE")):
+            raise ValueError("Windows patch build is missing its exact approved selection")
+        return None
+    selection_path = load_descriptor(bundle, selection_item)
+    selection = read_patch_selection(selection_path, selection_item["SHA256"])
+    if (selection["TARGET_PUBLIC_SHA"] != attempt["PUBLIC_MASTER_SHA"]
+            or selection["TARGET_CONTENT_DUMP_SHA"] != attempt["CONTENT_DUMP_SHA"]
+            or selection["TARGET_GAMEDATA_MANIFEST"] != attempt["WINDOWS_GAMEDATA_MANIFEST"]
+            or not patch_hash(attempt.get("WINDOWS_PATCH_TOOL_SOURCE_SHA"), 40)):
+        raise ValueError("Frozen Windows patch selection differs from its build tuple")
+    return selection
+
+
+def validate_windows_reuse(bundle, attempt, selection):
+    evidence = attempt.get("WINDOWS_REUSED_OUTPUTS")
+    if not isinstance(evidence, dict) or set(evidence) != {"ACCEPTANCE", "BUILD_ATTEMPT", "STARTUP_RECEIPT"}:
+        raise ValueError("Patch reuse requires the immutable prior Windows build and startup evidence")
+    accepted = read_json(load_descriptor(bundle, evidence["ACCEPTANCE"]))
+    prior_build = read_json(load_descriptor(bundle, evidence["BUILD_ATTEMPT"]))
+    prior_startup = read_json(load_descriptor(bundle, evidence["STARTUP_RECEIPT"]))
+    if (accepted.get("WINDOWS_USER_ACCEPTED") != "YES" or accepted.get("ACCEPTED_BY") != "Mike"
+            or accepted.get("BUILD_ATTEMPT_RECEIPT", {}).get("SHA256") != evidence["BUILD_ATTEMPT"]["SHA256"]
+            or accepted.get("WINDOWS_RECEIPT", {}).get("SHA256") != evidence["STARTUP_RECEIPT"]["SHA256"]
+            or accepted.get("WINDOWS_RECEIPT_SHA256") != evidence["STARTUP_RECEIPT"]["SHA256"]
+            or prior_build.get("WINDOWS_BUILD") != "PASS" or prior_startup.get("WINDOWS_STARTUP") != "PASS"):
+        raise ValueError("Patch reused outputs lack a valid prior accepted Windows chain")
+    for key, field in (("PUBLIC_MASTER_SHA", "PUBLIC_SHA"), ("CONTENT_DUMP_SHA", "CONTENT_DUMP_SHA"),
+                       ("WINDOWS_GAMEDATA_MANIFEST", "GAMEDATA_MANIFEST")):
+        if not all(value.get(key) == selection["INSTALLED_" + field] for value in (accepted, prior_build, prior_startup)):
+            raise ValueError("Patch reuse evidence has a different installed base tuple")
+    expected_scope = {path: ("BUILT" if path in PATCH_OUTPUTS else "REUSED") for path in OUTPUTS}
+    if attempt.get("WINDOWS_BINARY_BUILD_SCOPE") != expected_scope:
+        raise ValueError("Actual Windows output scope must be ZoneEngine-only")
+    rows = [{row["path"]: row for row in value.get("BINARIES", []) if row["path"] not in PATCH_OUTPUTS}
+            for value in (attempt, prior_build, prior_startup)]
+    if rows[0] != rows[1] or rows[0] != rows[2]:
+        raise ValueError("Windows reused output bytes differ from the prior build/startup")
+
+
+def require_successful_attempt(bundle, attempt, *, selected_checkpoint=False):
     if attempt.get("BUILD_PURPOSE", "PRODUCTION_RELEASE") != "PRODUCTION_RELEASE":
         raise ValueError("Feature validation is not a production build or Windows acceptance")
     if (attempt.get("FORMAT_VERSION") != 1 or attempt.get("WINDOWS_BUILD") != "PASS"
@@ -2138,10 +2484,16 @@ def require_successful_attempt(bundle, attempt):
             or not attempt.get("BUILD_STARTED_UTC") or timestamp(attempt["BUILD_STARTED_UTC"]) > timestamp(attempt["BUILD_FINISHED_UTC"])
             or attempt.get("LOCAL_WINDOWS_SOURCE_SHA") != attempt.get("PUBLIC_MASTER_SHA")):
         raise ValueError("Prepared, failed or unfinished Windows build cannot be accepted")
+    selection = attempt_patch_selection(bundle, attempt)
+    products = set(attempt.get("PRODUCT_COMPILER_HOOKS", []))
+    if selection is None:
+        entrypoint = "NewZoneEngineBuild/build.cmd"
+        hooks_match = {"ChatEngine.WinNet10", "LoginEngine.WinNet10", "WorldEngine", "ZoneEngine_New"} <= products
+    else:
+        entrypoint = PATCH_ENTRYPOINT
+        hooks_match = "ZoneEngine_New" in products and not products & PATCH_ENGINE_PRODUCTS
     if (not re.fullmatch("[0-9a-f]{32}", attempt.get("ATTEMPT_ID", ""))
-            or attempt.get("APPROVED_BUILD_ENTRYPOINT") != "NewZoneEngineBuild/build.cmd"
-            or not {"ChatEngine.WinNet10", "LoginEngine.WinNet10", "WorldEngine", "ZoneEngine_New"}
-                <= set(attempt.get("PRODUCT_COMPILER_HOOKS", []))):
+            or attempt.get("APPROVED_BUILD_ENTRYPOINT") != entrypoint or not hooks_match):
         raise ValueError("Successful approved wrapper and product build observations are required")
     if any(not re.fullmatch("[0-9a-f]{40}", attempt.get(key, "")) for key in ("PUBLIC_MASTER_SHA", "CONTENT_DUMP_SHA")):
         raise ValueError("Exact public and dump source SHAs are required")
@@ -2149,7 +2501,10 @@ def require_successful_attempt(bundle, attempt):
         fetch = attempt.get(key, {})
         expected_role, expected_method = (("PUBLIC_PRODUCT", "GIT_FETCH") if key == "PUBLIC_FETCH"
                                          else ("PRIVATE_CONTENT_UPSTREAM", "AUTHENTICATED_GITHUB_API"))
-        if (fetch.get("RESULT") != "SUCCESS" or fetch.get("TIP_SHA") != attempt[field]
+        selected_fetch = key == "PUBLIC_FETCH" and selection is not None
+        identity_matches = (patch_hash(fetch.get("TIP_SHA"), 40) and fetch.get("SELECTED_SHA") == attempt[field]
+                            if selected_fetch else fetch.get("TIP_SHA") == attempt[field] and "SELECTED_SHA" not in fetch)
+        if (fetch.get("RESULT") != "SUCCESS" or not identity_matches
                 or fetch.get("ATTEMPT_ID") != attempt["ATTEMPT_ID"] or fetch.get("ROLE") != expected_role
                 or fetch.get("METHOD") != expected_method or not fetch.get("FETCHED_AT_UTC")
                 or not timestamp(attempt["ATTEMPT_STARTED_UTC"]) <= timestamp(fetch["FETCHED_AT_UTC"]) <= timestamp(attempt["BUILD_STARTED_UTC"])):
@@ -2160,8 +2515,10 @@ def require_successful_attempt(bundle, attempt):
     for row in binaries:
         if type(row.get("bytes")) is not int or row["bytes"] <= 0 or not re.fullmatch("[0-9a-f]{64}", row.get("sha256", "")):
             raise ValueError("Measured Windows output identity is invalid")
+    if selection is not None:
+        validate_windows_reuse(bundle, attempt, selection)
     reconciliation = read_json(load_descriptor(bundle, attempt["RECONCILIATION"]))
-    rows = validate_reconciliation_summary(bundle, reconciliation)
+    rows = validate_reconciliation_summary(bundle, reconciliation, selected_patch=selection is not None or selected_checkpoint)
     validation = attempt.get("WINDOWS_CONTENT_VALIDATION", {})
     if (set(validation) != {"METHOD", "SUMMARY_SHA256", "LOCAL_REPLAY_SHA256", "CANONICAL_MANIFEST", "VALIDATED_AT_UTC"}
             or validation["METHOD"] != "LOCAL_GUARDED_REPLAY_AND_WHOLE_TREE_MEASUREMENT"
@@ -2184,7 +2541,13 @@ def require_successful_attempt(bundle, attempt):
 
 def current_matches(root, profile, bundle, attempt):
     require_successful_attempt(bundle, attempt)
-    source_exact(root, attempt["PUBLIC_MASTER_SHA"], profile.get("LOCAL_CONFIG_OVERRIDES", ()))
+    selection = attempt.get("WINDOWS_PATCH_SELECTION")
+    if selection is None:
+        source_exact(root, attempt["PUBLIC_MASTER_SHA"], profile.get("LOCAL_CONFIG_OVERRIDES", ()))
+    else:
+        authority = fresh_public(root, profile)
+        verify_patch_source(root, profile, authority, load_descriptor(bundle, selection), selection["SHA256"],
+                            attempt["WINDOWS_PATCH_TOOL_SOURCE_SHA"])
     rows, _ = inventory(profile["CANONICAL_GAMEDATA_ROOT"])
     if validate_manifest(rows) != attempt["WINDOWS_GAMEDATA_MANIFEST"]:
         raise ValueError("Current Windows GameData differs from the build handed to Mike")
@@ -2199,6 +2562,7 @@ def validate_startup(bundle, windows, attempt):
             or windows.get("WINDOWS_PRODUCT_SOURCE_SHA") != attempt["PUBLIC_MASTER_SHA"]
             or windows.get("WINDOWS_RUNTIME_DIFFS") != 0
             or any(windows.get(key) != attempt[key] for key in TUPLE)
+            or windows.get("WINDOWS_PATCH_SELECTION") != attempt.get("WINDOWS_PATCH_SELECTION")
             or windows.get("WORLD_RECOVERY_COMPLETE") is not True):
         raise ValueError("Actual successful current-tuple Windows startup required")
     if {row["path"]: (row["sha256"], row["bytes"]) for row in windows.get("BINARIES", [])} != {
@@ -2333,6 +2697,8 @@ def record_startup(root, profile, attempt_path, raw_receipt_path):
     windows["BUILD_ATTEMPT_RECEIPT"] = descriptor(bundle, attempt_path)
     windows["RAW_WINDOWS_RECEIPT"] = stash(bundle, "raw-windows-receipt.json", raw.read_bytes())
     windows["WINDOWS_USER_ACCEPTED"] = "NO"
+    if "WINDOWS_PATCH_SELECTION" in attempt:
+        windows["WINDOWS_PATCH_SELECTION"] = attempt["WINDOWS_PATCH_SELECTION"]
     selections = bundle / "startup-selection"
     if not selections.is_dir():
         raise ValueError("Release-mode launcher selection evidence is absent")
@@ -2373,13 +2739,15 @@ def accept_windows(root, profile, windows_path, evidence_path):
     receipt = {"FORMAT_VERSION": 1, **expected, "WINDOWS_USER_ACCEPTED": "YES", "ACCEPTED_BY": "Mike",
                "ACCEPTED_UTC": now(), "EXPLICIT_ACCEPTANCE_EVIDENCE": stash(bundle, "explicit-mike-acceptance.json", evidence_path.read_bytes()),
                "BUILD_ATTEMPT_RECEIPT": descriptor(bundle, attempt_path), "WINDOWS_RECEIPT": descriptor(bundle, windows_path)}
+    if "WINDOWS_PATCH_SELECTION" in attempt:
+        receipt["WINDOWS_PATCH_SELECTION"] = attempt["WINDOWS_PATCH_SELECTION"]
     target = bundle / "acceptance.json"
     write_json(target, receipt, exclusive=True)
     load_accepted_release(root, target)
     return export_accepted_bundle(root, bundle, target)
 
 
-def load_accepted_release(repository_root, acceptance_path):
+def load_accepted_release(repository_root, acceptance_path, *, selected_checkpoint=False):
     """Validate one portable immutable accepted bundle; no fetches or source writes."""
     repository_root = Path(repository_root).resolve(strict=True)
     acceptance_path = Path(acceptance_path)
@@ -2394,9 +2762,10 @@ def load_accepted_release(repository_root, acceptance_path):
     attempt_path = load_descriptor(bundle, acceptance["BUILD_ATTEMPT_RECEIPT"])
     windows_path = load_descriptor(bundle, acceptance["WINDOWS_RECEIPT"])
     attempt, windows = read_json(attempt_path), read_json(windows_path)
-    rows, reconciliation = require_successful_attempt(bundle, attempt)
+    rows, reconciliation = require_successful_attempt(bundle, attempt, selected_checkpoint=selected_checkpoint)
     validate_startup(bundle, windows, attempt)
-    if windows["BUILD_ATTEMPT_RECEIPT"] != acceptance["BUILD_ATTEMPT_RECEIPT"]:
+    if (windows["BUILD_ATTEMPT_RECEIPT"] != acceptance["BUILD_ATTEMPT_RECEIPT"]
+            or acceptance.get("WINDOWS_PATCH_SELECTION") != attempt.get("WINDOWS_PATCH_SELECTION")):
         raise ValueError("Windows receipt is bound to a different build attempt")
     expected = {**{key: attempt[key] for key in TUPLE}, "WINDOWS_RECEIPT_SHA256": digest(windows_path.read_bytes())}
     evidence = read_json(load_descriptor(bundle, acceptance["EXPLICIT_ACCEPTANCE_EVIDENCE"]))
@@ -2416,6 +2785,11 @@ def main(argv=None):
     parser.add_argument("--repository-root", type=Path, default=Path(__file__).resolve().parents[1])
     parser.add_argument("--profile", type=Path)
     parser.add_argument("--approved-plan-sha256")
+    parser.add_argument("--patch-selection", type=Path)
+    parser.add_argument("--approved-patch-selection-sha256")
+    parser.add_argument("--patch-tool-source-sha")
+    parser.add_argument("--patch-windows-baseline", type=Path)
+    parser.add_argument("--patch-windows-baseline-sha256")
     parser.add_argument("--resolutions", type=Path)
     parser.add_argument("--generated-items-receipt", type=Path)
     parser.add_argument("--generated-surfaces-receipt", type=Path)
@@ -2430,10 +2804,18 @@ def main(argv=None):
     args, child = parser.parse_known_args(argv)
     try:
         root = args.repository_root.resolve(strict=True)
+        patch = (args.patch_selection, args.approved_patch_selection_sha256, args.patch_tool_source_sha)
+        reuse = (args.patch_windows_baseline, args.patch_windows_baseline_sha256)
+        if any(patch) and (not all(patch) or args.mode not in ("prepare-build", "run-build")):
+            raise ValueError("Patch intake requires an exact selection, digest and public tooling commit")
+        if any(reuse) and (not all(reuse) or not all(patch) or args.mode not in ("prepare-build", "run-build")):
+            raise ValueError("Windows reuse requires a hash-bound prior accepted baseline for the scoped build")
+        patch = patch if all(patch) else None
+        reuse = reuse if all(reuse) else None
         if args.developer_build:
             release_arguments = (args.profile, args.approved_plan_sha256, args.resolutions,
                                  args.generated_items_receipt, args.generated_surfaces_receipt, args.build_attempt, args.windows_receipt,
-                                 args.acceptance_evidence, args.publishing, child)
+                                 args.acceptance_evidence, args.publishing, child, patch, reuse)
             if args.mode != "verify-build-token" or any(release_arguments):
                 raise ValueError("Developer compilation cannot replace a governed build, publishing or release validation")
             print("WINDOWS_BUILD_SCOPE=DEVELOPER; PRIVATE_RELEASE_PROFILE=NOT_REQUIRED")
@@ -2455,7 +2837,9 @@ def main(argv=None):
             child = child[1:] if child[:1] == ["--"] else child
             if not child:
                 raise ValueError("Existing build child command is required")
-            return (run_feature_validation if args.mode == "run-feature-validation" else run_build)(root, profile, child)
+            if args.mode == "run-feature-validation":
+                return run_feature_validation(root, profile, child)
+            return run_build(root, profile, child, patch=patch, reuse=reuse)
         elif child:
             raise ValueError("Unknown contract command arguments")
         elif args.mode == "reconcile-content":
@@ -2463,7 +2847,10 @@ def main(argv=None):
                 raise ValueError("Explicit hash-bound safe content-plan approval required")
             apply_content(root, profile, args.approved_plan_sha256, read_json(args.resolutions) if args.resolutions else None, args.generated_items_receipt, args.generated_surfaces_receipt)
         elif args.mode == "prepare-build":
-            bundle, attempt, plan, _, _ = intake(root, profile, read_json(args.resolutions) if args.resolutions else None, args.generated_items_receipt, args.generated_surfaces_receipt)
+            prior = load_windows_patch_baseline(read_patch_selection(patch[0], patch[1]), *reuse) if patch and reuse else None
+            bundle, attempt, plan, _, _ = intake(root, profile, read_json(args.resolutions) if args.resolutions else None,
+                                                args.generated_items_receipt, args.generated_surfaces_receipt,
+                                                patch=patch, reused_context=prior)
             print("CONTENT_PLAN_SHA256=" + digest(encoded(plan)))
             print("BUILD_ATTEMPT_RECEIPT=" + (bundle / "prepared.json").relative_to(root).as_posix())
             if plan["CANONICAL_BEFORE_MANIFEST"] != plan["WINDOWS_GAMEDATA_MANIFEST"]:
@@ -2477,7 +2864,7 @@ def main(argv=None):
                 raise ValueError("Frozen Windows receipt and explicit Mike acceptance evidence required")
             print("WINDOWS_ACCEPTANCE=" + accept_windows(root, profile, args.windows_receipt, args.acceptance_evidence).relative_to(root).as_posix())
         return 0
-    except (OSError, ValueError, KeyError, TypeError) as error:
+    except (OSError, ValueError, KeyError, TypeError, subprocess.SubprocessError) as error:
         print("WINDOWS_RELEASE_CONTRACT=FAIL " + str(error), file=sys.stderr)
         return 1
 

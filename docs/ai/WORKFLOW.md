@@ -229,8 +229,10 @@ closed without their required private configuration. The helper's
 it rejects release arguments/active capabilities and creates no release state.
 
 Follow [BUILD_RELEASE_CONTRACT.md](../project/BUILD_RELEASE_CONTRACT.md) before
-every governed release build/release attempt. The local Windows integration checkout
-must match freshly fetched public master. Check the configured private content
+every governed release build/release attempt. Full and ordinary releases
+require the current public-master tip. Explicit ZoneEngine-only runtime patches
+may use an exact master ancestor through the approved private patch selection.
+Check the configured private content
 upstream every attempt, reconcile every approved addition/modification/removal,
 and preserve legitimate canonical repairs and private/generated content before
 the Windows build.
@@ -256,6 +258,14 @@ canonical GameData manifest. `reconcile-content` applies only approved content
 decisions. The normal product build wrapper enforces the same pre-build intake;
 direct product builds must not bypass it. Private role bindings and canonical
 data remain in the configured private intake settings.
+
+For a selected ZoneEngine-only runtime patch, pass the existing planner JSON
+through `--patch-selection` and its approved digest through
+`--approved-patch-selection-sha256`. Use the owning private profile and
+provide the hash-bound prior Windows acceptance bundle for unchanged engine
+artifacts. The release wrapper records the freshly fetched authority tip
+separately from the selected checkout source. The measured startup and Mike's
+exact-input acceptance still gate the private Linux build.
 
 When changed inputs or an explicit fresh-data instruction require renewed item data, build the current
 Tools/RDBDataExtractor/RDBDataExtractor.csproj from that exact public SHA and
