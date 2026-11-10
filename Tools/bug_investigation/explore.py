@@ -22,9 +22,9 @@ CODE_ROOTS = tuple(SERVER + name for name in (
     "AORebirth.BotService", "AORebirth.Modules.Abstractions", "AORebirth.ObjectManager",
     "AORebirth.DungeonGenerator", "AORebirth.World.Collision", "AORebirth.World.Contracts",
     "AORebirth.World.Package", "AORebirth.World.Pathfinding", "AOtomation/AOtomation.Messaging",
-)) + ("Tools/MissionDaoValidation", "Tools/ZoneEngineSchemaValidation")
+)) + ("Tools/MissionDaoValidation", "Tools/ZoneEngineSchemaValidation", "Tests/Fixtures/Gameplay/Playfields")
 DOC_ROOTS = ("docs/ai", "docs/project", "docs/evidence", "docs/reference", "docs/generated", "docs/reports")
-CODE_TYPES = (".cs", ".csproj", ".sql", ".props")
+CODE_TYPES = (".cs", ".csproj", ".sql", ".props", ".proto")
 DOC_TYPES = (".md", ".csv", ".json", ".yaml", ".yml", ".txt")
 PRIVATE_TYPES = {".json", ".csv", ".tsv", ".md", ".txt", ".log"}
 SOURCE_PATTERNS = tuple(
