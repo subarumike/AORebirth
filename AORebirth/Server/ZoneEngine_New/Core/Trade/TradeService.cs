@@ -1764,10 +1764,14 @@ namespace ZoneEngine_New.Core.Trade
 
                 foreach (TradeSession session in _byPlayer.Values)
                 {
-                    if (!ReferenceEquals(session.Initiator.Playfield, playfield))
-                        continue;
-
-                    if (!IsStale(session, playfield))
+                    if (IsQuarantinedShop(session))
+                    {
+                        // A quarantined logout skips normal trade cancellation and can already be detached.
+                        // The machine's owner tick can still release its shopper count.
+                        if (!ReferenceEquals(session.Machine?.Playfield, playfield))
+                            continue;
+                    }
+                    else if (!ReferenceEquals(session.Initiator.Playfield, playfield) || !IsStale(session, playfield))
                         continue;
 
                     stale ??= [];
@@ -1780,7 +1784,31 @@ namespace ZoneEngine_New.Core.Trade
                 return;
 
             foreach (TradeSession session in stale)
-                Close(session, "out of range or partner gone");
+            {
+                if (IsQuarantinedShop(session))
+                    ReleaseQuarantinedShop(session, playfield);
+                else
+                    Close(session, "out of range or partner gone");
+            }
+        }
+
+        static bool IsQuarantinedShop(TradeSession session)
+            => session.Kind == TradeKind.Shop && session.Initiator.IsPersistenceQuarantined;
+
+        void ReleaseQuarantinedShop(TradeSession session, Playfield playfield)
+        {
+            lock (_gate)
+            {
+                int characterId = session.Initiator.Identity.Instance;
+                if (session.Machine is not VendingMachine machine || !ReferenceEquals(machine.Playfield, playfield)
+                    || !_byPlayer.TryGetValue(characterId, out TradeSession? current) || !ReferenceEquals(current, session))
+                    return;
+
+                // Drop the transient pane only. A quarantined player must reload parked items from storage.
+                session.Committing = true;
+                _byPlayer.Remove(characterId);
+                machine.Stock.CloseTrade();
+            }
         }
 
         static bool IsStale(TradeSession session, Playfield playfield)
