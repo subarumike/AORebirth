@@ -32,6 +32,11 @@ namespace AORebirth.Interfaces.Persistence.Characters
         PersistedOrgLockoutData LoadOrgLockout(int characterId);
         /// <summary>Inserts or updates the organization lockout row of this character.</summary>
         void SaveOrgLockout(int characterId, string characterName, long secondsRemaining);
+        /// <summary>
+        /// Stores one Anarchism kick request under the organizations row lock. Quorum is memberQuorum for a member
+        /// target and leaderQuorum for the leader; when reached, the stored requests of that target are deleted.
+        /// </summary>
+        PersistedAnarchistKickResult RecordAnarchistKick(int organizationId, int kickedId, string kickedName, int kickerId, string kickerName, int memberQuorum, int leaderQuorum);
         /// <summary>Clears Clan and ClanLevel and sets SocialStatus to the orgless value for one character.</summary>
         void ClearOrganizationMembership(int characterId);
         /// <summary>Character ids whose Clan stat equals the organization id.</summary>

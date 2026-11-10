@@ -46,7 +46,12 @@ namespace ZoneEngine_New.Core.Data
             => Run(() => _persistence.LoadOrgLockout(characterId));
 
         public void SaveLockout(int characterId, string characterName, long secondsRemaining)
-            => Run(() => _persistence.SaveOrgLockout(characterId, characterName, secondsRemaining));
+                 => Run(() => _persistence.SaveOrgLockout(characterId, characterName, secondsRemaining));
+
+            public AORebirth.Interfaces.Persistence.Characters.PersistedAnarchistKickResult RecordAnarchistKick(int organizationId,
+                int kickedId, string kickedName, int kickerId, string kickerName, int memberQuorum, int leaderQuorum)
+                => Run(() => _persistence.RecordAnarchistKick(organizationId, kickedId, kickedName, kickerId, kickerName,
+                    memberQuorum, leaderQuorum));
 
         public void ClearMembership(int characterId)
             => Run(() => _persistence.ClearOrganizationMembership(characterId));

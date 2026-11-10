@@ -184,6 +184,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MSSqlConnector.cs" />
     <Compile Include="SqlMapperUtil.cs" />
+    <Content Include="Migrations\20261109_org_anar_pend_kick.sql" />
     <Content Include="SqlTables\characterstimers.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -236,6 +237,7 @@
     <Content Include="SqlTables\generatedquests.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="SqlTables\org_anar_pend_kick.sql" />
     <Content Include="SqlTables\org_lockout.sql" />
     <Content Include="SqlTables\questdungeonkeys.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

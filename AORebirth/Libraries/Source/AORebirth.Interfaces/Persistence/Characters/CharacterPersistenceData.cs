@@ -177,6 +177,31 @@ namespace AORebirth.Interfaces.Persistence.Characters
         public long SecondsRemaining { get; set; }
     }
 
+    /// <summary>Result of one Anarchism kick request stored in org_anar_pend_kick.</summary>
+    public enum AnarchistKickOutcome
+    {
+        /// <summary>The organization, or the membership of the kicker or the target, no longer exists; nothing was stored.</summary>
+        Missing,
+        /// <summary>The request is stored and the quorum is not reached yet.</summary>
+        Recorded,
+        /// <summary>The quorum is reached; the stored requests of this target were consumed.</summary>
+        Reached
+    }
+
+    public sealed class PersistedAnarchistKickerData
+    {
+        public int KickerId { get; set; }
+        public string KickerName { get; set; }
+    }
+
+    public sealed class PersistedAnarchistKickResult
+    {
+        public AnarchistKickOutcome Outcome { get; set; }
+        public bool TargetIsLeader { get; set; }
+        /// <summary>Requests consumed by a reached quorum, oldest first.</summary>
+        public IList<PersistedAnarchistKickerData> Requesters { get; set; } = new List<PersistedAnarchistKickerData>();
+    }
+
     public sealed class CharacterActiveNanoData
     {
         public int CharacterId { get; set; }

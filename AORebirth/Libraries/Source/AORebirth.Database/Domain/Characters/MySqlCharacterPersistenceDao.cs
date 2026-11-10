@@ -124,6 +124,25 @@ namespace AORebirth.Database.Domain.Characters
                 return command.ExecuteNonQuery();
         }
 
+        // Reads inside a Transaction lambda must use its own transaction, not callerTransaction.
+        private static IList<T> QueryWithin<T>(IDbConnection connection, IDbTransaction transaction,
+            string sql, Func<IDataRecord, T> map, params object[] parameters)
+        {
+            var rows = new List<T>();
+            using (IDbCommand command = Command(connection, transaction, sql, parameters))
+            using (IDataReader reader = command.ExecuteReader())
+                while (reader.Read()) rows.Add(map(reader));
+            return rows;
+        }
+
+        private static bool IsMemberWithin(IDbConnection connection, IDbTransaction transaction, int organizationId, int characterId)
+        {
+            IList<int> memberOf = QueryWithin(connection, transaction,
+                "SELECT StatValue FROM stats WHERE Type=@Type AND Instance=@Id AND StatId=@Clan FOR UPDATE",
+                r => r.GetInt32(0), "@Type", (int)IdentityType.CanbeAffected, "@Id", characterId, "@Clan", (int)CharacterStat.Clan);
+            return memberOf.Count > 0 && memberOf[0] == organizationId;
+        }
+
         private IList<T> Query<T>(string sql, Func<IDataRecord, T> map, params object[] parameters)
         {
             return Read<IList<T>>(connection =>
@@ -250,15 +269,73 @@ namespace AORebirth.Database.Domain.Characters
                 "@CharId", characterId, "@Name", characterName ?? string.Empty, "@Seconds", secondsRemaining, "@Now", now));
         }
 
+        public PersistedAnarchistKickResult RecordAnarchistKick(int organizationId, int kickedId, string kickedName,
+            int kickerId, string kickerName, int memberQuorum, int leaderQuorum)
+        {
+            if (organizationId <= 0) throw new ArgumentOutOfRangeException(nameof(organizationId));
+            if (kickedId <= 0) throw new ArgumentOutOfRangeException(nameof(kickedId));
+            if (kickerId <= 0) throw new ArgumentOutOfRangeException(nameof(kickerId));
+            if (memberQuorum <= 0) throw new ArgumentOutOfRangeException(nameof(memberQuorum));
+            if (leaderQuorum <= 0) throw new ArgumentOutOfRangeException(nameof(leaderQuorum));
+            long now = DateTime.UtcNow.Ticks;
+            return Transaction((c, t) =>
+            {
+                // The organizations row lock serialises kicks of one organization, even across zone instances.
+                IList<int> leaders = QueryWithin(c, t, "SELECT LeaderId FROM organizations WHERE Id=@Id FOR UPDATE",
+                    r => r.GetInt32(0), "@Id", organizationId);
+                if (leaders.Count == 0) return new PersistedAnarchistKickResult { Outcome = AnarchistKickOutcome.Missing };
+                // Both parties must still belong to this organization, or a stale request would survive a leave.
+                if (!IsMemberWithin(c, t, organizationId, kickerId) || !IsMemberWithin(c, t, organizationId, kickedId))
+                    return new PersistedAnarchistKickResult { Outcome = AnarchistKickOutcome.Missing };
+
+                bool targetIsLeader = leaders[0] == kickedId;
+                Execute(c, t, "INSERT INTO org_anar_pend_kick (org_id,kicked_id,kicker_id,kicked_name,kicker_name,requested_at,last_updated) "
+                    + "VALUES (@Org,@Kicked,@Kicker,@KickedName,@KickerName,@Now,@Now) ON DUPLICATE KEY UPDATE "
+                    + "kicked_name=VALUES(kicked_name), kicker_name=VALUES(kicker_name), last_updated=VALUES(last_updated)",
+                    "@Org", organizationId, "@Kicked", kickedId, "@Kicker", kickerId,
+                    "@KickedName", kickedName ?? string.Empty, "@KickerName", kickerName ?? string.Empty, "@Now", now);
+
+                IList<PersistedAnarchistKickerData> requesters = QueryWithin(c, t,
+                    "SELECT kicker_id,kicker_name FROM org_anar_pend_kick WHERE org_id=@Org AND kicked_id=@Kicked "
+                    + "ORDER BY requested_at, kicker_id",
+                    r => new PersistedAnarchistKickerData { KickerId = r.GetInt32(0), KickerName = r.IsDBNull(1) ? string.Empty : r.GetString(1) },
+                    "@Org", organizationId, "@Kicked", kickedId);
+
+                int quorum = targetIsLeader ? leaderQuorum : memberQuorum;
+                if (requesters.Count < quorum)
+                    return new PersistedAnarchistKickResult
+                                        {
+                                            Outcome = AnarchistKickOutcome.Recorded,
+                                            TargetIsLeader = targetIsLeader,
+                                            Requesters = requesters
+                                        };
+
+                Execute(c, t, "DELETE FROM org_anar_pend_kick WHERE org_id=@Org AND kicked_id=@Kicked",
+                    "@Org", organizationId, "@Kicked", kickedId);
+                return new PersistedAnarchistKickResult
+                {
+                    Outcome = AnarchistKickOutcome.Reached,
+                    TargetIsLeader = targetIsLeader,
+                    Requesters = requesters
+                };
+            });
+        }
+
         public void ClearOrganizationMembership(int characterId)
         {
             if (characterId <= 0) throw new ArgumentOutOfRangeException(nameof(characterId));
             Transaction<int>((c, t) =>
             {
+                IList<int> memberOf = QueryWithin(c, t, "SELECT StatValue FROM stats WHERE Type=@Type AND Instance=@Id AND StatId=@Clan",
+                    r => r.GetInt32(0), "@Type", (int)IdentityType.CanbeAffected, "@Id", characterId, "@Clan", (int)CharacterStat.Clan);
+                // Same lock order as RecordAnarchistKick: the organizations row first.
+                if (memberOf.Count > 0)
+                    QueryWithin(c, t, "SELECT Id FROM organizations WHERE Id=@Id FOR UPDATE", r => r.GetInt32(0), "@Id", memberOf[0]);
                 // An orgless character has no Clan or ClanLevel row: a stored rank 0 would read as leader.
                 Execute(c, t, "DELETE FROM stats WHERE Type=@Type AND Instance=@Id AND (StatId=@Clan OR StatId=@Level)",
                     "@Type", (int)IdentityType.CanbeAffected, "@Id", characterId,
                     "@Clan", (int)CharacterStat.Clan, "@Level", (int)CharacterStat.ClanLevel);
+                Execute(c, t, "DELETE FROM org_anar_pend_kick WHERE kicked_id=@Id OR kicker_id=@Id", "@Id", characterId);
                 return 0;
             });
         }
@@ -282,6 +359,8 @@ namespace AORebirth.Database.Domain.Characters
             if (organizationId <= 0) throw new ArgumentOutOfRangeException(nameof(organizationId));
             Transaction<int>((c, t) =>
             {
+                // Organizations row first, the same lock order as RecordAnarchistKick.
+                QueryWithin(c, t, "SELECT Id FROM organizations WHERE Id=@Id FOR UPDATE", r => r.GetInt32(0), "@Id", organizationId);
                 // Members become orgless: their ClanLevel and Clan rows are removed, not zeroed.
                 Execute(c, t, "DELETE r FROM stats r JOIN stats m ON m.Type=r.Type AND m.Instance=r.Instance "
                     + "AND m.StatId=@Clan AND m.StatValue=@Id "
@@ -290,6 +369,7 @@ namespace AORebirth.Database.Domain.Characters
                     "@Type", (int)IdentityType.CanbeAffected, "@Level", (int)CharacterStat.ClanLevel);
                 Execute(c, t, "DELETE FROM stats WHERE Type=@Type AND StatId=@Clan AND StatValue=@Id",
                     "@Type", (int)IdentityType.CanbeAffected, "@Clan", (int)CharacterStat.Clan, "@Id", organizationId);
+                Execute(c, t, "DELETE FROM org_anar_pend_kick WHERE org_id=@Id", "@Id", organizationId);
                 Execute(c, t, "DELETE FROM organizations WHERE Id=@Id", "@Id", organizationId);
                 return 0;
             });
@@ -300,6 +380,9 @@ namespace AORebirth.Database.Domain.Characters
             if (organizationId <= 0) throw new ArgumentOutOfRangeException(nameof(organizationId));
             Transaction((c, t) =>
             {
+                // Locking the row before reading the previous form keeps a concurrent kick on the same form.
+                IList<int> previous = QueryWithin(c, t, "SELECT GovernmentForm FROM organizations WHERE Id=@Id FOR UPDATE",
+                    r => r.GetInt32(0), "@Id", organizationId);
                 Execute(c, t, "UPDATE organizations SET GovernmentForm=@Form WHERE Id=@Id",
                     "@Form", governingForm, "@Id", organizationId);
                 Execute(c, t, "UPDATE stats r JOIN stats m ON m.Type=r.Type AND m.Instance=r.Instance "
@@ -308,6 +391,9 @@ namespace AORebirth.Database.Domain.Characters
                     "@Clan", (int)CharacterStat.Clan, "@Id", organizationId, "@Lowest", lowestRank,
                     "@Type", (int)IdentityType.CanbeAffected, "@Level", (int)CharacterStat.ClanLevel,
                     "@Leader", leaderId);
+                // Stored Anarchism kick requests belong to the form that recorded them; a re-save keeps them.
+                if (previous.Count > 0 && previous[0] != governingForm)
+                    Execute(c, t, "DELETE FROM org_anar_pend_kick WHERE org_id=@Id", "@Id", organizationId);
                 return 0;
             });
         }

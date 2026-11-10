@@ -40,6 +40,9 @@ A GM may also disband the organization of a targeted leader (Org Msg 119220807, 
 - Invite: selected target in sight, same side, not in an org, not locked; the inviter must be at least 3 ranks above the lowest rank (rank 2 left of the lowest). Anarchism is exempt. The inviter sees nothing unless the target is another side or already in an org. Refusing the dialog produces nothing.
 - Leave: client dialog, then 6 h lock; leaver sees "You've left the organization.", members see "<name> just left your organization."
 Kicked characters get a 6 h lock (anarchist leader 12 h).
+- Anarchism quorum: 2 distinct kickers remove a member, 3 remove the leader (the successor is drawn among the 3). Requests persist in `org_anar_pend_kick` under the `organizations` row lock; they are cleared when the kicker or target leaves, on disband, and on a governing form change.
+- Each recorded (not yet applied) anarchist kick sends the kicker "%d more members need to kick player." (Text.json 233638763, category 508) with the remaining count (member: 1; leader: 2 then 1).
+- Org Msg for quorum kicks: member `"<kicker1> and <kicker2> kicked <kicked> from your organization."` (Text.json 169766805 wording, plain text); leader `"<k1>, <k2> and <k3> kicked <leader> from the organization."` (Text.json 33408158, plain text); new leader `%UKqG` ("Leadership has been given to X.", ref reused from the promote capture, draw not captured). Client refs for the kick messages are not captured yet.
 - Locks are cumulative: each new lock is added to the remaining one (6 h x 2 minus elapsed online time). Time only elapses while online.
 
 ## 6. Votes
