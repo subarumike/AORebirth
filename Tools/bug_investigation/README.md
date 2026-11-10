@@ -26,6 +26,8 @@ Add `--repair-plan <private-json>` to enable draft repairs. Keep the plan, queue
 
 Set exact paths and a focused test filter for the authorized scope. The worker supplies the documented Windows feature-validation command as argv with the attempt worktree as the current directory. The trusted runner must enforce isolation from production networks and credentials, use the owning worktree’s private validation profile, propagate the wrapper exit code, and stop its descendants on timeout. Git and `gh` need separate authorization to push and create drafts.
 
+For the ZoneEngine test project, optionally set `test_scope` to `NpcAiFocusedTests` or `MissionDestinationFocusedTests` to use the existing focused compilation target as well as the test filter.
+
 Repair attempts operate on existing approved C# files. Optional `report_id` and `symptom_id` plan fields narrow the scope further. A diagnosis informed by private evidence requires an independent public-source review before the worker can attempt a repair. A validated symptom can produce its own draft while other symptoms remain open. The worker retains attempts, validation results, and draft links in SQLite. An interrupted publication can reconcile the exact commit and draft on the next sweep.
 
 Fixture mode requires a loopback synthetic feed and a separate GitHub repository whose name ends in `-Fixture`. Use `mode: fixture`, `fixture_test_arg`, and `fixture_failure_marker` in the plan. The fixture build and regression must reproduce the expected baseline failure and pass with the proposed edit.

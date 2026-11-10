@@ -18,6 +18,8 @@ OS_ENV = {
 }
 PROJECT = re.compile(r"[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*\.csproj")
 FILTER = re.compile(r"FullyQualifiedName~[A-Za-z_][A-Za-z0-9_.]*")
+ZONE_TEST_PROJECT = "AORebirth/Server/ZoneEngine_New.Tests/ZoneEngine_New.Tests.csproj"
+ZONE_TEST_SCOPES = {"NpcAiFocusedTests", "MissionDestinationFocusedTests"}
 
 
 def executable(value, label, root):
@@ -108,6 +110,12 @@ def validate(worktree, plan, *, baseline):
             r"tools\windows_release_contract.cmd", "run-feature-validation", "--",
         ]
         regression = ["test", test_project, "--filter", selector, "--nologo"]
+        scope = plan.get("test_scope")
+        if scope is not None:
+            if (test_project != ZONE_TEST_PROJECT or not isinstance(scope, str)
+                    or scope not in ZONE_TEST_SCOPES):
+                raise ValidationError("test_scope must name an approved ZoneEngine focused test target.")
+            regression.append(f"-p:{scope}=true")
     return [
         run_step([*prefix, dotnet, *build], "Scoped build", worktree, env, timeout),
         run_step([*prefix, dotnet, *regression], "Focused regression", worktree, env, timeout, marker),

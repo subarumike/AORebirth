@@ -1,8 +1,11 @@
 import json
+from pathlib import Path
 import sqlite3
 import unittest
+from unittest.mock import patch
 
 import triage
+import validation
 from worker import initialize
 
 
@@ -101,6 +104,23 @@ class InvestigationTests(unittest.TestCase):
         self.assertEqual(saved["classification"], triage.INCOMPLETE)
         self.assertTrue(saved["symptoms"][0]["repair_ready"])
         self.assertEqual(saved["symptoms"][1]["classification"], triage.INCOMPLETE)
+
+
+class ValidationPlanTests(unittest.TestCase):
+    def test_existing_zone_scope_is_forwarded_but_arbitrary_properties_are_refused(self):
+        plan = {
+            "mode": "aorebirth", "validation_timeout": 20,
+            "validation_runner": ["trusted-runner"], "build_project": "Game.csproj",
+            "test_project": validation.ZONE_TEST_PROJECT, "test_filter": "FullyQualifiedName~NpcBrain",
+            "test_scope": "NpcAiFocusedTests",
+        }
+        with (patch.object(validation, "tracked_project", side_effect=lambda name, *_: name),
+              patch.object(validation, "executable", side_effect=lambda name, *_: str(name)),
+              patch.object(validation, "run_step", return_value="ok") as run):
+            validation.validate(Path.cwd(), plan, baseline=False)
+            self.assertIn("-p:NpcAiFocusedTests=true", run.call_args.args[0])
+            with self.assertRaises(validation.ValidationError):
+                validation.validate(Path.cwd(), {**plan, "test_scope": "ArbitraryProperty"}, baseline=False)
 
 
 if __name__ == "__main__":
