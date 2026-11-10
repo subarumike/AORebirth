@@ -27,11 +27,12 @@ DOC_ROOTS = ("docs/ai", "docs/project", "docs/evidence", "docs/reference", "docs
 CODE_TYPES = (".cs", ".csproj", ".sql", ".props", ".proto")
 DOC_TYPES = (".md", ".csv", ".json", ".yaml", ".yml", ".txt")
 PRIVATE_TYPES = {".json", ".csv", ".tsv", ".md", ".txt", ".log"}
+AUTHORED_INTERACTIONS = SERVER + "ZoneEngine_New/Content/Runtime/interactions.json"
 SOURCE_PATTERNS = tuple(
     f":(glob,icase){root}/**/*{suffix}"
     for roots, suffixes in ((CODE_ROOTS, CODE_TYPES), (DOC_ROOTS, DOC_TYPES))
     for root in roots for suffix in suffixes
-) + ("AGENTS.md", "AI_START_HERE.md", "Directory.Build.props")
+) + ("AGENTS.md", "AI_START_HERE.md", "Directory.Build.props", AUTHORED_INTERACTIONS)
 MAX_SOURCE_BYTES = 8 * 1024 * 1024
 MAX_PRIVATE_BYTES = 128 * 1024 * 1024
 MAX_PRIVATE_SCAN = 160 * 1024 * 1024
@@ -50,6 +51,7 @@ SECRET_LINE = re.compile(
     r"[\"']?\s*[:=]\s*[\"']?[^\s\"']|\b(?:gh[pousr]_|github_pat_|sk-)[a-z0-9_-]{16,}"
     r"|-----BEGIN .*PRIVATE KEY-----|\b(?:raw|payload|packethex)\s*[:=]\s*[0-9a-f ]{64,})", re.I,
 )
+INTERACTION_PACKET_LINE = re.compile(r'"(?:Delete)?Hex"\s*:|"[0-9a-f]{64,}"', re.I)
 PROTOCOLS = {"2024-11-05", "2025-03-26", "2025-06-18", "2025-11-25"}
 
 
@@ -80,10 +82,14 @@ def is_under(name, prefix):
 
 
 def allowed_source(name):
-    if name in {"AGENTS.md", "AI_START_HERE.md", "Directory.Build.props"}:
+    if name in {"AGENTS.md", "AI_START_HERE.md", "Directory.Build.props", AUTHORED_INTERACTIONS}:
         return True
     return (name.lower().endswith(CODE_TYPES) and any(is_under(name, root) for root in CODE_ROOTS)
             or name.lower().endswith(DOC_TYPES) and any(is_under(name, root) for root in DOC_ROOTS))
+
+
+def redacted_line(name, line):
+    return SECRET_LINE.search(line) or (name == AUTHORED_INTERACTIONS and INTERACTION_PACKET_LINE.search(line))
 
 
 def private_file(info, allow_hardlinks=False):
@@ -268,7 +274,7 @@ class Explorer:
                         if index % 1024 == 0:
                             remaining(deadline)
                         scanned += len(line)
-                        if needle in line.lower() and not SECRET_LINE.search(line.decode("utf-8", "replace")):
+                        if needle in line.lower() and not redacted_line(name, line.decode("utf-8", "replace")):
                             matches.append(index)
                         if len(matches) >= 6 or scanned >= MAX_PRIVATE_SCAN:
                             break
@@ -317,7 +323,7 @@ class Explorer:
                     next_line = index
                     break
                 line = raw.decode("utf-8", "replace").rstrip("\r\n")
-                if b"\0" in raw or SECRET_LINE.search(line):
+                if b"\0" in raw or redacted_line(name, line):
                     line = "[redacted]"
                     visible = False
                 elif len(line) > 500:

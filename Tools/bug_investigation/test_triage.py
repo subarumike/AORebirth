@@ -1,3 +1,4 @@
+import io
 import json
 from pathlib import Path
 import sqlite3
@@ -9,7 +10,7 @@ from unittest.mock import patch
 
 import triage
 import validation
-from explore import Explorer
+from explore import AUTHORED_INTERACTIONS, SOURCE_PATTERNS, Explorer, allowed_source
 from repair import ApprovalError, RepairError, prepare, review_candidate
 from worker import InvestigationError, initialize
 
@@ -20,6 +21,25 @@ SWEEP = {"path": "", "first": 0, "last": 0, "private": True, "tool": "evidence_s
 
 
 class EvidenceSearchTests(unittest.TestCase):
+    def test_pinned_interactions_expose_routing_without_raw_packets(self):
+        explorer = Explorer.__new__(Explorer)
+        explorer.source, explorer.commit = Path.cwd(), "c" * 40
+        explorer.public, explorer.private, explorer.aliases = {AUTHORED_INTERACTIONS: "blob"}, {}, {}
+        explorer.audit = io.StringIO()
+        payload = "abc123" * 16
+        content = ('"Key": "doja-nascense",\n' + f'"Hex": "{payload}",\n'
+                   + f'"DeleteHex": [\n  "{payload}"\n]').encode()
+        self.assertTrue(allowed_source(AUTHORED_INTERACTIONS))
+        self.assertFalse(allowed_source(AUTHORED_INTERACTIONS.replace("interactions", "settings")))
+        self.assertIn(AUTHORED_INTERACTIONS, SOURCE_PATTERNS)
+        with (patch.object(explorer, "open", side_effect=lambda *_: io.BytesIO(content)),
+              patch("explore.git", return_value=f"{explorer.commit}:{AUTHORED_INTERACTIONS}\0".encode())):
+            excerpt = explorer.read({"path": AUTHORED_INTERACTIONS})["excerpt"]
+            self.assertIn("doja-nascense", excerpt)
+            self.assertNotIn(payload, excerpt)
+            self.assertEqual(explorer.search({"query": "doja-nascense"})["matches"][0]["lines"], [1])
+            self.assertEqual(explorer.search({"query": payload})["matches"], [])
+
     def test_each_approved_root_is_searched_even_if_the_first_read_fails(self):
         explorer = Explorer.__new__(Explorer)
         explorer.aliases = {"evidence-1": "GameData", "evidence-2": "captures",
