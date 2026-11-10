@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 import sqlite3
+import sys
 from tempfile import TemporaryDirectory
 from types import SimpleNamespace
 import unittest
@@ -110,6 +111,18 @@ class InvestigationTests(unittest.TestCase):
 
 
 class ValidationPlanTests(unittest.TestCase):
+    def test_validation_log_keeps_the_result_and_bounds_verbose_output(self):
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            log = root / "build.log"
+            command = [sys.executable, "-c",
+                       "import sys; print('x' * 300000); print('build result', file=sys.stderr)"]
+            validation.run_step(command, "Scoped build", root, None, 20, log=log)
+            result = log.read_bytes()
+            self.assertLess(len(result), 270_000)
+            self.assertIn(b"Earlier output omitted", result)
+            self.assertIn(b"build result", result)
+
     def test_missing_product_runner_fails_before_fetch_or_attempt(self):
         with TemporaryDirectory() as temporary:
             root = Path(temporary).resolve()

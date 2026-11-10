@@ -6,10 +6,13 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import uuid
 
+from cleanup import (CleanupRetained, archive_artifacts, direct_info, owner, registration,
+                     validation_artifacts, verify_worktree, worktree_inventory)
 from evidence import requested_evidence
-from publisher import PublishError, publish
-from validation import ValidationError, runner_command, validate
+from publisher import PublishError, existing_draft, publish
+from validation import StoragePreflightError, ValidationError, runner_command, storage_preflight, validate
 
 
 PRODUCT = "subarumike/AORebirth"
@@ -83,7 +86,7 @@ def read_repair(db, report_id, *, internal=False):
     state = json.loads(row[0]) if row else None
     if internal or state is None:
         return state
-    return {key: value for key, value in state.items() if key != "proposal"}
+    return public_progress(state)
 
 
 def read_symptom_repairs(db, report_id, *, internal=False):
@@ -94,10 +97,13 @@ def read_symptom_repairs(db, report_id, *, internal=False):
     for symptom_id, progress in rows:
         state = json.loads(progress)
         state["symptom_id"] = symptom_id
-        if not internal:
-            state.pop("proposal", None)
-        states.append(state)
+        states.append(state if internal else public_progress(state))
     return states
+
+
+def public_progress(state):
+    return {key: value for key, value in state.items()
+            if key not in {"proposal", "validation_artifacts", "cleanup_archive", "worktree_owner"}}
 
 
 def count_attempts(db, report_id):
@@ -214,15 +220,27 @@ def candidate_files(original, proposal):
     return changed
 
 
-def worktree_path(args, report_id, state):
+def attempt_location(args, report_id, state):
+    attempt = state["attempts"]
+    if (type(report_id) is not int or report_id < 1 or type(attempt) is not int
+            or not 1 <= attempt <= MAX_ATTEMPTS):
+        raise RepairError("The repair attempt has an invalid identity.")
     scope = str(report_id)
     if "symptom_id" in state:
-        scope += f"-s{state['symptom_id']}"
-    path = args.db.parent / "repair-worktrees" / f"{scope}-{state['attempts']}"
+        symptom_id = state["symptom_id"]
+        if type(symptom_id) is not int or symptom_id < 1:
+            raise RepairError("The repair symptom has an invalid identity.")
+        scope += f"-s{symptom_id}"
+    path = args.db.parent / "repair-worktrees" / f"{scope}-{attempt}"
+    return path, f"codex/bugfix-{scope}-attempt-{attempt}"
+
+
+def worktree_path(db, args, report_id, state):
+    path, branch = attempt_location(args, report_id, state)
     if path.resolve() != path:
         raise RepairError("The repair worktree path traverses an unexpected link.")
-    branch = f"codex/bugfix-{scope}-attempt-{state['attempts']}"
-    if not path.exists():
+    created = not os.path.lexists(path)
+    if created:
         path.parent.mkdir(parents=True, exist_ok=True)
         git(args.source, "worktree", "add", "-b", branch, str(path), state["base_commit"], timeout=120)
     if (Path(git(path, "rev-parse", "--show-toplevel").strip()).resolve() != path
@@ -230,7 +248,94 @@ def worktree_path(args, report_id, state):
             or Path(git(path, "rev-parse", "--path-format=absolute", "--git-common-dir").strip()).resolve()
             != Path(git(args.source, "rev-parse", "--path-format=absolute", "--git-common-dir").strip()).resolve()):
         raise RepairError("The isolated repair worktree does not match its checkpoint.")
+    if created:
+        try:
+            ownership = owner(args.source, path, branch, git)
+            evidence_root = args.db.parent / "repair-evidence"
+            if evidence_root.resolve() != evidence_root:
+                raise CleanupRetained("The validation evidence path traverses a link.")
+            evidence_root.mkdir(exist_ok=True)
+            direct_info(evidence_root)
+            evidence_dir = evidence_root / f"{path.name}-{uuid.uuid4().hex}"
+            evidence_dir.mkdir()
+            save(db, report_id, state, worktree_owner=ownership, evidence_dir=str(evidence_dir))
+        except (OSError, RuntimeError):
+            save(db, report_id, state, cleanup_status="retained",
+                 cleanup_reason="The worker could not record fresh ownership and evidence storage.")
     return path
+
+
+def validate_attempt(db, args, report_id, path, state, *, baseline):
+    if os.name == "nt" and args.plan["mode"] == "aorebirth":
+        storage_preflight(path, args.source)
+    if not state.get("worktree_owner"):
+        return validate(path, args.plan, baseline=baseline)
+    evidence_dir = evidence_location(args, path, state)
+    try:
+        _, ignored_before, _ = worktree_inventory(path, git)
+    except (OSError, RuntimeError, UnicodeError):
+        ignored_before = None
+    checks = validate(path, args.plan, baseline=baseline, evidence_dir=evidence_dir)
+    try:
+        if ignored_before is None:
+            raise CleanupRetained("An unknown artifact existed before validation.")
+        previous = state.get("validation_artifacts", {})
+        observed = validation_artifacts(path, state, git)
+        protected = {name.as_posix() for name in ignored_before} - set(previous)
+        save(db, report_id, state,
+             validation_artifacts={name: info for name, info in observed.items() if name not in protected})
+    except (OSError, RuntimeError, ValueError):
+        save(db, report_id, state, cleanup_status="retained",
+             cleanup_reason="Validation artifacts could not be inventoried safely.")
+    return checks
+
+
+def evidence_location(args, path, state):
+    evidence_dir = Path(state["evidence_dir"])
+    if (evidence_dir.parent != args.db.parent / "repair-evidence"
+            or not re.fullmatch(re.escape(path.name) + r"-[0-9a-f]{32}", evidence_dir.name)
+            or evidence_dir.resolve(strict=True) != evidence_dir or not evidence_dir.is_dir()):
+        raise RepairError("The validation evidence directory does not match the attempt.")
+    return evidence_dir
+
+
+def cleanup_published(db, args, report_id, state, branch, *, publication_verified=False):
+    if state.get("cleanup_status") == "retained" and publication_verified:
+        print(f"Bug {report_id}: retained published attempt. {state['cleanup_reason']}", flush=True)
+    if not state.get("worktree_owner") or state.get("cleanup_status") in {"removed", "retained"}:
+        return
+    try:
+        path, worktree_branch = attempt_location(args, report_id, state)
+        expected = state["worktree_owner"]
+        if expected["path"] != str(path) or expected["branch"] != worktree_branch:
+            raise CleanupRetained("The attempt ownership changed.")
+        if verify_worktree(args.source, path, state, git):
+            if state.get("evidence_dir"):
+                evidence_location(args, path, state)
+            if not publication_verified:
+                ref = f"refs/heads/{branch}"
+                if (git(args.source, "ls-remote", "--refs", "origin", ref).strip()
+                        != f"{state['commit']}\t{ref}"
+                        or existing_draft(args.source, args.plan["repository"], args.plan["base"], branch,
+                                          state["commit"]) != state["draft_pr"]):
+                    raise CleanupRetained("The exact published commit and open draft could not be verified.")
+            archive, size = archive_artifacts(path, state, git)
+            save(db, report_id, state, cleanup_status="pending", cleanup_archive=archive,
+                 cleanup_bytes=size, cleanup_reason=None)
+            if verify_worktree(args.source, path, state, git):
+                final_archive, final_size = archive_artifacts(path, state, git)
+                if final_archive != archive or final_size != size:
+                    raise CleanupRetained("The attempt changed after its cleanup checkpoint.")
+                git(args.source, "worktree", "remove", "--", str(path), timeout=120)
+                if os.path.lexists(path) or registration(args.source, path, git) is not None:
+                    raise CleanupRetained("Git did not completely remove the worktree.")
+        save(db, report_id, state, cleanup_status="removed")
+        print(f"Bug {report_id}: removed published attempt ({state['cleanup_bytes']} apparent bytes).", flush=True)
+    except (OSError, RuntimeError, ValueError) as error:
+        reason = str(error) if isinstance(error, (CleanupRetained, RepairError, PublishError)) else (
+            "The attempt could not be checked or removed safely.")
+        save(db, report_id, state, cleanup_status="retained", cleanup_reason=reason)
+        print(f"Bug {report_id}: retained published attempt. {reason}", flush=True)
 
 
 def check_files(path, original, changed, *, apply=False):
@@ -285,17 +390,22 @@ def repair_one(db, args, feed, job, result, state, run_codex):
         if count_attempts(db, report_id) >= MAX_ATTEMPTS:
             save(db, report_id, state, phase="exhausted")
             return
+        if os.name == "nt" and args.plan["mode"] == "aorebirth":
+            next_path, _ = attempt_location(args, report_id, {**state, "attempts": state["attempts"] + 1})
+            storage_preflight(next_path, args.source)
         save(db, report_id, state, phase="baseline", attempts=state["attempts"] + 1,
              fingerprint=job["fingerprint"], base_commit=args.repair_base,
-             plan=args.plan_fingerprint, checks=[], error=None)
-    path = worktree_path(args, report_id, state)
+             plan=args.plan_fingerprint, checks=[], error=None, worktree_owner=None,
+             evidence_dir=None, validation_artifacts={}, cleanup_status=None, cleanup_reason=None)
+    path = worktree_path(db, args, report_id, state)
     base = state["base_commit"]
     if state["phase"] == "baseline":
         if git(path, "rev-parse", "HEAD").strip() != base or git(path, "status", "--porcelain"):
             raise RepairError("The repair baseline worktree is not clean and pinned.")
         checks = []
         if args.plan["mode"] == "fixture":
-            checks = [f"Baseline {check}" for check in validate(path, args.plan, baseline=True)]
+            checks = [f"Baseline {check}" for check in validate_attempt(
+                db, args, report_id, path, state, baseline=True)]
         save(db, report_id, state, phase="proposing", checks=checks)
         original = tracked_files(args.source, base, allowed_files)
         references = ([f"{ref['path']}:{ref['line']}" for ref in result["trace"]]
@@ -318,7 +428,7 @@ def repair_one(db, args, feed, job, result, state, run_codex):
         check_files(path, original, changed, apply=True)
         git(path, "add", "--", *sorted(changed))
         tree = git(path, "write-tree").strip()
-        checks = validate(path, args.plan, baseline=False)
+        checks = validate_attempt(db, args, report_id, path, state, baseline=False)
         check_files(path, original, changed)
         if git(path, "write-tree").strip() != tree or git(path, "rev-parse", "HEAD").strip() != base:
             raise RepairError("Validation changed the candidate tree.")
@@ -345,6 +455,7 @@ def repair_one(db, args, feed, job, result, state, run_codex):
         )
         save(db, report_id, state, phase="published", draft_pr=url, error=None)
         print(f"{scope.capitalize()}: draft {url}", flush=True)
+        cleanup_published(db, args, report_id, state, branch, publication_verified=True)
 
 
 def repair_candidates(db, job, result, selected_symptom):
@@ -381,6 +492,11 @@ def process_repair(db, args, feed, job, result, symptom, state, run_codex):
     report_id = job["id"]
     if (state["phase"] in {"published", "exhausted"}
             and state.get("fingerprint", job["fingerprint"]) == job["fingerprint"]):
+        if state["phase"] == "published" and state.get("plan") == args.plan_fingerprint:
+            branch = f"codex/bugfix-{report_id}"
+            if state.get("multi_symptom"):
+                branch += f"-s{state['symptom_id']}"
+            cleanup_published(db, args, report_id, state, branch)
         return False
     is_symptom = "symptom_id" in state
     scope_is_pinned = (
@@ -424,6 +540,10 @@ def process_repair(db, args, feed, job, result, symptom, state, run_codex):
         return False
     try:
         repair_one(db, args, feed, job, symptom, state, run_codex)
+    except StoragePreflightError as error:
+        save(db, report_id, state, error=str(error))
+        print(f"Bug {report_id} repair deferred. {error}", flush=True)
+        return True
     except (RepairError, ValidationError, PublishError, OSError) as error:
         phase = state["phase"] if state["phase"] in {"validated", "committed"} else "retry"
         if phase == "retry" and count_attempts(db, report_id) >= MAX_ATTEMPTS:

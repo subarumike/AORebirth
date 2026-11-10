@@ -236,12 +236,16 @@ def run_codex(args, schema, prompt, context, *, explore=False, public_only=False
         except (OSError, ValueError):
             raise InvestigationError("Codex did not produce a readable JSON result.") from None
 
+def source_head(source):
+    return subprocess.check_output(
+        ["git", "-C", str(source), "rev-parse", "--verify", "HEAD"],
+        env=git_environment(), stderr=subprocess.DEVNULL, text=True, timeout=15,
+    ).strip()
+
+
 def investigate(db, args, report, fingerprint, previous):
     try:
-        commit = args.repair_base or subprocess.check_output(
-            ["git", "-C", str(args.source), "rev-parse", "--verify", "HEAD"],
-            env=git_environment(), stderr=subprocess.DEVNULL, text=True, timeout=15,
-        ).strip()
+        commit = args.repair_base or source_head(args.source)
 
         def invoke(schema, prompt, context, **options):
             return run_codex(args, schema, prompt, context, explore="symptom" in context, **options)
@@ -312,6 +316,55 @@ def exclusive_sweep(path):
         yield
 
 
+def process_next_new(db, feed, args, propose):
+    from repair import RepairError, prepare, process_repairs
+    from validation import ValidationError
+
+    failed = False
+    repair_enabled = False
+    args.repair_base = None
+    if args.repair_plan:
+        try:
+            args.repair_base = prepare(args)
+            repair_enabled = True
+        except (RepairError, ValidationError) as error:
+            print(f"Repair plan unavailable. {error}", file=sys.stderr, flush=True)
+            failed = True
+        except (OSError, ValueError):
+            print("Repair plan unavailable. Could not read trusted JSON.", file=sys.stderr, flush=True)
+            failed = True
+    if args.repair_base is None:
+        try:
+            args.repair_base = source_head(args.source)
+        except (OSError, subprocess.SubprocessError):
+            print("Could not pin the source for this batch.", file=sys.stderr, flush=True)
+            return True
+
+    count = 0
+    for records in feed.pages():
+        for report, _ in records:
+            report_id = report["id"]
+            if db.execute("SELECT 1 FROM jobs WHERE id = ?", (report_id,)).fetchone() is not None:
+                continue
+            selected = feed.detail(report_id)
+            if selected is None:
+                continue
+            with db:
+                enqueue(db, *selected)
+            count += 1
+            failed = process_pending(db, feed, args, selected=selected) or failed
+            if repair_enabled and args.plan.get("report_id", report_id) == report_id:
+                try:
+                    failed = process_repairs(db, args, feed, propose, selected_id=report_id) or failed
+                except (FeedError, RepairError) as error:
+                    print(f"Bug {report_id} repair deferred. {error}", file=sys.stderr, flush=True)
+                    failed = True
+            if count == args.next_new:
+                return failed
+    print(f"Selected {count} of up to {args.next_new} new reports.", flush=True)
+    return failed
+
+
 def run(db, args):
     from repair import RepairError, prepare, process_repairs
 
@@ -335,6 +388,8 @@ def run(db, args):
     while True:
         try:
             with exclusive_sweep(args.db):
+                if args.next_new is not None:
+                    return int(process_next_new(db, feed, args, propose))
                 selected = None
                 if args.report_id is not None:
                     selected = feed.detail(args.report_id)
@@ -385,7 +440,10 @@ def main():
     polling.add_argument("--evidence-dir", type=Path, action="append", default=[])
     polling.add_argument("--synthetic", action="store_true", help="Allow only a loopback HTTP fixture.")
     polling.add_argument("--repair-plan", type=Path, help="Trusted local JSON plan enabling draft repairs.")
-    polling.add_argument("--report-id", type=positive, help="Retrieve and process only this open report.")
+    selection = polling.add_mutually_exclusive_group()
+    selection.add_argument("--report-id", type=positive, help="Retrieve and process only this open report.")
+    selection.add_argument("--next-new", type=positive, metavar="N",
+                           help="Process up to N open report IDs never queued before, in a single sweep.")
     polling.add_argument("--timeout", type=positive, default=180, help="Codex timeout in seconds.")
     polling.add_argument("--symptom-workers", type=positive, choices=range(1, 4), default=1,
                          help="Concurrent read-only symptom investigations within one report.")
@@ -403,6 +461,8 @@ def main():
             parser.error("--poll-seconds must be nonnegative.")
         if args.report_id is not None and (not valid_id(args.report_id) or args.poll_seconds):
             parser.error("--report-id requires a valid website ID and a single sweep.")
+        if args.next_new is not None and args.poll_seconds:
+            parser.error("--next-new requires a single sweep.")
         args.source = args.source.resolve(strict=True)
         if not (args.source / "AORebirth/Server/ZoneEngine_New").is_dir():
             raise WorkerError("The source must be an AORebirth checkout with ZoneEngine_New.")
@@ -425,7 +485,7 @@ def main():
             raise WorkerError("Specify at most six approved evidence directories.")
         args.token_file = args.token_file.resolve(strict=True)
         if args.repair_plan:
-            args.repair_plan = args.repair_plan.resolve(strict=True)
+            args.repair_plan = args.repair_plan.resolve(strict=args.next_new is None)
         roots = [args.source, WORKER_ROOT, *args.evidence_dir]
         private_paths = [args.token_file, args.db]
         if args.repair_plan:

@@ -4,6 +4,8 @@ Run `python -B Tools/bug_investigation/worker.py --db <private-queue> run --api-
 
 For the first real report, use `--report-id <website-ID>` in place of `--poll-seconds 60`. This selects the authenticated detail route and limits investigation and optional draft repair to that ID. Rerunning the same ID preserves an unchanged completed result.
 
+Use `--next-new 3` for a one-shot batch of up to three open reports that have never been queued. An interrupted report remains in SQLite and can be resumed with `--report-id` or the regular worker. This batch limits optional repair to its own reports.
+
 The worker splits distinct symptoms and checkpoints each against the pinned source commit. Codex can search and page through approved tracked source and evidence using the worker's read-only source tool. It cannot run commands, open attachments, read credentials, or write source during investigation. `show <ID>` lists the trace, reproduction reasoning, outstanding evidence, and repair progress for each symptom. A source investigation that needs more reads gets up to three passes and remains `SOURCE_INVESTIGATION_INCOMPLETE` if that budget is exhausted. Use `requeue <ID> --symptom-id <N>` to revisit only that symptom.
 
 `--symptom-workers 3` lets Codex investigate up to three symptoms of the same report concurrently. Reports and repair attempts still run one at a time.
@@ -29,6 +31,8 @@ Set exact paths and a focused test filter for the authorized scope. The worker s
 For the ZoneEngine test project, optionally set `test_scope` to `NpcAiFocusedTests` or `MissionDestinationFocusedTests` to use the existing focused compilation target as well as the test filter.
 
 The worker checks that the trusted runner exists before starting a repair attempt. Product validation also requires a fresh VSTest result with a passing test that matches the approved filter.
+
+On Windows, the worker runs the operator's storage preflight before each new product repair worktree and before validation. It saves bounded build and regression logs, the verified TRX, and recognized feature-validation evidence locally. After verified draft publication it removes only an eligible worker-owned worktree. Unknown files, private profiles and active Git operations cause retention with a recorded reason.
 
 Repair attempts operate on existing approved C# files. Optional `report_id` and `symptom_id` plan fields narrow the scope further. A diagnosis informed by private evidence requires an independent public-source review before the worker can attempt a repair. A validated symptom can produce its own draft while other symptoms remain open. The worker retains attempts, validation results, and draft links in SQLite. An interrupted publication can reconcile the exact commit and draft on the next sweep.
 

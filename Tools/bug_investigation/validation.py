@@ -5,11 +5,16 @@ from pathlib import Path
 import re
 import shutil
 import subprocess
+from threading import Thread
 import uuid
 from xml.etree import ElementTree
 
 
 class ValidationError(RuntimeError):
+    pass
+
+
+class StoragePreflightError(ValidationError):
     pass
 
 
@@ -24,6 +29,39 @@ ZONE_TEST_PROJECT = "AORebirth/Server/ZoneEngine_New.Tests/ZoneEngine_New.Tests.
 ZONE_TEST_SCOPES = {"NpcAiFocusedTests", "MissionDestinationFocusedTests"}
 TRX_NAMESPACE = {"trx": "http://microsoft.com/schemas/VisualStudio/TeamTest/2010"}
 TRX_NAME = "regression.trx"
+LOG_LIMIT = 256 * 1024
+
+
+def storage_preflight(worktree, source):
+    if os.name != "nt":
+        raise StoragePreflightError("Product validation requires the Windows storage preflight.")
+    env = {key: value for key, value in os.environ.items() if key.upper() in OS_ENV}
+    try:
+        profile = Path(os.environ["USERPROFILE"])
+        script = profile / ".codex" / "storage-preflight.ps1"
+        shell = Path(os.environ["SystemRoot"]) / "System32/WindowsPowerShell/v1.0/powershell.exe"
+        if not script.is_file() or not shell.is_file():
+            raise ValueError
+        growth = {}
+        for path, reserve in ((worktree, 8), (source, 1), (profile, 2),
+                              (Path(os.environ["TEMP"]), 1)):
+            drive = path.drive.upper()
+            if not re.fullmatch(r"[A-Z]:", drive):
+                raise ValueError
+            growth[drive[0]] = growth.get(drive[0], 0) + reserve
+        env["AOREBIRTH_BUG_STORAGE_PREFLIGHT"] = str(script)
+        entries = "; ".join(f"{drive} = {size}" for drive, size in sorted(growth.items()))
+        command = f"& $env:AOREBIRTH_BUG_STORAGE_PREFLIGHT -GrowthGiB @{{ {entries} }}"
+        result = subprocess.run(
+            [str(shell), "-NoLogo", "-NoProfile", "-NonInteractive", "-Command", command],
+            cwd=source, env=env, stdin=subprocess.DEVNULL, capture_output=True,
+            text=True, errors="replace", timeout=30, check=False,
+        )
+    except (KeyError, ValueError, OSError, subprocess.SubprocessError):
+        raise StoragePreflightError("Could not run the existing Windows storage preflight.") from None
+    if result.returncode:
+        detail = re.search(r"Storage preflight refused [A-Z]: [^\r\n]+", result.stderr)
+        raise StoragePreflightError(detail[0] if detail else "Windows storage preflight refused the repair.")
 
 
 def executable(value, label, root):
@@ -64,12 +102,56 @@ def tracked_project(name, root, env):
     return name
 
 
-def run_step(command, label, root, env, timeout, marker=None):
+def record_step(command, root, env, timeout, log):
+    process = subprocess.Popen(command, cwd=root, env=env, stdin=subprocess.DEVNULL,
+                               stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    tail = bytearray()
+    omitted = 0
+    read_error = []
+
+    def drain():
+        nonlocal omitted
+        try:
+            with process.stdout as stream:
+                while chunk := stream.read1(64 * 1024):
+                    tail.extend(chunk)
+                    if len(tail) > LOG_LIMIT:
+                        excess = len(tail) - LOG_LIMIT
+                        del tail[:excess]
+                        omitted += excess
+        except OSError as error:
+            read_error.append(error)
+
+    reader = Thread(target=drain, daemon=True)
+    reader.start()
     try:
-        result = subprocess.run(
-            command, cwd=root, env=env, stdin=subprocess.DEVNULL, check=False, timeout=timeout,
-            stdout=subprocess.PIPE if marker else subprocess.DEVNULL, stderr=subprocess.STDOUT,
-        )
+        try:
+            status = process.wait(timeout=timeout)
+        except (subprocess.TimeoutExpired, KeyboardInterrupt):
+            # The trusted runner owns its descendants and must terminate them when its handle closes.
+            process.kill()
+            process.wait(timeout=5)
+            raise
+    finally:
+        reader.join(timeout=5)
+        with log.open("xb") as stream:
+            if omitted:
+                stream.write(b"[Earlier output omitted to bound log size]\n")
+            stream.write(bytes(tail))
+        if reader.is_alive() or read_error:
+            raise ValidationError("The trusted validation process did not close its output stream.")
+    return subprocess.CompletedProcess(command, status, bytes(tail))
+
+
+def run_step(command, label, root, env, timeout, marker=None, *, log=None):
+    try:
+        if log is not None:
+            result = record_step(command, root, env, timeout, log)
+        else:
+            result = subprocess.run(
+                command, cwd=root, env=env, stdin=subprocess.DEVNULL, check=False, timeout=timeout,
+                stdout=subprocess.PIPE if marker else subprocess.DEVNULL, stderr=subprocess.STDOUT,
+            )
     except subprocess.TimeoutExpired:
         raise ValidationError(f"{label} timed out after {timeout} seconds.") from None
     except OSError:
@@ -83,7 +165,7 @@ def run_step(command, label, root, env, timeout, marker=None):
     return f"{label}: passed (exit 0)"
 
 
-def passed_regression(path, selector):
+def passed_regression(path, selector, *, archive=None):
     try:
         if path.resolve(strict=True) != path or not path.is_file() or path.stat().st_nlink != 1:
             raise ValueError
@@ -115,10 +197,13 @@ def passed_regression(path, selector):
                    for result in results)
     if not 0 < matching <= passed <= executed or failed != 0:
         raise ValidationError("Focused regression has no successful result for the approved test filter.")
+    if archive is not None:
+        with archive.open("xb") as stream:
+            stream.write(data)
     return matching
 
 
-def run_regression(command, worktree, env, timeout, selector):
+def run_regression(command, worktree, env, timeout, selector, *, evidence=None):
     directory = worktree / ".local" / f"bug-regression-{uuid.uuid4().hex}"
     result = directory / TRX_NAME
     if directory.resolve() != directory or re.search(r'[&|<>()^%!"\r\n]', str(directory)):
@@ -136,9 +221,12 @@ def run_regression(command, worktree, env, timeout, selector):
         raise ValidationError("Could not create a fresh regression result directory.") from None
 
     try:
-        run_step([*command, "--logger", f"trx;LogFileName={TRX_NAME}", "--results-directory", str(directory)],
-                 "Focused regression", worktree, env, timeout)
-        matching = passed_regression(result, selector)
+        argv = [*command, "--logger", f"trx;LogFileName={TRX_NAME}", "--results-directory", str(directory)]
+        if evidence is None:
+            run_step(argv, "Focused regression", worktree, env, timeout)
+        else:
+            run_step(argv, "Focused regression", worktree, env, timeout, log=evidence / "regression.log")
+        matching = passed_regression(result, selector, archive=evidence / TRX_NAME if evidence else None)
         return f"Focused regression: {matching} matching test result(s) passed"
     finally:
         resolved = directory.resolve()
@@ -146,7 +234,7 @@ def run_regression(command, worktree, env, timeout, selector):
             shutil.rmtree(directory)
 
 
-def validate(worktree, plan, *, baseline):
+def validate(worktree, plan, *, baseline, evidence_dir=None):
     worktree = worktree.resolve(strict=True)
     timeout = plan.get("validation_timeout")
     if type(timeout) is not int or not 1 <= timeout <= 1800:
@@ -188,8 +276,21 @@ def validate(worktree, plan, *, baseline):
                     or scope not in ZONE_TEST_SCOPES):
                 raise ValidationError("test_scope must name an approved ZoneEngine focused test target.")
             regression.append(f"-p:{scope}=true")
-    built = run_step([*prefix, dotnet, *build], "Scoped build", worktree, env, timeout)
+    evidence = None
+    if evidence_dir is not None and plan["mode"] == "aorebirth":
+        if (evidence_dir.resolve(strict=True) != evidence_dir or not evidence_dir.is_dir()
+                or evidence_dir.is_relative_to(worktree)):
+            raise ValidationError("Validation evidence needs a private directory outside the worktree.")
+        evidence = evidence_dir / f"validation-{uuid.uuid4().hex}"
+        evidence.mkdir()
+    command = [*prefix, dotnet, *build]
+    built = (run_step(command, "Scoped build", worktree, env, timeout, log=evidence / "build.log")
+             if evidence is not None else run_step(command, "Scoped build", worktree, env, timeout))
     command = [*prefix, dotnet, *regression]
-    tested = (run_step(command, "Focused regression", worktree, env, timeout, marker)
-              if plan["mode"] == "fixture" else run_regression(command, worktree, env, timeout, selector))
+    if plan["mode"] == "fixture":
+        tested = run_step(command, "Focused regression", worktree, env, timeout, marker)
+    elif evidence is None:
+        tested = run_regression(command, worktree, env, timeout, selector)
+    else:
+        tested = run_regression(command, worktree, env, timeout, selector, evidence=evidence)
     return [built, tested]
