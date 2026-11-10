@@ -62,7 +62,7 @@ def publish(worktree: Path, repository: str, base: str, branch: str, expected_sh
             title: str, body: str) -> str:
     if (not re.fullmatch(r"[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+", repository)
             or not re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9_.-]*", base)
-            or not re.fullmatch(r"codex/bugfix-[1-9][0-9]*", branch)
+            or not re.fullmatch(r"codex/bugfix-[1-9][0-9]*(?:-s[1-9][0-9]*)?", branch)
             or not re.fullmatch(r"[0-9a-f]{40}", expected_sha)):
         raise PublishError("Invalid GitHub publication target.")
     expected = {
