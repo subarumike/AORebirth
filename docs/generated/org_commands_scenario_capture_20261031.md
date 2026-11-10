@@ -107,8 +107,10 @@ Create refusals are Feedback 501 (see 5.2). Governing form: applying the CURRENT
 | `%rgLG` | vote twice, or try to change a vote | You have already cast your vote. You cannot vote more than once on this matter. |
 | `%7dp,` | bank remove by a non-leader | Only leaders can take credits out of the organization. |
 | `%#`LIu` | bank remove above the balance (parameter = balance) | You cannot withdraw more credits from the organizational bank account than is currently in it. The account holds N credits right now. |
-| `"]LeU` | bank add above own credits (to confirm in a capture) | You cannot add more credits than you own. |
-| - | bank remove reaching the 1B toon limit | You cannot receive that many credits or you'd reach your limit. (declared, no capture) |
+| `"]LeU` | bank add above own credits (to confirm in a capture) | You cannot add more credits than you own. (Text.json 89364632) |
+| - | bank add invalid, zero or negative amount (declared, no capture) | The specified amount of credits is not allowed. (Text.json 5429092) |
+| - | bank add when the Bank is already at 3999999999 (AOR only, declared) | The specified amount of credits is not allowed. (Text.json 5429092) |
+| - | bank remove by the leader when the toon would exceed 999999999 (declared, no capture; the 'reach your limit' sentence is not in Text.json) | The specified amount of credits is not allowed. (Text.json 5429092) |
 | - | kick by name refused for a non-leader, "offline" case | Only the leader can kick this character. (declared in missing.ods; NO ref captured; the captured by-name rank refusal uses `$3*4s`) |
 | client-side | invited character under lock | Unable to perform action, able in HH:MM:SS (evaluated by the client, see section 7) |
 
@@ -160,7 +162,7 @@ anarchist leader kicked 12 h, disbanded org 12 h for everyone (`disbandLockoutSe
 
 ## 8. Amounts
 
-Tax, BankAdd and BankRemove were tested with 1 credit; in the capture the bank held 1 credit, so `%#`LIu` parameter = balance (the "0 credits" example in missing.ods was made off-capture). Limits (bank cap 4 billion, toon limit 1 billion) are declared in rules.txt, not captured.
+The bank cap 3999999999 is supported by captured views (3999999999 at 11:24 and 11:26, 3000000001 at 11:26:38 on Old Athen). The toon limit 999999999 and the overflow rule (giver keeps the difference) are declared in rules.txt, not captured.
 
 ## 9. Still open
 

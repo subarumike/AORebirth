@@ -36,6 +36,10 @@ namespace ZoneEngine_New.Core.Data
         AORebirth.Interfaces.Persistence.Characters.PersistedAnarchistKickResult RecordAnarchistKick(int organizationId,
             int kickedId, string kickedName, int kickerId, string kickerName, int memberQuorum, int leaderQuorum);
 
+        /// <summary>Moves credits between one character's Cash and the Bank under the organization lock; caps are enforced there.</summary>
+        AORebirth.Interfaces.Persistence.Characters.PersistedOrganizationBankResult TransferBank(int organizationId, int characterId,
+            bool deposit, long amount, long bankCap, long cashCap);
+
         /// <summary>Removes the membership of one character (leave, kick, side change).</summary>
         void ClearMembership(int characterId);
 

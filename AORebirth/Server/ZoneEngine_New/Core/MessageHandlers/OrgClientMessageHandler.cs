@@ -12,6 +12,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Chat;
     using ZoneEngine_New.Core.GameData;
+    using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Organizations;
     using ZoneEngine_New.Core.Playfield;
@@ -91,6 +92,12 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 case OrgClientCommand.Disband:
                     HandleDisband(message, session, player);
                     return;
+                case OrgClientCommand.BankAdd:
+                    HandleBankTransfer(message, session, player, deposit: true);
+                    return;
+                case OrgClientCommand.BankRemove:
+                    HandleBankTransfer(message, session, player, deposit: false);
+                    return;
                 case OrgClientCommand.Unknown2:
                 case OrgClientCommand.Kick:
                     HandleKick(message, session, player);
@@ -107,7 +114,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
         static bool AnswersNotInOrganization(OrgClientCommand command) => command is
             OrgClientCommand.Debt or OrgClientCommand.VoteInfo or OrgClientCommand.Vote or OrgClientCommand.StartVote
             or OrgClientCommand.StopVote
-            or OrgClientCommand.BankAdd or OrgClientCommand.BankRemove or OrgClientCommand.Name
+            or OrgClientCommand.Name
             or OrgClientCommand.Description or OrgClientCommand.Objective or OrgClientCommand.History
             or OrgClientCommand.GoverningForm or OrgClientCommand.Invite;
 
@@ -135,12 +142,13 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     SendRef(session, player, OrgChatText.WithInt(OrgChatRefs.TaxValue, org.Tax));
                     return;
                 case OrgClientCommand.Bank:
-                    // Viewing is refused to the lowest rank except in single-rank forms (anarchism); that refusal's ref was
-                    // not captured, so such a request gets no reply rather than a guessed one.
+                    // Viewing is refused to the lowest rank except in single-rank forms (anarchism).
                     int lowest = forms.Forms.TryGetValue(org.GovernmentForm, out GoverningForm? f) ? f.Ranks.Length - 1 : 0;
                     int rank = player.Stats.GetOrZero(CharacterStat.ClanLevel, StatDetail.Base);
                     if (lowest == 0 || rank < lowest)
                         SendRef(session, player, OrgChatText.WithInt(OrgChatRefs.BankBalance, org.Bank));
+                    else
+                        ClientFeedback.SendFormattedInCategory(player, MemberCategory, BankViewTooLow);
                     return;
             }
         }

@@ -25,8 +25,8 @@ Rules are **declared**, confirmed where indicated by captures. Packet evidence a
 
 A GM may also disband the organization of a targeted leader (Org Msg 119220807, client notice 508/28601677 to online members, disband lockout not applied to the GM) / start a vote.
 - Governing form change resets everybody except the president to the lowest rank. Re-applying the SAME form is accepted and also resets the ranks (a way to rebuild the hierarchy).
-- Tax: shows the value; non-leaders cannot change it. The "leave the org?" dialog (OrgServer 0x0008) is sent ONLY when the new tax is greater than the old one; a lower or equal tax is applied silently. Collected every 2 hours of played time from connected members; a member without enough credits drops to 0 and the shortfall becomes debt (`/org debt`); credits given with `bank add` reduce the debt.
-- Bank: view refused to the lowest rank (except anarchism); `bank add` by anyone who owns the amount; org bank capped at 4,000,000,000 (excess is lost); `bank remove` limited by the org balance and by the toon limit of 1,000,000,000. Tested with 1 credit.
+credits given with `bank add` reduce the debt (this reduction is deferred to step [5] tax & debt, not part of step [3]).
+- Bank: view refused to the lowest rank (except anarchism, message 237299844; others get 78644776 with the Bank value). `bank add` by anyone who owns the amount, no success message; org bank capped at 3999999999 and the giver keeps the difference (decided, not captured). `bank remove` leader only (non-leader gets 222804051), limited by the org balance (210489620 with %i) and by the leader's 999999999 limit (5429092). Tested with 1 credit.
 - Disband needs a client dialog; every member gets a 12 h lock (`disbandLockoutSeconds` 43200 in Gameplay.json).
 
 ## 4. Promote / demote / ranks

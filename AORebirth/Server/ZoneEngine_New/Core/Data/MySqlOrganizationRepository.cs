@@ -53,6 +53,10 @@ namespace ZoneEngine_New.Core.Data
                 => Run(() => _persistence.RecordAnarchistKick(organizationId, kickedId, kickedName, kickerId, kickerName,
                     memberQuorum, leaderQuorum));
 
+        public AORebirth.Interfaces.Persistence.Characters.PersistedOrganizationBankResult TransferBank(int organizationId, int characterId,
+            bool deposit, long amount, long bankCap, long cashCap)
+            => Run(() => _persistence.TransferOrganizationBank(organizationId, characterId, deposit, amount, bankCap, cashCap));
+
         public void ClearMembership(int characterId)
             => Run(() => _persistence.ClearOrganizationMembership(characterId));
 

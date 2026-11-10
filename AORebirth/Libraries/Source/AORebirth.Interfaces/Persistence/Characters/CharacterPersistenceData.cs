@@ -202,6 +202,29 @@ namespace AORebirth.Interfaces.Persistence.Characters
         public IList<PersistedAnarchistKickerData> Requesters { get; set; } = new List<PersistedAnarchistKickerData>();
     }
 
+    public enum OrganizationBankOutcome
+    {
+        /// <summary>The organization no longer exists; nothing was stored.</summary>
+        Missing,
+        /// <summary>The transfer is stored; <see cref="PersistedOrganizationBankResult.Bank"/> and Cash hold the new values.</summary>
+        Done,
+        /// <summary>A deposit exceeds the depositor's credits.</summary>
+        InsufficientCash,
+        /// <summary>A deposit into a bank already at its cap.</summary>
+        BankFull,
+        /// <summary>A withdrawal exceeds the bank balance.</summary>
+        InsufficientBank,
+        /// <summary>A withdrawal would take the character past the cash cap.</summary>
+        CashFull
+    }
+
+    public sealed class PersistedOrganizationBankResult
+    {
+        public OrganizationBankOutcome Outcome { get; set; }
+        public long Bank { get; set; }
+        public long Cash { get; set; }
+    }
+
     public sealed class CharacterActiveNanoData
     {
         public int CharacterId { get; set; }

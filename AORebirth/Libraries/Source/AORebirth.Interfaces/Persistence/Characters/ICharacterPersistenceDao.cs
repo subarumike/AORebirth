@@ -37,6 +37,8 @@ namespace AORebirth.Interfaces.Persistence.Characters
         /// target and leaderQuorum for the leader; when reached, the stored requests of that target are deleted.
         /// </summary>
         PersistedAnarchistKickResult RecordAnarchistKick(int organizationId, int kickedId, string kickedName, int kickerId, string kickerName, int memberQuorum, int leaderQuorum);
+        /// <summary>Moves credits between one character's Cash and the organization Bank under the organization lock.</summary>
+        PersistedOrganizationBankResult TransferOrganizationBank(int organizationId, int characterId, bool deposit, long amount, long bankCap, long cashCap);
         /// <summary>Clears Clan and ClanLevel and sets SocialStatus to the orgless value for one character.</summary>
         void ClearOrganizationMembership(int characterId);
         /// <summary>Character ids whose Clan stat equals the organization id.</summary>

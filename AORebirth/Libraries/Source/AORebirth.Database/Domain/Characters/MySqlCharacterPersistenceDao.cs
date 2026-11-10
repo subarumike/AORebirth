@@ -249,6 +249,53 @@ namespace AORebirth.Database.Domain.Characters
                 "@Leader", leaderId, "@Id", organizationId));
         }
 
+        public PersistedOrganizationBankResult TransferOrganizationBank(int organizationId, int characterId, bool deposit,
+            long amount, long bankCap, long cashCap)
+        {
+            if (organizationId <= 0) throw new ArgumentOutOfRangeException(nameof(organizationId));
+            if (characterId <= 0) throw new ArgumentOutOfRangeException(nameof(characterId));
+            if (amount <= 0) throw new ArgumentOutOfRangeException(nameof(amount));
+            return Transaction((c, t) =>
+            {
+                // The organizations row lock serialises bank transfers of one organization, as RecordAnarchistKick does.
+                IList<long> banks = QueryWithin(c, t, "SELECT Bank FROM organizations WHERE Id=@Id FOR UPDATE",
+                    r => r.GetInt64(0), "@Id", organizationId);
+                if (banks.Count == 0) return new PersistedOrganizationBankResult { Outcome = OrganizationBankOutcome.Missing };
+
+                IList<long> cashes = QueryWithin(c, t,
+                    "SELECT StatValue FROM stats WHERE Type=@Type AND Instance=@Id AND StatId=@Cash FOR UPDATE",
+                    r => r.GetInt64(0), "@Type", (int)IdentityType.CanbeAffected, "@Id", characterId, "@Cash", (int)CharacterStat.Cash);
+                long bank = banks[0];
+                long cash = cashes.Count > 0 ? cashes[0] : 0;
+
+                if (deposit)
+                {
+                    if (cash < amount) return BankResult(OrganizationBankOutcome.InsufficientCash, bank, cash);
+                    if (bank >= bankCap) return BankResult(OrganizationBankOutcome.BankFull, bank, cash);
+                    // The bank keeps what fits under its cap; the giver keeps the rest.
+                    long moved = Math.Min(amount, bankCap - bank);
+                    bank += moved;
+                    cash -= moved;
+                }
+                else
+                {
+                    if (amount > bank) return BankResult(OrganizationBankOutcome.InsufficientBank, bank, cash);
+                    if (cash + amount > cashCap) return BankResult(OrganizationBankOutcome.CashFull, bank, cash);
+                    bank -= amount;
+                    cash += amount;
+                }
+
+                Execute(c, t, "UPDATE organizations SET Bank=@Bank WHERE Id=@Id", "@Bank", bank, "@Id", organizationId);
+                Execute(c, t, "INSERT INTO stats (Type,Instance,StatId,StatValue) VALUES (@Type,@Id,@Cash,@Value) "
+                    + "ON DUPLICATE KEY UPDATE StatValue=VALUES(StatValue)",
+                    "@Value", cash, "@Type", (int)IdentityType.CanbeAffected, "@Id", characterId, "@Cash", (int)CharacterStat.Cash);
+                return BankResult(OrganizationBankOutcome.Done, bank, cash);
+            });
+        }
+
+        static PersistedOrganizationBankResult BankResult(OrganizationBankOutcome outcome, long bank, long cash)
+            => new PersistedOrganizationBankResult { Outcome = outcome, Bank = bank, Cash = cash };
+
         public PersistedOrgLockoutData LoadOrgLockout(int characterId)
         {
             if (characterId <= 0) return null;
