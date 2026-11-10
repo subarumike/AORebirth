@@ -180,9 +180,10 @@ namespace AORebirth.World.Collision
 
         readonly struct DoorPoint
         {
-            public DoorPoint(int room, float x, float z, float y, int yaw)
+            public DoorPoint(int room, sbyte floor, float x, float z, float y, int yaw)
             {
                 Room = room;
+                Floor = floor;
                 X = x;
                 Z = z;
                 Y = y;
@@ -190,6 +191,7 @@ namespace AORebirth.World.Collision
             }
 
             public int Room { get; }
+            public sbyte Floor { get; }
 
             public float X { get; }
 
@@ -200,14 +202,15 @@ namespace AORebirth.World.Collision
             public int Yaw { get; }
 
             public bool Meets(in DoorPoint other)
-                => MathF.Abs(X - other.X) < DoorMatchDistance && MathF.Abs(Z - other.Z) < DoorMatchDistance;
+                => Floor == other.Floor
+                    && MathF.Abs(X - other.X) < DoorMatchDistance && MathF.Abs(Z - other.Z) < DoorMatchDistance;
         }
 
         /// <summary>
         /// Doors of an ACG layout, in the live order: the exit (the entrance room's connection that meets no other
-        /// room), then for each room in generator order, each of its connections (template order) that meets a
-        /// connection of an earlier room. A connection sits on the middle of its tile's edge, rotated into place by the
-        /// room's facing; unpaired connections other than the exit stay walls.
+        /// room on the same floor), then for each room in generator order, each of its connections (template order)
+        /// that meets a connection of an earlier room on that floor. A connection sits on the middle of its tile's
+        /// edge, rotated into place by the room's facing; unpaired connections other than the exit stay walls.
         /// Verified against every door of the five captured live dungeons (90 of 90, none extra).
         /// </summary>
         static IReadOnlyList<DungeonDoorPlacement> PlaceDoors(
@@ -245,7 +248,8 @@ namespace AORebirth.World.Collision
                         _ => (h - v, u)
                     };
                     int yaw = (180 + (90 * ((rotation + facing) & 3))) % 360;
-                    points.Add(new DoorPoint(i, bounds[i].Min.X + (x * tileSize), bounds[i].Min.Z + (z * tileSize), bounds[i].Min.Y + 1f, yaw));
+                    points.Add(new DoorPoint(i, rooms[i].Floor, bounds[i].Min.X + (x * tileSize),
+                        bounds[i].Min.Z + (z * tileSize), bounds[i].Min.Y + 1f, yaw));
                 }
 
                 byRoom[i] = points;
