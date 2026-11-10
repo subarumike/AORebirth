@@ -31,11 +31,12 @@ namespace ZoneEngine_New.Core.MessageHandlers
         readonly IChatEngineLink _chat;
         readonly OrgLockoutClock _lockouts;
         readonly OrgMembershipService _memberships;
+        readonly OrgTaxTickService _tax;
 
         // Lazy: PlayfieldManager depends on the message router, which depends on the handlers.
         public OrgClientMessageHandler(IGameData gameData, Lazy<PlayfieldManager> playfieldManager,
             IOrganizationRepository organizations, IZoneLogger logger, IChatEngineLink chat,
-            OrgLockoutClock lockouts, OrgMembershipService memberships)
+            OrgLockoutClock lockouts, OrgMembershipService memberships, OrgTaxTickService tax)
         {
             _gameData = gameData;
             _playfieldManager = playfieldManager;
@@ -44,6 +45,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
             _chat = chat;
             _lockouts = lockouts;
             _memberships = memberships;
+            _tax = tax;
         }
 
         public Type MessageBodyType => typeof(OrgClientMessage);
@@ -59,8 +61,14 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 || !ReferenceEquals(player.Session, session) || player.IsPersistenceQuarantined)
                 return;
 
+            if (player.Organization is not null && RefuseWhileSuspended(message, player))
+                return;
+
             switch (message.Command)
             {
+                case OrgClientCommand.Debt when player.Organization is not null:
+                    HandleDebt(player);
+                    return;
                 case OrgClientCommand.Info:
                     HandleInfo(message, session, player);
                     return;

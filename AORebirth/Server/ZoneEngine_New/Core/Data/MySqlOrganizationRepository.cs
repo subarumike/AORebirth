@@ -60,6 +60,12 @@ namespace ZoneEngine_New.Core.Data
             bool deposit, long amount, long bankCap, long cashCap)
             => Run(() => _persistence.TransferOrganizationBank(organizationId, characterId, deposit, amount, bankCap, cashCap));
 
+        public PersistedOrgMemberTaxData GetMemberTax(int characterId)
+            => Run(() => _persistence.LoadOrgMemberTax(characterId));
+
+        public void SaveMemberTax(int characterId, PersistedOrgMemberTaxData data)
+            => Run(() => _persistence.SaveOrgMemberTax(characterId, data));
+
         public void ClearMembership(int characterId)
             => Run(() => _persistence.ClearOrganizationMembership(characterId));
 

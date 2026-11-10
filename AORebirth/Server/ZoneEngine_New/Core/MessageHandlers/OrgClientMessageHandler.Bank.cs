@@ -25,7 +25,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
         const int BankInsufficientCash = 89364632;
         const int BankInsufficientBank = 210489620;
         const int BankViewTooLow = 237299844;
-        const long BankCap = 3_999_999_999;
+        const long BankCap = OrgTaxTickService.BankCap;
 
         void HandleBankTransfer(OrgClientMessage message, IZoneSession session, Player player, bool deposit)
         {
@@ -45,6 +45,14 @@ namespace ZoneEngine_New.Core.MessageHandlers
             {
                 ClientFeedback.SendFormattedInCategory(player, MemberCategory, BankInvalidAmount);
                 return;
+            }
+
+            // A deposit first clears the member's unpaid debt; only the remainder reaches the bank.
+            if (deposit)
+            {
+                amount -= _tax.RepayDebt(player, amount);
+                if (amount == 0)
+                    return;
             }
 
             // Pending in-memory credits reach the database first, so the transfer works on the current balance.

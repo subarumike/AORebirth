@@ -43,7 +43,13 @@ namespace ZoneEngine_New.Core.Data
         AORebirth.Interfaces.Persistence.Characters.PersistedOrganizationBankResult TransferBank(int organizationId, int characterId,
             bool deposit, long amount, long bankCap, long cashCap);
 
-        /// <summary>Removes the membership of one character (leave, kick, side change).</summary>
+        /// <summary>Tax schedule of one member (org_member_tax), or null when none is stored.</summary>
+        AORebirth.Interfaces.Persistence.Characters.PersistedOrgMemberTaxData GetMemberTax(int characterId);
+
+        /// <summary>Inserts or updates the tax schedule of one member.</summary>
+        void SaveMemberTax(int characterId, AORebirth.Interfaces.Persistence.Characters.PersistedOrgMemberTaxData data);
+
+        /// <summary>Removes the membership of one character (leave, kick, side change); also deletes its tax row.</summary>
         void ClearMembership(int characterId);
 
         /// <summary>Character ids that are members of the organization (stored Clan stat).</summary>

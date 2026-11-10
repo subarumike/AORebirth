@@ -204,8 +204,10 @@ namespace ZoneEngine_New.Core.Configuration
             if (Pets == null || !float.IsFinite(Pets.OwnerThreatSharePercent) || Pets.OwnerThreatSharePercent < 0)
                 throw new InvalidDataException(path + ": pets.ownerThreatSharePercent must be a finite, non-negative percent.");
             if (Org == null || Org.LeaveLockoutSeconds < 0 || Org.KickLockoutSeconds < 0 || Org.SideChangeLockoutSeconds < 0
-                || Org.AnarchistLeaderKickLockoutSeconds < 0 || Org.DisbandLockoutSeconds < 0)
-                throw new InvalidDataException(path + ": org lockout seconds must be 0 or more.");
+                    || Org.AnarchistLeaderKickLockoutSeconds < 0 || Org.DisbandLockoutSeconds < 0)
+                    throw new InvalidDataException(path + ": org lockout seconds must be 0 or more.");
+                if (Org.TaxTickSeconds <= 0 || Org.TaxPeriodSeconds <= 0)
+                    throw new InvalidDataException(path + ": org taxTickSeconds and taxPeriodSeconds must be above 0.");
             if (WorldClock == null || !WorldClock.TryGetEpoch(out _) || WorldClock.DayAtEpoch < 0
                 || WorldClock.TimeOfDayAtEpochSeconds < 0 || WorldClock.TimeOfDayAtEpochSeconds >= Network.GameClock.SecondsPerDay)
                 throw new InvalidDataException(path + ": worldClock needs an ISO 8601 epochUtc, dayAtEpoch 0 or more, and "
@@ -371,7 +373,7 @@ namespace ZoneEngine_New.Core.Configuration
         public bool OwnerSharesPetEngageRange { get; init; } = true;
     }
 
-    /// <summary>Organization lockouts, in seconds. A lockout blocks joining until it has run out; online time counts down.</summary>
+    /// <summary>Organization lockouts and tax timing, in seconds. Lockouts count down online; tax counts personal /played time.</summary>
     public sealed class GameplayOrg
     {
         /// <summary>Lockout after a member leaves (/org leave).</summary>
@@ -388,6 +390,12 @@ namespace ZoneEngine_New.Core.Configuration
 
         /// <summary>Lockout after an organization is disbanded (applied to every former member, as after leave).</summary>
         public long DisbandLockoutSeconds { get; init; } = 43200;
+
+        /// <summary>Personal /played seconds between two organization tax deductions for each non-leader member.</summary>
+        public long TaxTickSeconds { get; init; } = 7200;
+
+        /// <summary>Real-time seconds of a tax warning or suspension period before the next check.</summary>
+        public long TaxPeriodSeconds { get; init; } = 1800;
     }
 
     /// <summary>

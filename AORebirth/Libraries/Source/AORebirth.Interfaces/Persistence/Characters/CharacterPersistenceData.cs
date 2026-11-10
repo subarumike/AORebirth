@@ -184,6 +184,25 @@ namespace AORebirth.Interfaces.Persistence.Characters
         public long SecondsRemaining { get; set; }
     }
 
+    /// <summary>Organization tax stage of one member: None when paid, Warned after a failed tax, Suspended during the suspension.</summary>
+    public enum OrgTaxStage
+    {
+        None = 0,
+        Warned = 1,
+        Suspended = 2
+    }
+
+    /// <summary>Tax schedule of one organization member: next personal /played tick, unpaid debt and warning or suspension stage.</summary>
+    public sealed class PersistedOrgMemberTaxData
+    {
+        public int OrganizationId { get; set; }
+        public string CharacterName { get; set; }
+        public long NextTaxPlayed { get; set; }
+        public long Debt { get; set; }
+        public OrgTaxStage Stage { get; set; }
+        public long StageEndsUtc { get; set; }
+    }
+
     /// <summary>Result of one Anarchism kick request stored in org_anar_pend_kick.</summary>
     public enum AnarchistKickOutcome
     {

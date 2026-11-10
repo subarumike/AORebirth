@@ -853,6 +853,17 @@ namespace ZoneEngine_New.Core.Playfield
                     _characterSnapshot.CheckpointIfDue(player);
                 }
 
+                ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("org.tax");
+                if (_playfieldManager.OrgTax is { } orgTax)
+                {
+                    DateTime utcNow = DateTime.UtcNow;
+                    foreach (Player player in _tickPlayers)
+                    {
+                        if (ReferenceEquals(player.Playfield, this))
+                            orgTax.Tick(player, utcNow);
+                    }
+                }
+
                 if (_playfieldManager.ModuleWorld is { } moduleWorld)
                 {
                     ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("modules.world");

@@ -92,13 +92,15 @@ namespace ZoneEngine_New.Core.Playfield
             ZoneEngine_New.Core.World.CrossInstanceTransfer? crossInstance = null,
             ZoneEngine_New.Core.NpcScripts.NpcScriptCatalog? npcScripts = null,
             ZoneEngine_New.Core.Organizations.OrgMembershipService? orgMembership = null,
-            ZoneEngine_New.Core.Characters.CharacterPlayedClock? playedClock = null)
+            ZoneEngine_New.Core.Characters.CharacterPlayedClock? playedClock = null,
+            ZoneEngine_New.Core.Organizations.OrgTaxTickService? orgTax = null)
         {
             World = world;
             _crossInstance = crossInstance;
             Vicinity = vicinity;
             NpcScripts = npcScripts;
             OrgMembership = orgMembership;
+            OrgTax = orgTax;
             PlayedClock = playedClock;
             QuestDungeons = questDungeons;
             Knubot = knubot;
@@ -168,6 +170,8 @@ namespace ZoneEngine_New.Core.Playfield
 
         /// <summary>Organization leave, kick and side-change handling, forwarded into every playfield container.</summary>
         public ZoneEngine_New.Core.Organizations.OrgMembershipService? OrgMembership { get; }
+
+        public ZoneEngine_New.Core.Organizations.OrgTaxTickService? OrgTax { get; }
 
         /// <summary>Played-time clock, forwarded into every playfield container so spawn hooks reach the root singleton.</summary>
         public ZoneEngine_New.Core.Characters.CharacterPlayedClock? PlayedClock { get; }

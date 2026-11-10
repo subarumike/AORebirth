@@ -38,6 +38,10 @@ namespace AORebirth.Interfaces.Persistence.Characters
         PersistedCharacterPlayedBornData LoadCharacterPlayedBorn(int characterId);
         /// <summary>Inserts or updates the played time; the creation time is kept once recorded.</summary>
         void SaveCharacterPlayedBorn(int characterId, string characterName, long playedSeconds, long? createdAtUnix);
+        /// <summary>Tax schedule of this member (org_member_tax row), or null when none is stored.</summary>
+        PersistedOrgMemberTaxData LoadOrgMemberTax(int characterId);
+        /// <summary>Inserts or updates the tax schedule row of this member.</summary>
+        void SaveOrgMemberTax(int characterId, PersistedOrgMemberTaxData data);
         /// <summary>
         /// Stores one Anarchism kick request under the organizations row lock. Quorum is memberQuorum for a member
         /// target and leaderQuorum for the leader; when reached, the stored requests of that target are deleted.
@@ -45,13 +49,13 @@ namespace AORebirth.Interfaces.Persistence.Characters
         PersistedAnarchistKickResult RecordAnarchistKick(int organizationId, int kickedId, string kickedName, int kickerId, string kickerName, int memberQuorum, int leaderQuorum);
         /// <summary>Moves credits between one character's Cash and the organization Bank under the organization lock.</summary>
         PersistedOrganizationBankResult TransferOrganizationBank(int organizationId, int characterId, bool deposit, long amount, long bankCap, long cashCap);
-        /// <summary>Clears Clan and ClanLevel and sets SocialStatus to the orgless value for one character.</summary>
+        /// <summary>Clears Clan and ClanLevel, sets SocialStatus to the orgless value and deletes the tax row of one character.</summary>
         void ClearOrganizationMembership(int characterId);
         /// <summary>Character ids whose Clan stat equals the organization id.</summary>
         IList<int> LoadOrganizationMemberIds(int organizationId);
         /// <summary>Organization id of one character (stored Clan stat), 0 when orgless.</summary>
         int LoadOrganizationId(int characterId);
-        /// <summary>Clears the membership of every member and deletes the organizations row in one transaction.</summary>
+        /// <summary>Clears the membership of every member, deletes their tax rows and the organizations row in one transaction.</summary>
         void DisbandOrganization(int organizationId);
         IList<PersistedItemData> LoadCarriedItems(int characterId);
         IList<PersistedItemData> LoadBankItems(int characterId);

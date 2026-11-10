@@ -283,6 +283,7 @@ namespace ZoneEngine_New
             services.AddSingleton<IPetNameRepository, MySqlPetNameRepository>();
             services.AddSingleton<IOrganizationRepository, MySqlOrganizationRepository>();
             services.AddSingleton<OrgLockoutClock>();
+            services.AddSingleton<OrgTaxTickService>();
             services.AddSingleton<OrgMembershipService>();
             services.AddSingleton<ICharacterPlayedBornRepository, MySqlCharacterPlayedBornRepository>();
             services.AddSingleton<CharacterPlayedClock>();

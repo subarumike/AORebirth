@@ -239,6 +239,7 @@
     </Content>
     <Content Include="SqlTables\org_anar_pend_kick.sql" />
     <Content Include="SqlTables\org_lockout.sql" />
+    <Content Include="SqlTables\org_member_tax.sql" />
     <Content Include="SqlTables\questdungeonkeys.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

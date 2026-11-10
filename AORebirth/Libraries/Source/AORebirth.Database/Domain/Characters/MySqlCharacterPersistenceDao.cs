@@ -349,6 +349,38 @@ namespace AORebirth.Database.Domain.Characters
                 "@Created", createdAtUnix));
         }
 
+        public PersistedOrgMemberTaxData LoadOrgMemberTax(int characterId)
+        {
+            if (characterId <= 0) return null;
+            var rows = Query("SELECT org_id, char_name, next_tax_played, debt, stage, stage_ends_utc FROM org_member_tax WHERE char_id=@CharId LIMIT 1",
+                r => new PersistedOrgMemberTaxData
+                {
+                    OrganizationId = r.GetInt32(0),
+                    CharacterName = r.IsDBNull(1) ? string.Empty : r.GetString(1),
+                    NextTaxPlayed = r.GetInt64(2),
+                    Debt = r.GetInt64(3),
+                    Stage = (OrgTaxStage)Enum.Parse(typeof(OrgTaxStage), r.GetString(4)),
+                    StageEndsUtc = r.GetInt64(5),
+                },
+                "@CharId", characterId);
+            return rows.Count == 0 ? null : rows[0];
+        }
+
+        public void SaveOrgMemberTax(int characterId, PersistedOrgMemberTaxData data)
+        {
+            if (characterId <= 0) throw new ArgumentOutOfRangeException(nameof(characterId));
+            if (data == null) throw new ArgumentNullException(nameof(data));
+            if (data.OrganizationId <= 0) throw new ArgumentOutOfRangeException(nameof(data));
+            if (data.NextTaxPlayed < 0 || data.Debt < 0) throw new ArgumentOutOfRangeException(nameof(data));
+            long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            Transaction((c, t) => Execute(c, t, "INSERT INTO org_member_tax (char_id,org_id,char_name,next_tax_played,debt,stage,stage_ends_utc,last_updated) "
+                + "VALUES (@CharId,@Org,@Name,@Next,@Debt,@Stage,@Ends,@Now) ON DUPLICATE KEY UPDATE org_id=VALUES(org_id), "
+                + "char_name=VALUES(char_name), next_tax_played=VALUES(next_tax_played), debt=VALUES(debt), "
+                + "stage=VALUES(stage), stage_ends_utc=VALUES(stage_ends_utc), last_updated=VALUES(last_updated)",
+                "@CharId", characterId, "@Org", data.OrganizationId, "@Name", data.CharacterName ?? string.Empty,
+                "@Next", data.NextTaxPlayed, "@Debt", data.Debt, "@Stage", data.Stage.ToString(), "@Ends", data.StageEndsUtc, "@Now", now));
+        }
+
         public PersistedAnarchistKickResult RecordAnarchistKick(int organizationId, int kickedId, string kickedName,
             int kickerId, string kickerName, int memberQuorum, int leaderQuorum)
         {
@@ -416,6 +448,8 @@ namespace AORebirth.Database.Domain.Characters
                     "@Type", (int)IdentityType.CanbeAffected, "@Id", characterId,
                     "@Clan", (int)CharacterStat.Clan, "@Level", (int)CharacterStat.ClanLevel);
                 Execute(c, t, "DELETE FROM org_anar_pend_kick WHERE kicked_id=@Id OR kicker_id=@Id", "@Id", characterId);
+                // Leave, kick and side change end the tax schedule; its unpaid debt is dropped with the row.
+                Execute(c, t, "DELETE FROM org_member_tax WHERE char_id=@Id", "@Id", characterId);
                 return 0;
             });
         }
@@ -450,6 +484,7 @@ namespace AORebirth.Database.Domain.Characters
                 Execute(c, t, "DELETE FROM stats WHERE Type=@Type AND StatId=@Clan AND StatValue=@Id",
                     "@Type", (int)IdentityType.CanbeAffected, "@Clan", (int)CharacterStat.Clan, "@Id", organizationId);
                 Execute(c, t, "DELETE FROM org_anar_pend_kick WHERE org_id=@Id", "@Id", organizationId);
+                Execute(c, t, "DELETE FROM org_member_tax WHERE org_id=@Id", "@Id", organizationId);
                 Execute(c, t, "DELETE FROM organizations WHERE Id=@Id", "@Id", organizationId);
                 return 0;
             });
