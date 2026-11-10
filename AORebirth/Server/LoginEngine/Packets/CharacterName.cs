@@ -334,6 +334,7 @@ namespace LoginEngine.Packets
             this.Abis = breedAbilities.ToLegacyOrder();
             if (breedAbilities.Gender is int breedGender)
                 this.Gender = breedGender;
+            startPackage = startPackage.ResolveForGender(this.Gender);
 
             List<DBStats> stats = new List<DBStats>();
             foreach (StatValue starterStat in starter.Stats)

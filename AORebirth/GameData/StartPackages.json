@@ -749,7 +749,12 @@
           "lowId": 297665,
           "highId": 297665,
           "quality": 1,
-          "count": 1
+          "count": 1,
+          "genderTemplates": [
+            { "gender": 1, "templateId": 297667 },
+            { "gender": 2, "templateId": 297666 },
+            { "gender": 3, "templateId": 297665 }
+          ]
         }
       ],
       "uploadedNanos": []
