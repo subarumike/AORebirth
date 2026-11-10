@@ -4,11 +4,13 @@ Run `python -B Tools/bug_investigation/worker.py --db <private-queue> run --api-
 
 For the first real report, use `--report-id <website-ID>` in place of `--poll-seconds 60`. This selects the authenticated detail route and limits investigation and optional draft repair to that ID. Rerunning the same ID preserves an unchanged completed result.
 
-Use `--next-new 3` for a one-shot batch of up to three open reports that have never been queued. An interrupted report remains in SQLite and can be resumed with `--report-id` or the regular worker. This batch limits optional repair to its own reports.
+Use `--next-new 5` for a one-shot batch of up to five open reports that have never been queued. For read-only runs, optionally set `--source-commit <PIN>` to an existing full Git commit. An interrupted report remains in SQLite and can be resumed with `--report-id` or the regular worker.
 
 The worker splits distinct symptoms and checkpoints each against the pinned source commit. Codex can search approved tracked source and local evidence without shell access. Before escalating, it must search every approved evidence root. The worker discovers checkout GameData and Captures and a local `RDBEvidence` or `RDB` directory when present. Use `--evidence-dir` to point to other approved folders of decoded text evidence. Binary RDB shards and raw sensitive captures are not passed to Codex. Searches distinguish missing or bounded sources from a negative finding.
 
 `show <ID>` lists the effective diagnosis and original checkpoint. A source investigation gets up to three passes. Record a completed operator review with `record-followup <ID> --symptom-id <N> --source-commit <PIN> --classification <RESULT> --finding <TEXT> --evidence <REFERENCE> --next-action <TEXT>`. It updates that symptom's effective classification without granting automatic repair eligibility or modifying the website. Use `requeue <ID> --symptom-id <N>` to revisit only that symptom with its history.
+
+An unchanged evidence-blocked symptom stays parked. When new evidence is available in an approved folder, use `register-evidence <ID> --symptom-id <N> --fingerprint <REPORT_FINGERPRINT> --source-commit <PIN> --evidence-sha256 <CONTENT_HASH> --reference <REFERENCE>`. Get the report fingerprint and source commit from `show`. The queue keeps the old checkpoint and resumes only that symptom on its saved source. Registering the same content hash again leaves the queue as it was.
 
 `--symptom-workers 3` lets Codex investigate up to three symptoms of the same report concurrently. Reports and repair attempts still run one at a time.
 

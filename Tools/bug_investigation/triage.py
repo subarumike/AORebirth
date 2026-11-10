@@ -2,6 +2,7 @@
 
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import json
+import re
 
 
 INCOMPLETE = "SOURCE_INVESTIGATION_INCOMPLETE"
@@ -84,6 +85,9 @@ call search_evidence with a specific item, identity, message, or action.
 This searches every approved local RDB extract, GameData, and capture root.
 Follow relevant matches and distinguish unavailable or bounded searches
 from confirmed absence. Do not use this private tool in a public-only review.
+When new evidence is registered, seek its reference in the approved roots and
+explain whether it resolves the previously recorded gap. A reference alone
+does not establish new behavior.
 
 Use SOURCE_INVESTIGATION_INCOMPLETE if a missing read, caller, dependency or
 test/evidence search prevents a source conclusion. List each remaining source
@@ -223,17 +227,21 @@ def investigate_pass(report, identity, commit, prior, progress, invoke):
     print(f"Bug {report['id']}, symptom {identity['id']}: tracing source.", flush=True)
     public_review = progress.get("public_review", False)
     notes = [] if public_review else (prior or {}).get("evidence", [])
+    revisions = progress.get("evidence_revisions", [])
+    registered = [{"sha256": entry["sha256"], "reference": entry["reference"]}
+                  for entry in revisions[-8:]] if progress.get("evidence_pending") and not public_review else []
     result, reads = invoke(SCHEMA, PROMPT, {
         "report": report, "symptom": identity, "source_commit": commit,
         "previous": None if public_review else progress["result"],
         "previous_report_notes": notes,
         "operator_followups": [] if public_review else progress.get("followups", [])[-1:],
+        "registered_evidence": registered,
         "public_only_repair_review": public_review,
         "remaining_source_passes": 0 if public_review else MAX_PASSES - progress["passes"] - 1,
     }, public_only=public_review)
     result, reads, needs_public_review = verified_result(
         result, reads, [] if public_review else progress["reads"],
-        private_context=bool(notes or (not public_review and progress.get("followups"))),
+        private_context=bool(notes or registered or (not public_review and progress.get("followups"))),
         public_only=public_review,
     )
     if public_review and not result["repair_ready"]:
@@ -242,12 +250,24 @@ def investigate_pass(report, identity, commit, prior, progress, invoke):
         reads = progress["reads"]
     elif public_review:
         result["private_investigation"] = progress["result"]
-    return {"passes": progress["passes"] + 1, "reads": reads, "result": result,
-            "public_review": needs_public_review, "followups": progress.get("followups", [])}
+    passes = progress["passes"] + 1
+    updated = {"passes": passes, "reads": reads, "result": result,
+               "public_review": needs_public_review, "followups": progress.get("followups", [])}
+    if revisions:
+        updated["evidence_revisions"] = revisions
+        updated["evidence_pending"] = bool(progress.get("evidence_pending") and (
+            needs_public_review or result["classification"] == INCOMPLETE and passes < MAX_PASSES
+        ))
+    return updated
 
 
 def investigate(db, key, report, previous, invoke, *, workers=1):
     prior = previous.get("prior_result") if previous and "symptoms" in previous else previous
+    saved_commit = previous.get("source_commit") if previous else None
+    if saved_commit and saved_commit != key[2]:
+        pinned = (*key[:2], saved_commit)
+        if any(saved and json.loads(saved).get("evidence_pending") for *_, saved in db.execute(ROWS, pinned)):
+            key = pinned
     rows = db.execute(ROWS, key).fetchall()
     if not rows:
         split(db, key, report, prior, invoke)
@@ -321,6 +341,41 @@ def progress(db, report_id):
             for _, number, title, scope, raw, _, _ in current_rows(db, report_id)]
 
 
+def register_evidence(db, report_id, symptom_id, fingerprint, source_commit, sha256, reference):
+    if not re.fullmatch(r"[0-9a-f]{64}", sha256) or not bounded_text(reference, 1000):
+        raise ValueError("Provide the evidence SHA-256 and a short reference in an approved evidence root.")
+    job = db.execute("SELECT fingerprint, state, result FROM jobs WHERE id = ?", (report_id,)).fetchone()
+    if job is None or job[1] == "closed" or job[2] is None:
+        raise ValueError("Evidence registration needs an open report with an investigation checkpoint.")
+    previous = json.loads(job[2])
+    if job[0] != fingerprint or previous.get("source_commit") != source_commit:
+        raise ValueError("The fingerprint or source commit does not match the saved investigation.")
+    key = (report_id, fingerprint, source_commit)
+    row = db.execute("""
+        SELECT progress FROM investigations
+        WHERE id = ? AND fingerprint = ? AND source_commit = ? AND symptom_id = ?
+    """, (*key, symptom_id)).fetchone()
+    if not row or not row[0]:
+        raise ValueError("The specified symptom has no investigation checkpoint.")
+    saved = json.loads(row[0])
+    if not saved.get("result"):
+        raise ValueError("The symptom has no completed investigation pass to resume.")
+    history = saved.setdefault("evidence_revisions", [])
+    if any(entry["sha256"] == sha256 for entry in history):
+        return False
+    checkpoint = {field: saved[field] for field in ("passes", "reads", "result", "followup_active")
+                  if field in saved}
+    history.append({"sha256": sha256, "reference": reference, "previous_checkpoint": checkpoint})
+    saved.update(passes=0, revisit=True, public_review=False, followup_active=False, evidence_pending=True)
+    db.execute("""
+        UPDATE investigations SET progress = ?
+        WHERE id = ? AND fingerprint = ? AND source_commit = ? AND symptom_id = ?
+    """, (json.dumps(saved), *key, symptom_id))
+    db.execute("UPDATE jobs SET result = ?, state = 'pending', retry_at = 0, failures = 0 WHERE id = ?",
+               (json.dumps(snapshot(db, key, previous.get("prior_result"))), report_id))
+    return True
+
+
 def record_followup(db, report_id, symptom_id, source_commit, followup):
     if (followup.get("classification") not in set(DISPOSITIONS) - {INCOMPLETE}
             or not all(bounded_text(followup.get(field), 4_000) for field in ("finding", "next_action"))
@@ -347,6 +402,8 @@ def record_followup(db, report_id, symptom_id, source_commit, followup):
     if not history or history[-1] != followup:
         history.append(followup)
     saved["followup_active"] = True
+    if saved.get("evidence_pending"):
+        saved["evidence_pending"] = False
     db.execute("""
         UPDATE investigations SET progress = ?
         WHERE id = ? AND fingerprint = ? AND source_commit = ? AND symptom_id = ?

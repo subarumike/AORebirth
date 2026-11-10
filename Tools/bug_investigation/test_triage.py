@@ -158,6 +158,46 @@ class InvestigationTests(unittest.TestCase):
         self.assertEqual(triage.progress(self.db, 1)[0]["result"], original)
         self.assertEqual(triage.progress(self.db, 1)[0]["followups"], [finding])
 
+    def test_new_evidence_resumes_only_its_pinned_symptom_once(self):
+        def initial(schema, *_args, **_options):
+            if schema is triage.SPLIT_SCHEMA:
+                return {"symptoms": [{"title": title, "scope": title} for title in ("Save", "Display")]}
+            return diagnosis("CAPTURE_REQUIRED"), [READ, SWEEP]
+
+        blocked = triage.investigate(self.db, self.key, {"id": 1}, None, initial)
+        self.db.execute("UPDATE jobs SET state = 'done' WHERE id = 1")
+        self.assertEqual(triage.investigate(self.db, self.key, {"id": 1}, blocked,
+                                            lambda *_: self.fail("Reopened without new evidence")), blocked)
+        sha256 = "a" * 64
+        reference = "approved-capture-summary.txt"
+        with self.assertRaisesRegex(ValueError, "fingerprint or source commit"):
+            triage.register_evidence(self.db, 1, 2, "old", "source", sha256, reference)
+        self.assertTrue(triage.register_evidence(self.db, 1, 2, "r1", "source", sha256, reference))
+        self.assertFalse(triage.register_evidence(self.db, 1, 2, "r1", "source", sha256, "duplicate.txt"))
+        state, raw = self.db.execute("SELECT state, result FROM jobs WHERE id = 1").fetchone()
+        self.assertEqual(state, "pending")
+        queued = json.loads(raw)
+        self.assertEqual(queued["symptoms"][0], blocked["symptoms"][0])
+        self.assertEqual(queued["symptoms"][1]["classification"], triage.INCOMPLETE)
+
+        calls = []
+
+        def resume(_schema, _prompt, context, *, public_only):
+            calls.append((context["symptom"]["id"], context["source_commit"], public_only))
+            self.assertEqual(context["registered_evidence"],
+                             [] if public_only else [{"sha256": sha256, "reference": reference}])
+            return diagnosis("DIRECT_FIX"), [READ]
+
+        updated = triage.investigate(self.db, (1, "r1", "new-tip"), {"id": 1}, queued, resume)
+        self.assertEqual(calls, [(2, "source", False), (2, "source", True)])
+        self.assertEqual(updated["symptoms"][0], blocked["symptoms"][0])
+        self.assertEqual(updated["symptoms"][1]["classification"], "DIRECT_FIX")
+        progress = triage.progress(self.db, 1)[1]
+        self.assertFalse(progress["evidence_pending"])
+        self.assertEqual(progress["evidence_revisions"][0]["previous_checkpoint"]["result"]["classification"],
+                         "CAPTURE_REQUIRED")
+        self.assertFalse(triage.register_evidence(self.db, 1, 2, "r1", "source", sha256, reference))
+
 
 class ValidationPlanTests(unittest.TestCase):
     def test_validation_log_keeps_the_result_and_bounds_verbose_output(self):

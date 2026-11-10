@@ -336,7 +336,7 @@ def process_next_new(db, feed, args, propose):
             failed = True
     if args.repair_base is None:
         try:
-            args.repair_base = source_head(args.source)
+            args.repair_base = getattr(args, "source_commit", None) or source_head(args.source)
         except (OSError, subprocess.SubprocessError):
             print("Could not pin the source for this batch.", file=sys.stderr, flush=True)
             return True
@@ -396,7 +396,7 @@ def run(db, args):
                     selected = feed.detail(args.report_id)
                     if selected is None:
                         raise FeedError(f"Report {args.report_id} is not open or accessible.")
-                args.repair_base = prepare(args) if args.repair_plan else None
+                args.repair_base = prepare(args) if args.repair_plan else args.source_commit
                 if selected is not None:
                     with db:
                         enqueue(db, *selected)
@@ -454,6 +454,7 @@ def main():
     polling.add_argument("--api-url", required=True)
     polling.add_argument("--token-file", required=True, type=Path)
     polling.add_argument("--source", type=Path, default=WORKER_ROOT)
+    polling.add_argument("--source-commit", help="Pin read-only investigation to an existing full Git commit.")
     polling.add_argument("--evidence-dir", type=Path, action="append", default=[])
     polling.add_argument("--synthetic", action="store_true", help="Allow only a loopback HTTP fixture.")
     polling.add_argument("--repair-plan", type=Path, help="Trusted local JSON plan enabling draft repairs.")
@@ -473,6 +474,13 @@ def main():
     requeue = commands.add_parser("requeue")
     requeue.add_argument("id", type=positive)
     requeue.add_argument("--symptom-id", type=positive, help="Revisit only this tracked symptom.")
+    evidence = commands.add_parser("register-evidence", help="Resume one symptom when new evidence arrives.")
+    evidence.add_argument("id", type=positive)
+    evidence.add_argument("--symptom-id", type=positive, required=True)
+    evidence.add_argument("--fingerprint", required=True)
+    evidence.add_argument("--source-commit", required=True)
+    evidence.add_argument("--evidence-sha256", type=str.lower, required=True)
+    evidence.add_argument("--reference", required=True, help="Short reference in an approved evidence root.")
     followup = commands.add_parser("record-followup", help="Record a completed operator evidence review locally.")
     followup.add_argument("id", type=positive)
     followup.add_argument("--symptom-id", type=positive, required=True)
@@ -508,6 +516,15 @@ def main():
         ).strip()
         if Path(root).resolve() != args.source:
             raise WorkerError("The source path must be the Git checkout root.")
+        if args.source_commit is not None:
+            if args.repair_plan or not re.fullmatch(r"[0-9a-f]{40}|[0-9a-f]{64}", args.source_commit):
+                parser.error("--source-commit requires a full Git commit and no repair plan.")
+            kind = subprocess.check_output(
+                ["git", "--no-replace-objects", "-C", str(args.source), "cat-file", "-t", args.source_commit],
+                env=git_environment(), stderr=subprocess.DEVNULL, text=True, timeout=15,
+            ).strip()
+            if kind != "commit":
+                raise WorkerError("--source-commit must name a commit object.")
         args.evidence_dir = [path.resolve(strict=True) for path in args.evidence_dir]
         if any(not path.is_dir() for path in args.evidence_dir):
             raise WorkerError("Each evidence path must be an approved directory.")
@@ -540,9 +557,12 @@ def main():
             if not outcome and args.approve_tree is not None and not args.approval_consumed:
                 raise WorkerError("No matching candidate was approved or executed.")
             return outcome
-        lock = exclusive_sweep(args.db) if args.command in {"requeue", "record-followup"} else nullcontext()
+        lock = exclusive_sweep(args.db) if args.command in {
+            "requeue", "register-evidence", "record-followup",
+        } else nullcontext()
         with lock, db:
-            job = db.execute("SELECT state, failures, result FROM jobs WHERE id = ?", (args.id,)).fetchone()
+            job = db.execute("SELECT fingerprint, state, failures, result FROM jobs WHERE id = ?",
+                             (args.id,)).fetchone()
             if job is None:
                 raise WorkerError("Unknown report ID.")
             if args.command == "requeue":
@@ -552,6 +572,11 @@ def main():
                 db.execute("UPDATE jobs SET state = 'pending', retry_at = 0, failures = 0 WHERE id = ?",
                            (args.id,))
                 print(f"Requeued bug {args.id}.")
+            elif args.command == "register-evidence":
+                queued = triage.register_evidence(db, args.id, args.symptom_id, args.fingerprint,
+                                                  args.source_commit, args.evidence_sha256, args.reference)
+                detail = "new evidence queued" if queued else "evidence already registered"
+                print(f"Bug {args.id}, symptom {args.symptom_id}: {detail}.")
             elif args.command == "record-followup":
                 result = triage.record_followup(db, args.id, args.symptom_id, args.source_commit, {
                     "classification": args.classification, "finding": args.finding,
@@ -560,7 +585,8 @@ def main():
                 print(f"Bug {args.id}: {result} (operator follow-up recorded).")
             else:
                 print(json.dumps({
-                    "id": args.id, "state": job["state"], "failures": job["failures"],
+                    "id": args.id, "fingerprint": job["fingerprint"],
+                    "state": job["state"], "failures": job["failures"],
                     "result": json.loads(job["result"]) if job["result"] else None,
                     "repair": read_repair(db, args.id),
                     "symptom_repairs": read_symptom_repairs(db, args.id),
