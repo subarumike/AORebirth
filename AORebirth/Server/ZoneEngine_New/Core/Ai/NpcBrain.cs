@@ -1849,6 +1849,12 @@ namespace ZoneEngine_New.Core.Ai
         /// <summary>A heal order: casts a heal on <paramref name="target"/> now if one can land.</summary>
         internal HealOrderResult TryHeal(Character target) => _nanos.TryHeal(target, DateTime.UtcNow);
 
+        internal void ObserveNanoHealth() => _nanos.ObserveHealth();
+
+        internal void ResetNanoTriggers() => _nanos.ResetFight();
+
+        internal void OnSelfNanoExecuted(int nanoId) => _nanos.OnSelfNanoExecuted(nanoId);
+
         /// <summary>Makes <paramref name="target"/> the one the chase and attack work on (a pet's chosen enemy).</summary>
         internal void SetCurrentTarget(Identity target) => _currentTarget = target;
 

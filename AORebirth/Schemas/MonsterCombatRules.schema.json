@@ -16,6 +16,12 @@
           "MaxPets": {
             "type": "integer"
           },
+          "MaxPetsPerType": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
           "SummonIntervalSeconds": {
             "type": "number"
           },
@@ -24,6 +30,41 @@
           }
         },
         "additionalProperties": false
+      },
+      "TriggeredSelfNanos": {
+        "type": [
+          "array",
+          "null"
+        ],
+        "items": {
+          "type": "object",
+          "properties": {
+            "NanoId": {
+              "type": "integer"
+            },
+            "HealthBelowPercent": {
+              "type": "integer"
+            },
+            "ChancePercent": {
+              "type": "integer"
+            },
+            "MaxCastsPerFight": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "CooldownSeconds": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "NanoId",
+            "HealthBelowPercent",
+            "ChancePercent"
+          ],
+          "additionalProperties": false
+        }
       },
       "Features": {
         "type": [
@@ -36,7 +77,8 @@
             "NoMove",
             "Wander",
             "Guard",
-            "Boss"
+            "Boss",
+            "Social"
           ]
         }
       },

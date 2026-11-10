@@ -3,6 +3,7 @@ namespace ZoneEngine_New.Core.Ai
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.IO;
 
     using AORebirth.Enums;
 
@@ -11,6 +12,7 @@ namespace ZoneEngine_New.Core.Ai
     using ZoneEngine_New.Core.Configuration;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Inventory;
+    using ZoneEngine_New.Core.Mobs;
     using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
@@ -59,6 +61,8 @@ namespace ZoneEngine_New.Core.Ai
         readonly List<Dynel> _nearby = new();
         readonly Random _random;
         DateTime _nextAttemptUtc;
+        readonly TriggeredSelfNano[] _triggeredSelfNanos = Array.Empty<TriggeredSelfNano>();
+        TriggeredSelfNano? _triggerInFlight;
 
         public NpcNanoCaster(NpcBrain brain)
         {
@@ -66,6 +70,26 @@ namespace ZoneEngine_New.Core.Ai
             _random = new Random(brain.Npc.Identity.Instance);
             GameplayNpcNanos rules = GameplayNpcNanos.Default;
             _nextAttemptUtc = DateTime.UtcNow.AddSeconds(Between(rules.IdleCheckSeconds, rules.MaxCastIntervalSeconds));
+            if (brain.Pet == null && Npc.Playfield?.GetService<GameData.IGameData>()?.RootPath is string root && root.Length > 0)
+            {
+                var catalog = MonsterCombatRulesCatalog.For(root);
+                if (!(catalog.TryGet(Npc.SpawnHash, out MonsterCombatRules combatRules)
+                    && combatRules.TriggeredSelfNanos is { Count: > 0 }))
+                    catalog.TryGet(Npc.MobTemplate?.Hash, out combatRules);
+                if (combatRules?.TriggeredSelfNanos is { Count: > 0 } triggers)
+                {
+                    _triggeredSelfNanos = new TriggeredSelfNano[triggers.Count];
+                    for (int i = 0; i < triggers.Count; i++)
+                    {
+                        MonsterTriggeredSelfNano trigger = triggers[i];
+                        NanoSpell? spell = Resolve(trigger.NanoId);
+                        if (spell == null || spell.IsHostile || !Npc.UploadedNanoIds.Contains(trigger.NanoId))
+                            throw new InvalidDataException($"{MonsterCombatRulesCatalog.FileName}: {Npc.SpawnHash} "
+                                + $"TriggeredSelfNanos[{i}] must reference an uploaded, non-hostile nano ({trigger.NanoId}).");
+                        _triggeredSelfNanos[i] = new TriggeredSelfNano(trigger, spell);
+                    }
+                }
+            }
         }
 
         NpcCharacter Npc => _brain.Npc;
@@ -77,6 +101,13 @@ namespace ZoneEngine_New.Core.Ai
 
         public void Tick(DateTime nowUtc)
         {
+            // Damage can cross a threshold during an offensive cast. Keep that roll until a legal opportunity.
+            ObserveHealth();
+            if (_triggerInFlight != null && !Npc.IsCastingNano)
+            {
+                _triggerInFlight.State = TriggerState.Pending;
+                _triggerInFlight = null;
+            }
             if (nowUtc < _nextAttemptUtc)
                 return;
             if (Npc.IsDead || Npc.IsStunned || _brain.IsEvading || Npc.IsCastingNano || Npc.IsInNanoRecharge(nowUtc)
@@ -87,6 +118,9 @@ namespace ZoneEngine_New.Core.Ai
             _nextAttemptUtc = nowUtc.AddSeconds(rules.IdleCheckSeconds);
             _allies.Clear();
 
+            if (InCombat && TryTriggeredSelfCast(rules, nowUtc))
+                return;
+
             // Hostile nanos and summons have no target outside a fight, so the idle order leaves them out.
             NanoKind[] order = InCombat ? (rules.BuffInCombat ? CombatOrderWithBuffs : CombatOrder) : IdleOrder;
             for (int i = 0; i < order.Length; i++)
@@ -94,6 +128,99 @@ namespace ZoneEngine_New.Core.Ai
                 if (TryCast(order[i], rules, nowUtc))
                     return;
             }
+        }
+
+        /// <summary>Latch each configured threshold once, including damage received while casting.</summary>
+        public void ObserveHealth()
+        {
+            if (_triggeredSelfNanos.Length == 0 || !InCombat || _brain.IsEvading || Npc.IsDead)
+                return;
+
+            int percent = HealthPercent(Npc);
+            for (int i = 0; i < _triggeredSelfNanos.Length; i++)
+            {
+                TriggeredSelfNano trigger = _triggeredSelfNanos[i];
+                if (trigger.State != TriggerState.Unrolled || percent >= trigger.Rule.HealthBelowPercent)
+                    continue;
+
+                bool selected = trigger.Rule.ChancePercent == 100
+                    || (trigger.Rule.ChancePercent > 0 && _random.Next(100) < trigger.Rule.ChancePercent);
+                trigger.State = selected ? TriggerState.Pending : TriggerState.Finished;
+                LogUtil.Debug(DebugInfoDetail.Engine, $"NPC nano trigger roll npc={Npc.Identity.Instance} stage={i} "
+                    + $"nano={trigger.Spell.Id} hp={percent}% selected={selected}");
+            }
+        }
+
+        public void ResetFight()
+        {
+            foreach (TriggeredSelfNano trigger in _triggeredSelfNanos)
+            {
+                trigger.State = TriggerState.Unrolled;
+                trigger.CastsThisFight = 0;
+                trigger.ReadyAtUtc = default;
+            }
+            _triggerInFlight = null;
+        }
+
+        public void OnSelfNanoExecuted(int nanoId)
+        {
+            if (_triggerInFlight == null || _triggerInFlight.Spell.Id != nanoId)
+                return;
+
+            TriggeredSelfNano trigger = _triggerInFlight;
+            trigger.CastsThisFight++;
+            trigger.ReadyAtUtc = DateTime.UtcNow.AddSeconds(trigger.Rule.CooldownSeconds);
+            trigger.State = trigger.Rule.MaxCastsPerFight is int limit && trigger.CastsThisFight >= limit
+                ? TriggerState.Finished
+                : TriggerState.Pending;
+            _triggerInFlight = null;
+            LogUtil.Debug(DebugInfoDetail.Engine, $"NPC nano trigger executed npc={Npc.Identity.Instance} nano={nanoId}");
+        }
+
+        bool TryTriggeredSelfCast(GameplayNpcNanos rules, DateTime nowUtc)
+        {
+            foreach (TriggeredSelfNano trigger in _triggeredSelfNanos)
+            {
+                if (trigger.State != TriggerState.Pending || nowUtc < trigger.ReadyAtUtc || HasNano(Npc, trigger.Spell)
+                    || !NanoRuntime.CanStartCast(Npc, trigger.Spell, Npc, nowUtc))
+                    continue;
+
+                // Set before TryStartCast: an instant nano can execute synchronously.
+                _triggerInFlight = trigger;
+                trigger.State = TriggerState.Casting;
+                if (NanoRuntime.TryStartCast(Npc, trigger.Spell.Id, Npc.Identity, nowUtc) != NanoCastRefusal.None)
+                {
+                    trigger.State = TriggerState.Pending;
+                    _triggerInFlight = null;
+                    continue;
+                }
+
+                _nextAttemptUtc = nowUtc.AddSeconds(Between(rules.MinCastIntervalSeconds, rules.MaxCastIntervalSeconds));
+                return true;
+            }
+
+            return false;
+        }
+
+        bool IsTriggeredNano(int nanoId)
+        {
+            foreach (TriggeredSelfNano trigger in _triggeredSelfNanos)
+            {
+                if (trigger.Spell.Id == nanoId)
+                    return true;
+            }
+            return false;
+        }
+
+        enum TriggerState { Unrolled, Pending, Casting, Finished }
+
+        sealed class TriggeredSelfNano(MonsterTriggeredSelfNano rule, NanoSpell spell)
+        {
+            public readonly MonsterTriggeredSelfNano Rule = rule;
+            public readonly NanoSpell Spell = spell;
+            public TriggerState State;
+            public long CastsThisFight;
+            public DateTime ReadyAtUtc;
         }
 
         /// <summary>The first castable nano of <paramref name="kind"/>, starting from a random one so NPCs vary.</summary>
@@ -104,6 +231,8 @@ namespace ZoneEngine_New.Core.Ai
             for (int i = 0; i < nanos.Count; i++)
             {
                 int nanoId = nanos[(start + i) % nanos.Count];
+                if (IsTriggeredNano(nanoId))
+                    continue;
                 NanoSpell? spell = Resolve(nanoId);
                 if (spell == null || KindOf(nanoId, spell) != kind)
                     continue;
@@ -174,6 +303,8 @@ namespace ZoneEngine_New.Core.Ai
             bool hasHeal = false;
             foreach (int nanoId in Npc.UploadedNanoIds)
             {
+                if (IsTriggeredNano(nanoId))
+                    continue;
                 NanoSpell? spell = Resolve(nanoId);
                 if (spell == null || spell.IsHostile || !IsHeal(spell))
                     continue;

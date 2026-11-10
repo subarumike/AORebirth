@@ -377,6 +377,8 @@ namespace ZoneEngine_New.Core.Entities
             if ((attacker.IsPlayer || attacker is NpcCharacter) && !ReferenceEquals(attacker, this))
                 Brain?.AddThreatFrom(attacker, hpRemoved, fromDamage: true);
 
+            Brain?.ObserveNanoHealth();
+
             // The percent is only computed when the program listens for health thresholds.
             if (Scripts is { } scripts && scripts.Program.Subscribes(NpcScripts.NpcScriptTrigger.HealthBelow))
             {
@@ -393,6 +395,8 @@ namespace ZoneEngine_New.Core.Entities
         /// </summary>
         public void OnReset()
         {
+            Brain?.ResetNanoTriggers();
+
             // An NPC that resets sends its pets away.
             if (OwnedPets.Count > 0)
                 Playfield?.GetService<Pets.PetService>()?.DismissAll(this, "owner reset");

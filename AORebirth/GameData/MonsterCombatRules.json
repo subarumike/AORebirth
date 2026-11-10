@@ -49,6 +49,12 @@
       "NoCombat"
     ]
   },
+  "CETH": {
+    "Pets": {
+      "MaxPets": 4,
+      "MaxPetsPerType": 1
+    }
+  },
   "CRDY": {
     "Hates": [
       0
@@ -77,6 +83,17 @@
   "NEBG": {
     "Features": [
       "Guard"
+    ]
+  },
+  "NETH": {
+    "TriggeredSelfNanos": [
+      {
+        "NanoId": 149991,
+        "HealthBelowPercent": 50,
+        "ChancePercent": 100,
+        "MaxCastsPerFight": null,
+        "CooldownSeconds": 94
+      }
     ]
   },
   "OPBW": {
