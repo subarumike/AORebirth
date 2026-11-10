@@ -99,11 +99,15 @@ namespace ZoneEngine_New.Core.Entities
         /// Allied combat (MustAlliedCombat / MustNotAlliedCombat) read on this NPC: a player's pet shares its owner's
         /// allies (the owner, the owner's pets, the owner's team and their pets); any other NPC is its own only ally.
         /// Health and Nano Recharger 291082 aims MustNotAlliedCombat at its target, which may be the user's pet.
-        /// Every other leaf goes to <see cref="Character.ResolveRequirement"/>.
+        /// NPCHatelistSize reads the brain's current threat entries. Other leaves go to
+        /// <see cref="Character.ResolveRequirement"/>.
         /// </summary>
         public override bool? ResolveRequirement(ItemRequirement requirement)
         {
             ArgumentNullException.ThrowIfNull(requirement);
+            if ((CharacterStat)requirement.StatNumber == CharacterStat.NPCHatelistSize)
+                return ItemTemplate.EvaluateRequirement(Brain?.Hate.Count ?? 0, requirement);
+
             return (Operator)requirement.Operator switch
             {
                 Operator.MustNotAlliedCombat => !IsAlliedInCombat(),
