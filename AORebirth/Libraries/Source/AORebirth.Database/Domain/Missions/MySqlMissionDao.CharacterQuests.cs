@@ -140,6 +140,19 @@ namespace AORebirth.Database.Domain.Missions
                     || ledger.Status != MissionRewardStatus.Pending || ledger.RewardType != CharacterQuestRewardType)
                     return QuestCompletionResult(CharacterQuestCompletionStatus.Rejected, quest, "The objective has no pending earned reward.");
 
+                CharacterQuestSuccessorRequest successor = request.Successor;
+                CharacterQuestCompletionSnapshotData previousSuccessor = null;
+                if (successor != null)
+                {
+                    ValidateText(successor.QuestId, "successorQuestId", 32, false);
+                    if (string.Equals(successor.QuestId, quest.QuestId, StringComparison.OrdinalIgnoreCase)
+                        || successor.RequiredCount <= 0 || request.NowUtcTicks < quest.AssignedAtUtcTicks)
+                        throw new ArgumentException("The successor must be a distinct valid template assignment.");
+                    previousSuccessor = this.ReadCharacterQuest(successor.QuestId);
+                    if (!CharacterQuestSuccessorRequest.CanAssign(previousSuccessor, quest.AssignedAtUtcTicks))
+                        return QuestCompletionResult(CharacterQuestCompletionStatus.Rejected, quest, "The successor already has a protected assignment.");
+                }
+
                 // Projections contain the existing runtime's complete cash/XP/level effects. Fail closed on a stale base.
                 if (request.StatMutations.Count != request.ExpectedStatValues.Count
                     || request.StatMutations.Any(mutation => mutation == null || mutation.Kind != MissionStatMutationKind.Set)
@@ -155,7 +168,7 @@ namespace AORebirth.Database.Domain.Missions
                         return QuestCompletionResult(CharacterQuestCompletionStatus.Rejected, quest, "The durable character stats changed before completion.");
                 }
 
-                this.ApplyInventoryMutationCore(request.Grants, new MissionItemInstanceData[0]);
+                this.ApplyInventoryMutationCore(request.Grants, new MissionItemInstanceData[0], allowOverflowGrants: successor != null);
                 // Only this private path can authorize the shared ledger/stat primitive from characterquests.
                 MissionAtomicStatRewardResultData reward = this.ApplyCharacterStatReward(key, CharacterQuestRewardType,
                     request.StatMutations, "characterquest:" + quest.QuestId + ":" + quest.AssignedAtUtcTicks.ToString(CultureInfo.InvariantCulture),
@@ -167,11 +180,29 @@ namespace AORebirth.Database.Domain.Missions
                     + "WHERE CharacterId=@CharacterId AND QuestId=@QuestId AND State=1 AND Progress>=RequiredCount AND AssignedAtUtcTicks=@Assigned",
                     new { this.CharacterId, quest.QuestId, Now = request.NowUtcTicks, Assigned = quest.AssignedAtUtcTicks }, this.transaction);
                 this.RequireSingleWrite(completed, "quest completion", quest.QuestId, 0);
+                if (successor != null)
+                    this.AssignSuccessor(successor, previousSuccessor, request.NowUtcTicks);
                 quest.State = 2;
                 quest.UpdatedAtUtcTicks = request.NowUtcTicks;
                 var result = QuestCompletionResult(CharacterQuestCompletionStatus.Applied, quest, "Quest state, inventory, stats and reward ledger committed together.");
                 result.StatValues = reward.StatValues;
                 return result;
+            }
+
+            private void AssignSuccessor(CharacterQuestSuccessorRequest successor,
+                CharacterQuestCompletionSnapshotData previous, long now)
+            {
+                int updated = previous == null
+                    ? this.ExecuteWrite(
+                        "INSERT INTO characterquests (CharacterId,QuestId,Source,State,Progress,RequiredCount,AssignedAtUtcTicks,UpdatedAtUtcTicks) "
+                        + "VALUES (@CharacterId,@QuestId,0,1,0,@RequiredCount,@Now,@Now)",
+                        new { this.CharacterId, successor.QuestId, successor.RequiredCount, Now = now }, this.transaction)
+                    : this.ExecuteWrite(
+                        "UPDATE characterquests SET State=1,Progress=0,RequiredCount=@RequiredCount,AssignedAtUtcTicks=@Now,UpdatedAtUtcTicks=@Now "
+                        + "WHERE CharacterId=@CharacterId AND QuestId=@QuestId AND Source=0 AND State=@State AND AssignedAtUtcTicks=@Assigned",
+                        new { this.CharacterId, successor.QuestId, successor.RequiredCount, Now = now,
+                            previous.State, Assigned = previous.AssignedAtUtcTicks }, this.transaction);
+                this.RequireSingleWrite(updated, "quest successor assignment", successor.QuestId, 0);
             }
 
             private bool CharacterQuestBindingMatches(CharacterQuestCompletionSnapshotData quest, long assigned,

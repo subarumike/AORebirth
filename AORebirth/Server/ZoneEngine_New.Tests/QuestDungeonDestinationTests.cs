@@ -764,7 +764,8 @@ public sealed class QuestDungeonDestinationTests
         internal Fixture(IMissionDao? completionDao = null, IItemBuilder? items = null, Func<DateTime>? now = null,
             CharacterSnapshotService? snapshots = null, IItemTemplateCatalog? templates = null,
             IInventoryRepository? inventory = null, IItemInstanceIdAllocator? ids = null, int playerId = 77,
-            bool enableMissionPopulationPersistence = false, GeneratedMissionOffer? rolledOffer = null)
+            bool enableMissionPopulationPersistence = false, GeneratedMissionOffer? rolledOffer = null,
+            QuestCatalog? questCatalog = null)
         {
             Player = TestWorld.CreatePlayer(playerId);
             _templates = templates ?? new StubCatalog();
@@ -797,7 +798,7 @@ public sealed class QuestDungeonDestinationTests
             var lazyManager = new Lazy<PlayfieldManager>(() => Manager ?? throw new InvalidOperationException("Fixture manager is not initialized."));
             _flush = new InventoryFlushService(lazyManager, Persistence, _logger);
             _actions = new InventoryActionService(Persistence, _flush, _ids, _logger);
-            _quests = new QuestService(new QuestCatalog(RuntimeData.Value, _logger), Store, _items, _flush, _logger,
+            _quests = new QuestService(questCatalog ?? new QuestCatalog(RuntimeData.Value, _logger), Store, _items, _flush, _logger,
                 now ?? (() => DateTime.UtcNow), completionDao, snapshots);
             Layouts = new DungeonLayoutGenerator(RuntimeData.Value, _logger);
             Assert.IsTrue(Layouts.IsAvailable, "Existing runtime GameData must contain the configured procedural styles. Root=" + RuntimeData.Value.RootPath + "; " + _logger.Errors);
@@ -991,6 +992,7 @@ public sealed class QuestDungeonDestinationTests
         internal GeneratedMissionOffer Offer = null!;
         internal GeneratedQuestRow? Generated;
         internal CharacterQuestRow? Character;
+        internal readonly Dictionary<string, CharacterQuestRow> AdditionalQuests = new(StringComparer.Ordinal);
         internal readonly Dictionary<int, string> Links = [];
         internal readonly List<QuestDungeonKeyItemRow> Keys = [];
         internal Action? BeforeAccept;
@@ -1029,7 +1031,8 @@ public sealed class QuestDungeonDestinationTests
             if (!Links.TryGetValue(sourceKeyInstanceId, out string? quest) || Links.Count >= maxKeys) return null;
             Links.Add(copy.InstanceId, quest); Keys.Add(copy); return quest;
         }
-        public IList<CharacterQuestRow> Load(int characterId) => Character != null ? [Character] : [];
+        public IList<CharacterQuestRow> Load(int characterId)
+            => Character != null ? [Character, .. AdditionalQuests.Values] : [.. AdditionalQuests.Values];
         public IList<GeneratedQuestRow> LoadGeneratedFor(int characterId) => Generated != null ? [Generated] : [];
         public GeneratedQuestRow? LoadGenerated(string questId) => Generated?.QuestId == questId ? Generated : null;
         public IDictionary<int, string> LoadKeyQuests(IReadOnlyCollection<int> keyInstanceIds)
@@ -1044,7 +1047,13 @@ public sealed class QuestDungeonDestinationTests
         public IList<string> LoadExpiredQuestsWithKeys(long nowUtcTicks, int limit) => [];
         public int PurgeEndedGeneratedQuests(long cutoffUtcTicks, int limit) => 0;
         public int RetireDeadKeysForCharacter(int characterId, int keyLowId, IReadOnlyCollection<int> ownedContainerTypes, int bagContainerType) => 0;
-        public void Save(CharacterQuestRow row) => Character = row;
+        public void Save(CharacterQuestRow row)
+        {
+            if (Character == null || Character.QuestId == row.QuestId)
+                Character = row;
+            else
+                AdditionalQuests[row.QuestId] = row;
+        }
         public void SaveGenerated(GeneratedQuestRow row) => Generated = row;
         public IList<RetiredDungeonKey> EndQuestKeys(string questId)
         {

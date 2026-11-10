@@ -62,9 +62,22 @@ namespace AORebirth.Interfaces.Persistence.Missions
         public string ExpectedDefinitionJson { get; set; }
         public string ExpectedAcgBuildingGeneratorJson { get; set; }
         public long NowUtcTicks { get; set; }
+        public CharacterQuestSuccessorRequest Successor { get; set; }
         public IReadOnlyList<MissionItemInstanceData> Grants { get; set; } = new MissionItemInstanceData[0];
         public IList<MissionStatMutationData> StatMutations { get; set; } = new MissionStatMutationData[0];
         public IList<MissionStatValueData> ExpectedStatValues { get; set; } = new MissionStatValueData[0];
+    }
+
+    /// <summary>A template step to assign with the completion of its predecessor.</summary>
+    public sealed class CharacterQuestSuccessorRequest
+    {
+        public string QuestId { get; set; }
+        public int RequiredCount { get; set; }
+
+        /// <summary>A fresh chain can restart an older closed template row. A current-run row is left alone.</summary>
+        public static bool CanAssign(CharacterQuestCompletionSnapshotData current, long predecessorAssignedAtUtcTicks)
+            => current == null || (current.Source == 0 && current.State >= 2 && current.State <= 5
+                && current.AssignedAtUtcTicks < predecessorAssignedAtUtcTicks);
     }
 
     public sealed class CharacterQuestCompletionResult
