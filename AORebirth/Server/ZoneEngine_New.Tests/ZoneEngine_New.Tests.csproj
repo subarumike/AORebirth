@@ -89,6 +89,11 @@
     <Compile Include="TestDoubles.cs" />
     <Compile Include="ModuleApiTests.cs" />
   </ItemGroup>
+  <ItemGroup Condition="'$(KnubotTeleportFocusedTests)' == 'true'">
+    <Compile Remove="@(Compile)" />
+    <Compile Include="TestDoubles.cs" />
+    <Compile Include="KnubotTeleportTests.cs" />
+  </ItemGroup>
   <ItemGroup Condition="'$(GameDataReloadFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />
     <Compile Include="TestDoubles.cs" />
