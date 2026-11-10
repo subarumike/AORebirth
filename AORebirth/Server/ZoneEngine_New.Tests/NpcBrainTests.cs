@@ -10,6 +10,7 @@ namespace ZoneEngine_New.Tests
 
     using ZoneEngine_New.Core.Ai;
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Pets;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.WorldSimulation;
 
@@ -216,6 +217,46 @@ namespace ZoneEngine_New.Tests
             Assert.IsTrue(brain.IsInAttackRange(player));
             Assert.IsFalse(npc.HasLineOfSightTo(player));
             Assert.IsFalse(brain.CanAttackNow(player));
+        }
+
+        [TestMethod]
+        [DataRow(3.0, 3.0)]
+        [DataRow(5.0, 3.4)]
+        public void AttackPetUsesDirectRouteOnlyWhenFormationCannotStart(double enemyX, double expectedDestinationX)
+        {
+            using ServiceProvider services = CombatServices();
+            Playfield playfield = Playfield(services);
+            typeof(Playfield).GetField("<FightModes>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .SetValue(playfield, DistrictFightModes.None);
+            Player owner = TestWorld.CreatePlayer(41);
+            NpcCharacter pet = CreateNpc();
+            pet.Position = new Vector3(0, 0, 0);
+            var enemy = new NpcCharacter(
+                new Identity { Type = IdentityType.CanbeAffected, Instance = 1002 }, new StubItemBuilder());
+            enemy.Position = new Vector3(enemyX, 0, 0);
+            pet.Stats.Set(CharacterStat.CharRadius, 1);
+            pet.Stats.Set(CharacterStat.Scale, 25);
+            pet.Stats.Set(CharacterStat.RunSpeed, 1000);
+            pet.Motor.RefreshFromStats();
+            enemy.Stats.Set(CharacterStat.CharRadius, 1);
+            enemy.Stats.Set(CharacterStat.Scale, 25);
+            var weapon = TestWorld.CreateItem();
+            weapon.Definition.Stats[CharacterStat.AttackRange] = 2;
+            pet.SetWeapon(WeaponSlot.MainHand, new CharacterWeapon { Item = weapon });
+            Place(playfield, services, owner, pet, enemy);
+            var controller = new PetController(owner, PetTypes.Attack, "TEST", 1, null);
+            pet.BindPet(controller);
+            NpcBrain brain = NpcBrain.CreatePet(pet, controller);
+            brain.SetCurrentTarget(enemy.Identity);
+
+            Assert.IsFalse(brain.IsInAttackRange(enemy));
+            new PetFightNode(brain).Evaluate(0.1f);
+
+            Assert.AreEqual(enemy.Identity, pet.FightingTarget);
+            Assert.IsTrue(pet.Motor.HasPath, "An out-of-range pet must begin closing on a reachable target.");
+            var destination = (Vector3)typeof(NpcBrain).GetField("_segmentDestination", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .GetValue(brain)!;
+            Assert.AreEqual(expectedDestinationX, destination.x, 1e-3);
         }
 
         [TestMethod]
