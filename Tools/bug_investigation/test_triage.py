@@ -11,7 +11,7 @@ import triage
 import validation
 from explore import Explorer
 from repair import ApprovalError, RepairError, prepare, review_candidate
-from worker import initialize
+from worker import InvestigationError, initialize
 
 
 PATH = "AORebirth/Server/ZoneEngine_New/Example.cs"
@@ -124,15 +124,26 @@ class InvestigationTests(unittest.TestCase):
             if schema is triage.SPLIT_SCHEMA:
                 return {"symptoms": [{"title": title, "scope": title} for title in ("Save", "Display")]}
             if context["symptom"]["id"] == 2:
-                raise RuntimeError("Interrupted")
+                raise InvestigationError("Interrupted", interrupted_reads=[READ])
             return diagnosis("DIRECT_FIX"), [READ]
 
-        with self.assertRaisesRegex(RuntimeError, "Interrupted"):
+        with self.assertRaisesRegex(InvestigationError, "Interrupted"):
             triage.investigate(self.db, self.key, {"id": 1}, None, invoke, workers=2)
         saved = json.loads(self.db.execute("SELECT result FROM jobs WHERE id = 1").fetchone()[0])
         self.assertEqual(saved["classification"], triage.INCOMPLETE)
         self.assertTrue(saved["symptoms"][0]["repair_ready"])
         self.assertEqual(saved["symptoms"][1]["classification"], triage.INCOMPLETE)
+        self.assertEqual(triage.progress(self.db, 1)[1]["interrupted_reads"], [READ])
+        self.assertEqual(saved["symptoms"][1]["source_reads"], [])
+
+        def retry(_schema, _prompt, context, **_options):
+            self.assertEqual(context["symptom"]["id"], 2)
+            self.assertEqual(context["interrupted_read_hints"], [READ])
+            return diagnosis("DIRECT_FIX"), []
+
+        retried = triage.investigate(self.db, self.key, {"id": 1}, saved, retry)
+        self.assertEqual(retried["symptoms"][1]["classification"], triage.INCOMPLETE)
+        self.assertFalse(retried["symptoms"][1]["repair_ready"])
 
     def test_followup_reclassifies_only_reviewed_symptom_and_preserves_raw_checkpoint(self):
         def invoke(schema, *_args, **_opts):

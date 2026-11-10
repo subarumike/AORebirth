@@ -13,6 +13,7 @@ DISPOSITIONS = (
 REPAIRABLE = {"DIRECT_FIX", "ADDITIONAL_IMPLEMENTATION"}
 NEEDS_EXTERNAL_EVIDENCE = {"CAPTURE_REQUIRED", "GHIDRA_REQUIRED", "HUMAN_REQUIRED"}
 MAX_PASSES = 3
+MAX_INTERRUPTED_READS = 80
 ROWS = """
     SELECT symptom_id, title, scope, progress FROM investigations
     WHERE id = ? AND fingerprint = ? AND source_commit = ? ORDER BY symptom_id
@@ -88,6 +89,8 @@ from confirmed absence. Do not use this private tool in a public-only review.
 When new evidence is registered, seek its reference in the approved roots and
 explain whether it resolves the previously recorded gap. A reference alone
 does not establish new behavior.
+Source reads from interrupted passes are navigation hints. Reopen the relevant
+lines yourself before citing them.
 
 Use SOURCE_INVESTIGATION_INCOMPLETE if a missing read, caller, dependency or
 test/evidence search prevents a source conclusion. List each remaining source
@@ -230,18 +233,22 @@ def investigate_pass(report, identity, commit, prior, progress, invoke):
     revisions = progress.get("evidence_revisions", [])
     registered = [{"sha256": entry["sha256"], "reference": entry["reference"]}
                   for entry in revisions[-8:]] if progress.get("evidence_pending") and not public_review else []
+    interrupted = progress.get("interrupted_reads", [])
+    hints = [item for item in interrupted if not (public_review and item["private"])]
     result, reads = invoke(SCHEMA, PROMPT, {
         "report": report, "symptom": identity, "source_commit": commit,
         "previous": None if public_review else progress["result"],
         "previous_report_notes": notes,
         "operator_followups": [] if public_review else progress.get("followups", [])[-1:],
         "registered_evidence": registered,
+        "interrupted_read_hints": hints,
         "public_only_repair_review": public_review,
         "remaining_source_passes": 0 if public_review else MAX_PASSES - progress["passes"] - 1,
     }, public_only=public_review)
     result, reads, needs_public_review = verified_result(
         result, reads, [] if public_review else progress["reads"],
-        private_context=bool(notes or registered or (not public_review and progress.get("followups"))),
+        private_context=bool(notes or registered or any(item["private"] for item in hints)
+                             or (not public_review and progress.get("followups"))),
         public_only=public_review,
     )
     if public_review and not result["repair_ready"]:
@@ -253,6 +260,8 @@ def investigate_pass(report, identity, commit, prior, progress, invoke):
     passes = progress["passes"] + 1
     updated = {"passes": passes, "reads": reads, "result": result,
                "public_review": needs_public_review, "followups": progress.get("followups", [])}
+    if interrupted:
+        updated["interrupted_reads"] = interrupted
     if revisions:
         updated["evidence_revisions"] = revisions
         updated["evidence_pending"] = bool(progress.get("evidence_pending") and (
@@ -261,7 +270,7 @@ def investigate_pass(report, identity, commit, prior, progress, invoke):
     return updated
 
 
-def investigate(db, key, report, previous, invoke, *, workers=1):
+def investigate(db, key, report, previous, invoke, *, workers=1, cancelled=None):
     prior = previous.get("prior_result") if previous and "symptoms" in previous else previous
     saved_commit = previous.get("source_commit") if previous else None
     if saved_commit and saved_commit != key[2]:
@@ -277,29 +286,51 @@ def investigate(db, key, report, previous, invoke, *, workers=1):
     checkpoints = {number: json.loads(saved) if saved else {"passes": 0, "reads": [], "result": None}
                    for number, _, _, saved in rows}
     failures = {}
+
+    def save_checkpoint(future, number):
+        try:
+            checkpoint = future.result()
+        except Exception as error:
+            failures[number] = error
+            reads = getattr(error, "interrupted_reads", ())
+            if not reads:
+                return
+            checkpoint = checkpoints[number]
+            combined = [*checkpoint.get("interrupted_reads", []), *reads]
+            unique = {json.dumps(read, sort_keys=True): read for read in combined}
+            checkpoint["interrupted_reads"] = list(unique.values())[-MAX_INTERRUPTED_READS:]
+        checkpoints[number] = checkpoint
+        with db:
+            db.execute("""
+                UPDATE investigations SET progress = ?
+                WHERE id = ? AND fingerprint = ? AND source_commit = ? AND symptom_id = ?
+            """, (json.dumps(checkpoint), *key, number))
+            db.execute("UPDATE jobs SET result = ? WHERE id = ? AND fingerprint = ?",
+                       (json.dumps(snapshot(db, key, prior)), key[0], key[1]))
+
     with ThreadPoolExecutor(max_workers=workers) as executor:
         while pending := [number for number, checkpoint in checkpoints.items()
                           if number not in failures and needs_pass(checkpoint)]:
-            futures = {executor.submit(investigate_pass, report, identities[number], key[2],
-                                       prior, checkpoints[number], invoke): number
-                       for number in pending}
-            for future in as_completed(futures):
-                number = futures[future]
-                try:
-                    checkpoint = future.result()
-                except Exception as error:
-                    failures[number] = error
-                    continue
-                checkpoints[number] = checkpoint
-                with db:
-                    db.execute("""
-                        UPDATE investigations SET progress = ?
-                        WHERE id = ? AND fingerprint = ? AND source_commit = ? AND symptom_id = ?
-                    """, (json.dumps(checkpoint), *key, number))
-                    db.execute("UPDATE jobs SET result = ? WHERE id = ? AND fingerprint = ?",
-                               (json.dumps(snapshot(db, key, prior)), key[0], key[1]))
+            futures = {}
+            try:
+                for number in pending:
+                    future = executor.submit(investigate_pass, report, identities[number], key[2],
+                                             prior, checkpoints[number], invoke)
+                    futures[future] = number
+                for future in as_completed(futures):
+                    save_checkpoint(future, futures[future])
+                    del futures[future]
+            except KeyboardInterrupt:
+                if cancelled is not None:
+                    cancelled.set()
+                for future in futures:
+                    future.cancel()
+                for future in as_completed(futures):
+                    save_checkpoint(future, futures[future])
+                raise
     if failures:
-        raise next(iter(failures.values()))
+        errors = list(failures.values())
+        raise next((error for error in errors if not getattr(error, "retryable", True)), errors[0])
     return snapshot(db, key, prior)
 
 
@@ -363,7 +394,8 @@ def register_evidence(db, report_id, symptom_id, fingerprint, source_commit, sha
     history = saved.setdefault("evidence_revisions", [])
     if any(entry["sha256"] == sha256 for entry in history):
         return False
-    checkpoint = {field: saved[field] for field in ("passes", "reads", "result", "followup_active")
+    checkpoint = {field: saved[field] for field in
+                  ("passes", "reads", "result", "followup_active", "interrupted_reads")
                   if field in saved}
     history.append({"sha256": sha256, "reference": reference, "previous_checkpoint": checkpoint})
     saved.update(passes=0, revisit=True, public_review=False, followup_active=False, evidence_pending=True)

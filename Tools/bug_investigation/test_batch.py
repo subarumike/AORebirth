@@ -75,6 +75,21 @@ class NextNewReportsTests(unittest.TestCase):
             "SELECT id, state, failures FROM jobs ORDER BY id"
         )], [(1, "pending", 1), (2, "done", 0)])
 
+    def test_stalled_investigation_stops_automatically_retrying_after_three_failures(self):
+        selected = record(1)
+        with self.db:
+            worker.enqueue(self.db, *selected)
+        with (patch.object(worker.time, "time", return_value=100) as now,
+              patch.object(worker, "investigate", side_effect=worker.InvestigationError("Stalled")) as inspect):
+            for when, retry in ((100, 115), (115, 145), (145, worker.PARKED)):
+                now.return_value = when
+                self.assertTrue(worker.process_pending(self.db, Mock(), self.args, selected=selected))
+                self.assertEqual(self.db.execute("SELECT retry_at FROM jobs").fetchone()[0], retry)
+            now.return_value = 10000
+            self.assertFalse(worker.process_pending(self.db, Mock(), self.args, selected=selected))
+            self.assertEqual(inspect.call_count, 3)
+        self.assertIn("Bug 1 parked for review.", self.errors.getvalue())
+
 
 if __name__ == "__main__":
     unittest.main()

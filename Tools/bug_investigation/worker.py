@@ -12,15 +12,20 @@ import sqlite3
 import subprocess
 import sys
 import tempfile
+from threading import Event
 import time
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode, urlsplit
 from urllib.request import HTTPRedirectHandler, ProxyHandler, Request, build_opener
 
 import triage
+from investigation_process import WatchdogError, run as run_watched
 
 
 WORKER_ROOT = Path(__file__).resolve().parents[2]
+MAX_INVESTIGATION_FAILURES = 3
+PARKED = 2**63 - 1
+MAX_AUDIT_BYTES = 1024 * 1024
 
 
 class WorkerError(Exception):
@@ -32,7 +37,10 @@ class FeedError(WorkerError):
 
 
 class InvestigationError(WorkerError):
-    pass
+    def __init__(self, message, *, interrupted_reads=(), retryable=True):
+        super().__init__(message)
+        self.interrupted_reads = interrupted_reads
+        self.retryable = retryable
 
 
 class NoRedirect(HTTPRedirectHandler):
@@ -183,7 +191,39 @@ def codex_environment():
     return {key: value for key, value in os.environ.items() if key.upper() in names}
 
 
-def run_codex(args, schema, prompt, context, *, explore=False, public_only=False):
+def audit_reads(path, *, partial=False):
+    reads = []
+    try:
+        with path.open("rb") as stream:
+            data = stream.read(MAX_AUDIT_BYTES + 1)
+    except FileNotFoundError:
+        return reads
+    except OSError:
+        if partial:
+            return reads
+        raise
+    if len(data) > MAX_AUDIT_BYTES and not partial:
+        raise ValueError("Codex source audit exceeds its size limit.")
+    for line in data[:MAX_AUDIT_BYTES].splitlines(keepends=True):
+        if not line.endswith(b"\n") and partial:
+            break
+        try:
+            item = json.loads(line)
+            if (not isinstance(item, dict) or set(item) != {"tool", "path", "first", "last", "private"}
+                    or not isinstance(item["tool"], str) or not isinstance(item["path"], str)
+                    or type(item["first"]) is not int or type(item["last"]) is not int
+                    or type(item["private"]) is not bool):
+                raise ValueError("Unexpected source audit entry.")
+        except (ValueError, TypeError):
+            if not partial:
+                raise
+            continue
+        if item["tool"] in {"read", "evidence_sweep"} or item["private"]:
+            reads.append(item)
+    return reads
+
+
+def run_codex(args, schema, prompt, context, *, explore=False, public_only=False, cancelled=None):
     with tempfile.TemporaryDirectory(prefix="aor-bug-codex-") as directory:
         scratch = Path(directory)
         schema_path = scratch / "schema.json"
@@ -205,7 +245,7 @@ def run_codex(args, schema, prompt, context, *, explore=False, public_only=False
             )
         schema_path.write_text(json.dumps(schema), encoding="utf-8")
         command = [
-            args.codex, "-a", "never", "exec", "--skip-git-repo-check",
+            args.codex, "-a", "never", "exec", "--skip-git-repo-check", "--json",
             "--sandbox", "read-only", "--ignore-user-config", "--ephemeral",
             "--disable", "shell_tool", "--disable", "hooks", "--disable", "shell_snapshot",
             "--disable", "skill_search", "--disable", "view_image",
@@ -215,27 +255,25 @@ def run_codex(args, schema, prompt, context, *, explore=False, public_only=False
             prompt,
         ]
         try:
-            completed = subprocess.run(
-                command, cwd=scratch, env=codex_environment(), input=json.dumps(context),
-                text=True, encoding="utf-8", stdout=subprocess.DEVNULL,
-                stderr=subprocess.DEVNULL, timeout=args.timeout, check=False,
+            status = run_watched(
+                command, cwd=scratch, env=codex_environment(), payload=json.dumps(context).encode("utf-8"),
+                audit_path=audit_path, idle_seconds=args.timeout, cancelled=cancelled,
             )
-            if completed.returncode:
-                raise InvestigationError(f"Codex exited with code {completed.returncode}.")
+            if status:
+                raise InvestigationError(f"Codex exited with code {status}.")
             if output_path.stat().st_size > 65_536:
                 raise InvestigationError("Codex result exceeds the size limit.")
             payload = json.loads(output_path.read_text(encoding="utf-8"))
             if not explore:
                 return payload
-            reads = []
-            if audit_path.is_file():
-                reads = [json.loads(line) for line in audit_path.read_text(encoding="utf-8").splitlines()]
-            return payload, [item for item in reads
-                             if item["tool"] in {"read", "evidence_sweep"} or item["private"]]
-        except subprocess.TimeoutExpired:
-            raise InvestigationError("Codex investigation timed out.") from None
-        except (OSError, ValueError):
-            raise InvestigationError("Codex did not produce a readable JSON result.") from None
+            return payload, audit_reads(audit_path)
+        except (WatchdogError, InvestigationError, OSError, ValueError) as error:
+            reads = audit_reads(audit_path, partial=True) if explore else []
+            message = str(error) if isinstance(error, (WatchdogError, InvestigationError)) else (
+                "Codex did not produce a readable JSON result."
+            )
+            raise InvestigationError(message, interrupted_reads=reads,
+                                     retryable=getattr(error, "retryable", True)) from None
 
 def source_head(source):
     return subprocess.check_output(
@@ -247,12 +285,14 @@ def source_head(source):
 def investigate(db, args, report, fingerprint, previous):
     try:
         commit = args.repair_base or source_head(args.source)
+        cancelled = Event()
 
         def invoke(schema, prompt, context, **options):
-            return run_codex(args, schema, prompt, context, explore="symptom" in context, **options)
+            return run_codex(args, schema, prompt, context, explore="symptom" in context,
+                             cancelled=cancelled, **options)
 
         return triage.investigate(db, (report["id"], fingerprint, commit), report, previous, invoke,
-                                  workers=args.symptom_workers)
+                                  workers=args.symptom_workers, cancelled=cancelled)
     except (OSError, subprocess.SubprocessError, ValueError, TypeError, KeyError) as error:
         raise InvestigationError("Could not verify the source investigation.") from error
 
@@ -284,19 +324,23 @@ def process_pending(db, feed, args, *, selected=None):
             result = investigate(db, args, report, fingerprint, previous)
         except InvestigationError as error:
             with db:
-                failures = db.execute("SELECT failures FROM jobs WHERE id = ?", (report_id,)).fetchone()[0]
-                retry_at = int(time.time()) + min(300, 15 * (2 ** min(failures, 5)))
+                failures = db.execute("SELECT failures FROM jobs WHERE id = ?", (report_id,)).fetchone()[0] + 1
+                parked = not error.retryable or failures >= MAX_INVESTIGATION_FAILURES
+                retry_at = PARKED if parked else int(time.time()) + 15 * (2 ** (failures - 1))
                 db.execute(
-                    "UPDATE jobs SET failures = failures + 1, retry_at = ? WHERE id = ?",
-                    (retry_at, report_id),
+                    "UPDATE jobs SET failures = ?, retry_at = ? WHERE id = ?",
+                    (failures, retry_at, report_id),
                 )
-            print(f"Bug {report_id} remains queued. {error}", file=sys.stderr, flush=True)
+            status = "parked for review" if parked else "remains queued"
+            print(f"Bug {report_id} {status}. {error}", file=sys.stderr, flush=True)
+            if not error.retryable:
+                raise WorkerError("Stopping this sweep because Codex cleanup could not be verified.") from None
             failed = True
             continue
         incomplete = result["classification"] == triage.INCOMPLETE
         with db:
-            db.execute("UPDATE jobs SET state = ?, retry_at = ?, result = ? WHERE id = ?",
-                       ("pending" if incomplete else "done", 2**63 - 1 if incomplete else 0,
+            db.execute("UPDATE jobs SET state = ?, retry_at = ?, result = ?, failures = 0 WHERE id = ?",
+                       ("pending" if incomplete else "done", PARKED if incomplete else 0,
                         json.dumps(result), report_id))
         print(f"Bug {report_id}: {result['classification']}", flush=True)
 
@@ -466,7 +510,8 @@ def main():
     selection.add_argument("--report-id", type=positive, help="Retrieve and process only this open report.")
     selection.add_argument("--next-new", type=positive, metavar="N",
                            help="Process up to N open report IDs never queued before, in a single sweep.")
-    polling.add_argument("--timeout", type=positive, default=180, help="Codex timeout in seconds.")
+    polling.add_argument("--idle-timeout", "--timeout", dest="timeout", type=positive, default=300,
+                         help="Maximum seconds without a Codex event or source read (default: 300).")
     polling.add_argument("--symptom-workers", type=positive, choices=range(1, 4), default=1,
                          help="Concurrent read-only symptom investigations within one report.")
     polling.add_argument("--poll-seconds", type=int, default=0, help="Zero runs one sweep.")
