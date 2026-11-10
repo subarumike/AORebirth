@@ -230,7 +230,8 @@ def run_codex(args, schema, prompt, context, *, explore=False, public_only=False
             reads = []
             if audit_path.is_file():
                 reads = [json.loads(line) for line in audit_path.read_text(encoding="utf-8").splitlines()]
-            return payload, [item for item in reads if item["tool"] == "read" or item["private"]]
+            return payload, [item for item in reads
+                             if item["tool"] in {"read", "evidence_sweep"} or item["private"]]
         except subprocess.TimeoutExpired:
             raise InvestigationError("Codex investigation timed out.") from None
         except (OSError, ValueError):
@@ -429,6 +430,22 @@ def git_environment():
     return {key: value for key, value in os.environ.items() if not key.upper().startswith("GIT_")}
 
 
+def add_checkout_evidence(args):
+    common = subprocess.check_output(
+        ["git", "-C", str(args.source), "rev-parse", "--path-format=absolute", "--git-common-dir"],
+        env=git_environment(), stderr=subprocess.DEVNULL, text=True, timeout=15,
+    ).strip()
+    git_dir = Path(common).resolve()
+    checkouts = [git_dir.parent, args.source] if git_dir.name == ".git" else [args.source]
+    for names in (("GameData",), ("Captures",), ("RDBEvidence", "RDB")):
+        if any(path.name.casefold() in {name.casefold() for name in names} for path in args.evidence_dir):
+            continue
+        candidates = (root / name for root in checkouts for name in names)
+        candidate = next((path for path in candidates if path.is_dir() and path.resolve() == path), None)
+        if candidate is not None:
+            args.evidence_dir.append(candidate)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--db", required=True, type=Path, help="Private local SQLite file.")
@@ -440,6 +457,10 @@ def main():
     polling.add_argument("--evidence-dir", type=Path, action="append", default=[])
     polling.add_argument("--synthetic", action="store_true", help="Allow only a loopback HTTP fixture.")
     polling.add_argument("--repair-plan", type=Path, help="Trusted local JSON plan enabling draft repairs.")
+    polling.add_argument("--supervised-validation", action="store_true",
+                         help="Stage a product candidate for operator review; never run it unattended.")
+    polling.add_argument("--approve-tree", metavar="GIT_TREE",
+                         help="Request interactive validation of exactly this previously staged tree.")
     selection = polling.add_mutually_exclusive_group()
     selection.add_argument("--report-id", type=positive, help="Retrieve and process only this open report.")
     selection.add_argument("--next-new", type=positive, metavar="N",
@@ -452,6 +473,15 @@ def main():
     requeue = commands.add_parser("requeue")
     requeue.add_argument("id", type=positive)
     requeue.add_argument("--symptom-id", type=positive, help="Revisit only this tracked symptom.")
+    followup = commands.add_parser("record-followup", help="Record a completed operator evidence review locally.")
+    followup.add_argument("id", type=positive)
+    followup.add_argument("--symptom-id", type=positive, required=True)
+    followup.add_argument("--source-commit", required=True)
+    followup.add_argument("--classification", choices=[x for x in triage.DISPOSITIONS if x != triage.INCOMPLETE],
+                          required=True)
+    followup.add_argument("--finding", required=True)
+    followup.add_argument("--evidence", action="append", required=True)
+    followup.add_argument("--next-action", required=True)
     args = parser.parse_args()
     args.db = args.db.resolve()
     if args.command != "run" and not args.db.is_file():
@@ -463,6 +493,12 @@ def main():
             parser.error("--report-id requires a valid website ID and a single sweep.")
         if args.next_new is not None and args.poll_seconds:
             parser.error("--next-new requires a single sweep.")
+        if args.supervised_validation and (not args.repair_plan or not args.report_id or args.synthetic):
+            parser.error("--supervised-validation requires a product --repair-plan and --report-id.")
+        if args.approve_tree is not None and (not args.supervised_validation
+                or not re.fullmatch(r"[0-9a-f]{40}|[0-9a-f]{64}", args.approve_tree)):
+            parser.error("--approve-tree requires supervised mode and a full Git tree ID.")
+        args.approval_consumed = False
         args.source = args.source.resolve(strict=True)
         if not (args.source / "AORebirth/Server/ZoneEngine_New").is_dir():
             raise WorkerError("The source must be an AORebirth checkout with ZoneEngine_New.")
@@ -475,12 +511,7 @@ def main():
         args.evidence_dir = [path.resolve(strict=True) for path in args.evidence_dir]
         if any(not path.is_dir() for path in args.evidence_dir):
             raise WorkerError("Each evidence path must be an approved directory.")
-        for name in ("GameData", "Captures"):
-            if any(path.name.casefold() == name.casefold() for path in args.evidence_dir):
-                continue
-            candidate = args.source / name
-            if candidate.is_dir() and candidate.resolve().is_relative_to(args.source):
-                args.evidence_dir.append(candidate.resolve())
+        add_checkout_evidence(args)
         if len(args.evidence_dir) > 6:
             raise WorkerError("Specify at most six approved evidence directories.")
         args.token_file = args.token_file.resolve(strict=True)
@@ -505,8 +536,11 @@ def main():
         initialize(db)
         initialize_repairs(db)
         if args.command == "run":
-            return run(db, args)
-        lock = exclusive_sweep(args.db) if args.command == "requeue" else nullcontext()
+            outcome = run(db, args)
+            if not outcome and args.approve_tree is not None and not args.approval_consumed:
+                raise WorkerError("No matching candidate was approved or executed.")
+            return outcome
+        lock = exclusive_sweep(args.db) if args.command in {"requeue", "record-followup"} else nullcontext()
         with lock, db:
             job = db.execute("SELECT state, failures, result FROM jobs WHERE id = ?", (args.id,)).fetchone()
             if job is None:
@@ -518,6 +552,12 @@ def main():
                 db.execute("UPDATE jobs SET state = 'pending', retry_at = 0, failures = 0 WHERE id = ?",
                            (args.id,))
                 print(f"Requeued bug {args.id}.")
+            elif args.command == "record-followup":
+                result = triage.record_followup(db, args.id, args.symptom_id, args.source_commit, {
+                    "classification": args.classification, "finding": args.finding,
+                    "evidence": args.evidence, "next_action": args.next_action,
+                })
+                print(f"Bug {args.id}: {result} (operator follow-up recorded).")
             else:
                 print(json.dumps({
                     "id": args.id, "state": job["state"], "failures": job["failures"],

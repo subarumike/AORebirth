@@ -74,14 +74,6 @@ def executable(value, label, root):
     return str(path)
 
 
-def runner_command(plan, worktree):
-    runner = plan.get("validation_runner")
-    if (not isinstance(runner, list) or not runner
-            or any(not isinstance(arg, str) or "\0" in arg for arg in runner)):
-        raise ValidationError("validation_runner must be trusted executable argv.")
-    return [executable(runner[0], "validation_runner", worktree), *runner[1:]]
-
-
 def tracked_project(name, root, env):
     if (not isinstance(name, str) or not PROJECT.fullmatch(name)
             or any(part in {".", ".."} for part in name.split("/"))):
@@ -128,8 +120,17 @@ def record_step(command, root, env, timeout, log):
         try:
             status = process.wait(timeout=timeout)
         except (subprocess.TimeoutExpired, KeyboardInterrupt):
-            # The trusted runner owns its descendants and must terminate them when its handle closes.
-            process.kill()
+            # Stop only this invocation and its descendants, never by executable name.
+            if os.name == "nt" and process.poll() is None:
+                try:
+                    subprocess.run([str(Path(os.environ["SystemRoot"]) / "System32/taskkill.exe"),
+                                    "/PID", str(process.pid), "/T", "/F"],
+                                   env=env, stdin=subprocess.DEVNULL, capture_output=True,
+                                   check=False, timeout=10)
+                except (KeyError, OSError, subprocess.SubprocessError):
+                    pass
+            if process.poll() is None:
+                process.kill()
             process.wait(timeout=5)
             raise
     finally:
@@ -234,8 +235,10 @@ def run_regression(command, worktree, env, timeout, selector, *, evidence=None):
             shutil.rmtree(directory)
 
 
-def validate(worktree, plan, *, baseline, evidence_dir=None):
+def validate(worktree, plan, *, baseline, evidence_dir=None, supervised=False):
     worktree = worktree.resolve(strict=True)
+    if plan["mode"] == "aorebirth" and (not supervised or os.name != "nt" or evidence_dir is None):
+        raise ValidationError("Product validation requires supervised Windows execution and private logs.")
     timeout = plan.get("validation_timeout")
     if type(timeout) is not int or not 1 <= timeout <= 1800:
         raise ValidationError("validation_timeout must be 1–1800 seconds per step.")
@@ -265,7 +268,6 @@ def validate(worktree, plan, *, baseline, evidence_dir=None):
         if re.search(r"[&|<>()^%!\"\r\n]", dotnet):
             raise ValidationError("dotnet has an unsafe path for the Windows release wrapper.")
         prefix = [
-            *runner_command(plan, worktree),
             executable(shell, "cmd.exe", worktree), "/d", "/c",
             r"tools\windows_release_contract.cmd", "run-feature-validation", "--",
         ]

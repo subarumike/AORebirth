@@ -174,7 +174,7 @@ class Explorer:
         self.audit = audit
         self.public = source_inventory(self.source, commit)
         self.private = {}
-        self.aliases = []
+        self.aliases = {}
         common_git_dir = Path(os.fsdecode(git(
             self.source, "rev-parse", "--path-format=absolute", "--git-common-dir",
         ).strip()))
@@ -184,14 +184,17 @@ class Explorer:
         for index, directory in enumerate(roots, start=1):
             root = directory.resolve(strict=True)
             owned_evidence_root = (root.parent == self.source
-                                   and root.name.casefold() in {"gamedata", "captures"})
+                                   and root.name.casefold() in {"gamedata", "captures", "rdbevidence"})
             if (not root.is_dir() or root != directory.absolute() or reparse(root.lstat())
                     or root.drive.startswith("\\\\")
                     or (not owned_evidence_root and any(part.startswith(".") for part in root.parts[1:]))
                     or self.source.is_relative_to(root)):
                 raise ValueError("Private evidence roots must be approved real directories.")
             alias = f"evidence-{index}"
-            self.aliases.append(alias)
+            self.aliases[alias] = {"gamedata": "GameData", "captures": "captures",
+                                   "rdb": "RDB extracts", "rdbevidence": "RDB extracts",
+                                   "itemdump": "RDB extracts"}.get(
+                                       root.name.casefold(), "approved research")
             # Canonical GameData is installed with regular hard-linked files. Other evidence roots
             # may contain operator exports and do not get that exception.
             self.private.update(private_inventory(root, alias, root in canonical_roots))
@@ -228,11 +231,11 @@ class Explorer:
         for alias in self.aliases:
             if is_under(prefix, alias) or is_under(alias, prefix):
                 self.record("discover", alias, 0, 0, private=True)
-        return {"paths": names[:limit], "more": len(names) > limit, "private_roots": self.aliases}
+        return {"paths": names[:limit], "more": len(names) > limit, "private_roots": list(self.aliases)}
 
-    def search(self, arguments):
+    def search(self, arguments, *, seconds=TOOL_SECONDS):
         query, prefix, limit = query_args(arguments, required=True)
-        deadline = time.monotonic() + TOOL_SECONDS
+        deadline = time.monotonic() + seconds
         needle = query.encode("utf-8").lower()
         paths = []
         if not any(is_under(prefix, alias) for alias in self.aliases):
@@ -275,6 +278,25 @@ class Explorer:
                 results.append({"path": name, "lines": matches})
                 self.record("search", name, matches[0], matches[-1])
         return {"matches": results, "bounded": scanned >= MAX_PRIVATE_SCAN or len(results) >= limit}
+
+    def search_evidence(self, arguments):
+        query, _, _ = query_args(arguments, required=True)
+        results = {}
+        # Share the budget so one large corpus cannot prevent checking the other roots.
+        for alias, category in self.aliases.items():
+            indexed = any(is_under(name, alias) for name in self.private)
+            if indexed:
+                try:
+                    result = self.search({"query": query, "path": alias, "limit": 6},
+                                         seconds=TOOL_SECONDS / len(self.aliases))
+                except (ValueError, OSError, subprocess.SubprocessError):
+                    result = {"matches": [], "bounded": True, "unavailable": "Read limit or error"}
+            else:
+                result = {"matches": [], "unavailable": "No approved readable extracts indexed"}
+            results[alias] = {"category": category, **result}
+        self.record("evidence_sweep", "", 0, 0, private=bool(self.aliases))
+        return {"roots": results, "unconfigured": sorted(
+            {"GameData", "captures", "RDB extracts"} - set(self.aliases.values()))}
 
     def read(self, arguments):
         name = arguments.get("path")
@@ -322,6 +344,8 @@ QUERY_PROPERTIES = {"query": {"type": "string"}, "path": PATH_SCHEMA,
 TOOLS = [
     {"name": "search", "description": "Find a literal symbol or phrase. Search the pinned Git tree by default, or an explicit private evidence alias. Returns matching paths and line numbers.",
      "inputSchema": {"type": "object", "properties": QUERY_PROPERTIES, "required": ["query"], "additionalProperties": False}},
+    {"name": "search_evidence", "description": "Search every approved local RDB extract, GameData, capture and research root for an exact item, symbol, action, or identity. Reports unconfigured sources and bounds separately.",
+     "inputSchema": {"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"], "additionalProperties": False}},
     {"name": "discover", "description": "List approved file paths by name substring and optional path prefix. Also lists available private root aliases.",
      "inputSchema": {"type": "object", "properties": QUERY_PROPERTIES, "additionalProperties": False}},
     {"name": "read", "description": "Read up to 80 numbered lines from an exact discovered path. Use next to continue sequentially.",
@@ -342,7 +366,8 @@ def send(request_id, *, result=None, error=None):
 
 def serve(explorer):
     stream = sys.stdin.buffer
-    methods = {"discover": explorer.discover, "search": explorer.search, "read": explorer.read}
+    methods = {"discover": explorer.discover, "search": explorer.search, "read": explorer.read,
+               "search_evidence": explorer.search_evidence}
     calls = 0
     while line := stream.readline(MAX_REQUEST + 1):
         if len(line) > MAX_REQUEST:

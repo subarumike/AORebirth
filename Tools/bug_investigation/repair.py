@@ -6,13 +6,14 @@ import os
 from pathlib import Path
 import re
 import subprocess
+import sys
 import uuid
 
 from cleanup import (CleanupRetained, archive_artifacts, direct_info, owner, registration,
                      validation_artifacts, verify_worktree, worktree_inventory)
 from evidence import requested_evidence
 from publisher import PublishError, existing_draft, publish
-from validation import StoragePreflightError, ValidationError, runner_command, storage_preflight, validate
+from validation import StoragePreflightError, ValidationError, storage_preflight, validate
 
 
 PRODUCT = "subarumike/AORebirth"
@@ -52,6 +53,10 @@ to attachments. If evidence is inadequate, return an empty edits array."""
 
 
 class RepairError(RuntimeError):
+    pass
+
+
+class ApprovalError(RepairError):
     pass
 
 
@@ -149,11 +154,11 @@ def prepare(args):
             raise RepairError("Fixture repairs require a loopback feed and a dedicated -Fixture repository.")
     elif mode == "aorebirth":
         if (args.synthetic or repository.lower() != PRODUCT.lower() or base != "master"
-                or not plan.get("validation_runner")):
-            raise RepairError("Product repairs require public master and a trusted isolated validation runner.")
-        runner, *_ = runner_command(plan, args.source)
-        if Path(runner).is_relative_to((args.db.parent / "repair-worktrees").resolve()):
-            raise RepairError("The trusted validation runner must live outside repair worktrees.")
+                or os.name != "nt" or not args.supervised_validation):
+            raise RepairError("Product repairs require public master and supervised Windows validation. "
+                              "Unattended product validation is disabled.")
+        if args.report_id is None:
+            raise RepairError("Supervised validation must select one report with --report-id.")
     else:
         raise RepairError("Repair plan mode must be fixture or aorebirth.")
     files = plan.get("allowed_files")
@@ -265,17 +270,24 @@ def worktree_path(db, args, report_id, state):
     return path
 
 
-def validate_attempt(db, args, report_id, path, state, *, baseline):
-    if os.name == "nt" and args.plan["mode"] == "aorebirth":
+def validate_attempt(db, args, report_id, path, state, *, baseline, approve=None):
+    supervised = args.plan["mode"] == "aorebirth"
+    if supervised:
         storage_preflight(path, args.source)
     if not state.get("worktree_owner"):
+        if supervised:
+            raise RepairError("Supervised validation requires a worker-owned worktree and private logs.")
         return validate(path, args.plan, baseline=baseline)
     evidence_dir = evidence_location(args, path, state)
     try:
         _, ignored_before, _ = worktree_inventory(path, git)
     except (OSError, RuntimeError, UnicodeError):
         ignored_before = None
-    checks = validate(path, args.plan, baseline=baseline, evidence_dir=evidence_dir)
+    if supervised:
+        if approve is None:
+            raise ApprovalError("No approval was provided for this candidate.")
+        approve()
+    checks = validate(path, args.plan, baseline=baseline, evidence_dir=evidence_dir, supervised=supervised)
     try:
         if ignored_before is None:
             raise CleanupRetained("An unknown artifact existed before validation.")
@@ -355,6 +367,38 @@ def check_files(path, original, changed, *, apply=False):
             target.write_text(text, encoding="utf-8", newline="\n")
 
 
+def review_candidate(args, state, path, base, tree, original, changed):
+    if git(path, "rev-parse", "HEAD").strip() != base or git(path, "write-tree").strip() != tree:
+        raise ApprovalError("The staged candidate changed. Review the preserved worktree.")
+    check_files(path, original, changed)
+    if (git(path, "diff", "--name-only", "--")
+            or set(git(path, "diff", "--cached", "--name-only", "-z").strip("\0").split("\0")) != set(changed)
+            or git(path, "diff", "--cached", "--summary", "--")):
+        raise ApprovalError("The candidate has unexpected index, mode, or working-tree changes.")
+    if state["approval_tree"] != args.approve_tree:
+        raise ApprovalError("The supplied approval does not name the staged candidate tree.")
+    if not sys.stdin.isatty() or not sys.stdout.isatty():
+        raise ApprovalError("Approval requires an interactive operator terminal.")
+    print(f"Worktree: {path}\nBase: {base}\nCandidate tree: {tree}\n"
+          f"Build: {args.plan.get('build_project')}\n"
+          f"Test: {args.plan.get('test_project')} ({args.plan.get('test_filter')})\n"
+          f"Test scope: {args.plan.get('test_scope') or 'filter only'}; "
+          f"timeout per step: {args.plan.get('validation_timeout')} seconds\n"
+          "The governed wrapper will execute reviewed code with your local Windows rights. "
+          "This mode does not isolate files or networks. Review the staged diff before approving.",
+          flush=True)
+    try:
+        if input(f"Type VALIDATE {tree} to continue: ").strip() != f"VALIDATE {tree}":
+            raise ApprovalError("Validation was not approved. The candidate remains staged.")
+    except EOFError:
+        raise ApprovalError("Validation was not approved. The candidate remains staged.") from None
+    if git(path, "rev-parse", "HEAD").strip() != base or git(path, "write-tree").strip() != tree:
+        raise ApprovalError("The candidate changed while awaiting approval.")
+    check_files(path, original, changed)
+    if git(path, "diff", "--name-only", "--"):
+        raise ApprovalError("The candidate changed while awaiting approval.")
+
+
 def pr_body(report_id, state, fixture):
     proposal = state["proposal"]
     scope = []
@@ -428,7 +472,27 @@ def repair_one(db, args, feed, job, result, state, run_codex):
         check_files(path, original, changed, apply=True)
         git(path, "add", "--", *sorted(changed))
         tree = git(path, "write-tree").strip()
+        if args.plan["mode"] == "aorebirth":
+            save(db, report_id, state, phase="awaiting_approval", approval_tree=tree)
+    if state["phase"] == "awaiting_approval":
+        tree = state["approval_tree"]
+        if args.approve_tree is None:
+            print(f"{scope.capitalize()}: awaiting validation approval for tree {tree}.\n"
+                  f'Review: git -C "{path}" diff --cached\n'
+                  f"Then rerun from an interactive terminal with --approve-tree {tree}.", flush=True)
+            return
+        if args.approve_tree != tree:
+            raise ApprovalError("No staged candidate for this report and approval tree.")
+        if args.approval_consumed:
+            raise ApprovalError("An approval can validate only one candidate.")
+        args.approval_consumed = True
+        original = tracked_files(args.source, base, allowed_files)
+        changed = candidate_files(original, state["proposal"])
+        checks = validate_attempt(db, args, report_id, path, state, baseline=False,
+                                  approve=lambda: review_candidate(args, state, path, base, tree, original, changed))
+    elif state["phase"] == "proposed":
         checks = validate_attempt(db, args, report_id, path, state, baseline=False)
+    if state["phase"] in {"proposed", "awaiting_approval"}:
         check_files(path, original, changed)
         if git(path, "write-tree").strip() != tree or git(path, "rev-parse", "HEAD").strip() != base:
             raise RepairError("Validation changed the candidate tree.")
@@ -511,6 +575,8 @@ def process_repair(db, args, feed, job, result, symptom, state, run_codex):
         return True
     if state["phase"] == "proposing":
         save(db, report_id, state, phase="retry", last_failure="Interrupted Codex proposal.")
+    if getattr(args, "approve_tree", None) is not None and state["phase"] != "awaiting_approval":
+        return False
     if result["source_commit"] != args.repair_base:
         with db:
             db.execute("UPDATE jobs SET state = 'pending', retry_at = 0 WHERE id = ?", (report_id,))
@@ -540,7 +606,7 @@ def process_repair(db, args, feed, job, result, symptom, state, run_codex):
         return False
     try:
         repair_one(db, args, feed, job, symptom, state, run_codex)
-    except StoragePreflightError as error:
+    except (ApprovalError, StoragePreflightError) as error:
         save(db, report_id, state, error=str(error))
         print(f"Bug {report_id} repair deferred. {error}", flush=True)
         return True

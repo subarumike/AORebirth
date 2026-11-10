@@ -10,6 +10,7 @@ DISPOSITIONS = (
     "GHIDRA_REQUIRED", "HUMAN_REQUIRED", "ALREADY_FIXED", INCOMPLETE,
 )
 REPAIRABLE = {"DIRECT_FIX", "ADDITIONAL_IMPLEMENTATION"}
+NEEDS_EXTERNAL_EVIDENCE = {"CAPTURE_REQUIRED", "GHIDRA_REQUIRED", "HUMAN_REQUIRED"}
 MAX_PASSES = 3
 ROWS = """
     SELECT symptom_id, title, scope, progress FROM investigations
@@ -78,6 +79,12 @@ Use OBSERVED, PROVEN, INFERRED, and UNVERIFIED precisely. A defect shown in
 source can be independent of whether it caused the exact live incident.
 State both explicitly when they differ.
 
+Before requesting a capture, reverse engineering, or human intervention,
+call search_evidence with a specific item, identity, message, or action.
+This searches every approved local RDB extract, GameData, and capture root.
+Follow relevant matches and distinguish unavailable or bounded searches
+from confirmed absence. Do not use this private tool in a public-only review.
+
 Use SOURCE_INVESTIGATION_INCOMPLETE if a missing read, caller, dependency or
 test/evidence search prevents a source conclusion. List each remaining source
 operation in missing_source. On a resumed pass, actually pursue those items.
@@ -141,7 +148,8 @@ def split(db, key, report, previous, invoke):
                         for number, item in enumerate(symptoms, 1)))
 
 
-def verified_result(result, reads, previous_reads, *, private_context=False):
+def verified_result(result, reads, previous_reads, *, private_context=False, public_only=False):
+    swept = any(item["tool"] == "evidence_sweep" for item in reads)
     reads = list({(item["tool"], item["path"], item["first"], item["last"], item["private"]): item
                   for item in [*previous_reads, *reads]}.values())
     missing = result["missing_source"]
@@ -160,6 +168,8 @@ def verified_result(result, reads, previous_reads, *, private_context=False):
             missing.append(f"Read the cited operation at {ref['path']}:{ref['line']}.")
     if not {"entry", "runtime"} <= {ref["stage"] for ref in trace}:
         missing.append("Read and cite the operation's entry point and runtime effect.")
+    if not public_only and result["classification"] in NEEDS_EXTERNAL_EVIDENCE and not swept:
+        missing.append("Search the approved local evidence with search_evidence before escalation.")
     sources = list(dict.fromkeys(ref["path"] for ref in trace))
     public = not private_context and not any(item["private"] for item in reads)
     eligible = (result["classification"] in REPAIRABLE and result["defect_identified"]
@@ -183,6 +193,11 @@ def snapshot(db, key, prior):
         progress = json.loads(saved) if saved else {"reads": [], "result": None}
         result = progress["result"] if not progress.get("revisit") else None
         result = result or {"classification": INCOMPLETE, "repair_ready": False}
+        followups = progress.get("followups", [])
+        if followups and progress.get("followup_active") and not progress.get("revisit"):
+            result = {**result, "original_classification": result["classification"],
+                      "classification": followups[-1]["classification"],
+                      "operator_followup": followups[-1], "repair_ready": False}
         symptoms.append({"id": number, "title": title, "scope": scope,
                          **result, "source_reads": progress["reads"]})
     classifications = {symptom["classification"] for symptom in symptoms}
@@ -194,6 +209,8 @@ def snapshot(db, key, prior):
 
 
 def needs_pass(progress):
+    if progress.get("followup_active") and not progress.get("revisit"):
+        return False
     return progress.get("public_review") or (
         progress["passes"] < MAX_PASSES and (
             progress["result"] is None or progress["result"]["classification"] == INCOMPLETE
@@ -210,12 +227,14 @@ def investigate_pass(report, identity, commit, prior, progress, invoke):
         "report": report, "symptom": identity, "source_commit": commit,
         "previous": None if public_review else progress["result"],
         "previous_report_notes": notes,
+        "operator_followups": [] if public_review else progress.get("followups", [])[-1:],
         "public_only_repair_review": public_review,
         "remaining_source_passes": 0 if public_review else MAX_PASSES - progress["passes"] - 1,
     }, public_only=public_review)
     result, reads, needs_public_review = verified_result(
         result, reads, [] if public_review else progress["reads"],
-        private_context=bool(notes),
+        private_context=bool(notes or (not public_review and progress.get("followups"))),
+        public_only=public_review,
     )
     if public_review and not result["repair_ready"]:
         result = progress["result"]
@@ -224,7 +243,7 @@ def investigate_pass(report, identity, commit, prior, progress, invoke):
     elif public_review:
         result["private_investigation"] = progress["result"]
     return {"passes": progress["passes"] + 1, "reads": reads, "result": result,
-            "public_review": needs_public_review}
+            "public_review": needs_public_review, "followups": progress.get("followups", [])}
 
 
 def investigate(db, key, report, previous, invoke, *, workers=1):
@@ -283,7 +302,7 @@ def requeue(db, report_id, symptom_id):
         key = (report_id, fingerprint, commit)
         if raw:
             saved = json.loads(raw)
-            saved.update(passes=0, revisit=True, public_review=False)
+            saved.update(passes=0, revisit=True, public_review=False, followup_active=False)
             db.execute("UPDATE investigations SET progress = ? WHERE rowid = ?",
                        (json.dumps(saved), row_id))
     if key is None:
@@ -300,3 +319,41 @@ def progress(db, report_id):
     return [{"id": number, "title": title, "scope": scope,
              **(json.loads(raw) if raw else {"passes": 0, "result": None})}
             for _, number, title, scope, raw, _, _ in current_rows(db, report_id)]
+
+
+def record_followup(db, report_id, symptom_id, source_commit, followup):
+    if (followup.get("classification") not in set(DISPOSITIONS) - {INCOMPLETE}
+            or not all(bounded_text(followup.get(field), 4_000) for field in ("finding", "next_action"))
+            or not 1 <= len(followup["evidence"]) <= 8
+            or not all(bounded_text(ref, 1000) for ref in followup["evidence"])):
+        raise ValueError("A completed follow-up needs a classification, finding, evidence and next action.")
+    job = db.execute("SELECT fingerprint, state, result, retry_at FROM jobs WHERE id = ?", (report_id,)).fetchone()
+    if job is None or job[1] == "closed" or job[2] is None:
+        raise ValueError("A follow-up needs an open report with an investigation checkpoint.")
+    previous = json.loads(job[2])
+    if previous.get("source_commit") != source_commit:
+        raise ValueError("The source commit does not match the report's saved investigation.")
+    key = (report_id, job[0], source_commit)
+    row = db.execute("""
+        SELECT progress FROM investigations
+        WHERE id = ? AND fingerprint = ? AND source_commit = ? AND symptom_id = ?
+    """, (*key, symptom_id)).fetchone()
+    if not row or not row[0]:
+        raise ValueError("The specified symptom has no investigation checkpoint.")
+    saved = json.loads(row[0])
+    if saved.get("revisit") or not saved.get("result"):
+        raise ValueError("The symptom has no completed investigation pass to review.")
+    history = saved.setdefault("followups", [])
+    if not history or history[-1] != followup:
+        history.append(followup)
+    saved["followup_active"] = True
+    db.execute("""
+        UPDATE investigations SET progress = ?
+        WHERE id = ? AND fingerprint = ? AND source_commit = ? AND symptom_id = ?
+    """, (json.dumps(saved), *key, symptom_id))
+    result = snapshot(db, key, previous.get("prior_result"))
+    pending = result["classification"] == INCOMPLETE
+    db.execute("UPDATE jobs SET result = ?, state = ?, retry_at = ? WHERE id = ?",
+               (json.dumps(result), "pending" if pending else "done", job[3] if pending else 0,
+                report_id))
+    return result["classification"]
