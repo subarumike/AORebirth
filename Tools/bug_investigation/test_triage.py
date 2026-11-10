@@ -1,11 +1,14 @@
 import json
 from pathlib import Path
 import sqlite3
+from tempfile import TemporaryDirectory
+from types import SimpleNamespace
 import unittest
 from unittest.mock import patch
 
 import triage
 import validation
+from repair import prepare
 from worker import initialize
 
 
@@ -107,6 +110,20 @@ class InvestigationTests(unittest.TestCase):
 
 
 class ValidationPlanTests(unittest.TestCase):
+    def test_missing_product_runner_fails_before_fetch_or_attempt(self):
+        with TemporaryDirectory() as temporary:
+            root = Path(temporary).resolve()
+            plan = root / "plan.json"
+            plan.write_text(json.dumps({
+                "mode": "aorebirth", "repository": "subarumike/AORebirth", "base": "master",
+                "validation_runner": [str(root / "missing.exe")],
+            }), encoding="utf-8")
+            args = SimpleNamespace(repair_plan=plan, synthetic=False, source=root / "source", db=root / "queue")
+            with patch("repair.git") as git:
+                with self.assertRaisesRegex(validation.ValidationError, "validation_runner"):
+                    prepare(args)
+                git.assert_not_called()
+
     def test_existing_zone_scope_is_forwarded_but_arbitrary_properties_are_refused(self):
         plan = {
             "mode": "aorebirth", "validation_timeout": 20,
@@ -116,11 +133,61 @@ class ValidationPlanTests(unittest.TestCase):
         }
         with (patch.object(validation, "tracked_project", side_effect=lambda name, *_: name),
               patch.object(validation, "executable", side_effect=lambda name, *_: str(name)),
-              patch.object(validation, "run_step", return_value="ok") as run):
+              patch.object(validation, "run_step", return_value="ok"),
+              patch.dict(validation.os.environ, {"OS": "Windows_NT", "GH_TOKEN": "not-inherited"}),
+              patch.object(validation, "run_regression", return_value="ok") as run):
             validation.validate(Path.cwd(), plan, baseline=False)
             self.assertIn("-p:NpcAiFocusedTests=true", run.call_args.args[0])
+            self.assertEqual(run.call_args.args[2]["OS"], "Windows_NT")
+            self.assertNotIn("GH_TOKEN", run.call_args.args[2])
             with self.assertRaises(validation.ValidationError):
                 validation.validate(Path.cwd(), {**plan, "test_scope": "ArbitraryProperty"}, baseline=False)
+
+    def test_product_regression_requires_a_pass_matching_the_fully_qualified_filter(self):
+        def trx(class_name, *, passed=1, failed=0, outcome="Passed"):
+            return f"""
+                <TestRun xmlns="{validation.TRX_NAMESPACE['trx']}">
+                    <Results>
+                        <UnitTestResult testId="test-1" testName="NpcBrain display label" outcome="{outcome}" />
+                    </Results>
+                    <TestDefinitions><UnitTest id="test-1">
+                        <TestMethod className="{class_name}" name="HandlesMove" />
+                    </UnitTest></TestDefinitions>
+                    <ResultSummary><Counters executed="{passed + failed}" passed="{passed}" failed="{failed}" /></ResultSummary>
+                </TestRun>
+            """
+
+        cases = (
+            ("missing", None, False),
+            ("malformed", "<TestRun", False),
+            ("empty", trx("ZoneTests.NpcBrain", passed=0, outcome="NotExecuted"), False),
+            ("failed despite a matching pass", trx("ZoneTests.NpcBrain", failed=1), False),
+            ("wrong filter despite display name", trx("ZoneTests.Other"), False),
+            ("matching fully qualified name", trx("ZoneTests.NpcBrain, ZoneTests"), True),
+        )
+        command = ["trusted-runner", "cmd.exe", "windows_release_contract.cmd", "test"]
+        for name, contents, should_pass in cases:
+            with self.subTest(name=name), TemporaryDirectory() as temporary:
+                worktree = Path(temporary).resolve()
+
+                def run_step(argv, *_):
+                    self.assertEqual(argv[:len(command)], command)
+                    self.assertIn("trx;LogFileName=regression.trx", argv)
+                    output = Path(argv[argv.index("--results-directory") + 1])
+                    self.assertEqual(output.parent, worktree / ".local")
+                    self.assertEqual(list(output.iterdir()), [])
+                    if contents is not None:
+                        (output / "regression.trx").write_text(contents, encoding="utf-8")
+
+                with (patch.object(validation.subprocess, "run", return_value=SimpleNamespace(returncode=0)),
+                      patch.object(validation, "run_step", side_effect=run_step)):
+                    if should_pass:
+                        result = validation.run_regression(command, worktree, {}, 20, "FullyQualifiedName~npcbrain")
+                        self.assertIn("1 matching test", result)
+                    else:
+                        with self.assertRaises(validation.ValidationError):
+                            validation.run_regression(command, worktree, {}, 20, "FullyQualifiedName~npcbrain")
+                self.assertEqual(list((worktree / ".local").iterdir()), [])
 
 
 if __name__ == "__main__":

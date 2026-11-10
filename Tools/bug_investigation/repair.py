@@ -9,7 +9,7 @@ import subprocess
 
 from evidence import requested_evidence
 from publisher import PublishError, publish
-from validation import ValidationError, validate
+from validation import ValidationError, runner_command, validate
 
 
 PRODUCT = "subarumike/AORebirth"
@@ -145,6 +145,9 @@ def prepare(args):
         if (args.synthetic or repository.lower() != PRODUCT.lower() or base != "master"
                 or not plan.get("validation_runner")):
             raise RepairError("Product repairs require public master and a trusted isolated validation runner.")
+        runner, *_ = runner_command(plan, args.source)
+        if Path(runner).is_relative_to((args.db.parent / "repair-worktrees").resolve()):
+            raise RepairError("The trusted validation runner must live outside repair worktrees.")
     else:
         raise RepairError("Repair plan mode must be fixture or aorebirth.")
     files = plan.get("allowed_files")

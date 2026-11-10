@@ -5,6 +5,8 @@ from pathlib import Path
 import re
 import shutil
 import subprocess
+import uuid
+from xml.etree import ElementTree
 
 
 class ValidationError(RuntimeError):
@@ -13,13 +15,15 @@ class ValidationError(RuntimeError):
 
 OS_ENV = {
     "APPDATA", "COMSPEC", "HOME", "HOMEDRIVE", "HOMEPATH", "LOCALAPPDATA",
-    "PATH", "PATHEXT", "PROGRAMDATA", "PROGRAMFILES", "PROGRAMFILES(X86)",
+    "OS", "PATH", "PATHEXT", "PROGRAMDATA", "PROGRAMFILES", "PROGRAMFILES(X86)",
     "PROGRAMW6432", "SYSTEMDRIVE", "SYSTEMROOT", "TEMP", "TMP", "USERPROFILE", "WINDIR",
 }
 PROJECT = re.compile(r"[A-Za-z0-9_.-]+(?:/[A-Za-z0-9_.-]+)*\.csproj")
 FILTER = re.compile(r"FullyQualifiedName~[A-Za-z_][A-Za-z0-9_.]*")
 ZONE_TEST_PROJECT = "AORebirth/Server/ZoneEngine_New.Tests/ZoneEngine_New.Tests.csproj"
 ZONE_TEST_SCOPES = {"NpcAiFocusedTests", "MissionDestinationFocusedTests"}
+TRX_NAMESPACE = {"trx": "http://microsoft.com/schemas/VisualStudio/TeamTest/2010"}
+TRX_NAME = "regression.trx"
 
 
 def executable(value, label, root):
@@ -30,6 +34,14 @@ def executable(value, label, root):
             or (os.name == "nt" and path.suffix.lower() != ".exe") or not os.access(path, os.X_OK)):
         raise ValidationError(f"{label} must be an executable outside the worktree.")
     return str(path)
+
+
+def runner_command(plan, worktree):
+    runner = plan.get("validation_runner")
+    if (not isinstance(runner, list) or not runner
+            or any(not isinstance(arg, str) or "\0" in arg for arg in runner)):
+        raise ValidationError("validation_runner must be trusted executable argv.")
+    return [executable(runner[0], "validation_runner", worktree), *runner[1:]]
 
 
 def tracked_project(name, root, env):
@@ -71,6 +83,69 @@ def run_step(command, label, root, env, timeout, marker=None):
     return f"{label}: passed (exit 0)"
 
 
+def passed_regression(path, selector):
+    try:
+        if path.resolve(strict=True) != path or not path.is_file() or path.stat().st_nlink != 1:
+            raise ValueError
+        with path.open("rb") as file:
+            data = file.read(4_194_305)
+        if len(data) > 4_194_304 or b"\0" in data or b"<!DOCTYPE" in data:
+            raise ValueError
+        root = ElementTree.fromstring(data)
+        if root.tag != f"{{{TRX_NAMESPACE['trx']}}}TestRun":
+            raise ValueError
+        counters = root.find("trx:ResultSummary/trx:Counters", TRX_NAMESPACE)
+        executed, passed, failed = (int(counters.attrib[name]) for name in ("executed", "passed", "failed"))
+    except (OSError, RuntimeError, AttributeError, KeyError, ValueError, ElementTree.ParseError):
+        raise ValidationError("Focused regression did not produce a valid VSTest TRX result.") from None
+
+    expected = selector.split("~", 1)[1].casefold()
+    matching_ids = set()
+    for test in root.findall("trx:TestDefinitions/trx:UnitTest", TRX_NAMESPACE):
+        method = test.find("trx:TestMethod", TRX_NAMESPACE)
+        if method is None:
+            continue
+        class_name = method.get("className", "").partition(",")[0].strip()
+        method_name = method.get("name", "")
+        test_id = test.get("id")
+        if class_name and method_name and test_id and expected in f"{class_name}.{method_name}".casefold():
+            matching_ids.add(test_id)
+    results = root.findall("trx:Results//trx:UnitTestResult", TRX_NAMESPACE)
+    matching = sum(result.get("testId") in matching_ids and result.get("outcome") == "Passed"
+                   for result in results)
+    if not 0 < matching <= passed <= executed or failed != 0:
+        raise ValidationError("Focused regression has no successful result for the approved test filter.")
+    return matching
+
+
+def run_regression(command, worktree, env, timeout, selector):
+    directory = worktree / ".local" / f"bug-regression-{uuid.uuid4().hex}"
+    result = directory / TRX_NAME
+    if directory.resolve() != directory or re.search(r'[&|<>()^%!"\r\n]', str(directory)):
+        raise ValidationError("Expected a direct, safe regression result path inside the worktree.")
+    try:
+        ignored = subprocess.run(
+            ["git", "check-ignore", "-q", "--", result.relative_to(worktree).as_posix()],
+            cwd=worktree, env=env, stdin=subprocess.DEVNULL, stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL, check=False, timeout=15,
+        )
+        if ignored.returncode:
+            raise ValidationError("The regression result path must be Git-ignored.")
+        directory.mkdir(parents=True)
+    except (OSError, subprocess.SubprocessError):
+        raise ValidationError("Could not create a fresh regression result directory.") from None
+
+    try:
+        run_step([*command, "--logger", f"trx;LogFileName={TRX_NAME}", "--results-directory", str(directory)],
+                 "Focused regression", worktree, env, timeout)
+        matching = passed_regression(result, selector)
+        return f"Focused regression: {matching} matching test result(s) passed"
+    finally:
+        resolved = directory.resolve()
+        if resolved == directory and resolved.is_relative_to(worktree) and directory.is_dir():
+            shutil.rmtree(directory)
+
+
 def validate(worktree, plan, *, baseline):
     worktree = worktree.resolve(strict=True)
     timeout = plan.get("validation_timeout")
@@ -98,14 +173,11 @@ def validate(worktree, plan, *, baseline):
         selector = plan.get("test_filter")
         if not isinstance(selector, str) or not FILTER.fullmatch(selector):
             raise ValidationError("The product plan needs one approved FullyQualifiedName~ test filter.")
-        runner = plan.get("validation_runner")
-        if not isinstance(runner, list) or not runner or any(not isinstance(arg, str) or "\0" in arg for arg in runner):
-            raise ValidationError("validation_runner must be trusted executable argv.")
         shell = Path(os.environ.get("SystemRoot", "C:/Windows")) / "System32" / "cmd.exe"
         if re.search(r"[&|<>()^%!\"\r\n]", dotnet):
             raise ValidationError("dotnet has an unsafe path for the Windows release wrapper.")
         prefix = [
-            executable(runner[0], "validation_runner", worktree), *runner[1:],
+            *runner_command(plan, worktree),
             executable(shell, "cmd.exe", worktree), "/d", "/c",
             r"tools\windows_release_contract.cmd", "run-feature-validation", "--",
         ]
@@ -116,7 +188,8 @@ def validate(worktree, plan, *, baseline):
                     or scope not in ZONE_TEST_SCOPES):
                 raise ValidationError("test_scope must name an approved ZoneEngine focused test target.")
             regression.append(f"-p:{scope}=true")
-    return [
-        run_step([*prefix, dotnet, *build], "Scoped build", worktree, env, timeout),
-        run_step([*prefix, dotnet, *regression], "Focused regression", worktree, env, timeout, marker),
-    ]
+    built = run_step([*prefix, dotnet, *build], "Scoped build", worktree, env, timeout)
+    command = [*prefix, dotnet, *regression]
+    tested = (run_step(command, "Focused regression", worktree, env, timeout, marker)
+              if plan["mode"] == "fixture" else run_regression(command, worktree, env, timeout, selector))
+    return [built, tested]
