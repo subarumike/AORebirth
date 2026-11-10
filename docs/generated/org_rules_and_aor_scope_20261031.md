@@ -25,7 +25,7 @@ Rules are **declared**, confirmed where indicated by captures. Packet evidence a
 
 A GM may also disband the organization of a targeted leader (Org Msg 119220807, client notice 508/28601677 to online members, disband lockout not applied to the GM) / start a vote.
 - Governing form change resets everybody except the president to the lowest rank. Re-applying the SAME form is accepted and also resets the ranks (a way to rebuild the hierarchy).
-credits given with `bank add` reduce the debt (this reduction is deferred to step [5] tax & debt, not part of step [3]).
+credits given with `bank add` reduce the debt (this reduction is deferred to step [4B] debt, not part of step [3]).
 - Bank: view refused to the lowest rank (except anarchism, message 237299844; others get 78644776 with the Bank value). `bank add` by anyone who owns the amount, no success message; org bank capped at 3999999999 and the giver keeps the difference (decided, not captured). `bank remove` leader only (non-leader gets 222804051), limited by the org balance (210489620 with %i) and by the leader's 999999999 limit (5429092). Tested with 1 credit.
 - Disband needs a client dialog; every member gets a 12 h lock (`disbandLockoutSeconds` 43200 in Gameplay.json).
 
@@ -60,5 +60,15 @@ All sentences are consolidated in the catalog of the scenario document (sections
 1. Data: ref/sentence catalog JSON, lock durations (base 6 h, disband 12 h, anarchist leader kick 12 h), vote limits, tax/bank caps.
 2. Read-only commands: ranks, tax, bank, debt, vote info.
 3. Create (GM-locked), invite/join, leave, kick, promote/demote.
-4. Leader commands, bank, tax, then votes and disband.
-5. Locks and debt persistence only after explicit schema approval.
+4. Leader commands, bank, then tax [4A] (per-member tick, no debt write).
+5. Debt persistence [4B] only after explicit schema approval; then votes [5] and disband.
+
+## 9. Organization tax (step [4A])
+
+- `/org tax` (any member) shows the current tax (147882695, %i). A non-leader trying to change it gets 192685736; the leader gets 198384040 for a negative or non-integer value.
+- A valid change (int32, >= 0) sets `Organizations.Tax` and sends an Org Msg to all members, then the feedback 165930356 to the leader.
+- Org Msg 89226052 is ref `"]9V7` + text arg (leader name, `s` + length + 1 + name) + `i` + new tax + `u` + old tax (base-85 ints). Captured 0 -> 1: `"]9V7Nykorgtest i!!!!" u!!!!!` (new first, then old).
+- Feedback 165930356 is ref `$01,h` + `u` (old) + `i` (new). Captured 0 -> 1: `$01,hu!!!!!i!!!!"` (old first, then new, matching the text "changed from %u to %u").
+- If the new tax is strictly higher than the old one, online members get the client dialog 220373365 (OrgServer 0x0008); Yes runs the existing `/org leave` path without a second dialog, No does nothing.
+- Tax tick: each member is charged individually every `taxTick` (Gameplay.json > org > taxTick, default 7200) of his personal /played time, only while online. Only applied when the tax is > 0.
+- Insufficient credits: credits go to 0 (never negative); the unpaid difference is the debt, persisted in [4B] only after schema approval.

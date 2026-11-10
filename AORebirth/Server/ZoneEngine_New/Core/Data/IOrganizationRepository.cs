@@ -26,6 +26,9 @@ namespace ZoneEngine_New.Core.Data
         /// <summary>Stores the new leader (presidency transfer).</summary>
         void SaveLeader(int organizationId, int leaderId);
 
+        /// <summary>Stores the organization tax (whole credits, zero or positive).</summary>
+        void SaveTax(int organizationId, int tax);
+
         /// <summary>Organization invite lockout for this character, or null when none exists.</summary>
         AORebirth.Interfaces.Persistence.Characters.PersistedOrgLockoutData GetLockout(int characterId);
 

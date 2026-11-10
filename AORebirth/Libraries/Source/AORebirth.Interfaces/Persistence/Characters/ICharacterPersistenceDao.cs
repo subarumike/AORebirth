@@ -28,10 +28,16 @@ namespace AORebirth.Interfaces.Persistence.Characters
         /// <summary>Stores the organization membership (Clan stat) of one character, inserting the stat row when missing.</summary>
         void SaveOrganizationMembership(int characterId, int organizationId);
         void SaveOrganizationLeader(int organizationId, int leaderId);
+        /// <summary>Stores the organization tax (whole credits, zero or positive).</summary>
+        void SaveOrganizationTax(int organizationId, int tax);
         /// <summary>Organization invite lockout for this character, or null when none exists.</summary>
         PersistedOrgLockoutData LoadOrgLockout(int characterId);
         /// <summary>Inserts or updates the organization lockout row of this character.</summary>
         void SaveOrgLockout(int characterId, string characterName, long secondsRemaining);
+        /// <summary>Played time and creation time of this character, or null when no row exists.</summary>
+        PersistedCharacterPlayedBornData LoadCharacterPlayedBorn(int characterId);
+        /// <summary>Inserts or updates the played time; the creation time is kept once recorded.</summary>
+        void SaveCharacterPlayedBorn(int characterId, string characterName, long playedSeconds, long? createdAtUnix);
         /// <summary>
         /// Stores one Anarchism kick request under the organizations row lock. Quorum is memberQuorum for a member
         /// target and leaderQuorum for the leader; when reached, the stored requests of that target are deleted.

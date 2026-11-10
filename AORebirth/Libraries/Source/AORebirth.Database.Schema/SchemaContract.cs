@@ -38,7 +38,8 @@ public static class SchemaContract
         "20261030_daily_login_character_scope.sql",
         "20261102_account_sanctions.sql",
         "20261107_org_lockout.sql",
-        "20261109_org_anar_pend_kick.sql"
+        "20261109_org_anar_pend_kick.sql",
+        "20261111_character_played_born.sql"
     });
 
     // Other governed components may legitimately record these unrelated migrations.
@@ -59,7 +60,7 @@ public static class SchemaContract
         "generatedmissionbindings", "generatedmissionobservations", "generatedmissionartifacts", "generatedmissionobjects",
         "characterskilllocks", "characterquests", "generatedquests", "questdungeonkeys",
         "characterperklocks", "characterresearch", "characternanolinelocks", "characterpetnames", "dailyloginclaims",
-        "account_sanctions", "org_lockout", "org_anar_pend_kick"
+        "account_sanctions", "org_lockout", "org_anar_pend_kick", "characterplayedborn"
     });
 
     public static readonly IReadOnlyList<(string Table, string Columns)> UniqueKeys = Array.AsReadOnly(new[]
@@ -84,7 +85,8 @@ public static class SchemaContract
         ("characterpetnames", "CharacterId,PetType"),
         ("dailyloginclaims", "Id"), ("dailyloginclaims", "ClaimToken"), ("dailyloginclaims", "CharacterId,ClaimDateUtc"),
         ("account_sanctions", "SanctionId"), ("org_lockout", "char_id"),
-        ("org_anar_pend_kick", "org_id,kicked_id,kicker_id")
+        ("org_anar_pend_kick", "org_id,kicked_id,kicker_id"),
+        ("characterplayedborn", "char_id")
     });
 
     private static IReadOnlyList<ColumnRequirement> BuildColumns()
@@ -192,6 +194,9 @@ public static class SchemaContract
         Add("org_anar_pend_kick", "int", "org_id kicked_id kicker_id", false);
         Add("org_anar_pend_kick", "varchar", "kicked_name kicker_name");
         Add("org_anar_pend_kick", "bigint", "requested_at last_updated", false);
+        Add("characterplayedborn", "int", "char_id", false);
+        Add("characterplayedborn", "varchar", "char_name");
+        Add("characterplayedborn", "bigint", "played_sec created_at", false);
         Add("login", "int", "Id Flags");
         Add("login", "varchar", "Username");
         return result.AsReadOnly();

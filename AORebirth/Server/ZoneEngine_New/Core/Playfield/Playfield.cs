@@ -930,6 +930,8 @@ namespace ZoneEngine_New.Core.Playfield
                 services.AddSingleton(_playfieldManager.NpcScripts);
             if (_playfieldManager.OrgMembership != null)
                 services.AddSingleton(_playfieldManager.OrgMembership);
+            if (_playfieldManager.PlayedClock != null)
+                services.AddSingleton(_playfieldManager.PlayedClock);
             if (_playfieldManager.Gameplay != null)
                 services.AddSingleton(_playfieldManager.Gameplay);
             if (_playfieldManager.ModuleEvents != null)

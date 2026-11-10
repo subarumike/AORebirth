@@ -1,4 +1,4 @@
-﻿// --------------------------------------------------------------------------------------------------------------------
+// --------------------------------------------------------------------------------------------------------------------
 // <copyright file="OrgServerMessageType.cs" company="SmokeLounge">
 //   Copyright © 2013 SmokeLounge.
 //   This program is free software. It comes without any warranty, to
@@ -21,6 +21,8 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         OrgInvite = 0x05,
 
         OrgContract = 0x06,
+
+        OrgTaxIncrease = 0x08,
 
         OrgLeadershipTransfer = 0x09,
     }

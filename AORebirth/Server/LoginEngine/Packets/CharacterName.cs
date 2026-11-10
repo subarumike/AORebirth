@@ -443,6 +443,9 @@ namespace LoginEngine.Packets
                     CharacterStartPackageApplier.Apply(charID, startPackage, connection, transaction);
                     stage = "starting health and nano";
                     StarterVitalStats.Apply(charID, this.Breed, this.Profession, this.Abis, connection, transaction);
+                    stage = "character creation time";
+                    CharacterPlayedBornDao.RecordCreation(charID, newCharacter.Name ?? string.Empty,
+                        DateTimeOffset.UtcNow.ToUnixTimeSeconds(), connection, transaction);
                     stage = "starting location";
                     CharacterDao.Instance.Save(newCharacter,
                         new { Id = charID, Playfield = startLocation.Playfield, X = startLocation.X, Y = startLocation.Y, Z = startLocation.Z },

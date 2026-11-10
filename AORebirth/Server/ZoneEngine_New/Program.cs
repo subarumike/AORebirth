@@ -284,6 +284,8 @@ namespace ZoneEngine_New
             services.AddSingleton<IOrganizationRepository, MySqlOrganizationRepository>();
             services.AddSingleton<OrgLockoutClock>();
             services.AddSingleton<OrgMembershipService>();
+            services.AddSingleton<ICharacterPlayedBornRepository, MySqlCharacterPlayedBornRepository>();
+            services.AddSingleton<CharacterPlayedClock>();
             services.AddSingleton<ICharacterCoalesceCommit, MySqlCharacterCoalesceCommit>();
             services.AddSingleton<IItemInstanceIdAllocator, ItemInstanceIdAllocator>();
             services.AddSingleton<IItemTemplateCatalog, ItemTemplateCatalog>();

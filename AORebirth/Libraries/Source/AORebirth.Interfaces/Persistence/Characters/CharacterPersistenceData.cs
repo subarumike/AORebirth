@@ -171,6 +171,13 @@ namespace AORebirth.Interfaces.Persistence.Characters
         public int RemainingXp { get; set; }
     }
 
+    /// <summary>Played seconds and creation time (Unix seconds UTC, null when never recorded) of one character.</summary>
+    public sealed class PersistedCharacterPlayedBornData
+    {
+        public long PlayedSeconds { get; set; }
+        public long? CreatedAtUnix { get; set; }
+    }
+
     /// <summary>Organization invite lockout: remaining seconds, decremented only while the character is online.</summary>
     public sealed class PersistedOrgLockoutData
     {

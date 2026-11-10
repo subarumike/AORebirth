@@ -39,6 +39,7 @@ namespace ZoneEngine_New.Core.Organizations
         public const string InviteAlreadyInOrganization = "\"Y^0o";
         public const string InviteOtherSide = "%`cZp";
         public const string OrganizationDisbanded = "%.Neo";
+        public const string TaxChangedOrg = "\"]9V7";
 
     }
 
@@ -109,6 +110,11 @@ namespace ZoneEngine_New.Core.Organizations
         /// <summary>Org Msg after a rank kick (Text.json 37093479, rules.txt "was kicked by"). Plain text: no ref captured.</summary>
         public static string RankKickedOrgMessage(string kicker, string kicked)
             => kicker + " kicked " + kicked + " from your organization.";
+
+        /// <summary>Org Msg after the leader changes the tax (Text.json 89226052): leader name, then new tax, then old tax.</summary>
+        public static string TaxChangedOrgMessage(string leaderName, int newTax, int oldTax)
+            => Wrap(OrgChatRefs.TaxChangedOrg + TextArg(leaderName)
+                + "i" + EncodeInt((uint)newTax) + "u" + EncodeInt((uint)oldTax));
 
         /// <summary>Org Msg after a side-change kick (Text.json 181448347). Plain text: no ref captured.</summary>
         public static string SideChangeKickedOrgMessage(string kicked)

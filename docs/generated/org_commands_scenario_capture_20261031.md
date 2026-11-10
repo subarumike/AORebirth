@@ -61,7 +61,7 @@ Org system messages arrive as chat-server `GroupMessage`, `ChannelId=1`, `Sender
 | disband | `%.Neo` | `#`QX`s<leader>` | `Clan=0` online members |
 | promote to president (dialog 0x0009) | - | `%UKqGs<newPresident>`; new president `&!!!":"lW;as<old>` | - |
 | tax (no arg) | `#ge1Du!!!!<n>` | - | - |
-| tax <n> (leader) | `$01,hu` (from X to Y); if increased: OrgServer 0x0008 | `"]9V7s<leader>...` (new / old tax) | - |
+| tax <n> (leader) | `$01,hu` + old + `i` + new (from X to Y); if increased: OrgServer 0x0008 | `"]9V7` + `s` + leader name + `i` + new + `u` + old (captured 0 -> 1: `"]9V7Nykorgtesti!!!!"u!!!!!`) | - |
 | bank | `"L&(Yu!!!!<n>` | - | - |
 | bank add <n> | none; credits move toon -> org | - | credits |
 | bank remove <n> (leader) | none; credits move org -> toon | - | credits |
@@ -124,8 +124,8 @@ Create refusals (Feedback CategoryId 501, MessageId -> sentence):
 ### 5.2 Info sentences (declared)
 
 - `$c[u1s<Form>~<ranks>`: "Governing form: Feudalism / Ranks: Lord, Knight, Vassal, Peasant".
-- `$01,hu`: "Organizational tax changed from X to Y credits."
-- `"]9V7s...`: "Your leader, <name>, just changed the organizational tax. The new tax is Y credits (the old value was X)."
+- `$01,hu` + old + `i` + new: "Organizational tax changed from X to Y credits." (leader only)
+- `"]9V7` + leader name + `i` + new + `u` + old: "Your leader, <name>, just changed the organizational tax. The new tax is Y credits (the old value was X)." (Org Msg, all members)
 - `#ge1Du!!!!<n>`: "The current level of organizational tax is N."
 - `$JG@@i`: "Your debt to the organization is N credits."
 - `"L&(Yu!!!!<n>`: "Organization bank account: N credits."

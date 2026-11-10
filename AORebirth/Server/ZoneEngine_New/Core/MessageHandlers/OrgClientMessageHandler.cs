@@ -64,6 +64,9 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 case OrgClientCommand.Info:
                     HandleInfo(message, session, player);
                     return;
+                case OrgClientCommand.Tax when !string.IsNullOrEmpty(message.CommandArgs):
+                    HandleTaxChange(message, session, player);
+                    return;
                 case OrgClientCommand.Ranks:
                 case OrgClientCommand.Tax:
                 case OrgClientCommand.Bank:

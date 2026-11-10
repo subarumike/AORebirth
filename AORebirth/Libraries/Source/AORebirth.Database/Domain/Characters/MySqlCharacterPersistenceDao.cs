@@ -245,9 +245,17 @@ namespace AORebirth.Database.Domain.Characters
         {
             if (organizationId <= 0) throw new ArgumentOutOfRangeException(nameof(organizationId));
             if (leaderId <= 0) throw new ArgumentOutOfRangeException(nameof(leaderId));
-            Transaction((c, t) => Execute(c, t, "UPDATE organizations SET LeaderId=@Leader WHERE Id=@Id",
-                "@Leader", leaderId, "@Id", organizationId));
-        }
+                Transaction((c, t) => Execute(c, t, "UPDATE organizations SET LeaderId=@Leader WHERE Id=@Id",
+                    "@Leader", leaderId, "@Id", organizationId));
+            }
+
+            public void SaveOrganizationTax(int organizationId, int tax)
+            {
+                if (organizationId <= 0) throw new ArgumentOutOfRangeException(nameof(organizationId));
+                if (tax < 0) throw new ArgumentOutOfRangeException(nameof(tax));
+                Transaction((c, t) => Execute(c, t, "UPDATE organizations SET Tax=@Tax WHERE Id=@Id",
+                    "@Tax", tax, "@Id", organizationId));
+            }
 
         public PersistedOrganizationBankResult TransferOrganizationBank(int organizationId, int characterId, bool deposit,
             long amount, long bankCap, long cashCap)
@@ -314,6 +322,31 @@ namespace AORebirth.Database.Domain.Characters
                 + "VALUES (@CharId,@Name,@Seconds,@Now) ON DUPLICATE KEY UPDATE char_name=VALUES(char_name), "
                 + "seconds_remaining=VALUES(seconds_remaining), last_updated=VALUES(last_updated)",
                 "@CharId", characterId, "@Name", characterName ?? string.Empty, "@Seconds", secondsRemaining, "@Now", now));
+        }
+
+        public PersistedCharacterPlayedBornData LoadCharacterPlayedBorn(int characterId)
+        {
+            if (characterId <= 0) return null;
+            var rows = Query("SELECT played_sec, created_at FROM characterplayedborn WHERE char_id=@CharId LIMIT 1",
+                r => new PersistedCharacterPlayedBornData
+                {
+                    PlayedSeconds = r.GetInt64(0),
+                    CreatedAtUnix = r.IsDBNull(1) ? (long?)null : r.GetInt64(1),
+                },
+                "@CharId", characterId);
+            return rows.Count == 0 ? null : rows[0];
+        }
+
+        // The creation time is written only while it is still NULL, so the first recorded value is kept.
+        public void SaveCharacterPlayedBorn(int characterId, string characterName, long playedSeconds, long? createdAtUnix)
+        {
+            if (characterId <= 0) throw new ArgumentOutOfRangeException(nameof(characterId));
+            if (playedSeconds < 0) throw new ArgumentOutOfRangeException(nameof(playedSeconds));
+            Transaction((c, t) => Execute(c, t, "INSERT INTO characterplayedborn (char_id,char_name,played_sec,created_at) "
+                + "VALUES (@CharId,@Name,@Played,@Created) ON DUPLICATE KEY UPDATE char_name=VALUES(char_name), "
+                + "played_sec=VALUES(played_sec), created_at=COALESCE(created_at, VALUES(created_at))",
+                "@CharId", characterId, "@Name", characterName ?? string.Empty, "@Played", playedSeconds,
+                "@Created", createdAtUnix));
         }
 
         public PersistedAnarchistKickResult RecordAnarchistKick(int organizationId, int kickedId, string kickedName,

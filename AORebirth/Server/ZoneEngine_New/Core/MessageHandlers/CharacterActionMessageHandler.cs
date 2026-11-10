@@ -32,14 +32,17 @@ namespace ZoneEngine_New.Core.MessageHandlers
         private readonly TeamService _teams;
         private readonly Tradeskills.TradeskillService? _tradeskills;
         private readonly Lazy<DailyLogin.DailyLoginClaimBridge>? _dailyLogin;
+        private readonly CharacterPlayedClock? _playedClock;
 
         public CharacterActionMessageHandler(InventoryActionService inventoryActions, TeamService teams,
-            Tradeskills.TradeskillService? tradeskills = null, Lazy<DailyLogin.DailyLoginClaimBridge>? dailyLogin = null)
+            Tradeskills.TradeskillService? tradeskills = null, Lazy<DailyLogin.DailyLoginClaimBridge>? dailyLogin = null,
+            CharacterPlayedClock? playedClock = null)
         {
             _inventoryActions = inventoryActions;
             _teams = teams;
             _tradeskills = tradeskills;
             _dailyLogin = dailyLogin;
+            _playedClock = playedClock;
         }
 
         public Type MessageBodyType => typeof(CharacterActionMessage);
@@ -350,6 +353,22 @@ namespace ZoneEngine_New.Core.MessageHandlers
                         logoutPlayfield.GetRequiredService<SpawnService>().LogoutPlayer(player);
                     else
                         session.Close();
+                    break;
+                }
+
+                case CharacterActionType.PlayedTime:
+                {
+                    long played = _playedClock?.Played(player.Identity.Instance) ?? 0;
+                    session.Send(CharacterPlayedBornText.Played(player.Identity, player.Name ?? string.Empty, played));
+                    break;
+                }
+
+                case CharacterActionType.BornDate:
+                {
+                    // Without a recorded creation time there is no date to show, so the reply stays silent.
+                    long? createdAt = _playedClock?.CreatedAtUnix(player.Identity.Instance);
+                    if (createdAt is long created)
+                        session.Send(CharacterPlayedBornText.Born(player.Identity, player.Name ?? string.Empty, created));
                     break;
                 }
 

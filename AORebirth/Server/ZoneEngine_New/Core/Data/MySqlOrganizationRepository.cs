@@ -42,6 +42,9 @@ namespace ZoneEngine_New.Core.Data
         public void SaveLeader(int organizationId, int leaderId)
             => Run(() => _persistence.SaveOrganizationLeader(organizationId, leaderId));
 
+        public void SaveTax(int organizationId, int tax)
+            => Run(() => _persistence.SaveOrganizationTax(organizationId, tax));
+
         public AORebirth.Interfaces.Persistence.Characters.PersistedOrgLockoutData GetLockout(int characterId)
             => Run(() => _persistence.LoadOrgLockout(characterId));
 
