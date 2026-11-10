@@ -358,7 +358,7 @@ def register_evidence(db, report_id, symptom_id, fingerprint, source_commit, sha
     if not row or not row[0]:
         raise ValueError("The specified symptom has no investigation checkpoint.")
     saved = json.loads(row[0])
-    if not saved.get("result"):
+    if not saved.get("result") and not saved.get("followup_active"):
         raise ValueError("The symptom has no completed investigation pass to resume.")
     history = saved.setdefault("evidence_revisions", [])
     if any(entry["sha256"] == sha256 for entry in history):
@@ -383,21 +383,22 @@ def record_followup(db, report_id, symptom_id, source_commit, followup):
             or not all(bounded_text(ref, 1000) for ref in followup["evidence"])):
         raise ValueError("A completed follow-up needs a classification, finding, evidence and next action.")
     job = db.execute("SELECT fingerprint, state, result, retry_at FROM jobs WHERE id = ?", (report_id,)).fetchone()
-    if job is None or job[1] == "closed" or job[2] is None:
-        raise ValueError("A follow-up needs an open report with an investigation checkpoint.")
-    previous = json.loads(job[2])
-    if previous.get("source_commit") != source_commit:
+    if job is None or job[1] == "closed":
+        raise ValueError("A follow-up needs an open report with a tracked symptom.")
+    previous = json.loads(job[2]) if job[2] else {}
+    current = current_rows(db, report_id)
+    if not current or current[0][-1] != source_commit or previous.get("source_commit", source_commit) != source_commit:
         raise ValueError("The source commit does not match the report's saved investigation.")
     key = (report_id, job[0], source_commit)
     row = db.execute("""
         SELECT progress FROM investigations
         WHERE id = ? AND fingerprint = ? AND source_commit = ? AND symptom_id = ?
     """, (*key, symptom_id)).fetchone()
-    if not row or not row[0]:
-        raise ValueError("The specified symptom has no investigation checkpoint.")
-    saved = json.loads(row[0])
-    if saved.get("revisit") or not saved.get("result"):
-        raise ValueError("The symptom has no completed investigation pass to review.")
+    if not row:
+        raise ValueError("The specified symptom is not tracked.")
+    # A completed operator review is useful even if the automated pass was interrupted.
+    saved = json.loads(row[0]) if row[0] else {"passes": 0, "reads": [], "result": None}
+    saved["revisit"] = False
     history = saved.setdefault("followups", [])
     if not history or history[-1] != followup:
         history.append(followup)

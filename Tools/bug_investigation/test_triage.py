@@ -158,6 +158,19 @@ class InvestigationTests(unittest.TestCase):
         self.assertEqual(triage.progress(self.db, 1)[0]["result"], original)
         self.assertEqual(triage.progress(self.db, 1)[0]["followups"], [finding])
 
+    def test_operator_review_can_complete_an_interrupted_tracked_symptom(self):
+        triage.split(self.db, self.key, {}, None, lambda *_: {
+            "symptoms": [{"title": "Save", "scope": "Save"}],
+        })
+        finding = {"classification": "CAPTURE_REQUIRED", "finding": "Traced the save",
+                   "evidence": ["Operator source trace"], "next_action": "Capture the response"}
+        self.assertEqual(triage.record_followup(self.db, 1, 1, "source", finding), "CAPTURE_REQUIRED")
+        progress = triage.progress(self.db, 1)[0]
+        self.assertIsNone(progress["result"])
+        self.assertEqual(progress["passes"], 0)
+        self.assertEqual(progress["followups"], [finding])
+        self.assertTrue(triage.register_evidence(self.db, 1, 1, "r1", "source", "a" * 64, "new capture"))
+
     def test_new_evidence_resumes_only_its_pinned_symptom_once(self):
         def initial(schema, *_args, **_options):
             if schema is triage.SPLIT_SCHEMA:
