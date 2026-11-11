@@ -1,6 +1,7 @@
 namespace AORebirth.Interfaces.Persistence.CharacterCreation
 {
     using System.Collections.Generic;
+    using System.Linq;
 
     /// <summary>One profession's create-time inventory and optional uploaded nanos.</summary>
     public sealed class CharacterStartProfessionPackage
@@ -28,5 +29,9 @@ namespace AORebirth.Interfaces.Persistence.CharacterCreation
         public IReadOnlyList<CharacterStartPackageItem> Items { get; }
 
         public IReadOnlyList<int> UploadedNanos { get; }
+
+        public CharacterStartProfessionPackage ResolveForGender(int gender)
+            => new CharacterStartProfessionPackage(ProfessionId, Profession, Evidence,
+                Items.Select(item => item.ResolveForGender(gender)).ToArray(), UploadedNanos);
     }
 }
