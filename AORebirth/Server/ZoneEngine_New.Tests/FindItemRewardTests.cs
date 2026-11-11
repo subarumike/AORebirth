@@ -7,6 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading;
+using AORebirth.Database.Domain.Quests;
 using AORebirth.Enums;
 using AORebirth.Interfaces.Persistence.Missions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -15,6 +16,7 @@ using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using ZoneEngine_New.Core.Characters;
 using ZoneEngine_New.Core.Data;
 using ZoneEngine_New.Core.Entities;
+using ZoneEngine_New.Core.GameData;
 using ZoneEngine_New.Core.Inventory;
 using ZoneEngine_New.Core.Missions;
 using ZoneEngine_New.Core.Nanos;
@@ -360,6 +362,120 @@ public sealed class FindItemRewardTests
     }
 
     [TestMethod]
+    [DataRow(0, 0, false)]
+    [DataRow(0, 1, false)]
+    [DataRow(0, 2, true)]
+    [DataRow(0, 3, true)]
+    [DataRow(0, 4, true)]
+    [DataRow(0, 5, true)]
+    [DataRow(0, 6, false)]
+    [DataRow(1, 2, false)]
+    [DataRow(2, 2, false)]
+    public void SuccessorEligibilityPreservesPersistedQuestCodes(int source, int state, bool canAssign)
+    {
+        var olderRow = new CharacterQuestCompletionSnapshotData { Source = source, State = state, AssignedAtUtcTicks = 100 };
+        Assert.AreEqual(canAssign, CharacterQuestSuccessorRequest.CanAssign(olderRow, 101));
+        Assert.IsFalse(CharacterQuestSuccessorRequest.CanAssign(olderRow, 100));
+    }
+
+    [TestMethod]
+    [DataRow(0, false, true, false, true)]
+    [DataRow(0, false, false, true, true)]
+    [DataRow(1, true, false, false, false)]
+    [DataRow(5, false, false, false, false)]
+    [DataRow(5, true, false, false, true)]
+    public void AuthoredChainCommitsEligibleSuccessorAndStartItemTogether(int existingState, bool olderRun,
+        bool loseCommitAcknowledgment, bool fillInventory, bool assignSuccessor)
+    {
+        const string first = "T001", next = "T002";
+        const int startItem = 987653;
+        DirectoryInfo directory = Directory.CreateTempSubdirectory("ao-quest-successor-");
+        string catalogPath = Path.Combine(directory.FullName, QuestCatalog.FileName);
+        try
+        {
+            File.WriteAllText(catalogPath, """
+                [{"Hash":"T001","Name":"First","Action":"TalkTo","NextStep":"T002"},
+                 {"Hash":"T002","Name":"Next","Action":"TalkTo","StartItems":[{"Id":987653,"Quality":1}]}]
+                """);
+            var data = new StubGameData(new HashItemCatalog([], []), rootPath: directory.FullName);
+            var catalog = new QuestCatalog(data, new StubLogger());
+            var dao = new CompletionDao();
+            using var snapshots = new CharacterSnapshotService(dao, dao, new StubLogger());
+            DateTime now = new(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
+            using var f = new Fixture(dao, now: () => now, snapshots: snapshots, questCatalog: catalog);
+            dao.Fixture = f;
+            f.Player.Playfield = f.CreateWorld(25);
+            Assert.IsTrue(f.Quests.TryAssignTemplate(f.Player, first, out _));
+            long firstAssigned = now.Ticks;
+            long existingAssigned = now.AddMinutes(olderRun ? -1 : 1).Ticks;
+            if (existingState != 0)
+            {
+                f.Store.Save(new CharacterQuestRow
+                {
+                    CharacterId = f.Player.Identity.Instance, QuestId = next, Source = (int)QuestSource.Template,
+                    State = existingState, RequiredCount = 1, AssignedAtUtcTicks = existingAssigned
+                });
+                f.Player.QuestLog = null;
+            }
+            now = now.AddMinutes(2);
+            dao.UnknownCompletionCommit = loseCommitAcknowledgment ? true : null;
+
+            if (fillInventory)
+            {
+                int instance = 700000;
+                foreach (Container page in new[] { f.Player.Inventory.Inventory, f.Player.Inventory.Overflow })
+                    for (int slot = page.FindFreeSlot(); slot >= 0; slot = page.FindFreeSlot())
+                        Assert.IsTrue(page.Add(slot, TestWorld.CreateItem(765432, 765432, instanceId: ++instance, persisted: true)));
+                Assert.IsFalse(f.Quests.TryComplete(f.Player, first, out _));
+                Assert.IsTrue(f.Quests.GetLog(f.Player).Quests[first].IsRewardPending);
+                Assert.AreEqual(0, dao.Completed);
+                Assert.IsFalse(f.Store.AdditionalQuests.ContainsKey(next));
+                Assert.AreEqual(0, dao.Grants.Count);
+                Assert.IsNotNull(f.Player.Inventory.Overflow.Remove(f.Player.Inventory.Overflow.Offset));
+            }
+
+            Assert.AreEqual(!loseCommitAcknowledgment, f.Quests.TryComplete(f.Player, first, out _));
+            Assert.AreEqual((int)QuestState.Completed, f.Store.Character!.State);
+            Assert.AreEqual(firstAssigned, f.Store.Character.AssignedAtUtcTicks);
+            Assert.IsTrue(f.Store.AdditionalQuests.TryGetValue(next, out CharacterQuestRow? successor),
+                "The predecessor completion transaction must leave a durable successor row even if acknowledgment was lost.");
+            Assert.AreEqual(assignSuccessor ? (int)QuestState.Active : existingState, successor.State);
+            Assert.AreEqual(assignSuccessor ? now.Ticks : existingAssigned, successor.AssignedAtUtcTicks);
+            Assert.AreEqual(assignSuccessor ? 1 : 0, dao.Grants.Count(item => item.LowId == startItem));
+
+            if (loseCommitAcknowledgment)
+            {
+                Assert.IsTrue(f.Player.IsPersistenceQuarantined);
+                Assert.IsFalse(f.Player.Inventory.EnumerateHeldItems().Any(item => item.LowId == startItem));
+                var fresh = TestWorld.CreatePlayer(f.Player.Identity.Instance);
+                var session = new QuestDungeonDestinationTests.Session();
+                session.BindPlayer(fresh);
+                fresh.Session = session;
+                fresh.Playfield = f.Player.Playfield;
+                f.Quests.Restore(fresh);
+                Assert.AreEqual(QuestState.Active, fresh.QuestLog!.Quests[next].State);
+            }
+            else if (assignSuccessor)
+            {
+                Assert.IsTrue(f.Player.Inventory.EnumerateHeldItems().Single(item => item.LowId == startItem).IsPersisted);
+                if (fillInventory)
+                    Assert.AreEqual((int)IdentityType.OverflowWindow, dao.Grants.Single().ContainerType);
+                Assert.IsTrue(f.Quests.TryAbandon(f.Player, QuestJournal.JournalInstance(next)));
+                f.Player.QuestLog = null;
+                f.Quests.Restore(f.Player);
+                Assert.AreEqual(QuestState.Abandoned, f.Player.QuestLog!.Quests[next].State);
+            }
+            Assert.AreEqual(1, dao.Completed);
+            Assert.AreEqual(assignSuccessor ? 1 : 0, dao.Grants.Count(item => item.LowId == startItem));
+        }
+        finally
+        {
+            File.Delete(catalogPath);
+            directory.Delete();
+        }
+    }
+
+    [TestMethod]
     [DataRow(2, false)]
     [DataRow(25, false)]
     [DataRow(25, true)]
@@ -542,9 +658,11 @@ public sealed class FindItemRewardTests
         }
         public CharacterQuestCompletionSnapshotData ReadCharacterQuest(string questId)
         {
-            var row = Fixture.Store.Character!;
+            var row = Fixture.Store.Character?.QuestId == questId ? Fixture.Store.Character
+                : Fixture.Store.AdditionalQuests.GetValueOrDefault(questId);
+            if (row == null)
+                return null!;
             var generated = row.Source == (int)QuestSource.Generated ? Fixture.Store.Generated : null;
-            Assert.AreEqual(row.QuestId, questId);
             return new()
             {
                 CharacterId = row.CharacterId, QuestId = row.QuestId, Source = row.Source, State = row.State,
@@ -584,6 +702,16 @@ public sealed class FindItemRewardTests
             Grants.AddRange(request.Grants);
             foreach (var mutation in request.StatMutations) Stats[mutation.StatId] = checked((int)mutation.Value);
             Fixture.Store.Character.State = (int)QuestState.Completed;
+            if (request.Successor is { } successor)
+            {
+                Assert.IsTrue(CharacterQuestSuccessorRequest.CanAssign(ReadCharacterQuest(successor.QuestId), request.AssignedAtUtcTicks));
+                Fixture.Store.Save(new CharacterQuestRow
+                {
+                    CharacterId = CharacterId, QuestId = successor.QuestId, Source = (int)QuestSource.Template,
+                    State = (int)QuestState.Active, RequiredCount = successor.RequiredCount,
+                    AssignedAtUtcTicks = request.NowUtcTicks, UpdatedAtUtcTicks = request.NowUtcTicks
+                });
+            }
             Completed++;
             if (UnknownCompletionCommit == true) throw new MissionCommitOutcomeUnknownException(new Exception("Injected after commit."));
             return new() { Status = CharacterQuestCompletionStatus.Applied,

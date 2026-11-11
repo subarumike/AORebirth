@@ -27,6 +27,23 @@ namespace AORebirth.Interfaces.Persistence.Missions
         AlreadyCollected = 6
     }
 
+    /// <summary>Stable source codes stored in characterquests.Source.</summary>
+    public enum CharacterQuestSourceCode
+    {
+        Template = 0,
+        Generated = 1
+    }
+
+    /// <summary>Stable state codes stored in characterquests.State.</summary>
+    public enum CharacterQuestStateCode
+    {
+        Active = 1,
+        Completed = 2,
+        Failed = 3,
+        Expired = 4,
+        Abandoned = 5
+    }
+
     public sealed class CharacterQuestCompletionSnapshotData
     {
         public int CharacterId { get; set; }
@@ -62,9 +79,38 @@ namespace AORebirth.Interfaces.Persistence.Missions
         public string ExpectedDefinitionJson { get; set; }
         public string ExpectedAcgBuildingGeneratorJson { get; set; }
         public long NowUtcTicks { get; set; }
+        public CharacterQuestSuccessorRequest Successor { get; set; }
         public IReadOnlyList<MissionItemInstanceData> Grants { get; set; } = new MissionItemInstanceData[0];
         public IList<MissionStatMutationData> StatMutations { get; set; } = new MissionStatMutationData[0];
         public IList<MissionStatValueData> ExpectedStatValues { get; set; } = new MissionStatValueData[0];
+    }
+
+    /// <summary>A template step to assign with the completion of its predecessor.</summary>
+    public sealed class CharacterQuestSuccessorRequest
+    {
+        public string QuestId { get; set; }
+        public int RequiredCount { get; set; }
+
+        /// <summary>A fresh chain can restart an older closed template row. A current-run row is left alone.</summary>
+        public static bool CanAssign(CharacterQuestCompletionSnapshotData current, long predecessorAssignedAtUtcTicks)
+        {
+            if (current == null)
+                return true;
+            if (current.Source != (int)CharacterQuestSourceCode.Template
+                || current.AssignedAtUtcTicks >= predecessorAssignedAtUtcTicks)
+                return false;
+
+            switch ((CharacterQuestStateCode)current.State)
+            {
+                case CharacterQuestStateCode.Completed:
+                case CharacterQuestStateCode.Failed:
+                case CharacterQuestStateCode.Expired:
+                case CharacterQuestStateCode.Abandoned:
+                    return true;
+                default:
+                    return false;
+            }
+        }
     }
 
     public sealed class CharacterQuestCompletionResult

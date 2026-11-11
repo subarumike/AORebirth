@@ -16,6 +16,69 @@ namespace AORebirth.Tools.MissionDaoValidation
         private const string CompletionDefinition = "{\"Action\":\"FindItem\",\"Reward\":{\"Credits\":17,\"Xp\":23}}";
         private const string CompletionBinding = "{\"EntranceInstance\":-1073741319,\"ObjectiveInstance\":910099}";
 
+        private static void ValidateCharacterQuestSuccessors(MySqlMissionDao dao, string connectionString)
+        {
+            var quests = new MySqlCharacterQuestDao(() => new MySqlConnection(connectionString));
+            foreach (bool restart in new[] { false, true })
+            {
+                string path = restart ? "restart" : "insert";
+                string predecessor = "successor." + path + ".before";
+                string successor = "successor." + path + ".after";
+                int template = (int)CharacterQuestSourceCode.Template;
+                int active = (int)CharacterQuestStateCode.Active;
+                int abandoned = (int)CharacterQuestStateCode.Abandoned;
+                quests.SaveCharacterQuest(CompletionRow(predecessor, state: active, source: template));
+                if (restart)
+                    quests.SaveCharacterQuest(CompletionRow(successor, state: abandoned, source: template, assigned: CompletionAssigned - 1));
+                ResetCompletionStats(connectionString);
+                Require(dao.Execute(CompletionOwner, tx => ((ICharacterQuestCompletionTransaction)tx)
+                    .TryEarnCharacterQuest(EarnRequest(predecessor))).Status == CharacterQuestCompletionStatus.Earned,
+                    "successor-" + path + "-predecessor-earned");
+
+                MissionItemInstanceData startItem = CompletionItem(restart ? 920301 : 920300, restart ? 112 : 111);
+                startItem.ContainerType = (int)IdentityType.OverflowWindow;
+                var request = CompleteRequest(predecessor, startItem);
+                request.Successor = new CharacterQuestSuccessorRequest { QuestId = successor, RequiredCount = 2 };
+
+                Expect<ExpectedRollbackException>(() => dao.Execute<int>(CompletionOwner, tx =>
+                {
+                    Require(((ICharacterQuestCompletionTransaction)tx).TryCompleteCharacterQuest(request).Status
+                        == CharacterQuestCompletionStatus.Applied, "successor-" + path + "-applied-within-transaction");
+                    throw new ExpectedRollbackException();
+                }), "successor-" + path + "-known-rollback");
+
+                var rolledBack = quests.LoadForCharacter(CompletionOwner);
+                CharacterQuestRow oldSuccessor = rolledBack.SingleOrDefault(row => row.QuestId == successor);
+                Require(rolledBack.Single(row => row.QuestId == predecessor).State == active
+                    && (restart ? oldSuccessor != null && oldSuccessor.State == abandoned
+                        && oldSuccessor.AssignedAtUtcTicks == CompletionAssigned - 1 : oldSuccessor == null),
+                    "successor-" + path + "-rollback-restores-both-quest-states");
+                Require(Scalar(connectionString, "SELECT COUNT(*) FROM item_instances WHERE InstanceId=" + startItem.InstanceId) == 0
+                    && ReadCompletionStat(connectionString, CharacterStat.Cash) == 100
+                    && ReadCompletionStat(connectionString, CharacterStat.XP) == 200
+                    && Scalar(connectionString, "SELECT Status FROM missionrewardledger WHERE QuestId='" + predecessor + "'")
+                        == (int)MissionRewardStatus.Pending, "successor-" + path + "-rollback-restores-reward-and-grant");
+
+                Require(dao.Execute(CompletionOwner, tx => ((ICharacterQuestCompletionTransaction)tx)
+                    .TryCompleteCharacterQuest(request)).Status == CharacterQuestCompletionStatus.Applied,
+                    "successor-" + path + "-commits");
+                var committed = quests.LoadForCharacter(CompletionOwner);
+                CharacterQuestRow next = committed.Single(row => row.QuestId == successor);
+                Require(committed.Single(row => row.QuestId == predecessor).State == (int)CharacterQuestStateCode.Completed
+                    && next.Source == template && next.State == active && next.Progress == 0 && next.RequiredCount == 2
+                    && next.AssignedAtUtcTicks == request.NowUtcTicks, "successor-" + path + "-commits-exact-row");
+                Require(dao.Execute(CompletionOwner, tx => ((ICharacterQuestCompletionTransaction)tx)
+                    .TryCompleteCharacterQuest(request)).Status == CharacterQuestCompletionStatus.AlreadyApplied,
+                    "successor-" + path + "-retry-idempotent");
+                Require(Scalar(connectionString, "SELECT COUNT(*) FROM item_instances WHERE InstanceId=" + startItem.InstanceId
+                    + " AND ContainerType=" + startItem.ContainerType + " AND ContainerInstance=" + CompletionOwner) == 1
+                    && ReadCompletionStat(connectionString, CharacterStat.Cash) == 117
+                    && ReadCompletionStat(connectionString, CharacterStat.XP) == 223
+                    && Scalar(connectionString, "SELECT Status FROM missionrewardledger WHERE QuestId='" + predecessor + "'")
+                        == (int)MissionRewardStatus.Applied, "successor-" + path + "-reward-and-grant-exactly-once");
+            }
+        }
+
         private static void ValidateCharacterQuestCompletion(MySqlMissionDao dao, string connectionString)
         {
             var quests = new MySqlCharacterQuestDao(() => new MySqlConnection(connectionString));
@@ -75,6 +138,7 @@ namespace AORebirth.Tools.MissionDaoValidation
             ValidateQuestCompletionRollbackAndConcurrency(dao, quests, connectionString);
             ValidateRepeatableQuestRewards(dao, quests, connectionString);
             ValidateQuestCompletionStatBits(dao, quests, connectionString);
+            ValidateCharacterQuestSuccessors(dao, connectionString);
             Require(Scalar(connectionString, "SELECT COUNT(*) FROM missionstates WHERE QuestId LIKE 'completion.%'") == 0,
                 "quest-completion-does-not-mirror-authored-missionstate");
         }

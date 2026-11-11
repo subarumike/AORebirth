@@ -371,11 +371,10 @@ public sealed partial class QuestService
                 if (skippedUnique.Count > 0)
                     _logger.Info("Quest reward unique items already held, left out char=" + player.Identity.Instance
                         + " quest=" + quest.QuestId + " items=" + string.Join(", ", skippedUnique));
-                if (!InventoryGrantPlan.TryCreate(player, items, out var grant, allowOverflow: true))
-                {
-                    NotifyPending(player, quest);
-                    return;
-                }
+                QuestTemplate? successorTemplate = !string.IsNullOrEmpty(rewardTemplate.NextStep)
+                    && _catalog.TryGet(rewardTemplate.NextStep, out QuestTemplate next)
+                    && !string.Equals(next.Hash, quest.QuestId, StringComparison.OrdinalIgnoreCase) ? next : null;
+                QuestLog? successorLog = successorTemplate == null ? null : GetLog(player);
                 var xp = DirectXpRewardPlan.CreateQuestReward(player, Math.Max(0, reward?.Xp ?? 0));
                 // Runtime vitals are published by the full XP plan; only durable stats belong in the reward transaction.
                 var values = xp.Stats.Where(pair => !StatCollection.IsRuntimeOnly(pair.Key))
@@ -393,19 +392,58 @@ public sealed partial class QuestService
                     StatIdentityType = (int)player.Identity.Type, StatId = (int)stat,
                     Value = player.Stats.GetOrZero(stat, StatDetail.Base)
                 }).ToArray();
-                var result = _completionDao.Execute(player.Identity.Instance, null!, tx => RequireCompletion(tx).TryCompleteCharacterQuest(new()
+                PlayerQuest? successor = null;
+                InventoryGrantPlan? grant = null;
+                var skippedStartUnique = new List<string>();
+                var result = _completionDao.Execute<CharacterQuestCompletionResult?>(player.Identity.Instance, null!, tx =>
                 {
-                    QuestId = quest.QuestId, AssignedAtUtcTicks = earned.Quest.AssignedAtUtcTicks,
-                    ExpectedDefinitionJson = earned.Quest.DefinitionJson,
-                    ExpectedAcgBuildingGeneratorJson = earned.Quest.AcgBuildingGeneratorJson, NowUtcTicks = _now().Ticks,
-                    Grants = grant.Rows.Select(ToMissionItem).ToArray(), ExpectedStatValues = expected,
-                    StatMutations = values.Select(pair => new MissionStatMutationData
+                    var completion = RequireCompletion(tx);
+                    DateTime now = _now();
+                    if (successorTemplate != null && CharacterQuestSuccessorRequest.CanAssign(
+                            completion.ReadCharacterQuest(successorTemplate.Hash), earned.Quest.AssignedAtUtcTicks))
                     {
-                        StatIdentityType = (int)player.Identity.Type, StatId = (int)pair.Key,
-                        Kind = MissionStatMutationKind.Set, Value = pair.Value,
-                        MinimumValue = int.MinValue, MaximumValue = int.MaxValue
-                    }).ToArray()
-                }));
+                        successor = NewAssignment(successorTemplate.Hash, QuestSource.Template, successorTemplate, now);
+                        foreach (Item item in MintStartItems(player, successor))
+                        {
+                            if (UniqueItems.WouldDuplicate(player, item, out string name))
+                            {
+                                skippedStartUnique.Add(name);
+                                continue;
+                            }
+
+                            items.Add(item);
+                            if (UniqueItems.HasRepeatedUnique(items, out name))
+                            {
+                                items.RemoveAt(items.Count - 1);
+                                skippedStartUnique.Add(name);
+                            }
+                        }
+                    }
+
+                    if (!InventoryGrantPlan.TryCreate(player, items, out InventoryGrantPlan planned, allowOverflow: true))
+                        return null;
+                    grant = planned;
+                    return completion.TryCompleteCharacterQuest(new()
+                    {
+                        QuestId = quest.QuestId, AssignedAtUtcTicks = earned.Quest.AssignedAtUtcTicks,
+                        ExpectedDefinitionJson = earned.Quest.DefinitionJson,
+                        ExpectedAcgBuildingGeneratorJson = earned.Quest.AcgBuildingGeneratorJson, NowUtcTicks = now.Ticks,
+                        Successor = successor == null ? null : new()
+                            { QuestId = successor.QuestId, RequiredCount = successor.RequiredCount },
+                        Grants = planned.Rows.Select(ToMissionItem).ToArray(), ExpectedStatValues = expected,
+                        StatMutations = values.Select(pair => new MissionStatMutationData
+                        {
+                            StatIdentityType = (int)player.Identity.Type, StatId = (int)pair.Key,
+                            Kind = MissionStatMutationKind.Set, Value = pair.Value,
+                            MinimumValue = int.MinValue, MaximumValue = int.MaxValue
+                        }).ToArray()
+                    });
+                });
+                if (result == null)
+                {
+                    NotifyPending(player, quest);
+                    return;
+                }
                 if (result.Status != CharacterQuestCompletionStatus.Applied)
                 {
                     _logger.Warn("Quest reward delivery not applied char=" + player.Identity.Instance
@@ -427,7 +465,7 @@ public sealed partial class QuestService
                 // Local playtest: AddTemplate fills the first free client slot, so publish before key deletion opens a hole.
                 try
                 {
-                    grant.PublishAfterCommit();
+                    grant!.PublishAfterCommit();
                 }
                 finally
                 {
@@ -446,8 +484,13 @@ public sealed partial class QuestService
                 _logger.Info("Quest completed and rewards committed char=" + player.Identity.Instance + " quest=" + quest.QuestId
                     + (tokenReward == null ? string.Empty : " tokenWon=" + tokenReward.Won + " tokenItem=" + tokenReward.ItemId
                         + " tokenKills=" + tokenReward.Killed + "/" + tokenReward.Total));
-                if (!string.IsNullOrEmpty(rewardTemplate.NextStep) && _catalog.TryGet(rewardTemplate.NextStep, out _))
-                    TryAssignTemplate(player, rewardTemplate.NextStep, out _);
+                if (successor != null)
+                {
+                    successorLog!.Quests[successor.QuestId] = successor;
+                    QuestJournal.Send(player, successor, announce: true);
+                    foreach (string name in skippedStartUnique)
+                        ClientFeedback.SendFormatted(player, ClientFeedback.AlreadyHaveUniqueItem, name);
+                }
             }
             catch (Exception exception)
             {
