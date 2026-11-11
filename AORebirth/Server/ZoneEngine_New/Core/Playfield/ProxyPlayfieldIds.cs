@@ -22,6 +22,9 @@ namespace ZoneEngine_New.Core.Playfield
         /// <summary>First proxy instance id: the top 24-bit block of positive ints, above RDB ids, retired mission ids and quest dungeons.</summary>
         public const int First = 0x7F000000;
 
+        const int DoorIndexAndPlayfieldMask = 0x00FFFFFF;
+        const int DoorPlayfieldMask = ushort.MaxValue;
+
         public static bool IsProxy(int playfieldId) => playfieldId >= First;
 
         /// <summary>
@@ -31,11 +34,11 @@ namespace ZoneEngine_New.Core.Playfield
         public static bool TryCreate(int sourcePlayfieldId, int sourceDoorInstance, out int proxyPlayfieldId)
         {
             proxyPlayfieldId = 0;
-            if (sourcePlayfieldId <= 0 || sourcePlayfieldId > 0xFFFF || sourceDoorInstance == 0
-                || (sourceDoorInstance & 0xFFFF) != sourcePlayfieldId)
+            if (sourcePlayfieldId <= 0 || sourcePlayfieldId > DoorPlayfieldMask || sourceDoorInstance == 0
+                || (sourceDoorInstance & DoorPlayfieldMask) != sourcePlayfieldId)
                 return false;
 
-            proxyPlayfieldId = First + (sourceDoorInstance & 0x00FFFFFF);
+            proxyPlayfieldId = First + (sourceDoorInstance & DoorIndexAndPlayfieldMask);
             return true;
         }
 
@@ -47,7 +50,7 @@ namespace ZoneEngine_New.Core.Playfield
             if (!IsProxy(proxyPlayfieldId))
                 return false;
             doorLow24 = proxyPlayfieldId - First;
-            sourcePlayfieldId = doorLow24 & 0xFFFF;
+            sourcePlayfieldId = doorLow24 & DoorPlayfieldMask;
             return sourcePlayfieldId > 0;
         }
 
@@ -60,7 +63,7 @@ namespace ZoneEngine_New.Core.Playfield
         public static bool ShouldInstance(IGameData gameData, int destinationPlayfieldId)
         {
             ArgumentNullException.ThrowIfNull(gameData);
-            return destinationPlayfieldId > 0 && destinationPlayfieldId <= 0xFFFF;
+            return destinationPlayfieldId > 0 && destinationPlayfieldId <= DoorPlayfieldMask;
         }
 
         /// <summary>
@@ -88,9 +91,9 @@ namespace ZoneEngine_New.Core.Playfield
 
             if (routedType != (int)IdentityType.Door
                 || routedPlayfield <= 0
-                || routedPlayfield > 0xFFFF
+                || routedPlayfield > DoorPlayfieldMask
                 || (routedInstance & 0xFF000000u) != 0xC0000000u
-                || (routedInstance & 0xFFFFu) != (uint)routedPlayfield)
+                || (routedInstance & DoorPlayfieldMask) != (uint)routedPlayfield)
                 return false;
 
             destinationPlayfieldId = routedPlayfield;
@@ -117,7 +120,7 @@ namespace ZoneEngine_New.Core.Playfield
             for (int i = 0; i < dynels.Count; i++)
             {
                 PlayfieldDynel dynel = dynels[i];
-                if (dynel.IdentityType != (int)IdentityType.Door || (dynel.IdentityInstance & 0x00FFFFFF) != doorLow24)
+                if (dynel.IdentityType != (int)IdentityType.Door || (dynel.IdentityInstance & DoorIndexAndPlayfieldMask) != doorLow24)
                     continue;
 
                 int destination = 0;

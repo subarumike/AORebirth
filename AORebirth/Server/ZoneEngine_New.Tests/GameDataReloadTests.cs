@@ -17,6 +17,7 @@ using ZoneEngine_New.Core.Ai;
 using ZoneEngine_New.Core.Data;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.GameData;
+using ZoneEngine_New.Core.Inventory;
 using ZoneEngine_New.Core.Knubot;
 using ZoneEngine_New.Core.Mobs;
 using ZoneEngine_New.Core.Modules;
@@ -67,6 +68,32 @@ public sealed class GameDataReloadTests
         Assert.AreEqual(1, broken.Problems.Count);
         StringAssert.StartsWith(broken.Problems[0], MonsterCombatRulesCatalog.FileName + ": ");
         Assert.IsTrue(MonsterCombatRulesCatalog.For(content.Root).TryGet(Hash, out _), "A failed reload keeps the old rules.");
+    }
+
+    [TestMethod]
+    [DataRow("""{ "Hash": "BAD", "Action": "Assemble" }""", "requires an objective SpecItem")]
+    [DataRow("""{ "Hash": "BAD", "Action": "Equip", "Objective": { "SpecItem": "MISSING" } }""",
+        "objective SpecItem 'MISSING' does not resolve")]
+    [DataRow("""{ "Hash": "BAD", "StartItems": [ { "Hash": "MISSING", "Quality": 1 } ] }""",
+        "start item hash 'MISSING' must resolve")]
+    public void QuestReloadRejectsMissingRequiredItemsAndKeepsPublishedTemplates(string invalidQuest, string problem)
+    {
+        using var content = new Content();
+        using var overrides = new OverrideFolder();
+        const string validQuest = """{ "Hash": "GOOD", "Action": "TalkTo" }""";
+        string file = overrides.Write(QuestCatalog.FileName, "[" + validQuest + "]");
+        var logger = new StubLogger();
+        var quests = new QuestCatalog(new GameDataStore(logger, null, content.Root), logger);
+        Assert.IsTrue(quests.TryGet("GOOD", out QuestTemplate before));
+
+        File.WriteAllText(file, "[" + validQuest + "," + invalidQuest + "]");
+        GameDataReloadResult result = quests.Reload();
+
+        Assert.IsFalse(result.Ok);
+        StringAssert.Contains(result.Problems.Single(), problem);
+        Assert.IsTrue(quests.TryGet("GOOD", out QuestTemplate after));
+        Assert.AreSame(before, after);
+        Assert.IsFalse(quests.TryGet("BAD", out _));
     }
 
     [TestMethod]
@@ -143,7 +170,9 @@ public sealed class GameDataReloadTests
             """);
         var logger = new StubLogger();
         var data = new GameDataStore(logger, null, content.Root);
-        KnubotCatalog knubot = WithoutKnubotOverride(() => new KnubotCatalog(data, new QuestCatalog(data, logger), new StubCatalog(), logger));
+        var items = new StubCatalog();
+        var minter = new HashItemMinter(data, items, new StubItemBuilder());
+        KnubotCatalog knubot = WithoutKnubotOverride(() => new KnubotCatalog(data, new QuestCatalog(data, logger, minter), items, logger));
         Assert.IsFalse(data.CanResolveItemHash("NEWI"));
         Assert.AreEqual(0, knubot.Reload().Loaded, "The script names a hash ItemTemplates.json does not have yet.");
 
@@ -151,7 +180,7 @@ public sealed class GameDataReloadTests
             "{ \"NEWI\": { \"Templates\": [ 246817 ] } }");
         int knubotReloads = 0;
         knubot.Reloaded += _ => knubotReloads++;
-        GameDataReloadResult result = WithoutKnubotOverride(() => new ItemTemplatesReload(data, knubot).Reload());
+        GameDataReloadResult result = WithoutKnubotOverride(() => new ItemTemplatesReload(data, knubot, minter).Reload());
 
         Assert.IsTrue(result.Ok, string.Join("; ", result.Problems));
         Assert.AreEqual(1, result.Entries);

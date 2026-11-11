@@ -397,9 +397,12 @@ namespace AORebirth.Database.Domain.Quests
                     ParentContainerType = reader.IsDBNull(2) ? 0 : reader.GetInt32(2),
                     ParentContainerInstance = reader.IsDBNull(3) ? 0 : reader.GetInt32(3)
                 };
-                if (reader.GetInt32(4) != artifact.ItemType || reader.GetInt32(5) != artifact.LowId
-                    || reader.GetInt32(6) != artifact.HighId || reader.GetInt32(7) != artifact.Quality
-                    || reader.GetInt32(8) != artifact.Source || reader.GetInt32(9) != 1)
+                if (reader.GetInt32(reader.GetOrdinal(nameof(QuestDungeonKeyItemRow.ItemType))) != artifact.ItemType
+                    || reader.GetInt32(reader.GetOrdinal(nameof(QuestDungeonKeyItemRow.LowId))) != artifact.LowId
+                    || reader.GetInt32(reader.GetOrdinal(nameof(QuestDungeonKeyItemRow.HighId))) != artifact.HighId
+                    || reader.GetInt32(reader.GetOrdinal(nameof(QuestDungeonKeyItemRow.Quality))) != artifact.Quality
+                    || reader.GetInt32(reader.GetOrdinal(nameof(QuestDungeonKeyItemRow.Source))) != artifact.Source
+                    || reader.GetInt32(reader.GetOrdinal("StackCount")) != 1)
                     throw new InvalidOperationException("The exact mission artifact item definition changed.");
                 if (item.ContainerType == 0)
                     return null;
