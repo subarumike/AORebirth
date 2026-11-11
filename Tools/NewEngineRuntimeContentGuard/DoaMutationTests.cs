@@ -39,6 +39,14 @@ internal static class DoaMutationTests
             ("mission persistence boundary", () => Block("using MySqlConnector; class Test { object Open() => new MySqlConnection(); }", "DOA_MODULE_DEPENDENCY")),
             ("project dependency boundary", CheckProjects),
             ("unchanged and introduced findings", CheckDiff),
+            ("strict acceptance and authority boundary", CheckStrictAcceptance),
+            ("inactive conditional source", CheckConditionalSource),
+            ("literal and implicit encounter policies", CheckEncounterPolicy),
+            ("authored operation privilege bypass", CheckAuthoredPrivilege),
+            ("compiled native content", CheckNativePolicy),
+            ("packaged and recorded gameplay data", CheckPackagedInteractions),
+            ("required encounter catalog inputs", CheckEncounterCatalog),
+            ("required LFT catalog and canonical playfield references", CheckLftPolicy),
             ("versioned layout exception", () => CheckHistoricalLayout(root)),
             ("provisional catalog validation", CheckCoverage),
             ("recorded payload field", CheckRecordedPayload),
@@ -97,6 +105,123 @@ internal static class DoaMutationTests
         Finding changed = DoaRules.DataFinding(MissionPath, "Probe", "EXAMPLE", "Open debt", "changed");
         var result = DoaEnforcement.Compare([old], [old with { Line = 200 }, old, changed]);
         Require(result.Inherited.Length == 1 && result.Introduced.Length == 2);
+    }
+
+    private static void CheckStrictAcceptance()
+    {
+        Finding inherited = DoaRules.DataFinding(MissionPath, "Probe", "EXAMPLE", "Open debt", "old");
+        Finding[] current = [inherited];
+        Require(DoaEnforcement.Compare([inherited], current).Introduced.Length == 0);
+        Require(DoaEnforcement.AcceptanceStatus(false, true, current.Length, 0, 0) == "FAIL_ARCHITECTURE");
+        Require(DoaEnforcement.AcceptanceStatus(false, true, 0, 1, 0) == "FAIL_ARCHITECTURE");
+        Require(DoaEnforcement.AcceptanceStatus(false, true, 0, 0, 1) == "FAIL_ARCHITECTURE");
+        Require(DoaEnforcement.AcceptanceStatus(false, false, 0, 0, 0) == "FAIL_ARCHITECTURE");
+        Require(DoaEnforcement.AcceptanceStatus(false, true, 0, 0, 0) == "PASS_ARCHITECTURE_AND_REFERENCES");
+        Require(DoaEnforcement.AcceptanceStatus(true, false, 0, 1, 0) == "FAIL_ARCHITECTURE");
+        Require(DoaEnforcement.AcceptanceStatus(true, false, 0, 0, 0) == "PASS_STRUCTURE_ONLY");
+    }
+
+    private static void CheckConditionalSource()
+    {
+        const string source = """
+            #if UNUSED_PROFILE
+            class Test { const int ItemLowId = 3210; }
+            #else
+            class Test { int Read() => data.GetInt32(5); }
+            #endif
+            """;
+        var unresolved = new List<string>();
+        Require(DoaRules.SourceVariants(MissionPath, source, unresolved.Add)
+            .SelectMany(syntax => DoaRules.SourceIssues(MissionPath, syntax))
+            .Any(finding => finding.Rule == "DOA_LITERAL_CONTENT_IDENTITY"));
+        Require(unresolved.Count == 0);
+
+        const string excessive = "#if A || B || C || D || E || F || G || H || I\nclass Test {}\n#endif";
+        _ = DoaRules.SourceVariants(MissionPath, excessive, unresolved.Add).ToArray();
+        Require(unresolved.Count == 1);
+    }
+
+    private static void CheckEncounterPolicy()
+    {
+        Block("class MonsterPetRule { int MaxPets { get; set; } = 1; }", "DOA_FIXED_ENCOUNTER_POLICY");
+        Block("class MonsterTriggeredSelfNano { int MaxCastsPerFight { get; set; } = 1; }", "DOA_FIXED_ENCOUNTER_POLICY");
+        Block("class NpcPetSummons { const int RetrySeconds = 1; }", "DOA_FIXED_ENCOUNTER_POLICY");
+        Block("class Test { object Make() => rules.Pets ?? new MonsterPetRule(); }", "DOA_IMPLICIT_ENCOUNTER_POLICY");
+        Require(!Rules("class MonsterPetRule { public required int MaxPets { get; init; } }").Any());
+    }
+
+    private static void CheckAuthoredPrivilege()
+    {
+        Block("class Test { bool Apply(ItemSpell spell) => NanoRuntime.TryApplyImmediate(a,b,c,d,e,f, gmApply: true); }",
+            "DOA_AUTHORED_PRIVILEGE_BYPASS");
+        Block("class Test { bool Apply(ItemSpell spell) => NanoRuntime.TryApplyImmediate(a,b,c,d,e,f, isEligible); }",
+            "DOA_AUTHORED_PRIVILEGE_BYPASS");
+        Block("class Test { bool Apply(ItemSpell spell) => NanoCastFunctions.TryExecute(a,b,spell,d,e, IsEligible(spell)); }",
+            "DOA_AUTHORED_PRIVILEGE_BYPASS");
+        Require(!Rules("class Test { bool Apply(ItemSpell spell) => NanoRuntime.TryApplyImmediate(a,b,c,d,e,f, areaSpread: true); }").Any());
+    }
+
+    private static void CheckNativePolicy()
+    {
+        const string path = DoaAdditionalInputs.NativeSourceRoot + "/test.cpp";
+        const string source = """
+            // const int ServerPort = 9999;
+            constexpr unsigned long LocalIpHostOrder = (127ul << 24) | 1ul;
+            constexpr unsigned long LoginPort = 7500;
+            constexpr auto GamecodeBuild = 0x1234;
+            const PlayfieldName Rows[] = {
+            #include "playfields.inc"
+            };
+            """;
+        Finding[] issues = DoaAdditionalInputs.NativeIssues(path, source).ToArray();
+        Require(issues.Count(finding => finding.Rule == "DOA_NATIVE_COMPILED_ENDPOINT") == 2);
+        Require(issues.Count(finding => finding.Rule == "DOA_NATIVE_COMPILED_PLAYFIELDS") == 1);
+        Require(issues.All(finding => finding.Line > 1));
+        Require(!DoaAdditionalInputs.NativeIssues(path, "const auto LoginPort = config.LoginPort;").Any());
+    }
+
+    private static void CheckPackagedInteractions()
+    {
+        const string authored = """{"Journals":{"quest":{"Hex":"1234"}},"TimedTurnIns":[{"Key":"turnin","TurnInNpc":"SimpleChar:1"}]}""";
+        string[] rules = DoaAdditionalInputs.PackagedInteractionIssues(authored).Select(finding => finding.Rule).ToArray();
+        Require(rules.Contains("DOA_RECORDED_JOURNAL_PAYLOAD") && rules.Contains("DOA_PACKAGED_GAMEPLAY_BINDING"));
+        Require(DoaAdditionalInputs.PackagedInteractionIssues("""{"Journals":{"quest":{"DeleteHex":["1234"]}}}""")
+            .Any(finding => finding.Rule == "DOA_RECORDED_JOURNAL_PAYLOAD"));
+        Require(!DoaAdditionalInputs.PackagedInteractionIssues("""{"Journals":{"quest":{"Packet":{}}},"TimedTurnIns":[{"Key":"turnin"}]}""").Any());
+    }
+
+    private static void CheckEncounterCatalog()
+    {
+        const string path = DoaAdditionalInputs.MonsterPolicy;
+        Require(DoaAdditionalInputs.MonsterPolicyIssues(path, null).Any());
+        Require(DoaAdditionalInputs.MonsterPolicyIssues(path, """{"A":{"Pets":{"MaxPets":2}}}""")
+            .Any(finding => finding.Rule == "DOA_UNAUTHORED_PET_POLICY"));
+        Require(DoaAdditionalInputs.MonsterPolicyIssues(path, """{"A":{"Pets":true,"TriggeredSelfNanos":"unknown"}}""")
+            .Count() == 2);
+        Require(DoaAdditionalInputs.MonsterPolicyIssues(path, """{"A":{"TriggeredSelfNanos":[{"MaxCastsPerFight":null}]}}""")
+            .Any(finding => finding.Rule == "DOA_UNAUTHORED_NANO_POLICY"));
+        Require(!DoaAdditionalInputs.MonsterPolicyIssues(path, """
+            {"A":{"Pets":{"MaxPets":2,"SummonIntervalSeconds":1,"RespawnDelaySeconds":10},
+                "TriggeredSelfNanos":[{"MaxCastsPerFight":null,"CooldownSeconds":94}]}}
+            """).Any());
+    }
+
+    private static void CheckLftPolicy()
+    {
+        const string path = DoaAdditionalInputs.LftPolicy;
+        const string authored = """{"Version":1,"UnlistedRegion":"RubiKa","ShadowlandsPlayfieldIds":[1,2]}""";
+        Require(DoaAdditionalInputs.LftPolicyIssues(path, null).Any(finding => finding.Rule == "DOA_MISSING_LFT_POLICY"));
+        Require(DoaAdditionalInputs.LftPolicyIssues(path, authored.Replace("[1,2]", "[1,1]", StringComparison.Ordinal))
+            .Any(finding => finding.Rule == "DOA_INVALID_LFT_POLICY"));
+        Require(DoaAdditionalInputs.LftPolicyIssues(path, authored.Replace("RubiKa", "Unknown", StringComparison.Ordinal))
+            .Any(finding => finding.Rule == "DOA_INVALID_LFT_POLICY"));
+        Require(DoaAdditionalInputs.LftPolicyIssues(path, authored, id => id == 1)
+            .Single().Rule == "DOA_UNRESOLVED_LFT_PLAYFIELD");
+        Require(!DoaAdditionalInputs.LftPolicyIssues(path, authored, _ => true).Any());
+        Require(DoaAdditionalInputs.LftMetadataIdentityMatches("""{"playfieldId":42}""", 42));
+        Require(DoaAdditionalInputs.LftMetadataIdentityMatches("""{"PlayfieldId":42}""", 42));
+        Require(!DoaAdditionalInputs.LftMetadataIdentityMatches("""{"playfieldId":43}""", 42));
+        Require(!DoaAdditionalInputs.LftMetadataIdentityMatches("""{"playfieldId":42,"PlayfieldId":43}""", 42));
     }
 
     private static void CheckHistoricalLayout(string root)

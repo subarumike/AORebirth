@@ -10,6 +10,7 @@ internal static class DoaRules
     internal const string LayoutPath = "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/DungeonLayoutGenerator.cs";
     private const string DataPath = "AORebirth/GameData/";
     private const string DungeonPolicy = "DungeonGeneration.json";
+    private const int MaximumConditionalSymbols = 8;
     private static readonly string[] CapturedSymbols =
         ["MissionRollCaptureLibrary", "MissionRollCaptureTemplate", "CapturedRollBodiesHex", "CapturedPacketHex"];
     private static readonly string[] CapturedMembers = ["CapturedBody", "CapturedCount", "DecodeTemplate", "TemplateBody"];
@@ -19,6 +20,9 @@ internal static class DoaRules
         ["StyleId", "FloorCount", "FloorSize", "FloorHeight", "LockedDoorChancePercent", "SpawnPointChancePercent",
          "ItemHashes", "NpcHashes", "FindPersonNpcHashes", "RegularNpcHashes", "MinQuality", "MaxQuality", "MinItems", "MaxItems",
          "RoomDensity", "CountVariationFraction", "RarityWeights"];
+    private static readonly string[] EncounterPolicyFields =
+        ["MaxPets", "MaxPetsPerType", "SummonIntervalSeconds", "RespawnDelaySeconds", "RetrySeconds",
+         "MaxCastsPerFight", "CooldownSeconds", "HealthBelowPercent", "ChancePercent"];
     private static readonly IReadOnlyDictionary<string, int> HistoricalLayoutFields = new Dictionary<string, int>(StringComparer.Ordinal)
     {
         ["TemporaryStyle"] = 324, ["TemporaryFloors"] = 2, ["TemporaryFloorSize"] = 16,
@@ -34,6 +38,36 @@ internal static class DoaRules
 
     internal static Finding DataFinding(string path, string symbol, string rule, string reason, string value)
         => new(path, 0, symbol, "DATA_ORIENTED_ARCHITECTURE", rule, reason, value, Digest(value + "\n" + reason));
+
+    internal static IEnumerable<SyntaxNode> SourceVariants(string path, string source, Action<string> missingInput)
+    {
+        var options = new CSharpParseOptions(LanguageVersion.Preview);
+        SyntaxNode initial = CSharpSyntaxTree.ParseText(source, options, path).GetRoot();
+        yield return initial;
+
+        string[] symbols = initial.DescendantTrivia(descendIntoTrivia: true)
+            .Select(trivia => trivia.GetStructure() switch
+            {
+                IfDirectiveTriviaSyntax directive => directive.Condition,
+                ElifDirectiveTriviaSyntax directive => directive.Condition,
+                _ => null
+            })
+            .OfType<ExpressionSyntax>()
+            .SelectMany(expression => expression.DescendantNodesAndSelf().OfType<IdentifierNameSyntax>())
+            .Select(identifier => identifier.Identifier.ValueText)
+            .Distinct(StringComparer.Ordinal).Order(StringComparer.Ordinal).ToArray();
+        if (symbols.Length > MaximumConditionalSymbols)
+        {
+            missingInput($"Conditional C# source coverage exceeds the per-file bound: {path} ({symbols.Length} symbols).");
+            yield break;
+        }
+
+        for (int mask = 1; mask < (1 << symbols.Length); mask++)
+        {
+            string[] selected = symbols.Where((_, index) => (mask & (1 << index)) != 0).ToArray();
+            yield return CSharpSyntaxTree.ParseText(source, options.WithPreprocessorSymbols(selected), path).GetRoot();
+        }
+    }
 
     internal static bool IsForbiddenRuntimeProjectReference(string target)
     {
@@ -78,6 +112,11 @@ internal static class DoaRules
                 && !(historicalLayout && HistoricalLayoutFields.ContainsKey(target)))
                 yield return (literal, "DOA_FIXED_MISSION_POLICY", "Mission selection, QL or generation parameters belong in validated GameData.");
 
+            if (target != null && EncounterPolicyFields.Contains(target, StringComparer.Ordinal)
+                && literal.Ancestors().OfType<TypeDeclarationSyntax>().FirstOrDefault()?.Identifier.ValueText
+                    is "MonsterPetRule" or "MonsterTriggeredSelfNano" or "NpcPetSummons")
+                yield return (literal, "DOA_FIXED_ENCOUNTER_POLICY", "Encounter cast limits, cooldowns and summon cadence belong in authored, validated GameData.");
+
             ExpressionSyntax operand = UnwrapParent(literal);
             if (operand.Parent is ArgumentSyntax argument && argument.Parent is ArgumentListSyntax list
                 && list.Parent is InvocationExpressionSyntax call && ContentCalls.Contains(Name(call.Expression), StringComparer.Ordinal)
@@ -98,6 +137,32 @@ internal static class DoaRules
                 yield return (literal, "DOA_LITERAL_CONTENT_BRANCH", "A runtime pattern branches on a fixed gameplay identity.");
         }
 
+        foreach (var creation in syntax.DescendantNodes().OfType<ObjectCreationExpressionSyntax>())
+            if (Name(creation.Type) == "MonsterPetRule" && creation.Initializer == null
+                && creation.ArgumentList is { Arguments.Count: 0 })
+                yield return (creation, "DOA_IMPLICIT_ENCOUNTER_POLICY", "NPC summon policy must resolve from validated content rather than construct a default rule.");
+
+        foreach (var invocation in syntax.DescendantNodes().OfType<InvocationExpressionSyntax>())
+        {
+            if (invocation.Ancestors().OfType<MethodDeclarationSyntax>().FirstOrDefault() is not { } method
+                || !method.ParameterList.Parameters.Any(parameter => parameter.Type != null
+                    && Name(parameter.Type) is "ItemSpell" or "NanoSpell"))
+                continue;
+
+            SeparatedSyntaxList<ArgumentSyntax> arguments = invocation.ArgumentList.Arguments;
+            ArgumentSyntax? privilege = invocation.Expression is MemberAccessExpressionSyntax call
+                ? (Name(call.Expression), call.Name.Identifier.ValueText) switch
+                {
+                    ("NanoRuntime", "TryApplyImmediate") => GetArgument(arguments, "gmApply", 6),
+                    ("NanoCastFunctions", "TryExecute") => GetArgument(arguments, "scripted", 5),
+                    _ => null
+                }
+                : null;
+            if (privilege != null && !privilege.Expression.IsKind(SyntaxKind.FalseLiteralExpression))
+                yield return (privilege, "DOA_AUTHORED_PRIVILEGE_BYPASS",
+                    "Ordinary item and nano functions must preserve recipient, combat and line-of-sight rules.");
+        }
+
         if (missions)
         {
             foreach (var import in syntax.DescendantNodes().OfType<UsingDirectiveSyntax>())
@@ -107,6 +172,15 @@ internal static class DoaRules
                 if (Name(creation.Type) is "MySqlConnection" or "SqlConnection" or "MySqlCharacterQuestDao" or "MySqlMissionDao")
                     yield return (creation, "DOA_MODULE_DEPENDENCY", "Mission mechanics must use injected persistence contracts.");
         }
+    }
+
+    private static ArgumentSyntax? GetArgument(SeparatedSyntaxList<ArgumentSyntax> arguments, string parameter, int position)
+    {
+        foreach (ArgumentSyntax argument in arguments)
+            if (argument.NameColon?.Name.Identifier.ValueText == parameter)
+                return argument;
+
+        return arguments.Count > position && arguments[position].NameColon == null ? arguments[position] : null;
     }
 
     // 8f517d711f6208c3308c06c68b414fd59a1316df introduced seed-only payloads with these exact values.
@@ -357,6 +431,8 @@ internal static class DoaRules
         MemberBindingExpressionSyntax binding => binding.Name.Identifier.ValueText,
         ConditionalAccessExpressionSyntax conditional => Name(conditional.WhenNotNull),
         QualifiedNameSyntax qualified => qualified.Right.Identifier.ValueText,
+        AliasQualifiedNameSyntax alias => alias.Name.Identifier.ValueText,
+        NullableTypeSyntax nullable => Name(nullable.ElementType),
         _ => string.Empty
     };
 

@@ -11,7 +11,8 @@ permissions:
   contents: read
 
 jobs:
-  content-boundary:
+  runtime-structure:
+    name: dao-runtime-structure
     runs-on: windows-latest
     timeout-minutes: 12
     steps:
@@ -22,7 +23,7 @@ jobs:
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
-      - name: Verify proposed runtime and catalog changes
+      - name: Verify the runtime source and public catalog structure
         shell: pwsh
         env:
           PR_BASE: ${{ github.event.pull_request.base.sha }}
@@ -45,5 +46,6 @@ jobs:
           $guard = 'Tools/NewEngineRuntimeContentGuard/bin/Release/net10.0/NewEngineRuntimeContentGuard.dll'
           dotnet $guard --doa-self-test .
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          dotnet $guard --enforce . $baseline
-          exit $LASTEXITCODE
+          dotnet $guard --enforce-structure . $baseline
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          'Public structure passed. Authoritative GameData and runtime validation require dao-canonical-validation.' >> $env:GITHUB_STEP_SUMMARY

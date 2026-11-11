@@ -63,27 +63,26 @@ gate and references to those fields. The architecture mutation tests reject
 changes that broaden the gate. `ProceduralDungeonFoundationTests.PreviouslyAcceptedV2SeedsKeepExactGeneratorPayloadAndSpawnBits`
 checks version 2 against `Fixtures/ProceduralDungeonV2Golden.json`.
 
-The existing Roslyn runtime content guard provides two proposed-change modes.
 On Windows, run `Tools/run_newengine_content_architecture_guard.cmd --doa-self-test`
-for focused mutation cases and `Tools/run_newengine_content_architecture_guard.cmd
---enforce <base-sha>` for the change check. Supply the exact Git base of the
-proposal. Optionally add `--catalog-root <GameData>` for authoritative mission
-item and NPC family resolution and `--output <report>` for structured findings.
-Keep private catalog output in the owning ignored workspace.
+for deterministic mutation tests. Run the same wrapper with
+`--enforce-structure <base-sha>` for the public source and catalog check and
+`--enforce <base-sha> --catalog-root <GameData>` to include authoritative
+references. Both modes accept `--output <report>`. Supply the exact Git base.
+Keep reports containing private content in the owning ignored workspace.
 
-The CI workflow applies the source graph and public catalog checks on pull
-requests and relevant pushes. The check rejects new findings and newly
-unresolved project inputs. It inventories inherited findings separately by
-path, rule, syntax fingerprint and occurrence count. A moved, edited or copied
-violation cannot reuse an inherited occurrence. Treat inherited findings as
-remediation work. The existing full-inventory modes retain their report contract.
+Both checks reject every current architecture finding and unresolved required
+project input. The baseline identifies inherited findings for remediation. It
+has no effect on acceptance. Public pull-request CI reports its structural
+result as `dao-runtime-structure`.
 
-Public CI can check catalog structure, recorded payload fields and declarations
-of coverage. Authoritative private hash references require the selected
-GameData. Production loaders and targeted tests validate the actual item
-definitions and typed protocol fields. The Roslyn checks cover documented source
-patterns and the existing project graph inventory. Semantic review remains
-required for new APIs and indirect flows outside those patterns.
+Integration also requires `dao-canonical-validation` from a trusted private
+validator. Bind its result to the exact candidate and current base, the approved
+private upstream revision, and the canonical GameData manifest. The validator
+must resolve required references and exercise affected production loaders,
+eligibility checks, and serialization and persistence contracts. Publish only
+the status and a reference to restricted evidence. Keep private data and status
+publication credentials outside candidate-controlled jobs. Missing or
+inconclusive private evidence blocks integration.
 
 ## Data Flow
 

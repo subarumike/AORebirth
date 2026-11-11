@@ -367,8 +367,11 @@ Keep recorded packet payloads in offline evidence and test fixtures. Runtime
 offer generation uses validated typed definitions and reusable eligibility data.
 
 The [runtime data architecture check](docs/project/ARCHITECTURE.md#data-oriented-gameplay)
-runs against proposed changes in CI. A new violation blocks validation even when
-compilation succeeds. Inherited findings stay visible as open remediation work.
+runs against proposed changes in CI. Every current violation and unresolved
+required input blocks validation. Baseline comparison identifies inherited
+findings for remediation and never grants acceptance. Integration requires
+both the public structural check and the trusted private validation of the
+exact source and canonical GameData, including affected production loaders.
 
 ## Development authority
 

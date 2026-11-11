@@ -11,7 +11,7 @@ using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 if (args.Length < 2) return 64;
 string mode = args[0], root = Path.GetFullPath(args[1]);
-if (mode == "--enforce") return DoaEnforcement.Run(root, args);
+if (mode is "--enforce" or "--enforce-structure") return DoaEnforcement.Run(root, args);
 if (mode == "--doa-self-test") return DoaMutationTests.Run(root);
 if (mode is not ("--write" or "--check" or "--baseline" or "--self-test")) return 64;
 if (mode == "--self-test") return GuardMutationTests.Run(root);
@@ -29,31 +29,41 @@ string Git(params string[] arguments)
     if (process.ExitCode != 0) throw new InvalidOperationException(error);
     return result;
 }
-var tracked = Git("ls-tree", "-r", "--name-only", revision ?? "HEAD").Split('\n', StringSplitOptions.RemoveEmptyEntries).Select(s => s.TrimEnd('\r')).ToHashSet(StringComparer.Ordinal);
+var tracked = Git("ls-tree", "-rz", "--name-only", revision ?? "HEAD")
+    .Split('\0', StringSplitOptions.RemoveEmptyEntries).ToHashSet(StringComparer.Ordinal);
 var texts = new Dictionary<string, string>(StringComparer.Ordinal);
 string Read(string relative)
 {
     if (texts.TryGetValue(relative, out string? text)) return text;
     text = revision == null ? File.ReadAllText(Path.Combine(root, relative)) : Git("show", revision + ":" + relative);
     // Repository checkouts may normalize LF to CRLF; semantic receipts must be portable.
-    if (relative.EndsWith(".cs", StringComparison.Ordinal)) text = text.Replace("\r\n", "\n").Replace('\r', '\n');
+    if (relative.EndsWith(".cs", StringComparison.OrdinalIgnoreCase)) text = text.Replace("\r\n", "\n").Replace('\r', '\n');
     texts[relative] = text;
     return text;
 }
 bool Exists(string relative) => revision == null ? File.Exists(Path.Combine(root, relative)) : tracked.Contains(relative);
-bool IsSource(string file) => file.EndsWith(".cs", StringComparison.Ordinal) && !file.Contains("/obj/") && !file.Contains("/bin/");
+bool IsSource(string file) => file.EndsWith(".cs", StringComparison.OrdinalIgnoreCase)
+    && !file.Contains("/obj/", StringComparison.OrdinalIgnoreCase) && !file.Contains("/bin/", StringComparison.OrdinalIgnoreCase);
 var projects = new SortedSet<string>(StringComparer.Ordinal);
 var sourceFiles = new SortedSet<string>(StringComparer.Ordinal);
 var unresolved = new SortedSet<string>(StringComparer.Ordinal);
 var graphNotes = new SortedSet<string>(StringComparer.Ordinal);
 var dependencyFindings = new List<Finding>();
 IEnumerable<string> FilesUnder(string dir, string pattern = "*.cs") => revision != null ? tracked.Where(p => p.StartsWith(dir + "/", StringComparison.Ordinal))
-    : Directory.EnumerateFiles(Path.Combine(root, dir), pattern, SearchOption.AllDirectories).Select(Rel);
+    : Directory.Exists(Path.Combine(root, dir))
+        ? Directory.EnumerateFiles(Path.Combine(root, dir), pattern, SearchOption.AllDirectories).Select(Rel)
+        : [];
 string Resolve(string document, string value)
 {
     value = value.Replace("$(AORebirthRepositoryRoot)", root).Replace("$(MSBuildThisFileDirectory)", Path.GetDirectoryName(Path.Combine(root, document)) + Path.DirectorySeparatorChar);
     if (value.Contains("$(", StringComparison.Ordinal)) { unresolved.Add(document + ": " + value); return string.Empty; }
-    return Rel(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Path.Combine(root, document))!, value.Replace('\\', '/'))));
+    string resolved = Rel(Path.GetFullPath(Path.Combine(Path.GetDirectoryName(Path.Combine(root, document))!, value.Replace('\\', '/'))));
+    if (resolved == ".." || resolved.StartsWith("../", StringComparison.Ordinal) || Path.IsPathRooted(resolved))
+    {
+        unresolved.Add(document + ": project input escapes the checkout: " + value);
+        return string.Empty;
+    }
+    return resolved;
 }
 IEnumerable<string> Expand(string document, string value)
 {
@@ -114,12 +124,41 @@ void AddProject(string project)
     bool defaults = sdk && !xml.Descendants().Any(e => e.Name.LocalName == "EnableDefaultCompileItems" && e.Value.Trim() == "false"
         && !e.AncestorsAndSelf().Any(node => node.Attribute("Condition") != null));
     var projectSources = new HashSet<string>(StringComparer.Ordinal);
-    if (defaults) foreach (string file in FilesUnder(Normalize(Path.GetDirectoryName(project)!)).Where(IsSource)) projectSources.Add(file);
-    ReadItems(project, new(StringComparer.Ordinal), projectSources);
+    if (defaults)
+        foreach (string file in FilesUnder(Normalize(Path.GetDirectoryName(project)!), doaInventory ? "*" : "*.cs").Where(IsSource))
+            projectSources.Add(file);
+    var visited = new HashSet<string>(StringComparer.Ordinal);
+    if (doaInventory) ReadDirectoryBuild("Directory.Build.props");
+    ReadItems(project, visited, projectSources);
+    if (doaInventory) ReadDirectoryBuild("Directory.Build.targets");
     // The same physical file may remain compiled by another referenced project.
     sourceFiles.UnionWith(projectSources);
+
+    void ReadDirectoryBuild(string fileName)
+    {
+        for (string? directory = Path.GetDirectoryName(project); directory != null; directory = Path.GetDirectoryName(directory))
+        {
+            string path = Normalize(Path.Combine(directory, fileName));
+            if (!Exists(path)) continue;
+            ReadItems(path, visited, projectSources);
+            break;
+        }
+    }
 }
 AddProject("AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj");
+if (doaInventory)
+{
+    foreach (string project in new[]
+    {
+        "AORebirth/Server/WorldEngine/WorldEngine.csproj",
+        "WindowsBuildNet10/Projects/ChatEngine.WinNet10.csproj",
+        "WindowsBuildNet10/Projects/LoginEngine.WinNet10.csproj"
+    })
+    {
+        if (Exists(project)) AddProject(project);
+        else unresolved.Add("Missing runtime entry project: " + project);
+    }
+}
 
 var contentName = new Regex(@"Scarlett|Buckethead|Accepted(?:Arete|Garden|Social|Subway)|DojaChip|FlintKneecapping|CapturedSubwayTailor|SparrowChild|MongoNano", RegexOptions.CultureInvariant);
 var contentField = new Regex(@"(?:Npc|NPC|Nano|Quest|Vendor|Merchant|Template|Playfield|Mesh|Texture|Weapon|Reward|Item)(?:Id|Ids|Hash|Name|Template|Stock|Pool)|(?:Scarlett|Buckethead|Sarah|Stan|Arete)(?:Id|Instance|Position|Rotation|Name)|^(?:SpawnHash|MobHash|LowId|HighId|HeadMesh|CATMesh|MonsterData|NpcFamily)$", RegexOptions.CultureInvariant);
@@ -166,11 +205,10 @@ string Category(string text)
 foreach (string file in sourceFiles.Where(IsSource))
 {
     string source = Read(file);
-    var syntax = CSharpSyntaxTree.ParseText(source, new CSharpParseOptions(LanguageVersion.Preview,
-        preprocessorSymbols: ["DEBUG", "TRACE", "AOREBIRTH_WIN_NET10"]), path: file).GetRoot();
     var found = new List<Finding>();
     var recordedSpans = new HashSet<(int Start, int Length, string Rule)>();
     bool protocol = file.Contains("/AOtomation/") || file.Contains("/msgpack-cli/") || file.Contains("/Cell.Core/") || file.Contains("/Cell.Util/");
+    bool containsEnum = false;
     void Add(SyntaxNode node, string rule, string basis)
     {
         var member = node.AncestorsAndSelf().OfType<MemberDeclarationSyntax>().FirstOrDefault();
@@ -183,74 +221,103 @@ foreach (string file in sourceFiles.Where(IsSource))
         found.Add(new(file, line, symbol, Category(file + " " + symbol + " " + node), rule, basis,
             excerpt[..Math.Min(180, excerpt.Length)], doaInventory ? DoaRules.SourceFingerprint(node) : null));
     }
+    void Inspect(SyntaxNode syntax)
+    {
+        containsEnum |= syntax.DescendantNodes().OfType<EnumDeclarationSyntax>().Any();
+        if (doaInventory)
+            foreach (var issue in DoaRules.SourceIssues(file, syntax))
+                Add(issue.Node, issue.Rule, issue.Basis);
+        foreach (var member in syntax.DescendantNodes().OfType<MemberDeclarationSyntax>())
+        {
+            string name = member switch { TypeDeclarationSyntax t => t.Identifier.Text, MethodDeclarationSyntax m => m.Identifier.Text, _ => "" };
+            if (contentName.IsMatch(name)) Add(member, "CONTENT_SPECIFIC_RUNTIME_TYPE", "Named content behavior/bridge requires migration or semantic review.");
+        }
+        foreach (var literal in syntax.DescendantNodes().OfType<LiteralExpressionSyntax>())
+        {
+            if (literal.Ancestors().Any(n => n is EnumDeclarationSyntax or AttributeSyntax)) continue;
+            var variable = literal.Ancestors().OfType<VariableDeclaratorSyntax>().FirstOrDefault();
+            var property = literal.Ancestors().OfType<PropertyDeclarationSyntax>().FirstOrDefault();
+            var assignment = literal.Ancestors().OfType<AssignmentExpressionSyntax>().FirstOrDefault();
+            string target = assignment?.Left.ToString() ?? variable?.Identifier.Text ?? property?.Identifier.Text ?? "";
+            string leaf = target.Split('.').Last();
+            bool number = literal.IsKind(SyntaxKind.NumericLiteralExpression) && double.TryParse(literal.Token.Value?.ToString(), out double value) && value > 1;
+            bool text = literal.IsKind(SyntaxKind.StringLiteralExpression) && literal.Token.ValueText.Length > 0;
+            if (!number && !text) continue;
+            bool infrastructureName = leaf.EndsWith("FileName", StringComparison.Ordinal) || leaf.EndsWith("DirectoryName", StringComparison.Ordinal)
+                || IsDatabaseSqlLiteral(file, leaf, literal)
+                || (file.Contains("/AORebirth.Database/") && text && literal.Token.ValueText.StartsWith("system.", StringComparison.Ordinal));
+            // An argument to a decoder/reader call is an index, not the assigned content value.
+            bool directValue = !literal.Ancestors().TakeWhile(n => n != assignment && n != variable && n != property)
+                .Any(n => n is InvocationExpressionSyntax or ElementAccessExpressionSyntax);
+            if (contentField.IsMatch(leaf) && !infrastructureName && directValue)
+                Add(literal, "CONTENT_LITERAL_BINDING", "Content identity/assignment value is embedded in a runtime declaration or initializer.");
+            if (directValue && literal.Ancestors().OfType<ObjectCreationExpressionSyntax>().Any(creation =>
+                Regex.IsMatch(creation.Type.ToString(), @"(?:^|\.)(?:MobTemplate|WorldNpcDefinition|WorldShopDefinition|WorldVendorStock|QuestDefinition|MissionDefinition|DialogueNode|DialogueOption|NpcFamilyStatTemplate)$", RegexOptions.CultureInvariant)))
+                Add(literal, "COMPILED_CONTENT_RECORD", "A concrete content-model record is initialized with fixed runtime values.");
+            if (text && contentName.IsMatch(literal.Token.ValueText) && assignment != null
+                && Regex.IsMatch(leaf, "Name|Title|Text|Description|Route", RegexOptions.CultureInvariant))
+                Add(literal, "NAMED_CONTENT_TEXT", "Specific game content text assigned in runtime C#.");
+            if (number && literal.Ancestors().OfType<BinaryExpressionSyntax>().FirstOrDefault() is { } binary
+                && binary.Kind() is SyntaxKind.EqualsExpression or SyntaxKind.NotEqualsExpression
+                && (contentField.IsMatch(binary.Left.ToString().Split('.').Last()) || contentField.IsMatch(binary.Right.ToString().Split('.').Last())))
+                Add(literal, "CONTENT_ID_BRANCH", "Runtime branch selects a specific content identity.");
+            if (number && literal.Ancestors().OfType<SwitchStatementSyntax>().FirstOrDefault() is { } statement
+                && literal.Ancestors().OfType<CaseSwitchLabelSyntax>().Any()
+                && contentField.IsMatch(statement.Expression.ToString().Split('.').Last()))
+                Add(literal, "CONTENT_ID_SWITCH", "Runtime switch selects a specific content identity.");
+            if (number && literal.Ancestors().OfType<InvocationExpressionSyntax>().FirstOrDefault() is { } call
+                && call.Expression.ToString().EndsWith(".Stats.Set", StringComparison.Ordinal)
+                && IsDirectStatsSetLiteral(literal, call)
+                && (literal.Ancestors().OfType<TypeDeclarationSyntax>().Any(t => Regex.IsMatch(t.Identifier.Text, "Npc|NPC|Mob|Spawn|Vendor|Merchant", RegexOptions.CultureInvariant))
+                    || literal.Ancestors().OfType<MethodDeclarationSyntax>().Any(m => m.ParameterList.Parameters.Any(p => p.Type?.ToString().Contains("Npc", StringComparison.Ordinal) == true))))
+                Add(literal, "COMPILED_NPC_STAT", "Runtime constructor assigns a fixed entity stat.");
+            if (text && literal.Token.ValueText.Length > 256 && Regex.IsMatch(literal.Token.ValueText, "^[A-Za-z0-9+/=]+$")
+                ) Add(literal, "COMPILED_CONTENT_PAYLOAD", "Opaque content payload embedded in runtime source.");
+        }
+    }
     if (doaInventory)
-        foreach (var issue in DoaRules.SourceIssues(file, syntax))
-            Add(issue.Node, issue.Rule, issue.Basis);
-    foreach (var member in syntax.DescendantNodes().OfType<MemberDeclarationSyntax>())
     {
-        string name = member switch { TypeDeclarationSyntax t => t.Identifier.Text, MethodDeclarationSyntax m => m.Identifier.Text, _ => "" };
-        if (contentName.IsMatch(name)) Add(member, "CONTENT_SPECIFIC_RUNTIME_TYPE", "Named content behavior/bridge requires migration or semantic review.");
+        foreach (SyntaxNode syntax in DoaRules.SourceVariants(file, source, message => unresolved.Add(message)))
+            Inspect(syntax);
     }
-    foreach (var literal in syntax.DescendantNodes().OfType<LiteralExpressionSyntax>())
-    {
-        if (literal.Ancestors().Any(n => n is EnumDeclarationSyntax or AttributeSyntax)) continue;
-        var variable = literal.Ancestors().OfType<VariableDeclaratorSyntax>().FirstOrDefault();
-        var property = literal.Ancestors().OfType<PropertyDeclarationSyntax>().FirstOrDefault();
-        var assignment = literal.Ancestors().OfType<AssignmentExpressionSyntax>().FirstOrDefault();
-        string target = assignment?.Left.ToString() ?? variable?.Identifier.Text ?? property?.Identifier.Text ?? "";
-        string leaf = target.Split('.').Last();
-        bool number = literal.IsKind(SyntaxKind.NumericLiteralExpression) && double.TryParse(literal.Token.Value?.ToString(), out double value) && value > 1;
-        bool text = literal.IsKind(SyntaxKind.StringLiteralExpression) && literal.Token.ValueText.Length > 0;
-        if (!number && !text) continue;
-        bool infrastructureName = leaf.EndsWith("FileName", StringComparison.Ordinal) || leaf.EndsWith("DirectoryName", StringComparison.Ordinal)
-            || IsDatabaseSqlLiteral(file, leaf, literal)
-            || (file.Contains("/AORebirth.Database/") && text && literal.Token.ValueText.StartsWith("system.", StringComparison.Ordinal));
-        // An argument to a decoder/reader call is an index, not the assigned content value.
-        bool directValue = !literal.Ancestors().TakeWhile(n => n != assignment && n != variable && n != property)
-            .Any(n => n is InvocationExpressionSyntax or ElementAccessExpressionSyntax);
-        if (contentField.IsMatch(leaf) && !infrastructureName && directValue)
-            Add(literal, "CONTENT_LITERAL_BINDING", "Content identity/assignment value is embedded in a runtime declaration or initializer.");
-        if (directValue && literal.Ancestors().OfType<ObjectCreationExpressionSyntax>().Any(creation =>
-            Regex.IsMatch(creation.Type.ToString(), @"(?:^|\.)(?:MobTemplate|WorldNpcDefinition|WorldShopDefinition|WorldVendorStock|QuestDefinition|MissionDefinition|DialogueNode|DialogueOption|NpcFamilyStatTemplate)$", RegexOptions.CultureInvariant)))
-            Add(literal, "COMPILED_CONTENT_RECORD", "A concrete content-model record is initialized with fixed runtime values.");
-        if (text && contentName.IsMatch(literal.Token.ValueText) && assignment != null
-            && Regex.IsMatch(leaf, "Name|Title|Text|Description|Route", RegexOptions.CultureInvariant))
-            Add(literal, "NAMED_CONTENT_TEXT", "Specific game content text assigned in runtime C#.");
-        if (number && literal.Ancestors().OfType<BinaryExpressionSyntax>().FirstOrDefault() is { } binary
-            && binary.Kind() is SyntaxKind.EqualsExpression or SyntaxKind.NotEqualsExpression
-            && (contentField.IsMatch(binary.Left.ToString().Split('.').Last()) || contentField.IsMatch(binary.Right.ToString().Split('.').Last())))
-            Add(literal, "CONTENT_ID_BRANCH", "Runtime branch selects a specific content identity.");
-        if (number && literal.Ancestors().OfType<SwitchStatementSyntax>().FirstOrDefault() is { } statement
-            && literal.Ancestors().OfType<CaseSwitchLabelSyntax>().Any()
-            && contentField.IsMatch(statement.Expression.ToString().Split('.').Last()))
-            Add(literal, "CONTENT_ID_SWITCH", "Runtime switch selects a specific content identity.");
-        if (number && literal.Ancestors().OfType<InvocationExpressionSyntax>().FirstOrDefault() is { } call
-            && call.Expression.ToString().EndsWith(".Stats.Set", StringComparison.Ordinal)
-            && IsDirectStatsSetLiteral(literal, call)
-            && (literal.Ancestors().OfType<TypeDeclarationSyntax>().Any(t => Regex.IsMatch(t.Identifier.Text, "Npc|NPC|Mob|Spawn|Vendor|Merchant", RegexOptions.CultureInvariant))
-                || literal.Ancestors().OfType<MethodDeclarationSyntax>().Any(m => m.ParameterList.Parameters.Any(p => p.Type?.ToString().Contains("Npc", StringComparison.Ordinal) == true))))
-            Add(literal, "COMPILED_NPC_STAT", "Runtime constructor assigns a fixed entity stat.");
-        if (text && literal.Token.ValueText.Length > 256 && Regex.IsMatch(literal.Token.ValueText, "^[A-Za-z0-9+/=]+$")
-            ) Add(literal, "COMPILED_CONTENT_PAYLOAD", "Opaque content payload embedded in runtime source.");
-    }
+    else
+        Inspect(CSharpSyntaxTree.ParseText(source, new CSharpParseOptions(LanguageVersion.Preview,
+            preprocessorSymbols: ["DEBUG", "TRACE", "AOREBIRTH_WIN_NET10"]), path: file).GetRoot());
     findings.AddRange(found);
     files.Add(new { path = file, sha256 = Convert.ToHexStringLower(SHA256.HashData(Encoding.UTF8.GetBytes(source))),
         classification = found.Count > 0 ? found.Select(f => f.Classification).Distinct().Order().ToArray()
-            : new[] { protocol || syntax.DescendantNodes().OfType<EnumDeclarationSyntax>().Any() ? "GENERIC_PROTOCOL_CONSTANT" : "GENERIC_RUNTIME_LOGIC" },
+            : new[] { protocol || containsEnum ? "GENERIC_PROTOCOL_CONSTANT" : "GENERIC_RUNTIME_LOGIC" },
         candidateCount = found.Count, reviewBasis = "Roslyn syntax and declaration-context scan; domain semantic audit is recorded in the bridge inventory." });
 }
+int nativeFilesAudited = 0;
 if (doaInventory)
 {
     findings.AddRange(dependencyFindings.Distinct());
     findings.AddRange(DoaRules.CatalogIssues(
         relative => Exists("AORebirth/GameData/" + relative) ? Read("AORebirth/GameData/" + relative) : null));
+    string publicPolicy = "AORebirth/GameData/" + DoaAdditionalInputs.MonsterPolicy;
+    findings.AddRange(DoaAdditionalInputs.MonsterPolicyIssues(publicPolicy, Exists(publicPolicy) ? Read(publicPolicy) : null));
+    string publicLftPolicy = "AORebirth/GameData/" + DoaAdditionalInputs.LftPolicy;
+    findings.AddRange(DoaAdditionalInputs.LftPolicyIssues(publicLftPolicy, Exists(publicLftPolicy) ? Read(publicLftPolicy) : null));
+    if (Exists(DoaAdditionalInputs.PackagedInteractions))
+        findings.AddRange(DoaAdditionalInputs.PackagedInteractionIssues(Read(DoaAdditionalInputs.PackagedInteractions)));
+    foreach (string file in FilesUnder(DoaAdditionalInputs.NativeSourceRoot, "*").Where(DoaAdditionalInputs.IsNativeSource))
+    {
+        findings.AddRange(DoaAdditionalInputs.NativeIssues(file, Read(file)));
+        nativeFilesAudited++;
+    }
+    if (nativeFilesAudited == 0)
+        unresolved.Add("Missing native client source inputs: " + DoaAdditionalInputs.NativeSourceRoot);
 }
 findings = findings.OrderBy(f => f.Path, StringComparer.Ordinal).ThenBy(f => f.Line).ThenBy(f => f.Rule, StringComparer.Ordinal).ToList();
-var report = new { schemaVersion = 2, scope = "Conservative static NewEngine project-reference source graph including SDK default files, explicit imported Compile items, linked shared and library sources; tests/tools are not runtime.",
-    sourceRevision = revision, runtimeCSharpFilesAudited = files.Count, totalRuntimeContentViolations = findings.Count,
+var report = new { schemaVersion = 2, scope = doaInventory
+        ? "Conservative static Zone, World, Chat and Login project graph, client proxy sources and selected public runtime catalogs."
+        : "Conservative static NewEngine project-reference source graph including SDK default files, explicit imported Compile items and linked shared sources.",
+    sourceRevision = revision, runtimeCSharpFilesAudited = files.Count, nativeFilesAudited, totalRuntimeContentViolations = findings.Count,
     sourceGraphMethod = "Static project XML expansion, not an evaluated MSBuild compilation manifest. Conditional includes are included conservatively; conditional removals do not hide sources. SDK-generated sources and package binaries are outside this source audit.",
-    sourceGraphLimitations = new[] { "Implicit SDK/Directory.Build imports, target-generated Compile items and arbitrary MSBuild property functions are not evaluated.",
-        "C# scan uses DEBUG, TRACE and AOREBIRTH_WIN_NET10; inactive branches under other symbol sets require a separate profile audit." },
+    sourceGraphLimitations = new[] { "Implicit SDK imports, target-generated Compile items and arbitrary MSBuild property functions are not evaluated.",
+        doaInventory ? "The strict scan inspects all satisfiable per-file conditional-symbol combinations up to its fail-closed bound."
+            : "Legacy inventory uses DEBUG, TRACE and AOREBIRTH_WIN_NET10." },
     sourceGraphNotes = graphNotes.ToArray(),
     classificationMethod = "Contextual syntax candidates plus separately recorded domain semantic review. No filename-wide grandfathered violation allowlist.",
     unresolvedProjectInputs = unresolved.ToArray(), projects = projects.ToArray(), files, findings };

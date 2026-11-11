@@ -8,22 +8,36 @@ internal static class DoaEnforcement
 
     internal static int Run(string root, string[] args)
     {
+        bool structureOnly = args[0] == "--enforce-structure";
         if (args.Length < 3 || !Regex.IsMatch(args[2], "^[0-9a-fA-F]{40}$"))
         {
-            Console.Error.WriteLine("Usage: --enforce <checkout> <exact-base-sha> [--catalog-root <GameData>] [--output <report>]");
+            Console.Error.WriteLine("Usage: --enforce <checkout> <exact-base-sha> --catalog-root <GameData> [--output <report>]");
+            Console.Error.WriteLine("       --enforce-structure <checkout> <exact-base-sha> [--output <report>]");
             return 64;
         }
 
         string? catalogRoot = null, output = null;
         for (int index = 3; index < args.Length; index += 2)
         {
-            if (index + 1 >= args.Length) return 64;
+            if (index + 1 >= args.Length || string.IsNullOrWhiteSpace(args[index + 1])
+                || args[index + 1].StartsWith("--", StringComparison.Ordinal))
+            {
+                Console.Error.WriteLine("DOA_INVALID_VALIDATION_OPTION=" + args[index]);
+                return 64;
+            }
             switch (args[index])
             {
-                case "--catalog-root" when catalogRoot == null: catalogRoot = Path.GetFullPath(args[index + 1]); break;
+                case "--catalog-root" when !structureOnly && catalogRoot == null: catalogRoot = Path.GetFullPath(args[index + 1]); break;
                 case "--output" when output == null: output = Path.GetFullPath(args[index + 1]); break;
-                default: return 64;
+                default:
+                    Console.Error.WriteLine("DOA_INVALID_VALIDATION_OPTION=" + args[index]);
+                    return 64;
             }
+        }
+        if (!structureOnly && catalogRoot == null)
+        {
+            Console.Error.WriteLine("DOA_MISSING_REQUIRED_INPUT=--catalog-root <GameData>");
+            return 1;
         }
 
         string baselinePath = Path.GetTempFileName();
@@ -44,15 +58,20 @@ internal static class DoaEnforcement
             string[] baselineUnresolved = ReadUnresolved(before.RootElement);
             string[] unresolved = ReadUnresolved(after.RootElement);
             string[] introducedProjectInputs = unresolved.Except(baselineUnresolved, StringComparer.Ordinal).ToArray();
-            Finding[] authoritative = catalogRoot == null ? [] : DoaRules.AuthoritativeReferenceIssues(catalogRoot).ToArray();
-            bool passed = introduced.Length == 0 && introducedProjectInputs.Length == 0 && authoritative.Length == 0;
+            Finding[] authoritative = catalogRoot == null ? [] : ReadAuthorityFindings(root, catalogRoot).ToArray();
+            // The baseline classifies findings for the report. Acceptance uses the proposed inventory directly.
+            string status = AcceptanceStatus(structureOnly, catalogRoot != null, proposedFindings.Length,
+                unresolved.Length, authoritative.Length);
             var report = new
             {
-                status = passed ? "PASS_PROPOSED_CHANGES" : "FAIL_ARCHITECTURE",
+                status,
+                validationScope = structureOnly ? "PUBLIC_STRUCTURE" : "STRUCTURE_AND_AUTHORITATIVE_REFERENCES",
                 baselineRevision = baseline,
                 sourceGraph = after.RootElement.GetProperty("sourceGraphMethod").GetString(),
                 runtimeCSharpFilesAudited = after.RootElement.GetProperty("runtimeCSharpFilesAudited").GetInt32(),
-                authoritativeGameDataChecked = catalogRoot != null,
+                nativeFilesAudited = after.RootElement.GetProperty("nativeFilesAudited").GetInt32(),
+                sourceGraphLimitations = after.RootElement.GetProperty("sourceGraphLimitations").Clone(),
+                authoritativeReferencesEvaluated = catalogRoot != null,
                 inheritedOpenFindings = inherited,
                 introducedFindings = introduced,
                 unresolvedProjectInputs = unresolved,
@@ -67,15 +86,15 @@ internal static class DoaEnforcement
             Console.WriteLine($"DOA_BASELINE={baseline}");
             Console.WriteLine($"DOA_INHERITED_OPEN_FINDINGS={inherited.Length}");
             Console.WriteLine($"DOA_INTRODUCED_FINDINGS={introduced.Length}");
-            Console.WriteLine($"DOA_AUTHORITATIVE_GAMEDATA={(catalogRoot == null ? "NOT_SUPPLIED" : "CHECKED")}");
-            foreach (Finding finding in inherited)
-                Console.WriteLine($"OPEN {finding.Path}:{finding.Line} {finding.Rule} {finding.Symbol}: {finding.Basis}");
-            foreach (Finding finding in introduced.Concat(authoritative))
+            Console.WriteLine($"DOA_TOTAL_CURRENT_FINDINGS={proposedFindings.Length}");
+            Console.WriteLine($"DOA_UNRESOLVED_PROJECT_INPUTS={unresolved.Length}");
+            Console.WriteLine($"DOA_AUTHORITATIVE_REFERENCES={(structureOnly ? "NOT_EVALUATED" : authoritative.Length == 0 ? "PASS" : "FAIL")}");
+            foreach (Finding finding in inherited.Concat(introduced).Concat(authoritative))
                 Console.Error.WriteLine($"BLOCK {finding.Path}:{finding.Line} {finding.Rule} {finding.Symbol}: {finding.Basis}");
-            foreach (string finding in introducedProjectInputs)
+            foreach (string finding in unresolved)
                 Console.Error.WriteLine("BLOCK unresolved project input: " + finding);
-            Console.WriteLine("DOA_ENFORCEMENT=" + (passed ? "PASS_PROPOSED_CHANGES" : "FAIL"));
-            return passed ? 0 : 1;
+            Console.WriteLine("DOA_ENFORCEMENT=" + status);
+            return status == "FAIL_ARCHITECTURE" ? 1 : 0;
         }
         catch (Exception exception) when (exception is IOException or InvalidOperationException or JsonException or TimeoutException)
         {
@@ -87,6 +106,42 @@ internal static class DoaEnforcement
             File.Delete(baselinePath);
             File.Delete(proposedPath);
         }
+    }
+
+    private static IEnumerable<Finding> ReadAuthorityFindings(string checkout, string root)
+    {
+        foreach (Finding finding in DoaRules.AuthoritativeReferenceIssues(root))
+            yield return finding;
+
+        string policyPath = Path.Combine(root, DoaAdditionalInputs.MonsterPolicy);
+        foreach (Finding finding in DoaAdditionalInputs.MonsterPolicyIssues(DoaAdditionalInputs.MonsterPolicy,
+                     File.Exists(policyPath) ? File.ReadAllText(policyPath) : null))
+            yield return finding;
+
+        string lftPolicyPath = Path.Combine(root, DoaAdditionalInputs.LftPolicy);
+        string? selected = File.Exists(lftPolicyPath) ? File.ReadAllText(lftPolicyPath) : null;
+        foreach (Finding finding in DoaAdditionalInputs.LftPolicyIssues(DoaAdditionalInputs.LftPolicy, selected,
+                     id => DoaAdditionalInputs.LftMetadataMatches(root, id)))
+            yield return finding;
+
+        string proposedRelative = "AORebirth/GameData/" + DoaAdditionalInputs.LftPolicy;
+        string proposedPath = Path.Combine(checkout, proposedRelative);
+        if (!File.Exists(proposedPath)) yield break;
+        string proposed = File.ReadAllText(proposedPath);
+        if (string.Equals(proposed, selected, StringComparison.Ordinal)) yield break;
+        foreach (Finding finding in DoaAdditionalInputs.LftPolicyIssues(proposedRelative, proposed,
+                     id => DoaAdditionalInputs.LftMetadataMatches(root, id)))
+            yield return finding;
+    }
+
+    internal static string AcceptanceStatus(bool structureOnly, bool catalogSupplied, int currentFindings,
+        int unresolvedInputs, int authoritativeFindings)
+    {
+        if ((!structureOnly && !catalogSupplied) || currentFindings != 0
+            || unresolvedInputs != 0 || authoritativeFindings != 0)
+            return "FAIL_ARCHITECTURE";
+
+        return structureOnly ? "PASS_STRUCTURE_ONLY" : "PASS_ARCHITECTURE_AND_REFERENCES";
     }
 
     internal static (Finding[] Inherited, Finding[] Introduced) Compare(IEnumerable<Finding> baseline, IEnumerable<Finding> proposed)
