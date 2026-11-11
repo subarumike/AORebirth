@@ -172,6 +172,7 @@ namespace ZoneEngine_New.Core.Ai
 
             GameplayNpcNanos rules = Rules;
             bool hasHeal = false;
+            bool waitingForNano = false;
             foreach (int nanoId in Npc.UploadedNanoIds)
             {
                 NanoSpell? spell = Resolve(nanoId);
@@ -179,15 +180,24 @@ namespace ZoneEngine_New.Core.Ai
                     continue;
 
                 hasHeal = true;
-                if (!InRange(spell, target, rules.SupportRange) || !NanoRuntime.CanStartCast(Npc, spell, target, nowUtc))
+                if (!InRange(spell, target, rules.SupportRange))
                     continue;
-                if (NanoRuntime.TryStartCast(Npc, spell.Id, target.Identity, nowUtc) != NanoCastRefusal.None)
+
+                NanoCastRefusal refusal = NanoRuntime.PreviewStartCast(Npc, spell, target, nowUtc);
+                if (refusal == NanoCastRefusal.None)
+                    refusal = NanoRuntime.TryStartCast(Npc, spell.Id, target.Identity, nowUtc);
+                if (refusal == NanoCastRefusal.NotEnoughNano)
+                    waitingForNano = true;
+                if (refusal != NanoCastRefusal.None)
                     continue;
 
                 _nextAttemptUtc = nowUtc.AddSeconds(Between(rules.MinCastIntervalSeconds, rules.MaxCastIntervalSeconds));
                 return HealOrderResult.Cast;
             }
 
+            // A summoned pet replenishes nano. Keep its accepted target while it can still recover in range.
+            if (waitingForNano)
+                return HealOrderResult.Busy;
             return hasHeal ? HealOrderResult.OutOfRange : HealOrderResult.NoHeal;
         }
 
