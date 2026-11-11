@@ -25,6 +25,50 @@ public sealed class ChatNetworkTests
     const uint RecipientId = 91002;
 
     [TestMethod]
+    public void LftLocationsReadTheAuthoredClassificationAndUnlistedRegion()
+    {
+        string path = Path.GetTempFileName();
+        try
+        {
+            File.WriteAllText(path, """{ "Version": 1, "UnlistedRegion": "RubiKa", "ShadowlandsPlayfieldIds": [42] }""");
+            object catalog = LoadLftLocations(path);
+            MethodInfo classify = catalog.GetType().GetMethod("IsShadowlands", BindingFlags.Instance | BindingFlags.NonPublic)!;
+
+            Assert.AreEqual(true, classify.Invoke(catalog, new object[] { 42 }));
+            Assert.AreEqual(false, classify.Invoke(catalog, new object[] { 43 }));
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [DataTestMethod]
+    [DataRow("""{ "Version": 1, "ShadowlandsPlayfieldIds": [42] }""")]
+    [DataRow("""{ "Version": 1, "UnlistedRegion": "RubiKa", "ShadowlandsPlayfieldIds": [42, 42] }""")]
+    [DataRow("""{ "Version": 1, "Version": 1, "UnlistedRegion": "RubiKa", "ShadowlandsPlayfieldIds": [42] }""")]
+    public void LftLocationsRejectIncompleteOrAmbiguousCatalogs(string json)
+    {
+        string path = Path.GetTempFileName();
+        try
+        {
+            File.WriteAllText(path, json);
+            var error = Assert.ThrowsException<TargetInvocationException>(() => LoadLftLocations(path));
+            Assert.IsInstanceOfType<InvalidDataException>(error.InnerException);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    static object LoadLftLocations(string path)
+    {
+        Type type = typeof(ChatServer).Assembly.GetType("ChatEngine.PacketHandlers.LftLocationCatalog", throwOnError: true)!;
+        return type.GetMethod("Load", BindingFlags.Static | BindingFlags.NonPublic)!.Invoke(null, new object[] { path })!;
+    }
+
+    [TestMethod]
     public void CompleteHtmlTellUsesTheActualParserAndOutboundPacket()
     {
         using var world = new ChatWorld();

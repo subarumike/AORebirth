@@ -50,6 +50,7 @@ namespace AORebirth.Core.GameData
         public const string TeamsFolderName = "Teams";
 
         public const string LevelEligibilityFileName = "LevelEligibility.json";
+        public const string LftLocationsFileName = "LftLocations.json";
 
         public const string MonsterDataFileName = "MonsterData.json";
 

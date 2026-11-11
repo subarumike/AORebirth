@@ -50,6 +50,8 @@ namespace ChatEngine.CoreServer
     using ChatEngine.Lists;
     using ChatEngine.Packets;
 
+    using LftLocationCatalog = ChatEngine.PacketHandlers.LftLocationCatalog;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using Utility;
@@ -95,6 +97,8 @@ namespace ChatEngine.CoreServer
         /// </summary>
         internal ChatEngineBotRouter BotRouter;
 
+        internal LftLocationCatalog LftLocations { get; }
+
         /// <summary>The GameData ChatChannels.json channels, fixed for the process; also in <see cref="Channels"/>.</summary>
         private readonly ConfiguredChannel[] staticChannels;
 
@@ -106,6 +110,7 @@ namespace ChatEngine.CoreServer
         /// </summary>
         public ChatServer()
         {
+            this.LftLocations = LftLocationCatalog.LoadRuntime();
             // Static channels (Global, Shopping, sided, GM) and their join conditions come from GameData.
             IReadOnlyList<ChannelDefinition> definitions = ChannelCatalog.LoadRuntime().Channels;
             this.staticChannels = new ConfiguredChannel[definitions.Count];

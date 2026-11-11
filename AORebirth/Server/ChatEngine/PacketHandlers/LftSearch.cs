@@ -16,9 +16,12 @@ namespace ChatEngine.PacketHandlers
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
     using System.Text;
+    using System.Text.Json;
     using System.Threading;
 
+    using AORebirth.Core.GameData;
     using AORebirth.Database.Dao;
     using AORebirth.Database.Entities;
     using AORebirth.Enums;
@@ -73,136 +76,6 @@ namespace ChatEngine.PacketHandlers
 
         private const uint LocationShadowlands =
             3;
-
-        /*
-         * ============================================================
-         * SHADOWLANDS PLAYFIELD IDs
-         * ============================================================
-         *
-         * PF ID in this list = Shadowlands.
-         * PF ID not in this list = Rubi-Ka.
-         */
-        private static readonly HashSet<uint> ShadowlandsPlayfieldIds =
-            new HashSet<uint>
-            {
-                4211,
-                4212,
-                4213,
-                4214,
-                4215,
-                4001,
-
-                4220,
-                4221,
-                4222,
-                4223,
-                4224,
-
-                4310,
-                4311,
-                4312,
-                4313,
-                4314,
-                4315,
-                4316,
-                4318,
-
-                4320,
-                4321,
-                4322,
-                4324,
-                4327,
-                4328,
-                4329,
-                4330,
-                4331,
-                4336,
-                4337,
-
-                4364,
-                4365,
-                4366,
-                4367,
-                4368,
-                4374,
-
-                4524,
-                4525,
-                4526,
-                4530,
-                4531,
-                4532,
-                4533,
-                4534,
-                4540,
-                4541,
-                4542,
-                4543,
-                4544,
-
-                4605,
-
-                4621,
-                4622,
-                4623,
-                4624,
-                4625,
-                4626,
-                4627,
-                4628,
-                4629,
-                4630,
-
-                4676,
-                4677,
-                4678,
-                4679,
-                4680,
-                4681,
-                4682,
-                4683,
-                4684,
-                4685,
-                4686,
-                4687,
-                4688,
-                4689,
-                4690,
-                4691,
-                4692,
-                4693,
-                4694,
-                4695,
-                4696,
-                4697,
-                4698,
-                4699,
-
-                4872,
-                4873,
-                4877,
-                4880,
-                4881,
-
-                6011,
-                6012,
-                6013,
-                6015,
-                6020,
-                6021,
-                6022,
-                6024,
-                6041,
-
-                4335,
-                4389,
-                4390,
-                4391,
-                4468,
-                6007,
-                6035,
-                6036
-            };
 
         public static void Read(
             Client client,
@@ -367,11 +240,7 @@ namespace ChatEngine.PacketHandlers
                  * Otherwise:
                  *     RK
                  */
-                bool candidateIsShadowlands =
-                    ShadowlandsPlayfieldIds.Contains(
-                        (uint)Math.Max(
-                            0,
-                            candidatePlayfield));
+                bool candidateIsShadowlands = client.ChatServer().LftLocations.IsShadowlands(candidatePlayfield);
 
                 string candidateLocation =
                     candidateIsShadowlands
@@ -523,7 +392,7 @@ namespace ChatEngine.PacketHandlers
                         filter2,
                         searcherPlayfield,
                         candidatePlayfield,
-                        candidateId))
+                        candidateIsShadowlands))
                 {
                     skippedLocation++;
 
@@ -691,7 +560,7 @@ namespace ChatEngine.PacketHandlers
             uint filter,
             int searcherPlayfield,
             int candidatePlayfield,
-            uint candidateId)
+            bool candidateIsShadowlands)
         {
             /*
              * ========================================================
@@ -735,12 +604,6 @@ namespace ChatEngine.PacketHandlers
              *
              * The candidate CharacterId is NOT used here.
              */
-            bool candidateIsShadowlands =
-                ShadowlandsPlayfieldIds.Contains(
-                    (uint)Math.Max(
-                        0,
-                        candidatePlayfield));
-
             /*
              * ========================================================
              * RUBI-KA
@@ -822,8 +685,7 @@ namespace ChatEngine.PacketHandlers
         ///     - Displaying candidate PF
         ///
         /// It is also used to determine RK/SL by
-        /// checking the resulting PF ID against
-        /// ShadowlandsPlayfieldIds.
+        /// checking the resulting PF ID against the location catalog.
         /// </summary>
         private static int ResolvePlayfield(
             uint characterId)
@@ -876,6 +738,60 @@ namespace ChatEngine.PacketHandlers
             {
                 return 0;
             }
+        }
+    }
+
+    /// <summary>World-region classification used by the LFT location filter.</summary>
+    internal sealed class LftLocationCatalog
+    {
+        private readonly HashSet<int> shadowlands;
+        private readonly bool unlistedIsShadowlands;
+
+        private LftLocationCatalog(HashSet<int> shadowlands, bool unlistedIsShadowlands)
+        {
+            this.shadowlands = shadowlands;
+            this.unlistedIsShadowlands = unlistedIsShadowlands;
+        }
+
+        internal bool IsShadowlands(int playfield) => this.shadowlands.Contains(playfield) || this.unlistedIsShadowlands;
+
+        internal static LftLocationCatalog LoadRuntime()
+        {
+            string relative = Path.Combine(GameDataPaths.TeamsFolderName, GameDataPaths.LftLocationsFileName);
+            string path = GameDataPaths.ResolveFile(GameDataPaths.ResolveRuntimeRoot(), relative);
+            return Load(path);
+        }
+
+        internal static LftLocationCatalog Load(string path)
+        {
+            if (!File.Exists(path))
+                throw new FileNotFoundException("GameData LFT location catalog is required.", path);
+
+            using JsonDocument document = JsonDocument.Parse(File.ReadAllText(path));
+            JsonElement root = document.RootElement;
+            if (root.ValueKind != JsonValueKind.Object || !root.TryGetProperty("Version", out JsonElement version)
+                || version.ValueKind != JsonValueKind.Number || !version.TryGetInt32(out int versionNumber) || versionNumber != 1
+                || !root.TryGetProperty("UnlistedRegion", out JsonElement unlisted) || unlisted.ValueKind != JsonValueKind.String
+                || unlisted.GetString() is not ("RubiKa" or "Shadowlands")
+                || !root.TryGetProperty("ShadowlandsPlayfieldIds", out JsonElement rows) || rows.ValueKind != JsonValueKind.Array
+                || rows.GetArrayLength() == 0)
+                throw new InvalidDataException("Invalid LFT location catalog: " + path);
+
+            var properties = new HashSet<string>(StringComparer.Ordinal);
+            foreach (JsonProperty property in root.EnumerateObject())
+            {
+                if (property.Name is not ("Version" or "UnlistedRegion" or "ShadowlandsPlayfieldIds") || !properties.Add(property.Name))
+                    throw new InvalidDataException("Unknown or duplicate LFT location field in " + path);
+            }
+
+            var shadowlands = new HashSet<int>();
+            foreach (JsonElement row in rows.EnumerateArray())
+            {
+                if (row.ValueKind != JsonValueKind.Number || !row.TryGetInt32(out int id) || id <= 0 || !shadowlands.Add(id))
+                    throw new InvalidDataException("Invalid or duplicate LFT playfield id in " + path);
+            }
+
+            return new LftLocationCatalog(shadowlands, unlisted.GetString() == "Shadowlands");
         }
     }
 }

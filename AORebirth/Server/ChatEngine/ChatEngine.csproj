@@ -220,6 +220,10 @@
       <Link>GameData\Teams\LevelEligibility.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="..\..\GameData\Teams\LftLocations.json">
+      <Link>GameData\Teams\LftLocations.json</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="..\..\GameData\ChatChannels.json">
       <Link>GameData\ChatChannels.json</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

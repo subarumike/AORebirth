@@ -137,7 +137,7 @@ def runtime_content_path(value):
     if (any(part.casefold() in NON_RUNTIME_DIRECTORIES for part in parts[:-1])
             or parts[-1].casefold().endswith((".tmp", ".bak", ".log", ".md"))):
         return False
-    if value in RUNTIME_ROOT_CATALOGS or value in PRIVATE_CHEST_CATALOGS or value == "Teams/LevelEligibility.json":
+    if value in RUNTIME_ROOT_CATALOGS or value in PRIVATE_CHEST_CATALOGS or value in {"Teams/LevelEligibility.json", "Teams/LftLocations.json"}:
         return True
     if parts[0] == "Missions":
         return "/".join(parts[1:]) in RUNTIME_MISSION_FILES
