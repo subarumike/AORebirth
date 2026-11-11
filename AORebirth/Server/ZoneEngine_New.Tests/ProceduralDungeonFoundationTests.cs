@@ -36,6 +36,34 @@ public sealed class ProceduralDungeonFoundationTests
     }
 
     [TestMethod]
+    public void StackedFloorsKeepTheirOwnDoorPairsAndEntranceExit()
+    {
+        const int westDoor = (2 * 5 * 4) + 3;
+        const int eastDoor = ((2 * 5 + 4) * 4) + 1;
+        DungeonStyleCatalog catalog = DungeonStyleCatalog.CreateForTest(
+            341,
+            new PlayfieldMetaData { Width = 5, Height = 5, TileSize = 2f },
+            [], [],
+            [
+                new StyleRoomTemplate(0, 0, 0, 5, 5, new Vector3(2f, 2f, 2f), doorPosRots: [westDoor, eastDoor]),
+                new StyleRoomTemplate(1, 0, 0, 5, 5, new Vector3(2f, 4f, 2f), doorPosRots: [westDoor])
+            ]);
+        DungeonRoomSpec[] rooms =
+        [
+            new() { RoomId = 0, Floor = 0 },
+            new() { RoomId = 0, Floor = 1 },
+            new() { RoomId = 1, Floor = 0, GridX = 1 },
+            new() { RoomId = 1, Floor = 1, GridX = 1 }
+        ];
+
+        DungeonWorldLayout layout = DungeonCollisionBuilder.BuildLayout(catalog, rooms,
+            widthBlocks: 2, heightBlocks: 1, floorHeight: 64, playfieldId: 0);
+
+        CollectionAssert.AreEqual(new[] { (-1, 0), (2, 0), (3, 1) },
+            layout.Doors.Select(door => (door.Room, door.LinkedRoom)).ToArray());
+    }
+
+    [TestMethod]
     public void PreviouslyAcceptedV2SeedsKeepExactGeneratorPayloadAndSpawnBits()
     {
         string path = Path.Combine(RepositoryRoot(), "AORebirth", "Server", "ZoneEngine_New.Tests", "Fixtures", "ProceduralDungeonV2Golden.json");
