@@ -53,6 +53,9 @@ namespace ZoneEngine_New.Core.Characters
                 player.Stats.Set((CharacterStat)stat.StatId, stat.StatValue, StatDetail.Base);
             }
 
+            // The fresh motor starts standing; a saved movement mode belongs to the previous body.
+            player.Stats.Set(CharacterStat.CurrentMovementMode, (int)player.Motor.State, StatDetail.Base);
+
             // The account owns AccountFlags: refreshed from login.AccountFlags on every zone-in. Left unset, requirement
             // checks read the Unset sentinel, whose bits fail "NOT (AccountFlags & n)" gates such as zone doors.
             player.Stats.Set(CharacterStat.AccountFlags, character.AccountFlags, StatDetail.Base);
