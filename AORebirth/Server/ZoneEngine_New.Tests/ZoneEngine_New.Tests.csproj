@@ -133,6 +133,15 @@
     <Compile Include="NpcBrainTests.cs" />
     <Compile Include="NpcPatrolTests.cs" />
   </ItemGroup>
+  <ItemGroup Condition="'$(AuthoredTradeFocusedTests)' == 'true'">
+    <Compile Remove="@(Compile)" />
+    <Compile Include="TestDoubles.cs" />
+    <Compile Include="AuthoredQuestTests.cs" />
+    <Compile Include="AuthoredMissionTestDao.cs" />
+    <Compile Include="InteractionContentFixture.cs" />
+    <Compile Include="TradeSessionTests.cs" />
+    <Compile Include="../../../Tests/Fixtures/Gameplay/Doja/*.cs" Link="Fixtures/Doja/%(Filename)%(Extension)" />
+  </ItemGroup>
   <ItemGroup Condition="'$(ExpansionHydrationFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />
     <Compile Include="TestDoubles.cs" />

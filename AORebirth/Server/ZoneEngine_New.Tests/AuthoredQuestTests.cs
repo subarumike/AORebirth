@@ -57,7 +57,9 @@ public sealed class AuthoredQuestTests
         Assert.IsTrue(w.Session.Messages[1] is ContainerAddItemMessage);
         Assert.IsTrue(w.Session.Messages[2] is TemplateActionMessage { Action: TemplateActionType.Use });
         Assert.IsTrue(w.Session.Messages[3] is CharacterActionMessage { Action: CharacterActionType.DeleteItem });
-        Assert.AreEqual(2, w.Session.Messages.OfType<byte[]>().Count());
+        Assert.AreEqual(1, w.Session.Messages.OfType<CharacterActionMessage>()
+            .Count(message => message.Action == CharacterActionType.MissionAccomplished));
+        Assert.AreEqual(2, w.Session.Messages.OfType<QuestMessage>().Count(message => message.Action == QuestAction.Delete));
         Assert.IsTrue(w.Session.Messages.OfType<QuestFullUpdateMessage>().Single().Quests.Single().QuestId.Instance == unchecked((int)0x555BE9C5));
         Assert.IsFalse(w.Service.TryUseItem(w.Player, Slot, sealedItem));
     }
@@ -99,8 +101,7 @@ public sealed class AuthoredQuestTests
             Assert.AreSame(item, w.Player.Inventory.Inventory.Content[64]);
             Assert.AreEqual(0, w.Session.Messages.Count);
         };
-        var handler = new GenericCmdMessageHandler(new StubInventoryRepository(), new StubItemBuilder(),
-            (GeneratedMissionAcgService)RuntimeHelpers.GetUninitializedObject(typeof(GeneratedMissionAcgService)), w.Service);
+        var handler = new GenericCmdMessageHandler(new StubInventoryRepository(), new StubItemBuilder(), w.Service);
         handler.Handle(new GenericCmdMessage
         {
             Identity = w.Player.Identity, Action = GenericCmdAction.Use, User = w.Player.Identity, Target = [Slot]
@@ -116,7 +117,7 @@ public sealed class AuthoredQuestTests
         }
         else if (outcome == "overflow")
         {
-            Assert.IsFalse(w.Player.Inventory.Inventory.Content.Values.Contains(item));
+            Assert.IsFalse(w.Player.Inventory.Inventory.Content.Values.Contains(item), w.Logger.LastError);
             Assert.AreEqual(95577, w.Player.Inventory.Overflow.Content.Values.Single().LowId);
             Assert.AreEqual(DaoState.Completed, w.Dao.GetMission(new(111, AuthoredQuestFixture.BuyLockpick)).State);
             Assert.AreEqual(1, w.Session.Messages.OfType<GenericCmdMessage>().Single().Temp1);
@@ -180,7 +181,7 @@ public sealed class AuthoredQuestTests
     public void FullInventoryRewardIsSavedInOverflow()
     {
         using var w = new World(); w.Activate(AuthoredQuestFixture.BuyLockpick); var item = w.Add(295999); TestWorld.FillInventory(w.Player);
-        Assert.IsTrue(w.Service.TryUseItem(w.Player, Slot, item));
+        Assert.IsTrue(w.Service.TryUseItem(w.Player, Slot, item), w.Logger.LastError);
         Assert.AreEqual(DaoState.Completed, w.Dao.GetMission(new(111, AuthoredQuestFixture.BuyLockpick)).State);
         Item reward = w.Player.Inventory.Overflow.Content.Values.Single();
         Assert.AreEqual(95577, reward.LowId);
@@ -203,7 +204,10 @@ public sealed class AuthoredQuestTests
         using var w = new World(); var item = w.Add(284954); w.Player.Stats.Set(CharacterStat.Level, 10);
         Assert.IsTrue(w.Service.TryUseItem(w.Player, Slot, item)); Assert.AreSame(item, w.Player.Inventory.Inventory.Content[64]);
         Assert.AreEqual(104, w.Dao.Items[10].ContainerType); Assert.AreEqual(DaoState.Active, w.Dao.GetMission(new(111, DojaChipInteractionRules.QuestTurnIn)).State);
-        Assert.IsTrue(w.Session.Messages[0] is TemplateActionMessage { Action: TemplateActionType.Use }); Assert.IsTrue(w.Session.Messages[1] is byte[]);
+        Assert.IsTrue(w.Session.Messages[0] is TemplateActionMessage { Action: TemplateActionType.Use });
+        var expected = DojaChipPacketSender.CreateJournalPacketAtClientTime(111, DojaChipInteractionRules.QuestTurnIn,
+            60, GameClock.UnixSeconds(w.Now));
+        CollectionAssert.AreEqual(expected[16..], JournalBody((QuestFullUpdateMessage)w.Session.Messages[1]));
         int sent = w.Session.Messages.Count; Assert.IsTrue(w.Service.TryUseItem(w.Player, Slot, item)); Assert.AreEqual(sent, w.Session.Messages.Count);
         Assert.AreEqual(0, w.Session.Messages.OfType<CharacterActionMessage>().Count());
     }
@@ -281,8 +285,42 @@ public sealed class AuthoredQuestTests
         w.Dao.Flags[key + "|" + flag.FlagKey] = flag;
         w.Session.Messages.Clear(); w.Service.Restore(w.Player);
         Assert.AreEqual(1, w.Session.Messages.Count);
-        CollectionAssert.AreEqual(DojaChipPacketSender.CreateJournalPacket(111, key.QuestId, 3600, 0), (byte[])w.Session.Messages[0]);
+        var expected = DojaChipPacketSender.CreateJournalPacketAtClientTime(111, key.QuestId, 3600, GameClock.UnixSeconds(w.Now));
+        CollectionAssert.AreEqual(expected[16..], JournalBody((QuestFullUpdateMessage)w.Session.Messages[0]));
         Assert.AreEqual(flag.Value, w.Dao.GetFlag(key, flag.FlagKey).Value);
+    }
+
+    [TestMethod]
+    public void AuthoredJournalSendsCapturedDeleteBodiesInOrder()
+    {
+        using var w = new World();
+        foreach (string quest in w.Catalog.Content.Journals.Keys)
+        {
+            w.Session.Messages.Clear();
+            AuthoredQuestJournal.Delete(w.Player, quest, w.Catalog.Content);
+
+            byte[][] captured = DojaChipPacketSender.CreateDeletePackets(w.Player.Identity.Instance, quest);
+            bool doja = quest is DojaChipInteractionRules.QuestTurnIn or DojaChipInteractionRules.QuestCooldown;
+            Assert.AreEqual(doja ? 2 : 3, w.Session.Messages.Count, quest);
+            CollectionAssert.AreEqual(captured[0][16..], JournalBody((CharacterActionMessage)w.Session.Messages[0]), quest);
+            CollectionAssert.AreEqual(captured[1][16..], JournalBody((QuestMessage)w.Session.Messages[1]), quest);
+            if (!doja)
+                CollectionAssert.AreEqual(captured[1][16..], JournalBody((QuestMessage)w.Session.Messages[2]), quest);
+        }
+    }
+
+    [TestMethod]
+    public void DojaJournalExpiryUsesSynchronizedSessionClockAndAuthoredDuration()
+    {
+        using var w = new World(7010);
+        const int clockSeconds = 1_203_456_789;
+        const int elapsedSeconds = 15;
+        string quest = DojaChipInteractionRules.QuestCooldown;
+        w.Session.RecordGameTimeSynchronization(w.Now.AddSeconds(-elapsedSeconds), clockSeconds);
+        Assert.IsTrue(AuthoredQuestJournal.Send(w.Player, quest, w.Now, w.Catalog.Content, int.MaxValue));
+        var expected = DojaChipPacketSender.CreateJournalPacketAtClientTime(111, quest, int.MaxValue,
+            clockSeconds + elapsedSeconds);
+        CollectionAssert.AreEqual(expected[16..], JournalBody(w.Session.Messages.OfType<QuestFullUpdateMessage>().Single()));
     }
 
     [TestMethod]
@@ -401,6 +439,7 @@ public sealed class AuthoredQuestTests
 
     static Identity Slot => new() { Type = IdentityType.Inventory, Instance = 64 };
     static AuthoredQuestCatalog LoadCatalog() => AuthoredQuestCatalog.Load(Path.Combine(AppContext.BaseDirectory, "Content"));
+    static byte[] JournalBody(MessageBody message) => new ZoneMessageCodec().Serialize(message, 0, 111)[16..];
 
     internal sealed class World : IDisposable
     {
@@ -454,7 +493,7 @@ public sealed class AuthoredQuestTests
             { Playfield = Player.Playfield, Position = Player.Position, Name = "Fixture accepted actor" };
             Registry.Register(npc);
             if (accepted) Npcs.Bind(npc, new("fixture:" + instance, "accepted-test-contract", contentIdentity,
-                Player.Playfield!.Identity.Instance, true, vendor));
+                Player.Playfield!.Identity.Instance, vendor));
             return npc;
         }
         public void Dispose() { _flush.Dispose(); _services.Dispose(); }
@@ -477,14 +516,21 @@ public sealed class AuthoredQuestTests
     }
     sealed class NoIndependentFlush : ICharacterCoalesceCommit
     { public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int owner, IReadOnlyList<int> nanos, IReadOnlyList<ActiveNanoRecord>? activeNanos, IReadOnlyList<SkillLockRecord>? skillLocks) => throw new InvalidOperationException("No independent item transaction expected."); }
-    internal sealed class Session : IZoneSession
+    internal sealed class Session : IZoneSession, IGameTimeSession
     {
         internal readonly List<object> Messages = [];
         public SessionState State { get; set; } = SessionState.InPlay;
         public Player? Player { get; private set; }
         public void BindPlayer(Player player) => Player = player;
         public void UnbindPlayer() => Player = null;
-        public void TransferToPlayfield(Playfield destination, AORebirth.Core.Vector.Vector3 landing) => throw new NotSupportedException();
+        public bool TransferToPlayfield(Playfield destination, AORebirth.Core.Vector.Vector3 landing) => throw new NotSupportedException();
+        public DateTime? GameTimeSynchronizedAtUtc { get; private set; }
+        public int GameTimeServerSeconds { get; private set; }
+        public void RecordGameTimeSynchronization(DateTime utcNow, int serverSeconds)
+        {
+            GameTimeSynchronizedAtUtc = utcNow;
+            GameTimeServerSeconds = serverSeconds;
+        }
         public void Send(byte[] packet) => Messages.Add(packet);
         public void Send(Message message) => Messages.Add(message.Body);
         public void Send(MessageBody body) => Messages.Add(body);
