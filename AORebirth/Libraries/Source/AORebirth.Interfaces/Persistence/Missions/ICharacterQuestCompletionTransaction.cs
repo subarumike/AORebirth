@@ -27,6 +27,23 @@ namespace AORebirth.Interfaces.Persistence.Missions
         AlreadyCollected = 6
     }
 
+    /// <summary>Stable source codes stored in characterquests.Source.</summary>
+    public enum CharacterQuestSourceCode
+    {
+        Template = 0,
+        Generated = 1
+    }
+
+    /// <summary>Stable state codes stored in characterquests.State.</summary>
+    public enum CharacterQuestStateCode
+    {
+        Active = 1,
+        Completed = 2,
+        Failed = 3,
+        Expired = 4,
+        Abandoned = 5
+    }
+
     public sealed class CharacterQuestCompletionSnapshotData
     {
         public int CharacterId { get; set; }
@@ -76,8 +93,24 @@ namespace AORebirth.Interfaces.Persistence.Missions
 
         /// <summary>A fresh chain can restart an older closed template row. A current-run row is left alone.</summary>
         public static bool CanAssign(CharacterQuestCompletionSnapshotData current, long predecessorAssignedAtUtcTicks)
-            => current == null || (current.Source == 0 && current.State >= 2 && current.State <= 5
-                && current.AssignedAtUtcTicks < predecessorAssignedAtUtcTicks);
+        {
+            if (current == null)
+                return true;
+            if (current.Source != (int)CharacterQuestSourceCode.Template
+                || current.AssignedAtUtcTicks >= predecessorAssignedAtUtcTicks)
+                return false;
+
+            switch ((CharacterQuestStateCode)current.State)
+            {
+                case CharacterQuestStateCode.Completed:
+                case CharacterQuestStateCode.Failed:
+                case CharacterQuestStateCode.Expired:
+                case CharacterQuestStateCode.Abandoned:
+                    return true;
+                default:
+                    return false;
+            }
+        }
     }
 
     public sealed class CharacterQuestCompletionResult

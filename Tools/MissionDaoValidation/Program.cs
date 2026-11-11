@@ -38,7 +38,9 @@ namespace AORebirth.Tools.MissionDaoValidation
         {
             bool generatedIdentityOnly = args.Length == 2 && args[1] == "--generated-identity-only";
             bool chestsOnly = args.Length == 2 && args[1] == "--chests-only";
-            if ((args.Length != 1 && !generatedIdentityOnly && !chestsOnly) || !string.Equals(args[0], "--run-disposable", StringComparison.Ordinal))
+            bool questSuccessorOnly = args.Length == 2 && args[1] == "--quest-successor-only";
+            if ((args.Length != 1 && !generatedIdentityOnly && !chestsOnly && !questSuccessorOnly)
+                || !string.Equals(args[0], "--run-disposable", StringComparison.Ordinal))
             {
                 Console.Error.WriteLine("REFUSED: exact --run-disposable argument required.");
                 return 2;
@@ -72,6 +74,14 @@ namespace AORebirth.Tools.MissionDaoValidation
                     Console.WriteLine("MISSION_DAO_TEST_MODE=ISOLATED_PRODUCTION_SOURCES");
                     Console.WriteLine("MISSION_CHEST_MYSQL=PASS");
                     Console.WriteLine("MISSION_CHEST_CHECKS=" + checks.ToString(CultureInfo.InvariantCulture));
+                    return 0;
+                }
+                if (questSuccessorOnly)
+                {
+                    ValidateCharacterQuestSuccessors(dao, disposable.ApplicationConnectionString);
+                    Console.WriteLine("MISSION_DAO_TEST_MODE=ISOLATED_PRODUCTION_SOURCES");
+                    Console.WriteLine("MISSION_QUEST_SUCCESSOR_MYSQL=PASS");
+                    Console.WriteLine("MISSION_QUEST_SUCCESSOR_CHECKS=" + checks.ToString(CultureInfo.InvariantCulture));
                     return 0;
                 }
                 if (generatedIdentityOnly)

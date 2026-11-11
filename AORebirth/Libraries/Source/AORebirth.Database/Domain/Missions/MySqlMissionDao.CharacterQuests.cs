@@ -133,10 +133,10 @@ namespace AORebirth.Database.Domain.Missions
                     return QuestCompletionResult(CharacterQuestCompletionStatus.Rejected, quest, "The exact assigned quest binding is unavailable or changed.");
                 MissionRewardKeyData key = CharacterQuestRewardKey(quest);
                 MissionRewardStageData ledger = this.GetReward(key);
-                if (quest.State == 2 && ledger != null && ledger.Status == MissionRewardStatus.Applied
+                if (quest.State == (int)CharacterQuestStateCode.Completed && ledger != null && ledger.Status == MissionRewardStatus.Applied
                     && ledger.RewardType == CharacterQuestRewardType)
                     return QuestCompletionResult(CharacterQuestCompletionStatus.AlreadyApplied, quest, "This assigned quest run was already paid.");
-                if (quest.State != 1 || quest.Progress < quest.RequiredCount || ledger == null
+                if (quest.State != (int)CharacterQuestStateCode.Active || quest.Progress < quest.RequiredCount || ledger == null
                     || ledger.Status != MissionRewardStatus.Pending || ledger.RewardType != CharacterQuestRewardType)
                     return QuestCompletionResult(CharacterQuestCompletionStatus.Rejected, quest, "The objective has no pending earned reward.");
 
@@ -176,13 +176,14 @@ namespace AORebirth.Database.Domain.Missions
                 if (reward.Status != MissionAtomicRewardStatus.Applied)
                     throw new InvalidOperationException("The validated pending quest reward could not be applied atomically.");
                 int completed = this.ExecuteWrite(
-                    "UPDATE characterquests SET State=2,Progress=RequiredCount,UpdatedAtUtcTicks=@Now "
-                    + "WHERE CharacterId=@CharacterId AND QuestId=@QuestId AND State=1 AND Progress>=RequiredCount AND AssignedAtUtcTicks=@Assigned",
-                    new { this.CharacterId, quest.QuestId, Now = request.NowUtcTicks, Assigned = quest.AssignedAtUtcTicks }, this.transaction);
+                    "UPDATE characterquests SET State=@Completed,Progress=RequiredCount,UpdatedAtUtcTicks=@Now "
+                    + "WHERE CharacterId=@CharacterId AND QuestId=@QuestId AND State=@Active AND Progress>=RequiredCount AND AssignedAtUtcTicks=@Assigned",
+                    new { this.CharacterId, quest.QuestId, Now = request.NowUtcTicks, Assigned = quest.AssignedAtUtcTicks,
+                        Completed = (int)CharacterQuestStateCode.Completed, Active = (int)CharacterQuestStateCode.Active }, this.transaction);
                 this.RequireSingleWrite(completed, "quest completion", quest.QuestId, 0);
                 if (successor != null)
                     this.AssignSuccessor(successor, previousSuccessor, request.NowUtcTicks);
-                quest.State = 2;
+                quest.State = (int)CharacterQuestStateCode.Completed;
                 quest.UpdatedAtUtcTicks = request.NowUtcTicks;
                 var result = QuestCompletionResult(CharacterQuestCompletionStatus.Applied, quest, "Quest state, inventory, stats and reward ledger committed together.");
                 result.StatValues = reward.StatValues;
@@ -192,16 +193,19 @@ namespace AORebirth.Database.Domain.Missions
             private void AssignSuccessor(CharacterQuestSuccessorRequest successor,
                 CharacterQuestCompletionSnapshotData previous, long now)
             {
+                int template = (int)CharacterQuestSourceCode.Template;
+                int active = (int)CharacterQuestStateCode.Active;
                 int updated = previous == null
                     ? this.ExecuteWrite(
                         "INSERT INTO characterquests (CharacterId,QuestId,Source,State,Progress,RequiredCount,AssignedAtUtcTicks,UpdatedAtUtcTicks) "
-                        + "VALUES (@CharacterId,@QuestId,0,1,0,@RequiredCount,@Now,@Now)",
-                        new { this.CharacterId, successor.QuestId, successor.RequiredCount, Now = now }, this.transaction)
+                        + "VALUES (@CharacterId,@QuestId,@Source,@Active,0,@RequiredCount,@Now,@Now)",
+                        new { this.CharacterId, successor.QuestId, successor.RequiredCount, Source = template, Active = active, Now = now },
+                        this.transaction)
                     : this.ExecuteWrite(
-                        "UPDATE characterquests SET State=1,Progress=0,RequiredCount=@RequiredCount,AssignedAtUtcTicks=@Now,UpdatedAtUtcTicks=@Now "
-                        + "WHERE CharacterId=@CharacterId AND QuestId=@QuestId AND Source=0 AND State=@State AND AssignedAtUtcTicks=@Assigned",
+                        "UPDATE characterquests SET State=@Active,Progress=0,RequiredCount=@RequiredCount,AssignedAtUtcTicks=@Now,UpdatedAtUtcTicks=@Now "
+                        + "WHERE CharacterId=@CharacterId AND QuestId=@QuestId AND Source=@Source AND State=@PreviousState AND AssignedAtUtcTicks=@Assigned",
                         new { this.CharacterId, successor.QuestId, successor.RequiredCount, Now = now,
-                            previous.State, Assigned = previous.AssignedAtUtcTicks }, this.transaction);
+                            Source = template, Active = active, PreviousState = previous.State, Assigned = previous.AssignedAtUtcTicks }, this.transaction);
                 this.RequireSingleWrite(updated, "quest successor assignment", successor.QuestId, 0);
             }
 

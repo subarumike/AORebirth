@@ -362,6 +362,23 @@ public sealed class FindItemRewardTests
     }
 
     [TestMethod]
+    [DataRow(0, 0, false)]
+    [DataRow(0, 1, false)]
+    [DataRow(0, 2, true)]
+    [DataRow(0, 3, true)]
+    [DataRow(0, 4, true)]
+    [DataRow(0, 5, true)]
+    [DataRow(0, 6, false)]
+    [DataRow(1, 2, false)]
+    [DataRow(2, 2, false)]
+    public void SuccessorEligibilityPreservesPersistedQuestCodes(int source, int state, bool canAssign)
+    {
+        var olderRow = new CharacterQuestCompletionSnapshotData { Source = source, State = state, AssignedAtUtcTicks = 100 };
+        Assert.AreEqual(canAssign, CharacterQuestSuccessorRequest.CanAssign(olderRow, 101));
+        Assert.IsFalse(CharacterQuestSuccessorRequest.CanAssign(olderRow, 100));
+    }
+
+    [TestMethod]
     [DataRow(0, false, true, false, true)]
     [DataRow(0, false, false, true, true)]
     [DataRow(1, true, false, false, false)]

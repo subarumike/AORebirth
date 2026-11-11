@@ -1929,7 +1929,7 @@ def feature_command(root, child):
         wrapper = os.path.normcase(os.path.normpath(child[3]))
         dao_wrapper = checked(root, "Tools/run_mission_dao_validation.cmd")
         connected_wrapper = checked(root, "Tools/run_newengine_connected_acceptance.cmd")
-        if wrapper == os.path.normcase(str(dao_wrapper)) and child[4:] == ["--chests-only"]:
+        if wrapper == os.path.normcase(str(dao_wrapper)) and child[4:] in (["--chests-only"], ["--quest-successor-only"]):
             return checked(root, "Tools/MissionDaoValidation/MissionDaoValidation.csproj")
         if wrapper == os.path.normcase(str(connected_wrapper)) and len(child) == 11 and (
                 child[4], child[6], child[8], child[9]) == ("--engine", "--login-engine", "--chests-only", "--world-engine"):
@@ -2008,9 +2008,11 @@ def run_feature_validation(root, profile, child):
                 tool_hash = digest(tool.read_bytes())
                 if not state[2] or file_state(tool) != state:
                     raise ValueError("Source-only validation assembly changed during measurement")
+                method = ("EXISTING_CHESTS_ONLY_WRAPPER_COMPILES_LINKED_PERSISTENCE_SOURCES" if child[4] == "--chests-only"
+                          else "QUEST_SUCCESSOR_ONLY_WRAPPER_COMPILES_LINKED_PERSISTENCE_SOURCES")
                 attempt["SOURCE_ONLY_VALIDATION_TOOL"] = {"path": tool.relative_to(root).as_posix(),
                     "bytes": state[2], "sha256": tool_hash,
-                    "METHOD": "EXISTING_CHESTS_ONLY_WRAPPER_COMPILES_LINKED_PERSISTENCE_SOURCES"}
+                    "METHOD": method}
             attempt["AVAILABLE_OUTPUTS_POST_COMMAND"] = [{"path": path.relative_to(root).as_posix(),
                     "bytes": path.stat().st_size, "sha256": digest(path.read_bytes())} for path in sorted(outputs)]
             attempt.update(VALIDATION_RESULT="PASS", PRODUCT_COMPILER_HOOKS=observations["PRODUCT_HOOKS"])
