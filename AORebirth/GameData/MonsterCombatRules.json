@@ -52,7 +52,9 @@
   "CETH": {
     "Pets": {
       "MaxPets": 4,
-      "MaxPetsPerType": 1
+      "MaxPetsPerType": 1,
+      "SummonIntervalSeconds": 1,
+      "RespawnDelaySeconds": 10
     }
   },
   "CRDY": {

@@ -4,6 +4,8 @@ namespace ZoneEngine_New.Core.Pets
     using System.Collections.Generic;
     using System.Globalization;
 
+    using AORebirth.World.Pathfinding;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
@@ -17,6 +19,7 @@ namespace ZoneEngine_New.Core.Pets
     using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
+    using ZoneEngine_New.Core.WorldSimulation;
 
     using Vector3 = AORebirth.Core.Vector.Vector3;
 
@@ -34,6 +37,8 @@ namespace ZoneEngine_New.Core.Pets
 
         /// <summary>Starts a clearance ray just above the supporting floor, avoiding a hit on the floor itself.</summary>
         const float SpawnFloorClearance = 0.05f;
+
+        static readonly NavMeshBuildSettings DefaultCollisionAgent = NavMeshBuildSettings.CreateDefault();
 
         readonly Playfield _playfield;
         readonly IGameData _gameData;
@@ -127,19 +132,30 @@ namespace ZoneEngine_New.Core.Pets
             return pet;
         }
 
-        bool TryFindSpawnPosition(Character owner, NpcCharacter? previous, out Vector3 at, out int formationIndex)
+        internal bool TryFindSpawnPosition(Character owner, NpcCharacter? previous, out Vector3 at, out int formationIndex)
         {
             at = owner.Position;
             formationIndex = 0;
             var finder = _playfield.Pathfinder;
             var world = _playfield.WorldAccess.Instance;
-            if (finder == null || world?.Surface == null)
+            if (world == null)
                 return false;
 
-            // A floor alone is not sufficient: it can lie under a solid prop. Generated positions must also
-            // fit the navmesh agent and remain near their formation point, on the owner's side of obstacles.
-            float radius = finder.Settings.AgentRadius;
-            float height = finder.Settings.AgentHeight;
+            NavMeshBuildSettings agent = finder?.Settings ?? DefaultCollisionAgent;
+            if (finder != null && TryFindSpawnPosition(owner, previous, world, finder, agent, out at, out formationIndex))
+                return true;
+
+            // Valid collision can extend beyond a baked polygon, and some shop interiors have no mesh at all.
+            return TryFindSpawnPosition(owner, previous, world, null, agent, out at, out formationIndex);
+        }
+
+        bool TryFindSpawnPosition(Character owner, NpcCharacter? previous, PlayfieldWorldSimulation world,
+            NavMeshPathfinder? finder, NavMeshBuildSettings agent, out Vector3 at, out int formationIndex)
+        {
+            at = owner.Position;
+            formationIndex = 0;
+            float radius = agent.AgentRadius;
+            float height = agent.AgentHeight;
             int candidates = PetFormation.SlotCount + owner.OwnedPets.Count;
             for (int index = 0; index < candidates; index++)
             {
@@ -147,27 +163,32 @@ namespace ZoneEngine_New.Core.Pets
                     continue;
 
                 Vector3 wanted = PetFormation.PointFor(owner, index);
-                var point = new System.Numerics.Vector3(wanted.xf, wanted.yf, wanted.zf);
-                if (!finder.TrySnap(point, PetAi.FollowSnapMeters, out System.Numerics.Vector3 snapped))
+                Vector3 candidate = wanted;
+                if (finder != null)
+                {
+                    var point = new System.Numerics.Vector3(wanted.xf, wanted.yf, wanted.zf);
+                    if (!finder.TrySnap(point, PetAi.FollowSnapMeters, out System.Numerics.Vector3 snapped))
+                        continue;
+
+                    double dx = snapped.X - wanted.x;
+                    double dz = snapped.Z - wanted.z;
+                    if ((dx * dx) + (dz * dz) > PetAi.FollowSnapMeters * PetAi.FollowSnapMeters
+                        || Math.Abs(snapped.Y - wanted.y) > MovementConfig.GroundSnapTolerance)
+                        continue;
+                    candidate = new Vector3(snapped.X, snapped.Y, snapped.Z);
+                }
+
+                float maxDrop = finder == null ? MovementConfig.GroundSnapTolerance : MovementConfig.GroundProbeLift;
+                if (!world.TrySnapToFloor(candidate, out Vector3 floor)
+                    || floor.y - candidate.y > MovementConfig.GroundProbeLift || candidate.y - floor.y > maxDrop)
                     continue;
 
-                double dx = snapped.X - wanted.x;
-                double dz = snapped.Z - wanted.z;
-                if ((dx * dx) + (dz * dz) > PetAi.FollowSnapMeters * PetAi.FollowSnapMeters
-                    || Math.Abs(snapped.Y - wanted.y) > MovementConfig.GroundSnapTolerance)
-                    continue;
-
-                var onMesh = new Vector3(snapped.X, snapped.Y, snapped.Z);
-                if (!_playfield.TrySnapFeetToFloor(onMesh, out Vector3 floor)
-                    || Math.Abs(floor.y - onMesh.y) > MovementConfig.GroundProbeLift)
-                    continue;
-
-                // Check the actual collision floor as well as the baked mesh, so a new obstruction or a floor
-                // above the proposed feet cannot be hidden by accepting an old navigation polygon.
                 var feet = new Vector3(floor.x, floor.y + SpawnFloorClearance, floor.z);
                 var head = new Vector3(floor.x, floor.y + height, floor.z);
                 Vector3 ownerAt = owner.Position;
                 if (!world.HasLineOfSight(feet, head)
+                    || (finder == null && (world.TrySphereCast(feet, head, radius, out _, out _)
+                        || world.TrySphereCast(head, feet, radius, out _, out _)))
                     || !world.HasLineOfSight(ownerAt.xf, ownerAt.yf + MovementConfig.LineOfSightEyeHeight, ownerAt.zf,
                         floor.xf, floor.yf + MovementConfig.LineOfSightEyeHeight, floor.zf))
                     continue;

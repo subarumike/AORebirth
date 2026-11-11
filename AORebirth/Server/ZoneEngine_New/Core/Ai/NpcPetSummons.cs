@@ -18,7 +18,7 @@ namespace ZoneEngine_New.Core.Ai
     /// </summary>
     sealed class NpcPetSummons
     {
-        /// <summary>A summon that could not be selected or placed is tried again this much later.</summary>
+        /// <summary>Retry failed placement, or defer a rejected choice when the authored cadence is immediate.</summary>
         const double RetrySeconds = 1;
 
         readonly NpcCharacter _npc;
@@ -119,7 +119,9 @@ namespace ZoneEngine_New.Core.Ai
 
                 if (!TryChoosePet(out string hash, out int level, out int duration))
                 {
-                    _due[i] = nowUtc.AddSeconds(RetrySeconds);
+                    // Zero means an immediate initial attempt, not another random roll every world tick.
+                    double delay = _rule.SummonIntervalSeconds > 0 ? _rule.SummonIntervalSeconds : RetrySeconds;
+                    _due[i] = nowUtc.AddSeconds(delay);
                     continue;
                 }
 

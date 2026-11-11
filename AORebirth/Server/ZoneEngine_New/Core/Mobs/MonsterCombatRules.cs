@@ -167,10 +167,10 @@ namespace ZoneEngine_New.Core.Mobs
         public required int ChancePercent { get; set; }
 
         /// <summary>Successful executions allowed after the roll; null means unlimited. Reset restores the allowance.</summary>
-        public int? MaxCastsPerFight { get; set; } = 1;
+        public required int? MaxCastsPerFight { get; set; }
 
         /// <summary>Additional delay after successful execution; normal casting cadence and recharge still apply.</summary>
-        public int CooldownSeconds { get; set; }
+        public required int CooldownSeconds { get; set; }
     }
 
     /// <summary>

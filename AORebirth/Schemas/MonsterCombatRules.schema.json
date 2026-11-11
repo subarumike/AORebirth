@@ -61,7 +61,9 @@
           "required": [
             "NanoId",
             "HealthBelowPercent",
-            "ChancePercent"
+            "ChancePercent",
+            "MaxCastsPerFight",
+            "CooldownSeconds"
           ],
           "additionalProperties": false
         }
