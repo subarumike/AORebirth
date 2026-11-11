@@ -145,6 +145,12 @@ The uninstaller removes version.dll only when the ownership marker and current
 DLL hash both match this package. It restores the launcher URL backups when
 they are still owned by this package.
 
+The installer seeds aorebirth-patch\servers.txt with the package defaults.
+This file controls Auto login-key selection and Daily Login routing. Existing
+settings are preserved on reinstall and uninstall. Edit the file beside the
+client and restart the client for changes to take effect. Missing or malformed
+configuration prevents automatic routing.
+
 CONFLICTS
 ---------
 

@@ -1,6 +1,7 @@
 #include "daily_login_routing.h"
 
 #include "logging.h"
+#include "login_key_patch.h"
 #include "roomspace_fix.h"
 
 #include <winsock2.h>
@@ -19,29 +20,6 @@ namespace aorf
 {
     namespace
     {
-        constexpr unsigned long AoRebirthLoginIpHostOrder =
-            (2ul << 24) | (24ul << 16) | (96ul << 8) | 30ul;
-        constexpr unsigned long AoRebirthLoginIpClientArgumentOrder =
-            (30ul << 24) | (96ul << 16) | (24ul << 8) | 2ul;
-        constexpr unsigned long AoRebirthLocalIpHostOrder =
-            (127ul << 24) | 1ul;
-        constexpr unsigned long AoRebirthLocalIpClientArgumentOrder =
-            (1ul << 24) | 127ul;
-        constexpr unsigned long AoRebirthLoginPort = 7500;
-        constexpr const char* AoRebirthDailyLoginHost = "uwg.daily.icc-rk";
-
-        struct DailyLoginTarget
-        {
-            const char* ip;
-            const wchar_t* wideIp;
-            unsigned char address[4];
-        };
-
-        constexpr DailyLoginTarget ProductionDailyLoginTarget =
-            { "2.24.96.30", L"2.24.96.30", { 2, 24, 96, 30 } };
-        constexpr DailyLoginTarget LocalDailyLoginTarget =
-            { "127.0.0.1", L"127.0.0.1", { 127, 0, 0, 1 } };
-
         using FnGetAddrInfoA = int(WSAAPI*)(PCSTR, PCSTR, const ADDRINFOA*, PADDRINFOA*);
         using FnGetAddrInfoW = int(WSAAPI*)(PCWSTR, PCWSTR, const ADDRINFOW*, PADDRINFOW*);
         using FnGetHostByName = hostent*(WSAAPI*)(const char*);
@@ -56,18 +34,9 @@ namespace aorf
             LPWSAOVERLAPPED,
             LPWSAOVERLAPPED_COMPLETION_ROUTINE);
 
-        struct LaunchEndpoint
-        {
-            bool hasIp;
-            bool hasPort;
-            bool dottedIp;
-            unsigned long ip;
-            unsigned long port;
-        };
-
         LONG WorkerStarted = 0;
         bool RoutingEnabled = false;
-        const DailyLoginTarget* RoutingTarget = &ProductionDailyLoginTarget;
+        LoginServerSelection RoutingTarget = {};
         HMODULE Ws2 = nullptr;
         FnGetAddrInfoA RealGetAddrInfoA = nullptr;
         FnGetAddrInfoW RealGetAddrInfoW = nullptr;
@@ -112,158 +81,12 @@ namespace aorf
             return value;
         }
 
-        bool ParseUnsignedToken(const wchar_t* text, unsigned long& value, const wchar_t** end)
-        {
-            if (!text || !iswdigit(*text))
-            {
-                return false;
-            }
-
-            unsigned long parsed = 0;
-            while (iswdigit(*text))
-            {
-                unsigned long digit = static_cast<unsigned long>(*text - L'0');
-                if (parsed > (0xfffffffful - digit) / 10ul)
-                {
-                    return false;
-                }
-
-                parsed = parsed * 10ul + digit;
-                ++text;
-            }
-
-            value = parsed;
-            if (end)
-            {
-                *end = text;
-            }
-
-            return true;
-        }
-
-        bool ParseDottedIpToken(const wchar_t* text, unsigned long& value, const wchar_t** end)
-        {
-            unsigned long octets[4] = {};
-            const wchar_t* cursor = text;
-            for (int index = 0; index < 4; ++index)
-            {
-                if (!ParseUnsignedToken(cursor, octets[index], &cursor) || octets[index] > 255)
-                {
-                    return false;
-                }
-
-                if (index < 3)
-                {
-                    if (*cursor != L'.')
-                    {
-                        return false;
-                    }
-                    ++cursor;
-                }
-            }
-
-            value =
-                (octets[0] << 24) |
-                (octets[1] << 16) |
-                (octets[2] << 8) |
-                octets[3];
-            if (end)
-            {
-                *end = cursor;
-            }
-            return true;
-        }
-
-        bool IsTokenBoundary(wchar_t value)
-        {
-            return value == 0 || iswspace(value) || value == L'"';
-        }
-
-        bool TryParseLaunchEndpoint(const wchar_t* commandLine, LaunchEndpoint& endpoint)
-        {
-            endpoint = {};
-            if (!commandLine)
-            {
-                return false;
-            }
-
-            const wchar_t* ia = wcsstr(commandLine, L"IA");
-            while (ia)
-            {
-                unsigned long parsed = 0;
-                const wchar_t* end = nullptr;
-                bool dotted = ParseDottedIpToken(ia + 2, parsed, &end);
-                if (!dotted)
-                {
-                    if (!ParseUnsignedToken(ia + 2, parsed, &end))
-                    {
-                        ia = wcsstr(ia + 2, L"IA");
-                        continue;
-                    }
-                }
-
-                if (IsTokenBoundary(*end))
-                {
-                    endpoint.hasIp = true;
-                    endpoint.dottedIp = dotted;
-                    endpoint.ip = parsed;
-                    break;
-                }
-
-                ia = wcsstr(ia + 2, L"IA");
-            }
-
-            const wchar_t* ip = wcsstr(commandLine, L"IP");
-            while (ip)
-            {
-                unsigned long parsed = 0;
-                const wchar_t* end = nullptr;
-                if (ParseUnsignedToken(ip + 2, parsed, &end) &&
-                    IsTokenBoundary(*end) &&
-                    parsed <= 65535)
-                {
-                    endpoint.hasPort = true;
-                    endpoint.port = parsed;
-                    break;
-                }
-
-                ip = wcsstr(ip + 2, L"IP");
-            }
-
-            return endpoint.hasIp && endpoint.hasPort;
-        }
-
-        bool IsAoRebirthEndpoint(const LaunchEndpoint& endpoint)
-        {
-            return endpoint.hasIp &&
-                endpoint.hasPort &&
-                (endpoint.ip == AoRebirthLoginIpHostOrder ||
-                 endpoint.ip == AoRebirthLoginIpClientArgumentOrder ||
-                 endpoint.ip == AoRebirthLocalIpHostOrder ||
-                 endpoint.ip == AoRebirthLocalIpClientArgumentOrder) &&
-                endpoint.port == AoRebirthLoginPort;
-        }
-
-        const DailyLoginTarget& SelectDailyLoginTarget(const LaunchEndpoint& endpoint)
-        {
-            return IsAoRebirthEndpoint(endpoint) &&
-                (endpoint.ip == AoRebirthLocalIpHostOrder ||
-                 endpoint.ip == AoRebirthLocalIpClientArgumentOrder)
-                ? LocalDailyLoginTarget : ProductionDailyLoginTarget;
-        }
-
-        bool ShouldRewriteDailyLoginHttp(const DailyLoginTarget& target)
-        {
-            // Local hosting accepts the original host; preserve its request bytes and send counts.
-            return std::memcmp(target.address, LocalDailyLoginTarget.address, sizeof(target.address)) != 0;
-        }
-
         bool IsDailyLoginHost(const std::string& host)
         {
-            std::string lower = ToLower(host);
-            return lower == "dailyrewards.anarchy-online.com" ||
-                lower == "uwg.daily.icc-rk" ||
-                lower == "www.daily.icc-rk";
+            const std::string lower = ToLower(host);
+            return (!lower.empty() && lower == RoutingTarget.originalDailyHost) ||
+                std::find(RoutingTarget.dailyHosts.begin(), RoutingTarget.dailyHosts.end(), lower) !=
+                    RoutingTarget.dailyHosts.end();
         }
 
         bool IsOrdinalProcedureName(LPCSTR procName)
@@ -285,11 +108,10 @@ namespace aorf
                 value.rfind("HEAD ", 0) == 0;
         }
 
-        std::string RightPaddedHostReplacement()
+        std::string RightPaddedHostReplacement(const std::string& host)
         {
-            constexpr const char* source = "dailyrewards.anarchy-online.com";
-            std::string replacement = AoRebirthDailyLoginHost;
-            replacement.append(std::strlen(source) - replacement.size(), ' ');
+            std::string replacement = host;
+            replacement.append(RoutingTarget.originalDailyHost.size() - replacement.size(), ' ');
             return replacement;
         }
 
@@ -322,14 +144,18 @@ namespace aorf
                 return false;
             }
 
-            std::string lower = ToLower(request);
-            const bool matchedDailyRewards =
-                lower.find("dailyrewards.anarchy-online.com") != std::string::npos;
-            const bool matchedWww =
-                lower.find("www.daily.icc-rk") != std::string::npos;
-            const bool matchedUwg =
-                lower.find("uwg.daily.icc-rk") != std::string::npos;
-            if (!matchedDailyRewards && !matchedWww && !matchedUwg)
+            if (RoutingTarget.originalDailyHost.empty() || RoutingTarget.dailyHosts.empty())
+            {
+                return false;
+            }
+            const std::string& targetHost = RoutingTarget.dailyHosts.front();
+            const std::string& originalHost = RoutingTarget.originalDailyHost;
+            const std::string lower = ToLower(request);
+            const bool matchedDailyRewards = lower.find(originalHost) != std::string::npos;
+            const bool matchedAlias = std::any_of(
+                RoutingTarget.dailyHosts.begin(), RoutingTarget.dailyHosts.end(), [&](const std::string& host)
+                { return lower.find(host) != std::string::npos; });
+            if (!matchedDailyRewards && !matchedAlias)
             {
                 return false;
             }
@@ -337,20 +163,20 @@ namespace aorf
             bool changed = false;
             changed |= ReplaceAll(
                 request,
-                "Host: dailyrewards.anarchy-online.com",
-                "Host: " + RightPaddedHostReplacement());
+                "Host: " + originalHost,
+                "Host: " + RightPaddedHostReplacement(targetHost));
             changed |= ReplaceAll(
                 request,
-                "host: dailyrewards.anarchy-online.com",
-                "host: " + RightPaddedHostReplacement());
+                "host: " + originalHost,
+                "host: " + RightPaddedHostReplacement(targetHost));
             changed |= ReplaceAll(
                 request,
-                "http://dailyrewards.anarchy-online.com",
-                "http://" + std::string(AoRebirthDailyLoginHost));
-            changed |= ReplaceAll(
-                request,
-                "www.daily.icc-rk",
-                AoRebirthDailyLoginHost);
+                "http://" + originalHost,
+                "http://" + targetHost);
+            for (size_t i = 1; i < RoutingTarget.dailyHosts.size(); ++i)
+            {
+                changed |= ReplaceAll(request, RoutingTarget.dailyHosts[i], targetHost);
+            }
 
             if (!changed)
             {
@@ -359,10 +185,9 @@ namespace aorf
 
             rewritten.assign(request.begin(), request.end());
             Log(
-                "DAILYLOGIN route=http_rewrite hostDailyRewards=%s hostWww=%s hostUwg=%s bytesIn=%lu bytesOut=%lu",
+                "DAILYLOGIN route=http_rewrite hostDailyRewards=%s hostAlias=%s bytesIn=%lu bytesOut=%lu",
                 matchedDailyRewards ? "true" : "false",
-                matchedWww ? "true" : "false",
-                matchedUwg ? "true" : "false",
+                matchedAlias ? "true" : "false",
                 static_cast<unsigned long>(length),
                 static_cast<unsigned long>(rewritten.size()));
             return true;
@@ -623,10 +448,18 @@ namespace aorf
 
         bool AllowedDailyBridgeUrl(const char* url)
         {
-            return url && (_stricmp(url, "http://dailyrewards.anarchy-online.com/") == 0 ||
-                _stricmp(url, "http://dailyrewards.anarchy-online.com/index.app") == 0 ||
-                _stricmp(url, "http://uwg.daily.icc-rk/index.app") == 0 ||
-                _stricmp(url, "http://www.daily.icc-rk/index.app") == 0);
+            if (!url || RoutingTarget.originalDailyHost.empty())
+            {
+                return false;
+            }
+            const std::string lower = ToLower(url);
+            const std::string original = "http://" + RoutingTarget.originalDailyHost;
+            if (lower == original + "/" || lower == original + "/index.app")
+            {
+                return true;
+            }
+            return std::any_of(RoutingTarget.dailyHosts.begin(), RoutingTarget.dailyHosts.end(),
+                [&](const std::string& host) { return lower == "http://" + host + "/index.app"; });
         }
 
         bool CanDispatchDailyBridge(bool ready, bool endpoint, bool origin, const BridgeView& view, DWORD thread)
@@ -830,8 +663,7 @@ namespace aorf
                 module.handle = GetModuleHandleW(module.name);
                 if (!module.handle) return false;
             }
-            LaunchEndpoint endpoint = {};
-            NativeBridgeEndpoint = TryParseLaunchEndpoint(GetCommandLineW(), endpoint) && IsAoRebirthEndpoint(endpoint);
+            NativeBridgeEndpoint = RoutingTarget.matchedLaunchEndpoint;
             if (!NativeBridgeEndpoint || !NativeBridgeModulesMatch()) {
                 NativeBridgeRejected = true; Log("DAILYLOGIN native=BLOCKED reason=unsupported_endpoint_or_modules"); return false;
             }
@@ -913,30 +745,22 @@ namespace aorf
                 return false;
             }
 
-            LaunchEndpoint endpoint = {};
-            const bool hasEndpoint = TryParseLaunchEndpoint(GetCommandLineW(), endpoint);
-            // Select once before any hooks are installed; local testing must not use production.
-            RoutingTarget = &SelectDailyLoginTarget(endpoint);
-
-            if (length > 0 && _stricmp(value, "Always") == 0)
+            const bool always = length > 0 && length < sizeof(value) && _stricmp(value, "Always") == 0;
+            const char* failure = nullptr;
+            if (!TrySelectLoginServer(always, RoutingTarget, failure))
             {
-                Log("DAILYLOGIN route=ARMED reason=policy_always");
-                return true;
+                Log("DAILYLOGIN route=SKIP reason=%s", failure);
+                return false;
             }
-
-            if (!hasEndpoint)
+            if (RoutingTarget.dailyMode == DailyLoginMode::Off)
             {
-                Log("DAILYLOGIN route=SKIP reason=auto_endpoint_unavailable");
+                Log("DAILYLOGIN route=SKIP reason=endpoint_has_no_daily_policy");
                 return false;
             }
 
-            if (!IsAoRebirthEndpoint(endpoint))
-            {
-                Log("DAILYLOGIN route=SKIP reason=auto_endpoint_not_aorebirth port=%lu", endpoint.port);
-                return false;
-            }
-
-            Log("DAILYLOGIN route=ARMED reason=auto_endpoint_aorebirth port=%lu", endpoint.port);
+            Log("DAILYLOGIN route=ARMED reason=%s port=%lu",
+                RoutingTarget.matchedLaunchEndpoint ? "auto_endpoint_listed" : "policy_always",
+                RoutingTarget.port);
             return true;
         }
 
@@ -973,8 +797,8 @@ namespace aorf
         {
             if (RoutingEnabled && nodeName && IsDailyLoginHost(nodeName))
             {
-                Log("DAILYLOGIN route=dns host=%s target=%s", nodeName, RoutingTarget->ip);
-                return RealGetAddrInfoA(RoutingTarget->ip, serviceName, hints, result);
+                Log("DAILYLOGIN route=dns host=%s target=%s", nodeName, RoutingTarget.address.c_str());
+                return RealGetAddrInfoA(RoutingTarget.address.c_str(), serviceName, hints, result);
             }
 
             return RealGetAddrInfoA(nodeName, serviceName, hints, result);
@@ -1000,8 +824,8 @@ namespace aorf
                     nullptr);
                 if (converted > 0 && IsDailyLoginHost(host))
                 {
-                    Log("DAILYLOGIN route=dnsw host=%s target=%s", host, RoutingTarget->ip);
-                    return RealGetAddrInfoW(RoutingTarget->wideIp, serviceName, hints, result);
+                    Log("DAILYLOGIN route=dnsw host=%s target=%s", host, RoutingTarget.address.c_str());
+                    return RealGetAddrInfoW(RoutingTarget.wideAddress.c_str(), serviceName, hints, result);
                 }
             }
 
@@ -1022,9 +846,9 @@ namespace aorf
                 };
 
                 thread_local HostStorage storage = {};
-                strcpy_s(storage.name, RoutingTarget->ip);
+                strcpy_s(storage.name, RoutingTarget.address.c_str());
                 storage.aliases[0] = nullptr;
-                std::memcpy(storage.address, RoutingTarget->address, sizeof(storage.address));
+                std::memcpy(storage.address, RoutingTarget.addressBytes.data(), sizeof(storage.address));
                 storage.addressList[0] = reinterpret_cast<char*>(storage.address);
                 storage.addressList[1] = nullptr;
                 storage.entry.h_name = storage.name;
@@ -1032,7 +856,7 @@ namespace aorf
                 storage.entry.h_addrtype = AF_INET;
                 storage.entry.h_length = 4;
                 storage.entry.h_addr_list = storage.addressList;
-                Log("DAILYLOGIN route=gethostbyname host=%s target=%s", name, RoutingTarget->ip);
+                Log("DAILYLOGIN route=gethostbyname host=%s target=%s", name, RoutingTarget.address.c_str());
                 return &storage.entry;
             }
 
@@ -1042,7 +866,7 @@ namespace aorf
         int WSAAPI HookSend(SOCKET socket, const char* buffer, int length, int flags)
         {
             std::vector<char> rewritten;
-            if (RoutingEnabled && ShouldRewriteDailyLoginHttp(*RoutingTarget) &&
+            if (RoutingEnabled && RoutingTarget.dailyMode == DailyLoginMode::RewriteHttp &&
                 RewriteDailyLoginHttpRequest(buffer, length, rewritten))
             {
                 return RealSend(
@@ -1107,7 +931,7 @@ namespace aorf
             std::vector<char> rewritten;
             WSABUF replacement = {};
             if (RoutingEnabled &&
-                ShouldRewriteDailyLoginHttp(*RoutingTarget) &&
+                RoutingTarget.dailyMode == DailyLoginMode::RewriteHttp &&
                 RewriteDailyLoginHttpRequestFromWsabufs(buffers, bufferCount, rewritten))
             {
                 if (overlapped)
@@ -1199,6 +1023,8 @@ namespace aorf
 
     bool RunDailyLoginRoutingSelfTest()
     {
+        RoutingTarget.originalDailyHost = "dailyrewards.anarchy-online.com";
+        RoutingTarget.dailyHosts = { "uwg.daily.icc-rk", "www.daily.icc-rk" };
         if (!RunNativeBridgeMockSelfTest()) return false;
         if (!AllowedDailyBridgeUrl("http://dailyrewards.anarchy-online.com/") ||
             !AllowedDailyBridgeUrl("http://uwg.daily.icc-rk/index.app") ||
@@ -1224,62 +1050,6 @@ namespace aorf
         dispatchView.js = HookAweJsCallback;
         dispatchView.finish = nullptr;
         if (CanDispatchDailyBridge(true, true, true, dispatchView, 23)) return false;
-
-        LaunchEndpoint endpoint = {};
-        if (!TryParseLaunchEndpoint(L"anarchyonline.exe IA2.24.96.30 IP7500 DUprivate", endpoint) ||
-            !IsAoRebirthEndpoint(endpoint) ||
-            &SelectDailyLoginTarget(endpoint) != &ProductionDailyLoginTarget ||
-            !ShouldRewriteDailyLoginHttp(SelectDailyLoginTarget(endpoint)))
-        {
-            return false;
-        }
-
-        const unsigned char productionAddress[] = { 2, 24, 96, 30 };
-        if (std::strcmp(ProductionDailyLoginTarget.ip, "2.24.96.30") != 0 ||
-            wcscmp(ProductionDailyLoginTarget.wideIp, L"2.24.96.30") != 0 ||
-            std::memcmp(ProductionDailyLoginTarget.address, productionAddress, sizeof(productionAddress)) != 0)
-        {
-            return false;
-        }
-
-        const wchar_t* localCommands[] =
-        {
-            L"anarchyonline.exe IA127.0.0.1 IP7500 DUlocal",
-            L"anarchyonline.exe IA2130706433 IP7500 DUlocal",
-            L"anarchyonline.exe IA16777343 IP7500 DUlocal"
-        };
-        const unsigned char localAddress[] = { 127, 0, 0, 1 };
-        for (const wchar_t* command : localCommands)
-        {
-            if (!TryParseLaunchEndpoint(command, endpoint) || !IsAoRebirthEndpoint(endpoint))
-            {
-                return false;
-            }
-
-            const DailyLoginTarget& target = SelectDailyLoginTarget(endpoint);
-            if (&target != &LocalDailyLoginTarget ||
-                ShouldRewriteDailyLoginHttp(target) ||
-                std::strcmp(target.ip, "127.0.0.1") != 0 ||
-                wcscmp(target.wideIp, L"127.0.0.1") != 0 ||
-                std::memcmp(target.address, localAddress, sizeof(localAddress)) != 0)
-            {
-                return false;
-            }
-        }
-
-        if (!TryParseLaunchEndpoint(L"anarchyonline.exe IA2.24.96.30 IP7505 DUofficial", endpoint) ||
-            IsAoRebirthEndpoint(endpoint) ||
-            &SelectDailyLoginTarget(endpoint) != &ProductionDailyLoginTarget)
-        {
-            return false;
-        }
-
-        if (!TryParseLaunchEndpoint(L"anarchyonline.exe IA127.0.0.1 IP7505 DUother", endpoint) ||
-            IsAoRebirthEndpoint(endpoint) ||
-            &SelectDailyLoginTarget(endpoint) != &ProductionDailyLoginTarget)
-        {
-            return false;
-        }
 
         if (!IsDailyLoginHost("dailyrewards.anarchy-online.com") ||
             !IsDailyLoginHost("uwg.daily.icc-rk") ||

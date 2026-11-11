@@ -1,0 +1,8 @@
+# Login endpoints using the AORebirth client key, one host:port per line.
+# Optional rewrite-http or preserve-http enables Daily Login for that endpoint.
+# The first daily host is the HTTP rewrite target. All are recognized aliases.
+# "default" selects the explicit fallback for Daily Login Always mode.
+daily-original-host=dailyrewards.anarchy-online.com
+daily-hosts=uwg.daily.icc-rk,www.daily.icc-rk
+2.24.96.30:7500 rewrite-http default
+127.0.0.1:7500 preserve-http

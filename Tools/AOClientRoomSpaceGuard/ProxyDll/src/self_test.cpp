@@ -5,7 +5,7 @@
 
 #include <cstdio>
 
-int main()
+int wmain(int argumentCount, wchar_t** arguments)
 {
     if (!aorf::RunClientCrashMitigationSelfTest())
     {
@@ -13,7 +13,7 @@ int main()
         return 1;
     }
 
-    if (!aorf::RunLoginKeyPatchSelfTest())
+    if (argumentCount != 2 || !aorf::RunLoginKeyPatchSelfTest(arguments[1]))
     {
         std::fprintf(stderr, "AO login-key patch self-test failed.\n");
         return 1;

@@ -1,15 +1,20 @@
 #include "login_key_patch.h"
 #include "logging.h"
 
+#include <winsock2.h>
+#include <ws2tcpip.h>
 #include <windows.h>
 #include <bcrypt.h>
+#include <shellapi.h>
 
 #include <algorithm>
 #include <cstdint>
 #include <cstdio>
 #include <cstring>
-#include <cwctype>
+#include <cwchar>
 #include <string>
+#include <string_view>
+#include <utility>
 #include <vector>
 
 namespace aorf
@@ -21,15 +26,8 @@ namespace aorf
         constexpr char AoRebirthPublicKey[] =
             "26b5a3b4ac1177f24a2d9de44bafef477ff23ef1cb5f646919b1be26516053030b65d5afb60cef6f49de539958ba0b7922a099319b8016a8673cb27a696ae4b60fdece25ddcdad42e7f0056b87fc35687fe033b242e17e960d79806fd46c4a79cbc64f558660a50cabc1c242dace70de6af452e3433f97e30e202567f187de70";
         constexpr size_t PublicKeyLength = sizeof(FuncomPublicKey) - 1;
-        constexpr unsigned long AoRebirthLoginIpHostOrder =
-            (2ul << 24) | (24ul << 16) | (96ul << 8) | 30ul;
-        constexpr unsigned long AoRebirthLoginIpClientArgumentOrder =
-            (30ul << 24) | (96ul << 16) | (24ul << 8) | 2ul;
-        constexpr unsigned long AoRebirthLocalIpHostOrder =
-            (127ul << 24) | 1ul;
-        constexpr unsigned long AoRebirthLocalIpClientArgumentOrder =
-            (1ul << 24) | 127ul;
-        constexpr unsigned long AoRebirthLoginPort = 7500;
+        constexpr wchar_t LoginServersFile[] = L"aorebirth-patch\\servers.txt";
+        constexpr LONGLONG MaximumServerConfigBytes = 64ll * 1024ll;
 
         enum class Policy
         {
@@ -67,6 +65,21 @@ namespace aorf
             bool dottedIp;
             unsigned long ip;
             unsigned long port;
+        };
+
+        struct LoginServer
+        {
+            std::string host;
+            unsigned long port;
+            DailyLoginMode dailyMode;
+            bool dailyDefault;
+        };
+
+        struct LoginServerConfig
+        {
+            std::vector<LoginServer> servers;
+            std::string originalDailyHost;
+            std::vector<std::string> dailyHosts;
         };
 
         constexpr TargetModule Targets[] =
@@ -147,13 +160,13 @@ namespace aorf
 
         bool ParseUnsignedToken(const wchar_t* text, unsigned long& value, const wchar_t** end)
         {
-            if (!text || !iswdigit(*text))
+            if (!text || *text < L'0' || *text > L'9')
             {
                 return false;
             }
 
             unsigned long parsed = 0;
-            while (iswdigit(*text))
+            while (*text >= L'0' && *text <= L'9')
             {
                 unsigned long digit = static_cast<unsigned long>(*text - L'0');
                 if (parsed > (0xfffffffful - digit) / 10ul)
@@ -214,74 +227,243 @@ namespace aorf
             return true;
         }
 
-        bool IsTokenBoundary(wchar_t value)
-        {
-            return value == 0 || iswspace(value) || value == L'"';
-        }
-
         bool TryParseLaunchEndpoint(const wchar_t* commandLine, LaunchEndpoint& endpoint)
         {
             endpoint = {};
-            if (!commandLine)
+            if (!commandLine || *commandLine == L'\0')
             {
                 return false;
             }
 
-            const wchar_t* ia = wcsstr(commandLine, L"IA");
-            while (ia)
+            int count = 0;
+            wchar_t** arguments = CommandLineToArgvW(commandLine, &count);
+            if (!arguments)
             {
-                unsigned long parsed = 0;
-                const wchar_t* end = nullptr;
-                bool dotted = ParseDottedIpToken(ia + 2, parsed, &end);
-                if (!dotted)
-                {
-                    end = nullptr;
-                    dotted = false;
-                    if (!ParseUnsignedToken(ia + 2, parsed, &end))
-                    {
-                        ia = wcsstr(ia + 2, L"IA");
-                        continue;
-                    }
-                }
+                return false;
+            }
 
-                if (IsTokenBoundary(*end))
+            bool valid = true;
+            for (int i = 1; i < count && valid; ++i)
+            {
+                const wchar_t* argument = arguments[i];
+                const wchar_t* end = nullptr;
+                if (wcsncmp(argument, L"IA", 2) == 0)
                 {
-                    endpoint.hasIp = true;
+                    bool dotted = ParseDottedIpToken(argument + 2, endpoint.ip, &end);
+                    valid = !endpoint.hasIp &&
+                        (dotted || ParseUnsignedToken(argument + 2, endpoint.ip, &end)) && *end == L'\0';
+                    endpoint.hasIp = valid;
                     endpoint.dottedIp = dotted;
-                    endpoint.ip = parsed;
-                    break;
                 }
-
-                ia = wcsstr(ia + 2, L"IA");
-            }
-
-            const wchar_t* ip = wcsstr(commandLine, L"IP");
-            while (ip)
-            {
-                unsigned long parsed = 0;
-                const wchar_t* end = nullptr;
-                if (ParseUnsignedToken(ip + 2, parsed, &end) && IsTokenBoundary(*end) && parsed <= 65535)
+                else if (wcsncmp(argument, L"IP", 2) == 0)
                 {
-                    endpoint.hasPort = true;
-                    endpoint.port = parsed;
-                    break;
+                    valid = !endpoint.hasPort &&
+                        ParseUnsignedToken(argument + 2, endpoint.port, &end) && *end == L'\0' &&
+                        endpoint.port > 0 && endpoint.port <= 65535;
+                    endpoint.hasPort = valid;
                 }
-
-                ip = wcsstr(ip + 2, L"IP");
             }
-
-            return endpoint.hasIp && endpoint.hasPort;
+            LocalFree(arguments);
+            return valid && endpoint.hasIp && endpoint.hasPort;
         }
 
-        bool IsAoRebirthEndpoint(const LaunchEndpoint& endpoint)
+        bool IsEndpointAddress(const LaunchEndpoint& endpoint, unsigned long hostOrder, unsigned long networkOrder)
         {
-            return endpoint.hasIp &&
-                endpoint.hasPort &&
-                (endpoint.ip == AoRebirthLoginIpHostOrder ||
-                 endpoint.ip == AoRebirthLoginIpClientArgumentOrder ||
-                 endpoint.ip == AoRebirthLocalIpHostOrder ||
-                 endpoint.ip == AoRebirthLocalIpClientArgumentOrder) &&
-                endpoint.port == AoRebirthLoginPort;
+            // Dotted input explicitly specifies octet order. Older numeric launchers use either representation.
+            return endpoint.ip == hostOrder || (!endpoint.dottedIp && endpoint.ip == networkOrder);
+        }
+
+        bool IsServerHost(std::string_view host)
+        {
+            if (host.empty() || host.size() > 253)
+            {
+                return false;
+            }
+
+            if (host.find_first_not_of("0123456789.") == std::string_view::npos)
+            {
+                const std::wstring wide(host.begin(), host.end());
+                unsigned long ignored = 0;
+                const wchar_t* end = nullptr;
+                return ParseDottedIpToken(wide.c_str(), ignored, &end) && *end == L'\0';
+            }
+
+            while (!host.empty())
+            {
+                const size_t dot = host.find('.');
+                const std::string_view label = host.substr(0, dot);
+                if (label.empty() || label.size() > 63 || label.front() == '-' || label.back() == '-' ||
+                    label.find_first_not_of("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ-") !=
+                        std::string_view::npos)
+                {
+                    return false;
+                }
+
+                if (dot == std::string_view::npos)
+                {
+                    return true;
+                }
+                host.remove_prefix(dot + 1);
+            }
+            return false;
+        }
+
+        bool ParseDailyHost(std::string_view host, std::string& name)
+        {
+            if (!IsServerHost(host))
+            {
+                return false;
+            }
+            name.assign(host);
+            std::transform(name.begin(), name.end(), name.begin(), [](char ch)
+            {
+                return ch >= 'A' && ch <= 'Z' ? static_cast<char>(ch + 'a' - 'A') : ch;
+            });
+            return true;
+        }
+
+        bool ParseDailyHosts(std::string_view hosts, std::vector<std::string>& names)
+        {
+            for (;;)
+            {
+                const size_t comma = hosts.find(',');
+                std::string name;
+                if (!ParseDailyHost(hosts.substr(0, comma), name) ||
+                    std::find(names.begin(), names.end(), name) != names.end())
+                {
+                    return false;
+                }
+                names.push_back(name);
+                if (comma == std::string_view::npos)
+                {
+                    return true;
+                }
+                hosts.remove_prefix(comma + 1);
+            }
+        }
+
+        bool ParseLoginServers(std::string_view text, LoginServerConfig& config)
+        {
+            LoginServerConfig parsed;
+            bool hasDefault = false;
+            bool needsDailyHosts = false;
+            if (text.substr(0, 3) == "\xef\xbb\xbf")
+            {
+                text.remove_prefix(3);
+            }
+            while (!text.empty())
+            {
+                const size_t newline = text.find('\n');
+                std::string_view line = text.substr(0, newline);
+                text.remove_prefix(newline == std::string_view::npos ? text.size() : newline + 1);
+                line = line.substr(0, line.find('#'));
+                const size_t first = line.find_first_not_of(" \t\r");
+                if (first == std::string_view::npos)
+                {
+                    continue;
+                }
+                line = line.substr(first, line.find_last_not_of(" \t\r") - first + 1);
+
+                constexpr std::string_view OriginalDailyHostPrefix = "daily-original-host=";
+                if (line.substr(0, OriginalDailyHostPrefix.size()) == OriginalDailyHostPrefix)
+                {
+                    if (!parsed.originalDailyHost.empty() ||
+                        !ParseDailyHost(line.substr(OriginalDailyHostPrefix.size()), parsed.originalDailyHost))
+                    {
+                        return false;
+                    }
+                    continue;
+                }
+
+                constexpr std::string_view DailyHostsPrefix = "daily-hosts=";
+                if (line.substr(0, DailyHostsPrefix.size()) == DailyHostsPrefix)
+                {
+                    if (!parsed.dailyHosts.empty() ||
+                        !ParseDailyHosts(line.substr(DailyHostsPrefix.size()), parsed.dailyHosts))
+                    {
+                        return false;
+                    }
+                    continue;
+                }
+
+                const size_t space = line.find_first_of(" \t");
+                const std::string_view endpoint = line.substr(0, space);
+                const size_t colon = endpoint.find(':');
+                if (colon == std::string_view::npos || !IsServerHost(endpoint.substr(0, colon)))
+                {
+                    return false;
+                }
+
+                const std::string_view digits = endpoint.substr(colon + 1);
+                if (digits.empty() || digits.size() > 5 || digits.find_first_not_of("0123456789") != std::string_view::npos)
+                {
+                    return false;
+                }
+                unsigned long port = 0;
+                for (const char digit : digits)
+                {
+                    port = port * 10ul + static_cast<unsigned long>(digit - '0');
+                }
+                if (port == 0 || port > 65535)
+                {
+                    return false;
+                }
+
+                DailyLoginMode dailyMode = DailyLoginMode::Off;
+                bool dailyDefault = false;
+                if (space != std::string_view::npos)
+                {
+                    const std::string_view options = line.substr(line.find_first_not_of(" \t", space));
+                    const size_t optionEnd = options.find_first_of(" \t");
+                    const std::string_view option = options.substr(0, optionEnd);
+                    if (option == "rewrite-http")
+                    {
+                        dailyMode = DailyLoginMode::RewriteHttp;
+                    }
+                    else if (option == "preserve-http")
+                    {
+                        dailyMode = DailyLoginMode::PreserveHttp;
+                    }
+                    else
+                    {
+                        return false;
+                    }
+                    needsDailyHosts = true;
+                    if (optionEnd != std::string_view::npos)
+                    {
+                        if (hasDefault || options.substr(options.find_first_not_of(" \t", optionEnd)) != "default")
+                        {
+                            return false;
+                        }
+                        dailyDefault = hasDefault = true;
+                    }
+                }
+                const std::string host(endpoint.substr(0, colon));
+                if (std::any_of(parsed.servers.begin(), parsed.servers.end(), [&](const LoginServer& row)
+                    { return row.port == port && _stricmp(row.host.c_str(), host.c_str()) == 0; }))
+                {
+                    return false;
+                }
+                parsed.servers.push_back({ host, port, dailyMode, dailyDefault });
+            }
+            if (parsed.servers.empty())
+            {
+                return false;
+            }
+            if (needsDailyHosts || !parsed.originalDailyHost.empty() || !parsed.dailyHosts.empty())
+            {
+                // A rewritten Host header must still fit the original request's byte width.
+                if (parsed.originalDailyHost.empty() || parsed.dailyHosts.empty() ||
+                    std::any_of(parsed.dailyHosts.begin(), parsed.dailyHosts.end(), [&](const std::string& host)
+                    {
+                        return host == parsed.originalDailyHost || host.size() > parsed.originalDailyHost.size();
+                    }))
+                {
+                    return false;
+                }
+            }
+            config = std::move(parsed);
+            return true;
         }
 
         std::string Hex(const std::vector<unsigned char>& bytes)
@@ -298,7 +480,8 @@ namespace aorf
             return result;
         }
 
-        bool ReadFileBytes(const wchar_t* path, std::vector<unsigned char>& bytes)
+        bool ReadFileBytes(const wchar_t* path, std::vector<unsigned char>& bytes,
+            LONGLONG maximumSize = 64ll * 1024ll * 1024ll)
         {
             HANDLE file = CreateFileW(
                 path,
@@ -314,7 +497,7 @@ namespace aorf
             }
 
             LARGE_INTEGER size = {};
-            if (!GetFileSizeEx(file, &size) || size.QuadPart <= 0 || size.QuadPart > 64ll * 1024ll * 1024ll)
+            if (!GetFileSizeEx(file, &size) || size.QuadPart <= 0 || size.QuadPart > maximumSize)
             {
                 CloseHandle(file);
                 return false;
@@ -330,6 +513,161 @@ namespace aorf
                 nullptr) && read == bytes.size();
             CloseHandle(file);
             return ok;
+        }
+
+        bool ReadLoginServers(const wchar_t* path, LoginServerConfig& config)
+        {
+            std::vector<unsigned char> bytes;
+            return ReadFileBytes(path, bytes, MaximumServerConfigBytes) &&
+                ParseLoginServers(
+                    std::string_view(reinterpret_cast<const char*>(bytes.data()), bytes.size()), config);
+        }
+
+        bool TryLoadLoginServers(LoginServerConfig& config)
+        {
+            HMODULE module = nullptr;
+            wchar_t path[MAX_PATH] = {};
+            if (!GetModuleHandleExW(
+                    GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+                    LoginServersFile, &module))
+            {
+                return false;
+            }
+            const DWORD length = GetModuleFileNameW(module, path, MAX_PATH);
+            if (length == 0 || length >= MAX_PATH)
+            {
+                return false;
+            }
+            std::wstring filename(path, length);
+            const size_t separator = filename.find_last_of(L"\\/");
+            if (separator == std::wstring::npos)
+            {
+                return false;
+            }
+            filename.resize(separator + 1);
+            filename += LoginServersFile;
+
+            return ReadLoginServers(filename.c_str(), config);
+        }
+
+        bool ResolveServerAddress(const LoginServer& server, const LaunchEndpoint* endpoint,
+            unsigned long& host, bool& ambiguous)
+        {
+            ADDRINFOA hints = {};
+            hints.ai_family = AF_INET;
+            hints.ai_socktype = SOCK_STREAM;
+            ADDRINFOA* addresses = nullptr;
+            if (getaddrinfo(server.host.c_str(), nullptr, &hints, &addresses) != 0)
+            {
+                return false;
+            }
+
+            bool found = false;
+            for (const ADDRINFOA* address = addresses; address; address = address->ai_next)
+            {
+                if (address->ai_family != AF_INET || address->ai_addrlen < sizeof(sockaddr_in))
+                {
+                    continue;
+                }
+                const auto* ipv4 = reinterpret_cast<const sockaddr_in*>(address->ai_addr);
+                const unsigned long networkOrder = ipv4->sin_addr.s_addr;
+                const unsigned long hostOrder = ntohl(networkOrder);
+                if (endpoint && !IsEndpointAddress(*endpoint, hostOrder, networkOrder))
+                {
+                    continue;
+                }
+                if (found && host != hostOrder)
+                {
+                    ambiguous = true;
+                    break;
+                }
+                host = hostOrder;
+                found = true;
+            }
+            freeaddrinfo(addresses);
+            return found && !ambiguous;
+        }
+
+        bool SelectConfiguredServer(const LoginServerConfig& config, const wchar_t* commandLine,
+            bool allowDailyDefault, LoginServerSelection& selection, const char*& failure)
+        {
+            if (config.servers.empty())
+            {
+                failure = "server_config_missing_or_invalid";
+                return false;
+            }
+
+            LaunchEndpoint endpoint = {};
+            const bool hasEndpoint = TryParseLaunchEndpoint(commandLine, endpoint);
+            if (!hasEndpoint && !allowDailyDefault)
+            {
+                failure = "auto_endpoint_unavailable";
+                return false;
+            }
+
+            WSADATA winsock = {};
+            if (WSAStartup(MAKEWORD(2, 2), &winsock) != 0)
+            {
+                failure = "server_resolution_unavailable";
+                return false;
+            }
+            const LoginServer* matched = nullptr;
+            const LoginServer* dailyDefault = nullptr;
+            unsigned long selectedAddress = 0;
+            bool ambiguous = false;
+            for (const LoginServer& server : config.servers)
+            {
+                if (server.dailyDefault)
+                {
+                    dailyDefault = &server;
+                }
+                unsigned long address = 0;
+                if (hasEndpoint && server.port == endpoint.port)
+                {
+                    const bool found = ResolveServerAddress(server, &endpoint, address, ambiguous);
+                    if (ambiguous || (found && matched))
+                    {
+                        ambiguous = true;
+                        break;
+                    }
+                    if (found)
+                    {
+                        matched = &server;
+                        selectedAddress = address;
+                    }
+                }
+            }
+            const bool matchedEndpoint = matched != nullptr;
+            if (!ambiguous && !matched && allowDailyDefault && dailyDefault &&
+                ResolveServerAddress(*dailyDefault, nullptr, selectedAddress, ambiguous))
+            {
+                matched = dailyDefault;
+            }
+            WSACleanup();
+            if (ambiguous || !matched)
+            {
+                failure = ambiguous ? "ambiguous_server_match" : "auto_endpoint_not_aorebirth";
+                return false;
+            }
+
+            selection = {};
+            for (size_t i = 0; i < selection.addressBytes.size(); ++i)
+            {
+                const auto octet = static_cast<unsigned char>(selectedAddress >> (24 - i * 8));
+                if (i != 0)
+                {
+                    selection.address += '.';
+                }
+                selection.address += std::to_string(octet);
+                selection.addressBytes[i] = octet;
+            }
+            selection.wideAddress.assign(selection.address.begin(), selection.address.end());
+            selection.dailyMode = matched->dailyMode;
+            selection.originalDailyHost = config.originalDailyHost;
+            selection.dailyHosts = config.dailyHosts;
+            selection.port = matched->port;
+            selection.matchedLaunchEndpoint = matchedEndpoint;
+            return true;
         }
 
         bool Sha256(const std::vector<unsigned char>& bytes, std::string& hash)
@@ -603,23 +941,15 @@ namespace aorf
 
             if (policy == Policy::Auto)
             {
-                LaunchEndpoint endpoint = {};
-                if (!TryParseLaunchEndpoint(GetCommandLineW(), endpoint))
+                LoginServerSelection selection = {};
+                const char* failure = nullptr;
+                if (!TrySelectLoginServer(false, selection, failure))
                 {
-                    Log("LOGINKEY patch=SKIP reason=auto_endpoint_unavailable");
+                    Log("LOGINKEY patch=SKIP reason=%s", failure);
                     return 0;
                 }
 
-                if (!IsAoRebirthEndpoint(endpoint))
-                {
-                    Log(
-                        "LOGINKEY patch=SKIP reason=auto_endpoint_not_aorebirth ipFormat=%s port=%lu",
-                        endpoint.dottedIp ? "dotted" : "numeric",
-                        endpoint.port);
-                    return 0;
-                }
-
-                Log("LOGINKEY patch=ARMED reason=auto_endpoint_aorebirth port=%lu", endpoint.port);
+                Log("LOGINKEY patch=ARMED reason=auto_endpoint_listed port=%lu", selection.port);
             }
 
             bool completed[sizeof(Targets) / sizeof(Targets[0])] = {};
@@ -657,6 +987,48 @@ namespace aorf
         }
     }
 
+    bool TrySelectLoginServer(bool allowDailyDefault,
+        LoginServerSelection& selection, const char*& failure)
+    {
+        static const LoginServerConfig config = []()
+        {
+            LoginServerConfig loaded;
+            TryLoadLoginServers(loaded);
+            return loaded;
+        }();
+        struct CachedSelection
+        {
+            LoginServerSelection target = {};
+            const char* failure = nullptr;
+            bool found = false;
+        };
+        // Both hooks use the same match even if DNS changes after one starts installing imports.
+        static const CachedSelection launch = []()
+        {
+            CachedSelection result;
+            result.found = SelectConfiguredServer(
+                config, GetCommandLineW(), false, result.target, result.failure);
+            return result;
+        }();
+        if (launch.found || !allowDailyDefault ||
+            std::strcmp(launch.failure, "ambiguous_server_match") == 0)
+        {
+            selection = launch.target;
+            failure = launch.failure;
+            return launch.found;
+        }
+        static const CachedSelection fallback = []()
+        {
+            CachedSelection result;
+            result.found = SelectConfiguredServer(
+                config, nullptr, true, result.target, result.failure);
+            return result;
+        }();
+        selection = fallback.target;
+        failure = fallback.failure;
+        return fallback.found;
+    }
+
     bool StartLoginKeyPatchWorker()
     {
         if (InterlockedCompareExchange(&LoginKeyWorkerStarted, 1, 0) != 0)
@@ -675,80 +1047,91 @@ namespace aorf
         return true;
     }
 
-        bool RunLoginKeyPatchSelfTest()
+        bool RunLoginKeyPatchSelfTest(const wchar_t* packagedServers)
         {
             if (PublicKeyLength != sizeof(AoRebirthPublicKey) - 1)
             {
                 return false;
             }
 
-            LaunchEndpoint endpoint = {};
-            if (!TryParseLaunchEndpoint(L"anarchyonline.exe IA35151902 IP7500 DUprivate", endpoint) ||
-                !IsAoRebirthEndpoint(endpoint) ||
-                endpoint.dottedIp)
+            LoginServerConfig shipped;
+            if (!packagedServers || !ReadLoginServers(packagedServers, shipped))
             {
                 return false;
             }
 
-            if (!TryParseLaunchEndpoint(L"anarchyonline.exe IA509614082 IP7500 DUprivate", endpoint) ||
-                !IsAoRebirthEndpoint(endpoint) ||
-                endpoint.dottedIp)
+            LoginServerConfig config;
+            if (!ParseLoginServers(
+                    "daily-original-host=original-daily.example\n"
+                    "daily-hosts=daily.example,alternate.example\n"
+                    "192.0.2.10:7500 rewrite-http default\n"
+                    "127.0.0.1:7500 preserve-http\n"
+                    "198.51.100.1:7501 # key only\n", config))
             {
                 return false;
             }
 
-            if (!TryParseLaunchEndpoint(L"anarchyonline.exe IA2.24.96.30 IP7500 DUprivate", endpoint) ||
-                !IsAoRebirthEndpoint(endpoint) ||
-                !endpoint.dottedIp)
+            const wchar_t* productionCommands[] =
+            {
+                L"anarchyonline.exe IA192.0.2.10 IP7500 DUprivate",
+                L"anarchyonline.exe IA3221225994 IP7500 DUprivate",
+                L"anarchyonline.exe IA167903424 IP7500 DUprivate"
+            };
+            LoginServerSelection selection = {};
+            const char* failure = nullptr;
+            for (const wchar_t* command : productionCommands)
+            {
+                if (!SelectConfiguredServer(config, command, false, selection, failure) ||
+                    !selection.matchedLaunchEndpoint || selection.address != "192.0.2.10" ||
+                    selection.dailyMode != DailyLoginMode::RewriteHttp ||
+                    selection.originalDailyHost != "original-daily.example" ||
+                    selection.dailyHosts.front() != "daily.example")
+                {
+                    return false;
+                }
+            }
+
+            if (!SelectConfiguredServer(config, L"anarchyonline.exe IA127.0.0.1 IP7500", false, selection, failure) ||
+                selection.address != "127.0.0.1" || selection.dailyMode != DailyLoginMode::PreserveHttp ||
+                !SelectConfiguredServer(config, L"anarchyonline.exe IA198.51.100.1 IP7501", false, selection, failure) ||
+                selection.dailyMode != DailyLoginMode::Off)
             {
                 return false;
             }
 
-            if (!TryParseLaunchEndpoint(L"anarchyonline.exe IA127.0.0.1 IP7500 DUprivate", endpoint) ||
-                !IsAoRebirthEndpoint(endpoint) ||
-                !endpoint.dottedIp)
+            const wchar_t* rejectedCommands[] =
             {
-                return false;
+                L"anarchyonline.exe IA10.2.0.192 IP7500",
+                L"anarchyonline.exe IA192.0.2.10 IP7505",
+                L"anarchyonline.exe IA192.0.2.10 IP7506",
+                L"anarchyonline.exe IA127.0.0.1 IP80",
+                L"anarchyonline.exe IA123456 IP7500",
+                L"anarchyonline.exe DUmissing",
+                L"anarchyonline.exe BADIA192.0.2.10 IP7500",
+                L"anarchyonline.exe IA192.0.2.10 IP7500 IP7501"
+            };
+            for (const wchar_t* command : rejectedCommands)
+            {
+                if (SelectConfiguredServer(config, command, false, selection, failure))
+                {
+                    return false;
+                }
             }
 
-            if (!TryParseLaunchEndpoint(L"anarchyonline.exe IA2130706433 IP7500 DUprivate", endpoint) ||
-                !IsAoRebirthEndpoint(endpoint) ||
-                endpoint.dottedIp)
-            {
-                return false;
-            }
-
-            if (!TryParseLaunchEndpoint(L"anarchyonline.exe IA35151902 IP80 DUprivate", endpoint) ||
-                IsAoRebirthEndpoint(endpoint))
-            {
-                return false;
-            }
-
-            if (!TryParseLaunchEndpoint(L"anarchyonline.exe IA2.24.96.30 IP7505 DUofficial", endpoint) ||
-                IsAoRebirthEndpoint(endpoint))
-            {
-                return false;
-            }
-
-            if (!TryParseLaunchEndpoint(L"anarchyonline.exe IA2.24.96.30 IP7506 DUofficial", endpoint) ||
-                IsAoRebirthEndpoint(endpoint))
-            {
-                return false;
-            }
-
-            if (!TryParseLaunchEndpoint(L"anarchyonline.exe IA127.0.0.1 IP80 DUunknown", endpoint) ||
-                IsAoRebirthEndpoint(endpoint))
-            {
-                return false;
-            }
-
-            if (!TryParseLaunchEndpoint(L"anarchyonline.exe IA123456 IP7500 DUofficial", endpoint) ||
-                IsAoRebirthEndpoint(endpoint))
-            {
-                return false;
-            }
-
-            if (TryParseLaunchEndpoint(L"anarchyonline.exe DUmissing", endpoint))
+            LoginServerConfig invalid;
+            LoginServerConfig byteOrderCollision;
+            if (!SelectConfiguredServer(config, L"anarchyonline.exe DUmissing", true, selection, failure) ||
+                selection.matchedLaunchEndpoint || selection.address != "192.0.2.10" ||
+                !ParseLoginServers("192.0.2.10:7500\n10.2.0.192:7500\n", byteOrderCollision) ||
+                SelectConfiguredServer(byteOrderCollision, productionCommands[1], false, selection, failure) ||
+                !SelectConfiguredServer(byteOrderCollision, productionCommands[0], false, selection, failure) ||
+                selection.address != "192.0.2.10" ||
+                ParseLoginServers("192.0.2.10:7500\nbad:99999\n", invalid) ||
+                ParseLoginServers("192.0.2.10:7500 rewrite-http default\n", invalid) ||
+                ParseLoginServers("daily-hosts=long.example\n192.0.2.10:7500 rewrite-http\n", invalid) ||
+                ParseLoginServers("daily-original-host=a.test\ndaily-hosts=long.example\n192.0.2.10:7500 rewrite-http\n", invalid) ||
+                ParseLoginServers("192.0.2.10:7500\n192.0.2.10:7500\n", invalid) ||
+                ParseLoginServers("# empty list\n", invalid))
             {
                 return false;
             }

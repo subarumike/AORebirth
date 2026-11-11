@@ -69,7 +69,7 @@ cl /nologo /std:c++17 /O2 /GL /Gy /EHsc /W4 /WX /MT ^
   "%SRC%\version_proxy.cpp" ^
   /link /DLL /MACHINE:X86 /LTCG /OPT:REF /OPT:ICF /DYNAMICBASE /NXCOMPAT ^
   /guard:cf /Brepro /DEF:"%SRC%\version_proxy.def" ^
-  /OUT:"%BUILD_ROOT%\version.dll" bcrypt.lib user32.lib
+  /OUT:"%BUILD_ROOT%\version.dll" bcrypt.lib user32.lib shell32.lib ws2_32.lib
 if errorlevel 1 (
   popd
   echo [AORebirthClientPatch] ERROR proxy build failed.
@@ -89,13 +89,13 @@ cl /nologo /std:c++17 /O2 /GL /Gy /EHsc /W4 /WX /MT ^
   "%SRC%\self_test.cpp" ^
   /link /MACHINE:X86 /LTCG /OPT:REF /OPT:ICF /DYNAMICBASE /NXCOMPAT ^
   /guard:cf /Brepro /MANIFEST:EMBED /MANIFESTINPUT:"%SRC%\self_test.manifest" ^
-  /OUT:"%BUILD_ROOT%\AORebirthClientPatchSelfTest.exe" bcrypt.lib
+  /OUT:"%BUILD_ROOT%\AORebirthClientPatchSelfTest.exe" bcrypt.lib shell32.lib ws2_32.lib
 if errorlevel 1 (
   popd
   echo [AORebirthClientPatch] ERROR self-test build failed.
   exit /b 1
 )
-"%BUILD_ROOT%\AORebirthClientPatchSelfTest.exe"
+"%BUILD_ROOT%\AORebirthClientPatchSelfTest.exe" "%ROOT%AORebirthServers.txt"
 if errorlevel 1 (
   popd
   echo [AORebirthClientPatch] ERROR offline wrapper self-test failed.
@@ -207,6 +207,8 @@ copy /Y "%ROOT%AORebirthAnarchyLauncher.url" "%STAGE%\AORebirthAnarchyLauncher.u
 if errorlevel 1 goto :stage_copy_failed
 copy /Y "%ROOT%AORebirthDimensionServer.url" "%STAGE%\AORebirthDimensionServer.url" >nul
 if errorlevel 1 goto :stage_copy_failed
+copy /B "%ROOT%AORebirthServers.txt" "%STAGE%\AORebirthServers.txt" >nul
+if errorlevel 1 goto :stage_copy_failed
 copy /Y "%ROOT%Install.cmd" "%STAGE%\Install.cmd" >nul
 if errorlevel 1 goto :stage_copy_failed
 copy /Y "%ROOT%Uninstall.cmd" "%STAGE%\Uninstall.cmd" >nul
@@ -228,7 +230,7 @@ if errorlevel 1 (
 )
 
 set "TEMP_ZIP=%BUILD_ROOT%\AORebirthClientPatch-v%PATCH_VERSION%.zip"
-tar.exe -a -c -f "%TEMP_ZIP%" -C "%STAGE%" AOReloaded-MIT.txt AORebirthClientPatchDeploy.exe AORebirthAnarchyLauncher.url AORebirthDimensionServer.url Install.cmd README.txt SHA256SUMS.txt Uninstall.cmd version.dll
+tar.exe -a -c -f "%TEMP_ZIP%" -C "%STAGE%" AOReloaded-MIT.txt AORebirthClientPatchDeploy.exe AORebirthAnarchyLauncher.url AORebirthDimensionServer.url AORebirthServers.txt Install.cmd README.txt SHA256SUMS.txt Uninstall.cmd version.dll
 if errorlevel 1 (
   echo [AORebirthClientPatch] ERROR package ZIP creation failed.
   exit /b 1
@@ -307,6 +309,7 @@ set "SETUP_STAGE=%STAGE:\=/%"
   echo 101 RCDATA "%SETUP_STAGE%/AORebirthAnarchyLauncher.url"
   echo 102 RCDATA "%SETUP_STAGE%/AORebirthDimensionServer.url"
   echo 103 RCDATA "%SETUP_STAGE%/version.dll"
+  echo 104 RCDATA "%SETUP_STAGE%/AORebirthServers.txt"
 ) > "%SETUP_RC%"
 
 rc /nologo /fo "%SETUP_RES%" "%SETUP_RC%"

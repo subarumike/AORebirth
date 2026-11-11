@@ -22,6 +22,7 @@ namespace AORebirthClientPatchDeploy
     constexpr wchar_t ProxyName[] = L"version.dll";
     constexpr wchar_t ProxyBackupSuffix[] = L".AORebirthBackup";
     constexpr wchar_t LauncherBackupSuffix[] = L".AORebirthBackup";
+    constexpr wchar_t LoginServersPayload[] = L"AORebirthServers.txt";
 
     constexpr const wchar_t* PayloadNames[] =
     {
@@ -29,6 +30,7 @@ namespace AORebirthClientPatchDeploy
         L"AORebirthClientPatchDeploy.exe",
         L"AORebirthAnarchyLauncher.url",
         L"AORebirthDimensionServer.url",
+        LoginServersPayload,
         L"Install.cmd",
         L"README.txt",
         L"Uninstall.cmd",
@@ -370,6 +372,37 @@ namespace AORebirthClientPatchDeploy
 
         DeletePinnedRegularFile(targetPath);
         return false;
+    }
+
+    bool SeedLoginServers(const std::wstring& clientRoot, const std::wstring& packageRoot)
+    {
+        const std::wstring source = Combine(packageRoot, LoginServersPayload);
+        if (!IsRegularFile(source))
+        {
+            return false;
+        }
+        const std::wstring directory = Combine(clientRoot, L"aorebirth-patch");
+        if (!CreateDirectoryW(directory.c_str(), nullptr) && GetLastError() != ERROR_ALREADY_EXISTS)
+        {
+            return false;
+        }
+        UniqueHandle pinnedDirectory(CreateFileW(directory.c_str(), FILE_READ_ATTRIBUTES,
+            FILE_SHARE_READ | FILE_SHARE_WRITE, nullptr, OPEN_EXISTING,
+            FILE_FLAG_BACKUP_SEMANTICS | FILE_FLAG_OPEN_REPARSE_POINT, nullptr));
+        BY_HANDLE_FILE_INFORMATION info = {};
+        if (!pinnedDirectory.IsValid() || !GetFileInformationByHandle(pinnedDirectory.Get(), &info) ||
+            (info.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) == 0 ||
+            (info.dwFileAttributes & FILE_ATTRIBUTE_REPARSE_POINT) != 0)
+        {
+            return false;
+        }
+
+        const std::wstring target = Combine(directory, L"servers.txt");
+        if (PathExists(target))
+        {
+            return IsRegularFile(target);
+        }
+        return CopyVerifiedNoReplace(source, target);
     }
 
     bool ReadSmallHandle(HANDLE file, std::string& result)
@@ -1270,6 +1303,11 @@ namespace AORebirthClientPatchDeploy
         if (!HashPath(Combine(packageRoot, ProxyName), proxyHash))
         {
             std::fwprintf(stderr, L"ERROR package version.dll could not be hashed.\n");
+            return 1;
+        }
+        if (!SeedLoginServers(clientRoot, packageRoot))
+        {
+            std::fwprintf(stderr, L"ERROR could not seed aorebirth-patch\\servers.txt.\n");
             return 1;
         }
 

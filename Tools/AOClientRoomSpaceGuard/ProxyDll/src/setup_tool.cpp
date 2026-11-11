@@ -24,7 +24,8 @@ namespace
     {
         { 101, L"AORebirthAnarchyLauncher.url" },
         { 102, L"AORebirthDimensionServer.url" },
-        { 103, L"version.dll" }
+        { 103, L"version.dll" },
+        { 104, L"AORebirthServers.txt" }
     };
 
     constexpr wchar_t DialogTitle[] = L"AORebirth Client Patch";
