@@ -432,6 +432,11 @@ namespace AORebirth.Database.Domain.Missions
         private static void RetireGeneratedCleanupArtifact(IDbConnection connection, IDbTransaction transaction, MissionItemInstanceData item, int ownerId)
         {
             if (!IsOwnedTopLevelArtifact(item, ownerId)) throw new ArgumentException("Cleanup requires the exact owned top-level inventory row.");
+            RetireExactItemRow(connection, transaction, item);
+        }
+
+        private static void RetireExactItemRow(IDbConnection connection, IDbTransaction transaction, MissionItemInstanceData item)
+        {
             if (connection.Execute("UPDATE item_instances SET ContainerType=0,ContainerPlacement=InstanceId WHERE InstanceId=@InstanceId AND ContainerType=@ContainerType AND ContainerInstance=@ContainerInstance AND ContainerPlacement=@ContainerPlacement AND ItemType=@ItemType AND LowId=@LowId AND HighId=@HighId AND Quality=@Quality AND StackCount=@StackCount AND Source=@Source", item, transaction) != 1)
                 throw new InvalidOperationException("Bound artifact ownership/location/shape changed; complete objective transaction rolled back.");
         }

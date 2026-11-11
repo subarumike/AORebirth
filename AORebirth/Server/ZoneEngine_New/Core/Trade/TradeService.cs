@@ -1276,17 +1276,18 @@ namespace ZoneEngine_New.Core.Trade
         /// Opens the "Give Item" window for <paramref name="npc"/>. The client moves each item into its own
         /// KnuBot trade container as it sends it (Gamecode.dll N3Msg_NPCChatAddTradeItem), so the server mirrors
         /// that container: items leave the player's page and sit locked in <see cref="TradeSession.InitiatorOffer"/>
-        /// at the index the client used, the first free one. Nothing is written until the trade commits, so an
-        /// interrupted trade leaves every item at its stored location.
+        /// at the index the client used, the first free one. Authored one-item trades consume the parked
+        /// offer through their mission transaction.
         /// </summary>
         /// <param name="slots">The window's item slots: the script's largest trade (<see cref="Knubot.KnubotScript.TradeSlots"/>).</param>
-        public bool TryOpenKnubot(Player player, NpcCharacter npc, string message, int slots = TradeOffer.Capacity)
+        public bool TryOpenKnubot(Player player, NpcCharacter npc, string message, int slots = TradeOffer.Capacity,
+            bool usesAuthoredTurnIn = false)
         {
             ArgumentNullException.ThrowIfNull(player);
             ArgumentNullException.ThrowIfNull(npc);
 
             if (player.Session == null || player.Playfield == null || !player.Inventory.IsHydrated || player.IsDead
-                || npc.IsDead || !ReferenceEquals(npc.Playfield, player.Playfield))
+                || npc.IsDead || !ReferenceEquals(npc.Playfield, player.Playfield) || (usesAuthoredTurnIn && slots != 1))
                 return false;
 
             if (player.GetEdgeDistanceTo(npc) > RangeCancelDistance)
@@ -1297,14 +1298,15 @@ namespace ZoneEngine_New.Core.Trade
 
             if (TryGetSession(player, out TradeSession existing))
             {
-                if (existing.Kind == TradeKind.Knubot && ReferenceEquals(existing.Npc, npc))
+                if (existing.Kind == TradeKind.Knubot && ReferenceEquals(existing.Npc, npc)
+                    && existing.UsesAuthoredTurnIn == usesAuthoredTurnIn)
                     return true;
 
                 Close(existing, "opening another trade");
             }
 
             var session = new TradeSession(Identity.None, TradeKind.Knubot, player, partner: null, machine: null, npc,
-                initiatorSlots: slots);
+                initiatorSlots: slots) { UsesAuthoredTurnIn = usesAuthoredTurnIn };
             Register(player, session);
 
             // The client rejects an empty text (length must be 1..10000).
@@ -1365,7 +1367,9 @@ namespace ZoneEngine_New.Core.Trade
             }
 
             // No-drop items are allowed: the NPC only consumes them, they never reach another player.
-            string? refusal = InventoryMoveService.IsBagItem(item) ? "Feedback_ItemCantBeTraded"
+            string? refusal = InventoryMoveService.IsBagItem(item)
+                || (session.UsesAuthoredTurnIn && (!item.IsPersisted || item.InstanceId <= 0 || item.StackCount != 1))
+                ? "Feedback_ItemCantBeTraded"
                 : clientSlot < 0 ? "Feedback_CantTradeMoreItems"
                 : null;
             if (refusal != null)
@@ -1432,7 +1436,7 @@ namespace ZoneEngine_New.Core.Trade
             ArgumentNullException.ThrowIfNull(player);
             ArgumentNullException.ThrowIfNull(npc);
 
-            if (!TryGetKnubot(player, npc, out TradeSession session) || credits < 0
+            if (!TryGetKnubot(player, npc, out TradeSession session) || session.UsesAuthoredTurnIn || credits < 0
                 || player.Stats.GetOrZero(CharacterStat.Cash) < credits)
                 return false;
 
@@ -1470,6 +1474,37 @@ namespace ZoneEngine_New.Core.Trade
             _logger.Info(string.Format(CultureInfo.InvariantCulture, "Knubot trade completed player={0} npc={1} items={2} credits={3}",
                 player.Identity.Instance, npc.Identity.Instance, given.Length, credits));
             return true;
+        }
+
+        internal bool TryCommitAuthoredKnubot(Player player, NpcCharacter npc, Func<Item, Action, bool> commit)
+        {
+            if (!TryGetKnubot(player, npc, out TradeSession session) || !session.UsesAuthoredTurnIn
+                || !session.InitiatorOffer.Items.TryGetValue(0, out Item? item) || !item.Locked)
+                return false;
+
+            session.Committing = true;
+            bool applied = commit(item, () =>
+            {
+                session.InitiatorOffer.DrainAll();
+                Unregister(player);
+                player.Session?.Send(RejectedItemsFrame(player, npc, [], 0));
+                ModuleHooks.ItemMoved(player, item, ModuleHooks.Place(ItemPlaceKind.Trade, npc.Identity),
+                    ModuleHooks.Place(ItemPlaceKind.Destroyed));
+            });
+            if (applied)
+                return true;
+
+            if (player.IsPersistenceQuarantined)
+            {
+                // The authored service closed the transport. Returning the item would assume a rollback.
+                session.InitiatorOffer.DrainAll();
+                Unregister(player);
+            }
+            else
+            {
+                session.Committing = false;
+            }
+            return false;
         }
 
         /// <summary>Ends <paramref name="player"/>'s Knubot trade with <paramref name="npc"/>, handing everything back.</summary>

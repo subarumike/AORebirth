@@ -12,19 +12,21 @@ using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.Inventory;
+using ZoneEngine_New.Core.Missions;
 using ZoneEngine_New.Core.Modules;
 using ZoneEngine_New.Core.Quests;
 using ZoneEngine_New.Core.Trade;
 
 /// <summary>Services a line's effects are applied through.</summary>
 public sealed class KnubotEffectServices(QuestService quests, HashItemMinter minter, InventoryFlushService flush, TradeService trades,
-    InventoryActionService inventoryActions)
+    InventoryActionService inventoryActions, AuthoredQuestService authoredQuests)
 {
     public QuestService Quests { get; } = quests;
     public HashItemMinter Minter { get; } = minter;
     public InventoryFlushService Flush { get; } = flush;
     public TradeService Trades { get; } = trades;
     public InventoryActionService InventoryActions { get; } = inventoryActions;
+    public AuthoredQuestService AuthoredQuests { get; } = authoredQuests;
 }
 
 /// <summary>What a line's effects would do, built before anything is applied.</summary>
@@ -209,10 +211,19 @@ public sealed record KnubotOpenShop : KnubotEffect
 /// <summary><c>{opentrade}</c>: opens the NPC's Give Item window for the script's Trades.</summary>
 public sealed record KnubotOpenTrade : KnubotEffect
 {
-    public override bool Check(KnubotContext context, KnubotPlan plan, KnubotEffectServices services) => context.Script.Trades.Length != 0;
+    public override bool Check(KnubotContext context, KnubotPlan plan, KnubotEffectServices services)
+    {
+        if (context.Script.TimedTrade is not { TimedTurnIn: string key })
+            return context.Script.Trades.Length != 0;
+
+        return services.AuthoredQuests.ResolveNpcTimedTurnIn(context.Player, context.Npc, key) is { } rule
+            && services.AuthoredQuests.CanOpenTimedTrade(context.Player, rule);
+    }
 
     public override void Apply(KnubotContext context, KnubotEffectServices services)
-        => services.Trades.TryOpenKnubot(context.Player, context.Npc, KnubotService.TradeText(context.Npc), context.Script.TradeSlots);
+        => services.Trades.TryOpenKnubot(context.Player, context.Npc,
+            context.Script.TimedTrade?.Prompt ?? KnubotService.TradeText(context.Npc), context.Script.TradeSlots,
+            usesAuthoredTurnIn: context.Script.TimedTrade != null);
 }
 
 /// <summary>

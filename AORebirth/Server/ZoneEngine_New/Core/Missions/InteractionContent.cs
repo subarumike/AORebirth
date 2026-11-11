@@ -173,6 +173,7 @@ public sealed class TimedTurnInDefinition
     public string CooldownObjective { get; set; } = ""; public string CooldownFlag { get; set; } = "";
     public string GrantedFlag { get; set; } = ""; public int CooldownSeconds { get; set; }
     public int[] TurnInPlayfields { get; set; } = [];
+    public string? TurnInNpc { get; set; }
     public TimedItem[] Items { get; set; } = [];
     public string XpRewardKey { get; set; } = ""; public string TokenRewardKey { get; set; } = "";
     public string ObservationPrefix { get; set; } = ""; public string EventType { get; set; } = "";

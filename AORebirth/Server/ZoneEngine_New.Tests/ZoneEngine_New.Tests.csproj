@@ -33,6 +33,7 @@
     <Compile Include="../../../Tests/Fixtures/Gameplay/Packets/MorphCaptureWireCatalog.cs" Link="Fixtures/MorphCaptureWireCatalog.cs" />
     <Compile Include="../../../Tests/Fixtures/Gameplay/Doja/DojaChipInteractionRules.cs" Link="Fixtures/DojaChipInteractionRules.cs" />
     <Compile Include="../../../Tests/Fixtures/Gameplay/Doja/DojaChipPacketSender.Data.cs" Link="Fixtures/DojaChipPacketSender.Data.cs" />
+    <None Include="../../GameData/Knubot/ScarlettDalquist.json" Link="DojaGameData/Knubot/ScarlettDalquist.json" CopyToOutputDirectory="PreserveNewest" />
     <Compile Include="../../../Tests/Fixtures/Gameplay/Playfields/CapturedSubwayVendorContentProvider.cs" Link="Fixtures/CapturedSubwayVendorContentProvider.cs" />
     <Compile Include="../../../Tests/Fixtures/Gameplay/Playfields/CapturedBucketheadTechnodealerContentProvider.cs" Link="Fixtures/CapturedBucketheadTechnodealerContentProvider.cs" />
     <Compile Include="../../../Tests/Fixtures/Gameplay/Playfields/CapturedThrakGardenVendorContentProvider.cs" Link="Fixtures/CapturedThrakGardenVendorContentProvider.cs" />
@@ -132,6 +133,15 @@
     <Compile Include="TestDoubles.cs" />
     <Compile Include="NpcBrainTests.cs" />
     <Compile Include="NpcPatrolTests.cs" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(AuthoredTradeFocusedTests)' == 'true'">
+    <Compile Remove="@(Compile)" />
+    <Compile Include="TestDoubles.cs" />
+    <Compile Include="AuthoredQuestTests.cs" />
+    <Compile Include="AuthoredMissionTestDao.cs" />
+    <Compile Include="InteractionContentFixture.cs" />
+    <Compile Include="TradeSessionTests.cs" />
+    <Compile Include="../../../Tests/Fixtures/Gameplay/Doja/*.cs" Link="Fixtures/Doja/%(Filename)%(Extension)" />
   </ItemGroup>
   <ItemGroup Condition="'$(ExpansionHydrationFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />

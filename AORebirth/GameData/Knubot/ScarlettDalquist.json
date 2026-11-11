@@ -1,0 +1,31 @@
+{
+  "Npcs": ["SimpleChar:7A18B924"],
+  "Openers": [{ "Say": "greeting" }],
+  "Replies": {
+    "nascense": {
+      "Text": "I have found a DOJA Chip in Nascense.",
+      "Goto": "trade"
+    }
+  },
+  "Lines": {
+    "greeting": {
+      "Text": "If you are here for a tour… tags, discs or chips just hand them to me.",
+      "Replies": ["nascense"]
+    },
+    "trade": {
+      "Text": "Hand it to me.{opentrade}",
+      "Fail": "greeting"
+    },
+    "thanks": {
+      "Text": "Thank you. The DOJA chip will help us track the creatures in the Shadowlands.",
+      "ShowGoodbye": true
+    }
+  },
+  "Trades": {
+    "nascense": {
+      "TimedTurnIn": "doja-nascense",
+      "Prompt": "Drag and drop the item(s) you want to give to Scarlett Dalquist into one of the slots available and press \"accept\"",
+      "Goto": "thanks"
+    }
+  }
+}

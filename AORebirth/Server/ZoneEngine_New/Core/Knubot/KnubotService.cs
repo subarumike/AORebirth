@@ -233,6 +233,9 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
             // A script with only a TradeRefused line still opens the window: the NPC takes nothing and says it.
             if ((script.Trades.Length == 0 && script.TradeRefused == null) || !InReach(player, npc))
                 return true;
+            // Authored trades open from the captured dialogue choice and its eligibility check.
+            if (script.TimedTrade != null)
+                return true;
 
             if (_sessions.TryGetValue(player.Identity.Instance, out Conversation? conversation))
             {
@@ -333,7 +336,7 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
             KnubotContext context = Context(conversation);
             ZoneEngine_New.Core.Inventory.Item[] offered = session.InitiatorOffer.Items.Values.ToArray();
             KnubotTrade? trade = conversation.Script.Trades.FirstOrDefault(x => KnubotCondition.All(x.If, context) && x.Matches(offered, credits));
-            if (trade == null || (!trade.InspectItems && !effects.Trades.TryCommitKnubot(player, npc, credits)))
+            if (trade == null || (!trade.InspectItems && !CommitTrade(player, npc, trade, credits)))
             {
                 effects.Trades.EndKnubot(player, npc, refund, trade == null ? "no matching trade" : "commit failed");
                 // The items are back with the player; a script may have the NPC say why.
@@ -360,6 +363,16 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
             Pump(conversation);
             return true;
         }
+    }
+
+    bool CommitTrade(Player player, NpcCharacter npc, KnubotTrade trade, int credits)
+    {
+        if (trade.TimedTurnIn is not { } key)
+            return effects.Trades.TryCommitKnubot(player, npc, credits);
+
+        return effects.AuthoredQuests.ResolveNpcTimedTurnIn(player, npc, key) is { } rule
+            && effects.Trades.TryCommitAuthoredKnubot(player, npc, (item, acknowledge) =>
+                effects.AuthoredQuests.TryTurnInOfferedTimedItem(player, item, acknowledge, rule));
     }
 
     /// <summary>True when the close belongs to this player's Knubot chat with <paramref name="target"/>.</summary>
@@ -483,11 +496,12 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
         // A line that opened the Give Item window waits for the trade rather than closing (which would cancel it).
         if (line.CloseSeconds == null && visible.Length == 0 && effects.Trades.TryGetKnubot(conversation.Player, conversation.Npc, out _))
         {
-            QueueReplies(conversation, [KnubotScript.Goodbye]);
+            if (conversation.Script.TimedTrade == null)
+                QueueReplies(conversation, [KnubotScript.Goodbye]);
             return;
         }
 
-        if (line.CloseSeconds != null || visible.Length == 0)
+        if (line.CloseSeconds != null || (visible.Length == 0 && !line.ShowGoodbye))
         {
             QueueClose(conversation, line.CloseSeconds ?? DefaultCloseSeconds);
             return;

@@ -2165,6 +2165,7 @@
   "TimedTurnIns": [
     {
       "Key": "doja-nascense",
+      "TurnInNpc": "SimpleChar:7A18B924",
       "Quest": "Mission:55AA2421",
       "Objective": "mission_55AA2421_turnin",
       "CooldownQuest": "Mission:55AA2803",

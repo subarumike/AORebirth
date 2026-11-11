@@ -147,6 +147,7 @@ namespace ZoneEngine_New.Core.Trade
         internal ZoneEngine_New.Core.Network.IZoneSession? AcceptedShopTransport { get; }
 
         public TradeOffer InitiatorOffer { get; }
+        internal bool UsesAuthoredTurnIn { get; init; }
 
         public TradeOffer PartnerOffer { get; }
 

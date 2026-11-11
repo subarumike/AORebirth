@@ -18,13 +18,17 @@ using ZoneEngine.Core.Doja;
 using ZoneEngine.Core.Missions;
 using ZoneEngine_New.Core.Data;
 using ZoneEngine_New.Core.Entities;
+using ZoneEngine_New.Core.GameData;
 using ZoneEngine_New.Core.Inventory;
+using ZoneEngine_New.Core.Knubot;
 using ZoneEngine_New.Core.MessageHandlers;
 using ZoneEngine_New.Core.Missions;
 using ZoneEngine_New.Core.Mobs;
 using ZoneEngine_New.Core.Playfield.Locality;
 using ZoneEngine_New.Core.Network;
 using ZoneEngine_New.Core.Playfield;
+using ZoneEngine_New.Core.Quests;
+using ZoneEngine_New.Core.Trade;
 using DaoState = AORebirth.Interfaces.Persistence.Missions.MissionLifecycleState;
 
 [TestClass]
@@ -99,8 +103,7 @@ public sealed class AuthoredQuestTests
             Assert.AreSame(item, w.Player.Inventory.Inventory.Content[64]);
             Assert.AreEqual(0, w.Session.Messages.Count);
         };
-        var handler = new GenericCmdMessageHandler(new StubInventoryRepository(), new StubItemBuilder(),
-            (GeneratedMissionAcgService)RuntimeHelpers.GetUninitializedObject(typeof(GeneratedMissionAcgService)), w.Service);
+        var handler = new GenericCmdMessageHandler(new StubInventoryRepository(), new StubItemBuilder(), w.Service);
         handler.Handle(new GenericCmdMessage
         {
             Identity = w.Player.Identity, Action = GenericCmdAction.Use, User = w.Player.Identity, Target = [Slot]
@@ -235,6 +238,177 @@ public sealed class AuthoredQuestTests
         int sent = w.Session.Messages.Count; int calls = w.Dao.Calls;
         Assert.IsFalse(w.Service.TryTurnInDoja(w.Player, Slot, chip, () => accepted++));
         Assert.AreEqual(1, accepted); Assert.AreEqual(sent, w.Session.Messages.Count); Assert.AreEqual(calls + 1, w.Dao.Calls);
+    }
+
+    [TestMethod]
+    [DataRow("accepted")]
+    [DataRow("declined")]
+    [DataRow("wrong-item")]
+    [DataRow("credits")]
+    [DataRow("stale-row")]
+    [DataRow("rollback")]
+    [DataRow("unknown-commit")]
+    public void DojaScarlettHandlersCommitOrReturnTheExactOfferedChip(string result)
+    {
+        using var w = new World(DojaChipInteractionRules.ScarlettPlayfieldId, allowOfferParking: true);
+        Item chip = w.Add(DojaChipInteractionRules.NascenseChipItemId);
+        w.Activate(DojaChipInteractionRules.QuestTurnIn);
+        w.Player.Stats.Set(CharacterStat.Level, 2);
+        w.Player.Stats.Set(CharacterStat.XP, 1500);
+        w.Player.Stats.Set(CharacterStat.Side, 1);
+        NpcCharacter npc = w.AddNpc(DojaChipInteractionRules.ScarlettIdentityText, instance: DojaChipInteractionRules.ScarlettInstance);
+        NpcCharacter otherActor = w.AddNpc("fixture:other-actor");
+        var data = new StubGameData(HashItemCatalog.Parse("{}"), rootPath: Path.Combine(AppContext.BaseDirectory, "DojaGameData"));
+        var catalog = new TemplateCatalog();
+        var items = new StubItemBuilder();
+        var minter = new HashItemMinter(data, catalog, items);
+        var ids = new Ids();
+        var persistence = new NoIndependentTrade();
+        var trades = new TradeService(w.Logger, data, catalog, minter, ids, w.Flush, persistence);
+        var actions = new InventoryActionService(persistence, w.Flush, ids, w.Logger);
+        var quests = new QuestCatalog(data, w.Logger);
+        // This dialogue uses the authored ledger. Accidental use of the ordinary quest service fails the fixture.
+        var questService = (QuestService)RuntimeHelpers.GetUninitializedObject(typeof(QuestService));
+        long time = 100;
+        var knubot = new KnubotService(new KnubotCatalog(data, quests, catalog, w.Logger),
+            new KnubotEffectServices(questService, minter, w.Flush, trades, actions, w.Service), w.Logger, () => time);
+        void TickDialogue()
+        {
+            for (int i = 0; i < 5; i++)
+            {
+                time += 20;
+                knubot.Tick(w.Player.Playfield!);
+            }
+        }
+        new KnuBotStartTradeMessageHandler(knubot).Handle(new KnuBotStartTradeMessage { Target = npc.Identity }, w.Session);
+        Assert.IsFalse(w.Session.Messages.OfType<KnuBotStartTradeMessage>().Any());
+        var open = new KnuBotOpenChatWindowMessageHandler(knubot);
+        open.Handle(new KnuBotOpenChatWindowMessage { Target = otherActor.Identity }, w.Session);
+        Assert.AreEqual(0, w.Session.Messages.Count);
+        open.Handle(new KnuBotOpenChatWindowMessage { Target = npc.Identity }, w.Session);
+        TickDialogue();
+        var reply = w.Session.Messages.OfType<KnuBotAnswerListMessage>().Single();
+        Assert.AreEqual("I have found a DOJA Chip in Nascense.", reply.DialogOptions[0].Text);
+        w.Session.Messages.Clear();
+        new KnuBotAnswerMessageHandler(knubot).Handle(new KnuBotAnswerMessage { Target = npc.Identity, Answer = 0 }, w.Session);
+        TickDialogue();
+        var start = w.Session.Messages.OfType<KnuBotStartTradeMessage>().Single();
+        Assert.AreEqual(1, start.NumberOfItemSlotsInTradeWindow);
+        Assert.AreEqual("Drag and drop the item(s) you want to give to Scarlett Dalquist into one of the slots available and press \"accept\"",
+            start.Message);
+        Assert.IsFalse(w.Session.Messages.OfType<KnuBotAnswerListMessage>().Any());
+
+        Item offered = chip;
+        Identity offeredSlot = Slot;
+        if (result == "wrong-item")
+        {
+            offered = w.Add(95577, placement: 65, instanceId: 11);
+            offeredSlot = new Identity { Type = IdentityType.Inventory, Instance = 65 };
+        }
+        var offer = new KnuBotTradeMessageHandler(knubot);
+        var add = new KnuBotTradeMessage { Target = npc.Identity, Action = KnuBotTradeAction.Add, Container = offeredSlot };
+        Identity otherSlot = new() { Type = IdentityType.Inventory, Instance = 65 };
+        if (result == "accepted")
+        {
+            // An item with no durable row cannot occupy the offer.
+            var other = TestWorld.CreateItem(instanceId: 0, persisted: false);
+            Assert.IsTrue(w.Player.Inventory.Inventory.Add(otherSlot.Instance, other));
+            offer.Handle(new KnuBotTradeMessage { Target = npc.Identity, Action = KnuBotTradeAction.Add, Container = otherSlot }, w.Session);
+            Assert.IsFalse(other.Locked);
+            Assert.IsTrue(trades.TryGetSession(w.Player, out TradeSession openTrade));
+            Assert.AreEqual(0, openTrade.InitiatorOffer.Count);
+            Assert.AreSame(other, w.Player.Inventory.Inventory.Remove(otherSlot.Instance));
+        }
+        offer.Handle(add, w.Session);
+        Assert.IsFalse(w.Player.Inventory.Inventory.Content.ContainsKey(offeredSlot.Instance));
+        Assert.IsTrue(offered.Locked);
+        w.Flush.HardFlush(w.Player);
+        Assert.AreEqual((int)IdentityType.OverflowWindow, w.Dao.Items[offered.InstanceId].ContainerType);
+        Assert.AreEqual(offered.InstanceId, w.Dao.Items[offered.InstanceId].ContainerPlacement);
+        Item? interleavedGrant = null;
+        if (result is "accepted" or "rollback")
+        {
+            interleavedGrant = TestWorld.CreateItem(lowId: 95577, highId: 95577, instanceId: 11, persisted: false);
+            lock (w.Player.PersistenceGate)
+            {
+                Assert.IsTrue(InventoryGrantPlan.TryCreate(w.Player, [interleavedGrant], out var grant));
+                var row = grant.Rows.Single();
+                Assert.AreEqual(Slot.Instance, row.ContainerPlacement, "The normal grant reuses the slot freed by the offer.");
+                w.Dao.Execute(111, tx =>
+                {
+                    ((IMissionInventoryMutationTransaction)tx).ApplyInventoryMutation([new()
+                    {
+                        InstanceId = row.InstanceId, ContainerType = row.ContainerType, ContainerInstance = row.ContainerInstance,
+                        ContainerPlacement = row.ContainerPlacement, ItemType = row.ItemType, LowId = row.LowId, HighId = row.HighId,
+                        Quality = row.Quality, StackCount = row.StackCount, Source = (byte)row.Source
+                    }], []);
+                    return true;
+                });
+                Assert.IsTrue(grant.PublishAfterCommit());
+            }
+            Assert.AreEqual(interleavedGrant.LowId, w.Session.Messages.OfType<AddTemplateMessage>().Single().LowId);
+        }
+
+        w.Session.Messages.Clear();
+        w.Dao.BeforeCommit = pending =>
+        {
+            Assert.AreEqual(0, w.Session.Messages.Count);
+            Assert.AreEqual(0, pending.Items[chip.InstanceId].ContainerType);
+        };
+        if (result == "rollback")
+            w.Dao.Failure = new InvalidOperationException("Injected authored trade failure.");
+        if (result == "stale-row")
+            w.Dao.Items[chip.InstanceId].ContainerPlacement++;
+        w.Dao.UnknownCommit = result == "unknown-commit";
+        var finish = new KnuBotFinishTradeMessageHandler(knubot);
+        var message = new KnuBotFinishTradeMessage
+            { Target = npc.Identity, Decline = result == "declined" ? 1 : 0, Amount = result == "credits" ? 1 : 0 };
+        finish.Handle(new KnuBotFinishTradeMessage { Target = otherActor.Identity }, w.Session);
+        Assert.AreEqual(0, w.Session.Messages.Count);
+        Assert.IsTrue(offered.Locked);
+        finish.Handle(message, w.Session);
+        Assert.IsFalse(trades.TryGetSession(w.Player, out _));
+        Assert.IsFalse(offered.Locked);
+        int messages = w.Session.Messages.Count;
+        int calls = w.Dao.Calls;
+        finish.Handle(message, w.Session);
+        Assert.AreEqual(messages, w.Session.Messages.Count);
+        Assert.AreEqual(calls, w.Dao.Calls);
+
+        if (result == "accepted")
+        {
+            Assert.AreEqual(0, ((KnuBotRejectedItemsMessage)w.Session.Messages[0]).Items.Length);
+            Assert.IsFalse(w.Session.Messages.OfType<CharacterActionMessage>().Any(packet => packet.Action == CharacterActionType.DeleteItem));
+            Assert.AreSame(interleavedGrant, w.Player.Inventory.Inventory.Content[Slot.Instance]);
+            Assert.AreEqual(104, w.Dao.Items[interleavedGrant!.InstanceId].ContainerType);
+            Assert.AreEqual(Slot.Instance, w.Dao.Items[interleavedGrant.InstanceId].ContainerPlacement);
+            Assert.AreEqual(0, w.Dao.Items[chip.InstanceId].ContainerType);
+            Assert.AreEqual(DaoState.Completed, w.Dao.GetMission(new(111, DojaChipInteractionRules.QuestTurnIn)).State);
+            Assert.AreEqual(DaoState.Active, w.Dao.GetMission(new(111, DojaChipInteractionRules.QuestCooldown)).State);
+            Assert.AreEqual(2, w.Dao.Rewards.Count);
+            TickDialogue();
+            Assert.AreEqual("Goodbye", w.Session.Messages.OfType<KnuBotAnswerListMessage>().Single().DialogOptions[0].Text);
+        }
+        else if (result == "unknown-commit")
+        {
+            Assert.IsTrue(w.Player.IsPersistenceQuarantined);
+            Assert.AreEqual(SessionState.Closed, w.Session.State);
+            Assert.AreEqual(0, messages);
+            Assert.AreEqual(0, w.Dao.Items[chip.InstanceId].ContainerType);
+        }
+        else
+        {
+            var returned = w.Session.Messages.OfType<KnuBotRejectedItemsMessage>().Single().Items.Single();
+            Assert.AreEqual(offered.LowId, returned.LowId);
+            int returnedSlot = interleavedGrant == null ? offeredSlot.Instance : otherSlot.Instance;
+            Assert.AreSame(interleavedGrant ?? chip, w.Player.Inventory.Inventory.Content[Slot.Instance]);
+            Assert.AreSame(offered, w.Player.Inventory.Inventory.Content[returnedSlot]);
+            w.Flush.HardFlush(w.Player);
+            Assert.AreEqual(104, w.Dao.Items[offered.InstanceId].ContainerType);
+            Assert.AreEqual(returnedSlot, w.Dao.Items[offered.InstanceId].ContainerPlacement);
+            Assert.AreEqual(DaoState.Active, w.Dao.GetMission(new(111, DojaChipInteractionRules.QuestTurnIn)).State);
+            Assert.AreEqual(0, w.Dao.Rewards.Count);
+        }
     }
 
     [TestMethod]
@@ -416,12 +590,13 @@ public sealed class AuthoredQuestTests
         readonly InventoryFlushService _flush;
         internal InventoryFlushService Flush => _flush;
         readonly ServiceProvider _services;
-        internal World(int playfield = 6553, InteractionContent? content = null)
+        internal World(int playfield = 6553, InteractionContent? content = null, bool allowOfferParking = false)
         {
             Catalog = content == null ? LoadCatalog() : new(content);
             Player.Session = Session; Session.BindPlayer(Player);
             Player.Playfield = (Playfield)RuntimeHelpers.GetUninitializedObject(typeof(Playfield));
             typeof(Playfield).GetField("<Identity>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(Player.Playfield, new Identity { Type = IdentityType.Playfield, Instance = playfield });
+            typeof(Playfield).GetField("<ResourceId>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(Player.Playfield, playfield);
             var locality = new PlayfieldLocality(playfield, null);
             Npcs = new(Player.Playfield, Registry, locality, new StubItemBuilder(), new TemplateCatalog());
             _services = new ServiceCollection().AddSingleton(locality).AddSingleton(Registry).AddSingleton(Npcs).BuildServiceProvider();
@@ -430,7 +605,8 @@ public sealed class AuthoredQuestTests
             var manager = (PlayfieldManager)RuntimeHelpers.GetUninitializedObject(typeof(PlayfieldManager));
             typeof(PlayfieldManager).GetField("_sync", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(manager, new Lock());
             typeof(PlayfieldManager).GetField("_playersByCharacterId", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(manager, new Dictionary<int, Player>());
-            _flush = new(new Lazy<PlayfieldManager>(() => manager), new NoIndependentFlush(), new StubLogger());
+            _flush = new(new Lazy<PlayfieldManager>(() => manager),
+                allowOfferParking ? new OfferParkingFlush(Dao) : new NoIndependentFlush(), new StubLogger());
             Service = new(Dao, _flush, new StubItemBuilder(), new TemplateCatalog(), new Ids(), Catalog, Logger, () => Now);
         }
         internal void Activate(string quest)
@@ -439,11 +615,11 @@ public sealed class AuthoredQuestTests
             Assert.IsTrue(Dao.Execute(111, tx => AuthoredMissionProgression.Offer(tx, definition, Now.Ticks)));
             Assert.IsTrue(Dao.Execute(111, tx => AuthoredMissionProgression.Accept(tx, definition, Now.Ticks))); Dao.Calls = 0;
         }
-        internal Item Add(int template)
+        internal Item Add(int template, int placement = 64, int instanceId = 10)
         {
-            var item = TestWorld.CreateItem(lowId: template, highId: template, instanceId: 10); item.StackCount = 1;
-            Player.Inventory.Inventory.Add(64, item);
-            Dao.Items.Add(10, new() { InstanceId = 10, ContainerType = 104, ContainerInstance = 111, ContainerPlacement = 64,
+            var item = TestWorld.CreateItem(lowId: template, highId: template, instanceId: instanceId);
+            Player.Inventory.Inventory.Add(placement, item);
+            Dao.Items.Add(instanceId, new() { InstanceId = instanceId, ContainerType = 104, ContainerInstance = 111, ContainerPlacement = placement,
                 ItemType = item.Identity.Type != IdentityType.None ? (int)item.Identity.Type : item.Definition.ItemType,
                 LowId = template, HighId = template, Quality = 1, StackCount = 1, Source = (byte)item.Source });
             return item;
@@ -454,7 +630,7 @@ public sealed class AuthoredQuestTests
             { Playfield = Player.Playfield, Position = Player.Position, Name = "Fixture accepted actor" };
             Registry.Register(npc);
             if (accepted) Npcs.Bind(npc, new("fixture:" + instance, "accepted-test-contract", contentIdentity,
-                Player.Playfield!.Identity.Instance, true, vendor));
+                Player.Playfield!.Identity.Instance, vendor));
             return npc;
         }
         public void Dispose() { _flush.Dispose(); _services.Dispose(); }
@@ -477,6 +653,28 @@ public sealed class AuthoredQuestTests
     }
     sealed class NoIndependentFlush : ICharacterCoalesceCommit
     { public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int owner, IReadOnlyList<int> nanos, IReadOnlyList<ActiveNanoRecord>? activeNanos, IReadOnlyList<SkillLockRecord>? skillLocks) => throw new InvalidOperationException("No independent item transaction expected."); }
+    sealed class OfferParkingFlush(AuthoredMissionTestDao dao) : ICharacterCoalesceCommit
+    {
+        public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int owner,
+            IReadOnlyList<int> nanos, IReadOnlyList<ActiveNanoRecord>? activeNanos, IReadOnlyList<SkillLockRecord>? skillLocks)
+        {
+            Assert.AreEqual(0, inserts.Count);
+            foreach (ItemLocationUpdate location in updates)
+            {
+                Assert.AreEqual(owner, location.ContainerInstance);
+                var row = dao.Items[location.InstanceId];
+                row.ContainerType = location.ContainerType;
+                row.ContainerInstance = location.ContainerInstance;
+                row.ContainerPlacement = location.ContainerPlacement;
+                row.StackCount = location.StackCount ?? row.StackCount;
+            }
+        }
+    }
+    sealed class NoIndependentTrade : ITradePersistence, IInventoryMutationPersistence
+    {
+        public void Persist(TradePersistenceBatch batch) => throw new InvalidOperationException("The authored mission owns this trade.");
+        public void Persist(InventoryMutationBatch batch) => throw new InvalidOperationException("No independent inventory mutation expected.");
+    }
     internal sealed class Session : IZoneSession
     {
         internal readonly List<object> Messages = [];
@@ -484,7 +682,7 @@ public sealed class AuthoredQuestTests
         public Player? Player { get; private set; }
         public void BindPlayer(Player player) => Player = player;
         public void UnbindPlayer() => Player = null;
-        public void TransferToPlayfield(Playfield destination, AORebirth.Core.Vector.Vector3 landing) => throw new NotSupportedException();
+        public bool TransferToPlayfield(Playfield destination, AORebirth.Core.Vector.Vector3 landing) => throw new NotSupportedException();
         public void Send(byte[] packet) => Messages.Add(packet);
         public void Send(Message message) => Messages.Add(message.Body);
         public void Send(MessageBody body) => Messages.Add(body);

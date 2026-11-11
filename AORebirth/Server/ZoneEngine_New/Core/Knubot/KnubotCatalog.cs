@@ -418,7 +418,8 @@ public sealed class KnubotCatalog
                 errors.Add("line '" + lineId + "': " + error);
 
             lines[lineId] = new KnubotLine(lineId, parsed.Pieces.ToArray(), parsed.Effects.ToArray(),
-                string.IsNullOrWhiteSpace(source.Fail) ? null : source.Fail.Trim(), replies.ToArray(), parsed.Goto, parsed.CloseSeconds);
+                string.IsNullOrWhiteSpace(source.Fail) ? null : source.Fail.Trim(), replies.ToArray(), parsed.Goto,
+                parsed.CloseSeconds, source.ShowGoodbye);
         }
 
         var openers = new List<KnubotOpener>();
@@ -466,11 +467,17 @@ public sealed class KnubotCatalog
 
             if (source.Credits < 0)
                 tradeErrors.Add("Credits cannot be negative");
-            if (items.Count == 0 && source.Credits == 0 && tradeErrors.Count == 0)
+            if (source.TimedTurnIn == null && items.Count == 0 && source.Credits == 0 && tradeErrors.Count == 0)
                 tradeErrors.Add("needs Items or Credits");
             // An inspection hands everything back, so it has items to look at and no credits it would pretend to take.
             if (source.InspectItems && (items.Count == 0 || source.Credits != 0) && tradeErrors.Count == 0)
                 tradeErrors.Add("InspectItems needs Items and no Credits");
+            if (source.TimedTurnIn != null && (string.IsNullOrWhiteSpace(source.TimedTurnIn)
+                || string.IsNullOrWhiteSpace(source.Prompt) || file.Trades?.Count != 1
+                || source.Credits != 0 || source.InspectItems || items.Count != 0))
+            {
+                tradeErrors.Add("TimedTurnIn needs a prompt and must be the script's only trade, without item or credit rules");
+            }
 
             string target = (source.Goto ?? string.Empty).Trim();
             if (target is not (KnubotScript.CloseTarget or KnubotScript.OpenerTarget) && !lines.ContainsKey(target))
@@ -480,7 +487,8 @@ public sealed class KnubotCatalog
             foreach (string error in tradeErrors)
                 errors.Add("trade '" + pair.Key + "': " + error);
 
-            trades.Add(new KnubotTrade(pair.Key, conditions, items.ToArray(), source.Credits, target, source.InspectItems));
+            trades.Add(new KnubotTrade(pair.Key, conditions, items.ToArray(), source.Credits, target, source.InspectItems,
+                source.TimedTurnIn, source.Prompt));
         }
 
         foreach (KnubotLine line in lines.Values)
