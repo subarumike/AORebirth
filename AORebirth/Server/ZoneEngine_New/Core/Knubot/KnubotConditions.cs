@@ -11,6 +11,7 @@ using SmokeLounge.AOtomation.Messaging.GameData;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.GameData;
 using ZoneEngine_New.Core.Inventory;
+using ZoneEngine_New.Core.Missions;
 using ZoneEngine_New.Core.Quests;
 
 /// <summary>The player and NPC one conversation step is evaluated for.</summary>
@@ -27,15 +28,17 @@ public sealed class KnubotContext(Player player, NpcCharacter npc, KnubotScript 
 }
 
 /// <summary>Catalogs a script is resolved against when it loads.</summary>
-public sealed class KnubotLoadContext(QuestCatalog quests, IGameData gameData, IItemTemplateCatalog items)
+public sealed class KnubotLoadContext(QuestCatalog quests, IGameData gameData, IItemTemplateCatalog items,
+    AuthoredQuestCatalog? authoredQuests = null)
 {
     HashItemCatalog? _preparedItems;
     public QuestCatalog Quests { get; } = quests;
     public IGameData GameData { get; } = gameData;
     public IItemTemplateCatalog Items { get; } = items;
+    internal AuthoredQuestCatalog? AuthoredQuests { get; } = authoredQuests;
 
     internal KnubotLoadContext WithItemTemplates(HashItemCatalog prepared)
-        => new(Quests, GameData, Items) { _preparedItems = prepared };
+        => new(Quests, GameData, Items, AuthoredQuests) { _preparedItems = prepared };
 
     internal bool CanResolveItemHash(string hash)
         => _preparedItems?.CanResolveItem(hash) ?? GameData.CanResolveItemHash(hash);

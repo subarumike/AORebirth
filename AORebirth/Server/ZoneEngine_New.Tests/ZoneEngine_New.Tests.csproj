@@ -34,6 +34,7 @@
     <Compile Include="../../../Tests/Fixtures/Gameplay/Doja/DojaChipInteractionRules.cs" Link="Fixtures/DojaChipInteractionRules.cs" />
     <Compile Include="../../../Tests/Fixtures/Gameplay/Doja/DojaChipPacketSender.Data.cs" Link="Fixtures/DojaChipPacketSender.Data.cs" />
     <None Include="../../GameData/Knubot/ScarlettDalquist.json" Link="DojaGameData/Knubot/ScarlettDalquist.json" CopyToOutputDirectory="PreserveNewest" />
+    <None Include="../../../Tests/Fixtures/Gameplay/Doja/ScarlettPlacement.json" Link="DojaGameData/PlayfieldContent/7010/Npcs.json" CopyToOutputDirectory="PreserveNewest" />
     <Compile Include="../../../Tests/Fixtures/Gameplay/Playfields/CapturedSubwayVendorContentProvider.cs" Link="Fixtures/CapturedSubwayVendorContentProvider.cs" />
     <Compile Include="../../../Tests/Fixtures/Gameplay/Playfields/CapturedBucketheadTechnodealerContentProvider.cs" Link="Fixtures/CapturedBucketheadTechnodealerContentProvider.cs" />
     <Compile Include="../../../Tests/Fixtures/Gameplay/Playfields/CapturedThrakGardenVendorContentProvider.cs" Link="Fixtures/CapturedThrakGardenVendorContentProvider.cs" />

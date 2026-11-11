@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
+using System.Text.Json.Nodes;
 using System.Threading;
 using AORebirth.Enums;
 using AORebirth.Interfaces.Persistence.Missions;
@@ -61,7 +62,9 @@ public sealed class AuthoredQuestTests
         Assert.IsTrue(w.Session.Messages[1] is ContainerAddItemMessage);
         Assert.IsTrue(w.Session.Messages[2] is TemplateActionMessage { Action: TemplateActionType.Use });
         Assert.IsTrue(w.Session.Messages[3] is CharacterActionMessage { Action: CharacterActionType.DeleteItem });
-        Assert.AreEqual(2, w.Session.Messages.OfType<byte[]>().Count());
+        Assert.AreEqual(1, w.Session.Messages.OfType<CharacterActionMessage>()
+            .Count(message => message.Action == CharacterActionType.MissionAccomplished));
+        Assert.AreEqual(2, w.Session.Messages.OfType<QuestMessage>().Count(message => message.Action == QuestAction.Delete));
         Assert.IsTrue(w.Session.Messages.OfType<QuestFullUpdateMessage>().Single().Quests.Single().QuestId.Instance == unchecked((int)0x555BE9C5));
         Assert.IsFalse(w.Service.TryUseItem(w.Player, Slot, sealedItem));
     }
@@ -206,7 +209,10 @@ public sealed class AuthoredQuestTests
         using var w = new World(); var item = w.Add(284954); w.Player.Stats.Set(CharacterStat.Level, 10);
         Assert.IsTrue(w.Service.TryUseItem(w.Player, Slot, item)); Assert.AreSame(item, w.Player.Inventory.Inventory.Content[64]);
         Assert.AreEqual(104, w.Dao.Items[10].ContainerType); Assert.AreEqual(DaoState.Active, w.Dao.GetMission(new(111, DojaChipInteractionRules.QuestTurnIn)).State);
-        Assert.IsTrue(w.Session.Messages[0] is TemplateActionMessage { Action: TemplateActionType.Use }); Assert.IsTrue(w.Session.Messages[1] is byte[]);
+        Assert.IsTrue(w.Session.Messages[0] is TemplateActionMessage { Action: TemplateActionType.Use });
+        var expected = DojaChipPacketSender.CreateJournalPacketAtClientTime(111, DojaChipInteractionRules.QuestTurnIn,
+            60, GameClock.UnixSeconds(w.Now));
+        CollectionAssert.AreEqual(expected[16..], JournalBody((QuestFullUpdateMessage)w.Session.Messages[1]));
         int sent = w.Session.Messages.Count; Assert.IsTrue(w.Service.TryUseItem(w.Player, Slot, item)); Assert.AreEqual(sent, w.Session.Messages.Count);
         Assert.AreEqual(0, w.Session.Messages.OfType<CharacterActionMessage>().Count());
     }
@@ -248,6 +254,7 @@ public sealed class AuthoredQuestTests
     [DataRow("stale-row")]
     [DataRow("rollback")]
     [DataRow("unknown-commit")]
+    [DataRow("reloaded")]
     public void DojaScarlettHandlersCommitOrReturnTheExactOfferedChip(string result)
     {
         using var w = new World(DojaChipInteractionRules.ScarlettPlayfieldId, allowOfferParking: true);
@@ -270,7 +277,8 @@ public sealed class AuthoredQuestTests
         // This dialogue uses the authored ledger. Accidental use of the ordinary quest service fails the fixture.
         var questService = (QuestService)RuntimeHelpers.GetUninitializedObject(typeof(QuestService));
         long time = 100;
-        var knubot = new KnubotService(new KnubotCatalog(data, quests, catalog, w.Logger),
+        var scripts = new KnubotCatalog(data, quests, catalog, w.Logger, w.Catalog);
+        var knubot = new KnubotService(scripts,
             new KnubotEffectServices(questService, minter, w.Flush, trades, actions, w.Service), w.Logger, () => time);
         void TickDialogue()
         {
@@ -359,6 +367,8 @@ public sealed class AuthoredQuestTests
             w.Dao.Failure = new InvalidOperationException("Injected authored trade failure.");
         if (result == "stale-row")
             w.Dao.Items[chip.InstanceId].ContainerPlacement++;
+        if (result == "reloaded")
+            Assert.AreEqual(0, scripts.Reload().Problems.Count);
         w.Dao.UnknownCommit = result == "unknown-commit";
         var finish = new KnuBotFinishTradeMessageHandler(knubot);
         var message = new KnuBotFinishTradeMessage
@@ -395,6 +405,9 @@ public sealed class AuthoredQuestTests
             Assert.AreEqual(SessionState.Closed, w.Session.State);
             Assert.AreEqual(0, messages);
             Assert.AreEqual(0, w.Dao.Items[chip.InstanceId].ContainerType);
+            TickDialogue();
+            Assert.AreEqual(0, w.Session.Messages.Count);
+            Assert.IsFalse(knubot.HasSession(w.Player));
         }
         else
         {
@@ -408,7 +421,51 @@ public sealed class AuthoredQuestTests
             Assert.AreEqual(returnedSlot, w.Dao.Items[offered.InstanceId].ContainerPlacement);
             Assert.AreEqual(DaoState.Active, w.Dao.GetMission(new(111, DojaChipInteractionRules.QuestTurnIn)).State);
             Assert.AreEqual(0, w.Dao.Rewards.Count);
+            TickDialogue();
+            if (result == "reloaded")
+            {
+                Assert.IsFalse(w.Session.Messages.OfType<KnuBotAnswerListMessage>().Any());
+                Assert.IsFalse(knubot.HasSession(w.Player));
+            }
+            else
+            {
+                Assert.AreEqual("I have found a DOJA Chip in Nascense.",
+                    w.Session.Messages.OfType<KnuBotAnswerListMessage>().Single().DialogOptions[0].Text);
+                if (result is "declined" or "rollback")
+                {
+                    w.Dao.BeforeCommit = null;
+                    w.Dao.Failure = null;
+                    w.Session.Messages.Clear();
+                    new KnuBotAnswerMessageHandler(knubot).Handle(new KnuBotAnswerMessage { Target = npc.Identity, Answer = 0 }, w.Session);
+                    TickDialogue();
+                    Assert.AreEqual(1, w.Session.Messages.OfType<KnuBotStartTradeMessage>().Single().NumberOfItemSlotsInTradeWindow);
+                }
+            }
         }
+    }
+
+    [TestMethod]
+    public void TimedTurnInScriptRequiresResolvedNpcRuleAndExplicitEntryPolicy()
+    {
+        using var w = new World();
+        string root = Path.Combine(AppContext.BaseDirectory, "DojaGameData");
+        var data = new StubGameData(HashItemCatalog.Parse("{}"), rootPath: root);
+        var scripts = new KnubotCatalog(data, new QuestCatalog(data, w.Logger), new TemplateCatalog(), w.Logger, w.Catalog);
+        string json = File.ReadAllText(Path.Combine(root, "Knubot", "ScarlettDalquist.json"));
+        Assert.AreEqual(0, scripts.Check("fixture", json).Count);
+        Assert.IsTrue(scripts.Check("fixture", json.Replace("doja-nascense", "missing-rule", StringComparison.Ordinal))
+            .Any(error => error.Contains("unknown authored rule", StringComparison.Ordinal)));
+        Assert.IsTrue(scripts.Check("fixture", json.Replace(DojaChipInteractionRules.ScarlettIdentityText,
+            "fixture:unresolved-npc", StringComparison.Ordinal))
+            .Any(error => error.Contains("exact selected content identity", StringComparison.Ordinal)));
+        JsonObject withoutEntryPolicy = JsonNode.Parse(json)!.AsObject();
+        Assert.IsTrue(withoutEntryPolicy.Remove("DialogueTradeOnly"));
+        Assert.IsTrue(scripts.Check("fixture", withoutEntryPolicy.ToJsonString())
+            .Any(error => error.Contains("explicit DialogueTradeOnly", StringComparison.Ordinal)));
+
+        NpcCharacter misplaced = w.AddNpc(DojaChipInteractionRules.ScarlettIdentityText,
+            instance: DojaChipInteractionRules.ScarlettInstance);
+        Assert.IsFalse(scripts.TryResolve(misplaced, out _), "The same content identity on an unauthorized playfield is not a timed turn-in.");
     }
 
     [TestMethod]
@@ -455,8 +512,42 @@ public sealed class AuthoredQuestTests
         w.Dao.Flags[key + "|" + flag.FlagKey] = flag;
         w.Session.Messages.Clear(); w.Service.Restore(w.Player);
         Assert.AreEqual(1, w.Session.Messages.Count);
-        CollectionAssert.AreEqual(DojaChipPacketSender.CreateJournalPacket(111, key.QuestId, 3600, 0), (byte[])w.Session.Messages[0]);
+        var expected = DojaChipPacketSender.CreateJournalPacketAtClientTime(111, key.QuestId, 3600, GameClock.UnixSeconds(w.Now));
+        CollectionAssert.AreEqual(expected[16..], JournalBody((QuestFullUpdateMessage)w.Session.Messages[0]));
         Assert.AreEqual(flag.Value, w.Dao.GetFlag(key, flag.FlagKey).Value);
+    }
+
+    [TestMethod]
+    public void AuthoredJournalSendsCapturedDeleteBodiesInOrder()
+    {
+        using var w = new World();
+        foreach (string quest in w.Catalog.Content.Journals.Keys)
+        {
+            w.Session.Messages.Clear();
+            AuthoredQuestJournal.Delete(w.Player, quest, w.Catalog.Content);
+
+            byte[][] captured = DojaChipPacketSender.CreateDeletePackets(w.Player.Identity.Instance, quest);
+            bool doja = quest is DojaChipInteractionRules.QuestTurnIn or DojaChipInteractionRules.QuestCooldown;
+            Assert.AreEqual(doja ? 2 : 3, w.Session.Messages.Count, quest);
+            CollectionAssert.AreEqual(captured[0][16..], JournalBody((CharacterActionMessage)w.Session.Messages[0]), quest);
+            CollectionAssert.AreEqual(captured[1][16..], JournalBody((QuestMessage)w.Session.Messages[1]), quest);
+            if (!doja)
+                CollectionAssert.AreEqual(captured[1][16..], JournalBody((QuestMessage)w.Session.Messages[2]), quest);
+        }
+    }
+
+    [TestMethod]
+    public void DojaJournalExpiryUsesSynchronizedSessionClockAndAuthoredDuration()
+    {
+        using var w = new World(7010);
+        const int clockSeconds = 1_203_456_789;
+        const int elapsedSeconds = 15;
+        string quest = DojaChipInteractionRules.QuestCooldown;
+        w.Session.RecordGameTimeSynchronization(w.Now.AddSeconds(-elapsedSeconds), clockSeconds);
+        Assert.IsTrue(AuthoredQuestJournal.Send(w.Player, quest, w.Now, w.Catalog.Content, int.MaxValue));
+        var expected = DojaChipPacketSender.CreateJournalPacketAtClientTime(111, quest, int.MaxValue,
+            clockSeconds + elapsedSeconds);
+        CollectionAssert.AreEqual(expected[16..], JournalBody(w.Session.Messages.OfType<QuestFullUpdateMessage>().Single()));
     }
 
     [TestMethod]
@@ -575,6 +666,7 @@ public sealed class AuthoredQuestTests
 
     static Identity Slot => new() { Type = IdentityType.Inventory, Instance = 64 };
     static AuthoredQuestCatalog LoadCatalog() => AuthoredQuestCatalog.Load(Path.Combine(AppContext.BaseDirectory, "Content"));
+    static byte[] JournalBody(MessageBody message) => new ZoneMessageCodec().Serialize(message, 0, 111)[16..];
 
     internal sealed class World : IDisposable
     {
@@ -675,7 +767,7 @@ public sealed class AuthoredQuestTests
         public void Persist(TradePersistenceBatch batch) => throw new InvalidOperationException("The authored mission owns this trade.");
         public void Persist(InventoryMutationBatch batch) => throw new InvalidOperationException("No independent inventory mutation expected.");
     }
-    internal sealed class Session : IZoneSession
+    internal sealed class Session : IZoneSession, IGameTimeSession
     {
         internal readonly List<object> Messages = [];
         public SessionState State { get; set; } = SessionState.InPlay;
@@ -683,6 +775,13 @@ public sealed class AuthoredQuestTests
         public void BindPlayer(Player player) => Player = player;
         public void UnbindPlayer() => Player = null;
         public bool TransferToPlayfield(Playfield destination, AORebirth.Core.Vector.Vector3 landing) => throw new NotSupportedException();
+        public DateTime? GameTimeSynchronizedAtUtc { get; private set; }
+        public int GameTimeServerSeconds { get; private set; }
+        public void RecordGameTimeSynchronization(DateTime utcNow, int serverSeconds)
+        {
+            GameTimeSynchronizedAtUtc = utcNow;
+            GameTimeServerSeconds = serverSeconds;
+        }
         public void Send(byte[] packet) => Messages.Add(packet);
         public void Send(Message message) => Messages.Add(message.Body);
         public void Send(MessageBody body) => Messages.Add(body);

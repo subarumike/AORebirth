@@ -119,14 +119,16 @@ namespace ZoneEngine.Core.Doja
         }
 
         internal static byte[] CreateJournalPacket(int recipient, string questId, int remainingSeconds, long secondsSinceGameTime)
+            => CreateJournalPacketAtClientTime(recipient, questId, remainingSeconds,
+                ClientClockBaseSeconds + Math.Max(0, secondsSinceGameTime));
+
+        internal static byte[] CreateJournalPacketAtClientTime(int recipient, string questId, int remainingSeconds, long clientNow)
         {
             string hex = ResolveHex(questId);
             if (recipient <= 0 || hex == null || remainingSeconds <= 0) throw new ArgumentException("Owned active DOJA journal required.");
             bool cooldown = string.Equals(questId, DojaChipInteractionRules.QuestCooldown, StringComparison.OrdinalIgnoreCase);
             int duration = Math.Min(remainingSeconds, ResolveDurationSeconds(questId));
-            // Same accepted expiry arithmetic as the Legacy sender; caller supplies an actual session anchor.
-            long elapsed = Math.Max(0, secondsSinceGameTime);
-            long expiry = ClientClockBaseSeconds + elapsed + duration;
+            long expiry = clientNow + duration;
             byte[] packet = HexToBytes(hex);
             ReplaceInstance(packet, CapturedCharacterInstance, recipient);
             if (cooldown) WriteInt32BigEndian(packet, CooldownExpiryOffset, unchecked((int)expiry));

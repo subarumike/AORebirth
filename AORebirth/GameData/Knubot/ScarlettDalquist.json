@@ -1,5 +1,8 @@
 {
   "Npcs": ["SimpleChar:7A18B924"],
+  "DialogueTradeOnly": true,
+  "TradeRefused": "greeting",
+  "TradeDeclined": "greeting",
   "Openers": [{ "Say": "greeting" }],
   "Replies": {
     "nascense": {
@@ -14,7 +17,8 @@
     },
     "trade": {
       "Text": "Hand it to me.{opentrade}",
-      "Fail": "greeting"
+      "Fail": "greeting",
+      "ShowGoodbye": false
     },
     "thanks": {
       "Text": "Thank you. The DOJA chip will help us track the creatures in the Shadowlands.",

@@ -1,0 +1,15 @@
+{
+  "SchemaVersion": 1,
+  "PlayfieldId": 7010,
+  "Npcs": [
+    {
+      "Key": "fixture:scarlett",
+      "ContentNpcIdentity": "SimpleChar:7A18B924",
+      "PlayfieldId": 7010,
+      "InstanceId": 2048440612,
+      "Name": "Scarlett Dalquist",
+      "Position": [0, 0, 0],
+      "Rotation": [0, 0, 0, 1]
+    }
+  ]
+}

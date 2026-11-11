@@ -213,11 +213,10 @@ public sealed record KnubotOpenTrade : KnubotEffect
 {
     public override bool Check(KnubotContext context, KnubotPlan plan, KnubotEffectServices services)
     {
-        if (context.Script.TimedTrade is not { TimedTurnIn: string key })
+        if (context.Script.TimedTrade == null)
             return context.Script.Trades.Length != 0;
 
-        return services.AuthoredQuests.ResolveNpcTimedTurnIn(context.Player, context.Npc, key) is { } rule
-            && services.AuthoredQuests.CanOpenTimedTrade(context.Player, rule);
+        return services.AuthoredQuests.CanOpenTimedTrade(context.Player, context.Npc, context.Script);
     }
 
     public override void Apply(KnubotContext context, KnubotEffectServices services)

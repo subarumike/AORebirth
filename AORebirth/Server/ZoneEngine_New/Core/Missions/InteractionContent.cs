@@ -5,10 +5,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using ZoneEngine.Core.Arete;
 using ZoneEngine.Core.Arete.Quests;
 using ZoneEngine.Core.Missions;
 using ZoneEngine_New.Core.Missions.Content;
+using SmokeLounge.AOtomation.Messaging.GameData;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
 /// <summary>Generic runtime action bindings for the existing validated Content manifest/pack system.</summary>
@@ -62,27 +64,32 @@ public sealed class InteractionContent
             if (a.OptionalActions.Length != 0 && a.OptionalActions.Any(x => Actions[x].OptionalActions.Length != 0))
                 throw new InvalidDataException("Nested optional action graphs are unsupported.");
         }
+        var timedKeys = new HashSet<string>(StringComparer.Ordinal);
         foreach (var timed in TimedTurnIns)
-            if (timed.Items.Length == 0 || timed.Items.Any(x => x.ItemId <= 0 || x.MinLevel < 1 || x.MaxLevel < x.MinLevel)
+            if (string.IsNullOrWhiteSpace(timed.Key) || timed.Key != timed.Key.Trim() || !timedKeys.Add(timed.Key)
+                || timed.TurnInPlayfields.Length == 0 || timed.TurnInPlayfields.Any(id => id <= 0)
+                || timed.TurnInPlayfields.Distinct().Count() != timed.TurnInPlayfields.Length
+                || timed.Items.Length == 0 || timed.Items.Any(x => x.ItemId <= 0 || x.MinLevel < 1 || x.MaxLevel < x.MinLevel)
                 || timed.CooldownSeconds <= 0 || !quests.Contains(timed.Quest) || !quests.Contains(timed.CooldownQuest))
                 throw new InvalidDataException("Invalid timed item turn-in definition.");
         foreach (var pair in Journals)
         {
             var journal = pair.Value;
-            if (!quests.Contains(pair.Key) || journal.RecipientMarker <= 0 || journal.DeleteRecipientMarker <= 0
-                || journal.DeleteQuestMarker <= 0 || journal.DurationSeconds <= 0) throw new InvalidDataException("Invalid journal definition: " + pair.Key);
-            if (journal.Packet is { } packet)
-            {
-                var projection = packet.Deserialize<QuestFullUpdateMessage>(JsonOptions);
-                if (projection?.Quests is not { Length: 1 }) throw new InvalidDataException("Invalid typed quest journal.");
-            }
-            else
-            {
-                var bytes = Convert.FromHexString(journal.Hex);
-                if (bytes.Length < 4 || journal.ExpiryOffset < -1 || journal.ExpiryOffset > bytes.Length - 4)
-                    throw new InvalidDataException("Invalid journal packet/expiry projection.");
-            }
-            foreach (string hex in journal.DeleteHex) if (Convert.FromHexString(hex).Length < 4) throw new InvalidDataException("Invalid journal deletion frame.");
+            if (!quests.Contains(pair.Key) || journal.RecipientMarker <= 0 || journal.DurationSeconds <= 0
+                || journal.DeletePackets is not ([JournalDeletePacket.MissionAccomplished, JournalDeletePacket.QuestDelete]
+                    or [JournalDeletePacket.MissionAccomplished, JournalDeletePacket.QuestDelete, JournalDeletePacket.QuestDelete]))
+                throw new InvalidDataException("Invalid journal definition or deletion sequence: " + pair.Key);
+
+            var projection = journal.Packet.Deserialize<QuestFullUpdateMessage>(JsonOptions);
+            if (projection?.Quests is not { Length: 1 }
+                || projection.Quests[0]?.QuestId is not { Type: IdentityType.Mission } mission
+                || !string.Equals(pair.Key, $"Mission:{mission.Instance:X8}", StringComparison.Ordinal)
+                || projection.Identity is not { Type: IdentityType.CanbeAffected } recipient
+                || recipient.Instance != journal.RecipientMarker
+                || (journal.ClientClockExpiryActionIndex is int index
+                    && (index < 0 || projection.Quests[0].QuestActions == null
+                        || index >= projection.Quests[0].QuestActions.Length || projection.Quests[0].QuestActions[index] == null)))
+                throw new InvalidDataException("Invalid typed quest journal or expiry projection: " + pair.Key);
         }
         if (Props.GroupBy(x => (x.Playfield, x.Instance)).Any(x => x.Count() > 1)
             || Props.Any(x => !Actions.ContainsKey(x.Action) || x.Position.Length != 3 || x.Rotation.Length != 4
@@ -152,19 +159,24 @@ public sealed class StatReward
     public int Xp { get; set; } public int Cash { get; set; } public string Evidence { get; set; } = "";
     public string EffectReference { get; set; } = "";
 }
+[JsonUnmappedMemberHandling(JsonUnmappedMemberHandling.Disallow)]
 public sealed class JournalDefinition
 {
-    public JsonElement? Packet { get; set; }
-    public string Hex { get; set; } = "";
+    public required JsonElement Packet { get; set; }
     public int RecipientMarker { get; set; }
-    public string[] DeleteHex { get; set; } = [];
-    public int DeleteQuestMarker { get; set; }
-    public int DeleteRecipientMarker { get; set; }
-    public bool TypedDelete { get; set; }
+    public required JournalDeletePacket[] DeletePackets { get; set; }
     /// <summary>Send a GameTime from the shared world clock ahead of the journal; the expiry is written in that clock.</summary>
     public bool SynchronizeClock { get; set; }
     public int DurationSeconds { get; set; }
-    public int ExpiryOffset { get; set; } = -1;
+    /// <summary>The quest action whose four-byte journal field carries expiry in the client's synchronized clock.</summary>
+    public int? ClientClockExpiryActionIndex { get; set; }
+}
+
+[JsonConverter(typeof(JsonStringEnumConverter<JournalDeletePacket>))]
+public enum JournalDeletePacket
+{
+    MissionAccomplished,
+    QuestDelete
 }
 public sealed class TimedTurnInDefinition
 {
@@ -173,7 +185,6 @@ public sealed class TimedTurnInDefinition
     public string CooldownObjective { get; set; } = ""; public string CooldownFlag { get; set; } = "";
     public string GrantedFlag { get; set; } = ""; public int CooldownSeconds { get; set; }
     public int[] TurnInPlayfields { get; set; } = [];
-    public string? TurnInNpc { get; set; }
     public TimedItem[] Items { get; set; } = [];
     public string XpRewardKey { get; set; } = ""; public string TokenRewardKey { get; set; } = "";
     public string ObservationPrefix { get; set; } = ""; public string EventType { get; set; } = "";

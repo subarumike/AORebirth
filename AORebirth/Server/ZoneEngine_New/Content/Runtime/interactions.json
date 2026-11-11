@@ -1383,15 +1383,13 @@
         "PacketType": 10
       },
       "RecipientMarker": 111,
-      "DeleteHex": [
-        "0135000A0001003700000DB6765A690A5E4777700000C350765A690A000000003B000000000000DAC35556893A0000DAC35556893A0000",
-        "0136000A0001003500000DB6765A690A212C487A0000C350765A690A0000000001000000000000DAC35556893A0000000000000000"
-      ],
-      "DeleteQuestMarker": 1431734586,
-      "DeleteRecipientMarker": 1985636618,
-      "TypedDelete": true,
       "SynchronizeClock": true,
-      "DurationSeconds": 172800
+      "DurationSeconds": 172800,
+      "DeletePackets": [
+        "MissionAccomplished",
+        "QuestDelete",
+        "QuestDelete"
+      ]
     },
     "Mission:555BE9F6": {
       "Packet": {
@@ -1476,15 +1474,13 @@
         "PacketType": 10
       },
       "RecipientMarker": 111,
-      "DeleteHex": [
-        "0135000A0001003700000DB6765A690A5E4777700000C350765A690A000000003B000000000000DAC35556893A0000DAC35556893A0000",
-        "0136000A0001003500000DB6765A690A212C487A0000C350765A690A0000000001000000000000DAC35556893A0000000000000000"
-      ],
-      "DeleteQuestMarker": 1431734586,
-      "DeleteRecipientMarker": 1985636618,
-      "TypedDelete": true,
       "SynchronizeClock": true,
-      "DurationSeconds": 172800
+      "DurationSeconds": 172800,
+      "DeletePackets": [
+        "MissionAccomplished",
+        "QuestDelete",
+        "QuestDelete"
+      ]
     },
     "Mission:555BE9F7": {
       "Packet": {
@@ -1569,15 +1565,13 @@
         "PacketType": 10
       },
       "RecipientMarker": 111,
-      "DeleteHex": [
-        "0135000A0001003700000DB6765A690A5E4777700000C350765A690A000000003B000000000000DAC35556893A0000DAC35556893A0000",
-        "0136000A0001003500000DB6765A690A212C487A0000C350765A690A0000000001000000000000DAC35556893A0000000000000000"
-      ],
-      "DeleteQuestMarker": 1431734586,
-      "DeleteRecipientMarker": 1985636618,
-      "TypedDelete": true,
       "SynchronizeClock": true,
-      "DurationSeconds": 172800
+      "DurationSeconds": 172800,
+      "DeletePackets": [
+        "MissionAccomplished",
+        "QuestDelete",
+        "QuestDelete"
+      ]
     },
     "Mission:555B4366": {
       "Packet": {
@@ -1662,15 +1656,13 @@
         "PacketType": 10
       },
       "RecipientMarker": 111,
-      "DeleteHex": [
-        "0135000A0001003700000DB6765A690A5E4777700000C350765A690A000000003B000000000000DAC35556893A0000DAC35556893A0000",
-        "0136000A0001003500000DB6765A690A212C487A0000C350765A690A0000000001000000000000DAC35556893A0000000000000000"
-      ],
-      "DeleteQuestMarker": 1431734586,
-      "DeleteRecipientMarker": 1985636618,
-      "TypedDelete": true,
       "SynchronizeClock": true,
-      "DurationSeconds": 172800
+      "DurationSeconds": 172800,
+      "DeletePackets": [
+        "MissionAccomplished",
+        "QuestDelete",
+        "QuestDelete"
+      ]
     },
     "Mission:555BD124": {
       "Packet": {
@@ -1755,15 +1747,13 @@
         "PacketType": 10
       },
       "RecipientMarker": 111,
-      "DeleteHex": [
-        "0135000A0001003700000DB6765A690A5E4777700000C350765A690A000000003B000000000000DAC35556893A0000DAC35556893A0000",
-        "0136000A0001003500000DB6765A690A212C487A0000C350765A690A0000000001000000000000DAC35556893A0000000000000000"
-      ],
-      "DeleteQuestMarker": 1431734586,
-      "DeleteRecipientMarker": 1985636618,
-      "TypedDelete": true,
       "SynchronizeClock": true,
-      "DurationSeconds": 172800
+      "DurationSeconds": 172800,
+      "DeletePackets": [
+        "MissionAccomplished",
+        "QuestDelete",
+        "QuestDelete"
+      ]
     },
     "Mission:555BE9C5": {
       "Packet": {
@@ -1848,15 +1838,13 @@
         "PacketType": 10
       },
       "RecipientMarker": 111,
-      "DeleteHex": [
-        "0135000A0001003700000DB6765A690A5E4777700000C350765A690A000000003B000000000000DAC35556893A0000DAC35556893A0000",
-        "0136000A0001003500000DB6765A690A212C487A0000C350765A690A0000000001000000000000DAC35556893A0000000000000000"
-      ],
-      "DeleteQuestMarker": 1431734586,
-      "DeleteRecipientMarker": 1985636618,
-      "TypedDelete": true,
       "SynchronizeClock": true,
-      "DurationSeconds": 172800
+      "DurationSeconds": 172800,
+      "DeletePackets": [
+        "MissionAccomplished",
+        "QuestDelete",
+        "QuestDelete"
+      ]
     },
     "Mission:555BE9F2": {
       "Packet": {
@@ -1941,15 +1929,13 @@
         "PacketType": 10
       },
       "RecipientMarker": 111,
-      "DeleteHex": [
-        "0135000A0001003700000DB6765A690A5E4777700000C350765A690A000000003B000000000000DAC35556893A0000DAC35556893A0000",
-        "0136000A0001003500000DB6765A690A212C487A0000C350765A690A0000000001000000000000DAC35556893A0000000000000000"
-      ],
-      "DeleteQuestMarker": 1431734586,
-      "DeleteRecipientMarker": 1985636618,
-      "TypedDelete": true,
       "SynchronizeClock": true,
-      "DurationSeconds": 172800
+      "DurationSeconds": 172800,
+      "DeletePackets": [
+        "MissionAccomplished",
+        "QuestDelete",
+        "QuestDelete"
+      ]
     },
     "Mission:555BE9F3": {
       "Packet": {
@@ -2034,15 +2020,13 @@
         "PacketType": 10
       },
       "RecipientMarker": 111,
-      "DeleteHex": [
-        "0135000A0001003700000DB6765A690A5E4777700000C350765A690A000000003B000000000000DAC35556893A0000DAC35556893A0000",
-        "0136000A0001003500000DB6765A690A212C487A0000C350765A690A0000000001000000000000DAC35556893A0000000000000000"
-      ],
-      "DeleteQuestMarker": 1431734586,
-      "DeleteRecipientMarker": 1985636618,
-      "TypedDelete": true,
       "SynchronizeClock": true,
-      "DurationSeconds": 172800
+      "DurationSeconds": 172800,
+      "DeletePackets": [
+        "MissionAccomplished",
+        "QuestDelete",
+        "QuestDelete"
+      ]
     },
     "Mission:555BE9F4": {
       "Packet": {
@@ -2127,45 +2111,318 @@
         "PacketType": 10
       },
       "RecipientMarker": 111,
-      "DeleteHex": [
-        "0135000A0001003700000DB6765A690A5E4777700000C350765A690A000000003B000000000000DAC35556893A0000DAC35556893A0000",
-        "0136000A0001003500000DB6765A690A212C487A0000C350765A690A0000000001000000000000DAC35556893A0000000000000000"
-      ],
-      "DeleteQuestMarker": 1431734586,
-      "DeleteRecipientMarker": 1985636618,
-      "TypedDelete": true,
       "SynchronizeClock": true,
-      "DurationSeconds": 172800
+      "DurationSeconds": 172800,
+      "DeletePackets": [
+        "MissionAccomplished",
+        "QuestDelete",
+        "QuestDelete"
+      ]
     },
     "Mission:55AA2421": {
-      "Hex": "00D6000A000102A100000DB478D84040465A40610000C35078D8404001000007E20000DAC355AA24210000000F000000000000000000000002596F7527766520666F756E64206120444F4A412D436869700000000102596F7527766520666F756E64206120444F4A412D436869703C42523E596F75206861766520666F756E642061207069656365206F662068617264776172652075736564206279204A4F4245206669656C6420736369656E746973747320746F2074616720616E6420747261636B2063726561747572657320696E2074686520536861646F776C616E64732E20596F75276C6C20626520726577617264656420666F722072657475726E696E6720746865206368697020746F2074686520776F6D616E2077686F7365207369676E617475726520697320696D7072696E746564206F6E2074686520636869702C2022536361726C6574742044616C7175697374222E000000C35078D8404000000006000000000000000000000000000003F1000003F1000007E200045BAC00045BAC00000001000000005847434B0000000000000000335452380000003C000000000000000000000000000000000000C35078D840400003BC520000000000000000000007E20000001800000000000000000000000000000000000111D3000196BA0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000D2F14D861E3C00009C5000000FA1000186A0000186A0446940000000000044630000000007E20000C35078D840400000000105861E3C000000000000000000000006000007E20000C35078D8404000000000000196BA000000000000000000000000000000000000000000000007000003F101",
+      "Packet": {
+        "Quests": [
+          {
+            "QuestId": {
+              "Type": 56003,
+              "Instance": 1437213729
+            },
+            "Version": 15,
+            "Unknown2": 0,
+            "Unknown3": 0,
+            "Flags": 2,
+            "ShortInfo": "You've found a DOJA-Chip",
+            "LongInfo": "You've found a DOJA-Chip<BR>You have found a piece of hardware used by JOBE field scientists to tag and track creatures in the Shadowlands. You'll be rewarded for returning the chip to the woman whose signature is imprinted on the chip, \"Scarlett Dalquist\".",
+            "UnknownId1": {
+              "Type": 50000,
+              "Instance": 2027438144
+            },
+            "RewardDescriptorVersion": 6,
+            "CashReward": 0,
+            "Unknown7": 0,
+            "ExperienceReward": 0,
+            "Unknown9": 1009,
+            "Unknown10": 1009,
+            "MissionItemData": [
+              {
+                "LowId": 285612,
+                "HighId": 285612,
+                "Ql": 1,
+                "Unknown": 0
+              }
+            ],
+            "Unknown11": 1481065291,
+            "Unknown12": 0,
+            "Unknown13": 0,
+            "UnknownHash1": "3TR8",
+            "Unknown14": 60,
+            "Unknown15": 0,
+            "Unknown16": 0,
+            "Unknown17": 0,
+            "Unknown18": 0,
+            "UnknownId2": {
+              "Type": 50000,
+              "Instance": 2027438144
+            },
+            "MissionIconId": 244818,
+            "Unknown20": 0,
+            "Unknown21": 0,
+            "QuestActions": [
+              {
+                "Version": 24,
+                "Action": {
+                  "Type": 0,
+                  "Instance": 0
+                },
+                "UnknownId1": {
+                  "Type": 0,
+                  "Instance": 0
+                },
+                "UnknownId2": {
+                  "Type": 70099,
+                  "Instance": 104122
+                },
+                "UnknownId3": {
+                  "Type": 0,
+                  "Instance": 0
+                },
+                "UnknownId4": {
+                  "Type": 0,
+                  "Instance": 0
+                },
+                "Unknown1": 0,
+                "Unknown2": 0,
+                "Unknown3": 0,
+                "Unknown4": 0,
+                "UnknownId5": {
+                  "Type": 0,
+                  "Instance": 0
+                },
+                "Unknown5": 0,
+                "Unknown6": 0,
+                "Unknown7": 0,
+                "Unknown8": 0,
+                "UnknownId6": {
+                  "Type": 0,
+                  "Instance": 0
+                },
+                "UnknownHash1": "",
+                "Unknown9": 0,
+                "UnknownId7": {
+                  "Type": 54001,
+                  "Instance": 1300635196
+                },
+                "PlayfieldId": {
+                  "Type": 40016,
+                  "Instance": 4001
+                },
+                "Unknown10": 100000,
+                "Unknown11": 100000,
+                "Position": {
+                  "X": 933,
+                  "Y": 0,
+                  "Z": 908
+                }
+              }
+            ],
+            "PlayerIds": [
+              {
+                "Type": 50000,
+                "Instance": 2027438144
+              }
+            ],
+            "UnknownArray1": [
+              92675644
+            ],
+            "UnknownArray2": [],
+            "CharacterInfos": [],
+            "Unknown22": 6,
+            "PlayerIds2": [
+              {
+                "Type": 50000,
+                "Instance": 2027438144
+              }
+            ],
+            "Unknown23": 0,
+            "Unknown24": 104122,
+            "UnknownId3": {
+              "Type": 0,
+              "Instance": 0
+            },
+            "Unknown25": 0,
+            "Unknown26": 0,
+            "QuestIdentities": [],
+            "Unknown27": 7,
+            "FactionInfos": [],
+            "Unknown28": 1
+          }
+        ],
+        "N3MessageType": 1180319841,
+        "Identity": {
+          "Type": 50000,
+          "Instance": 2027438144
+        },
+        "Unknown": 1,
+        "PacketType": 10
+      },
       "RecipientMarker": 2027438144,
-      "DeleteHex": [
-        "003C000A0001003700000DB878D840405E4777700000C35078D84040000000003B000000000000DAC355AA24210000DAC355AA24210000",
-        "003D000A0001003500000DB878D84040212C487A0000C35078D840400000000001000000000000DAC355AA24210000000000000000"
-      ],
-      "DeleteRecipientMarker": 2027438144,
-      "DeleteQuestMarker": 1437213729,
       "DurationSeconds": 43200,
-      "ExpiryOffset": -1
+      "DeletePackets": [
+        "MissionAccomplished",
+        "QuestDelete"
+      ]
     },
     "Mission:55AA2803": {
-      "Hex": "003E000A000101C000000DB878D84040465A40610000C35078D8404001000007E20000DAC355AA28030000000F000000000000000000000402596F752063616E206F6E6C79207475726E20696E206F6E6520444F4A2E2E2E000000002A596F752063616E206F6E6C79207475726E20696E206F6E6520444F4A41206368697020746F6461792E000000C35078D8404000000006000000000000000000000000000003F1000003F1000003F13654464200000000000000000000000000000000000000000000000000000000000000000000C35078D840400003BC520000043800000438000007E20000001800000000000000000000000000000000000111D3000196D4000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000006A89B128000000000000D2F14D87A81500000000000000000000000000000000000000000000000000000000000007E20000C35078D84040000000010587A815000000000000000000000006000007E20000C35078D8404000000000000196D4000000000000000000000000000000000000000000000007000003F101",
+      "Packet": {
+        "Quests": [
+          {
+            "QuestId": {
+              "Type": 56003,
+              "Instance": 1437214723
+            },
+            "Version": 15,
+            "Unknown2": 0,
+            "Unknown3": 0,
+            "Flags": 1026,
+            "ShortInfo": "You can only turn in one DOJ...",
+            "LongInfo": "You can only turn in one DOJA chip today.",
+            "UnknownId1": {
+              "Type": 50000,
+              "Instance": 2027438144
+            },
+            "RewardDescriptorVersion": 6,
+            "CashReward": 0,
+            "Unknown7": 0,
+            "ExperienceReward": 0,
+            "Unknown9": 1009,
+            "Unknown10": 1009,
+            "MissionItemData": [],
+            "Unknown11": 911492674,
+            "Unknown12": 0,
+            "Unknown13": 0,
+            "UnknownHash1": "",
+            "Unknown14": 0,
+            "Unknown15": 0,
+            "Unknown16": 0,
+            "Unknown17": 0,
+            "Unknown18": 0,
+            "UnknownId2": {
+              "Type": 50000,
+              "Instance": 2027438144
+            },
+            "MissionIconId": 244818,
+            "Unknown20": 1080,
+            "Unknown21": 1080,
+            "QuestActions": [
+              {
+                "Version": 24,
+                "Action": {
+                  "Type": 0,
+                  "Instance": 0
+                },
+                "UnknownId1": {
+                  "Type": 0,
+                  "Instance": 0
+                },
+                "UnknownId2": {
+                  "Type": 70099,
+                  "Instance": 104148
+                },
+                "UnknownId3": {
+                  "Type": 0,
+                  "Instance": 0
+                },
+                "UnknownId4": {
+                  "Type": 0,
+                  "Instance": 0
+                },
+                "Unknown1": 0,
+                "Unknown2": 0,
+                "Unknown3": 0,
+                "Unknown4": 0,
+                "UnknownId5": {
+                  "Type": 0,
+                  "Instance": 0
+                },
+                "Unknown5": 0,
+                "Unknown6": 0,
+                "Unknown7": 0,
+                "Unknown8": 0,
+                "UnknownId6": {
+                  "Type": 0,
+                  "Instance": 0
+                },
+                "UnknownHash1": "j\u0089±(",
+                "Unknown9": 0,
+                "UnknownId7": {
+                  "Type": 54001,
+                  "Instance": 1300736021
+                },
+                "PlayfieldId": {
+                  "Type": 0,
+                  "Instance": 0
+                },
+                "Unknown10": 0,
+                "Unknown11": 0,
+                "Position": {
+                  "X": 0,
+                  "Y": 0,
+                  "Z": 0
+                }
+              }
+            ],
+            "PlayerIds": [
+              {
+                "Type": 50000,
+                "Instance": 2027438144
+              }
+            ],
+            "UnknownArray1": [
+              92776469
+            ],
+            "UnknownArray2": [],
+            "CharacterInfos": [],
+            "Unknown22": 6,
+            "PlayerIds2": [
+              {
+                "Type": 50000,
+                "Instance": 2027438144
+              }
+            ],
+            "Unknown23": 0,
+            "Unknown24": 104148,
+            "UnknownId3": {
+              "Type": 0,
+              "Instance": 0
+            },
+            "Unknown25": 0,
+            "Unknown26": 0,
+            "QuestIdentities": [],
+            "Unknown27": 7,
+            "FactionInfos": [],
+            "Unknown28": 1
+          }
+        ],
+        "N3MessageType": 1180319841,
+        "Identity": {
+          "Type": 50000,
+          "Instance": 2027438144
+        },
+        "Unknown": 1,
+        "PacketType": 10
+      },
       "RecipientMarker": 2027438144,
-      "DeleteHex": [
-        "003C000A0001003700000DB878D840405E4777700000C35078D84040000000003B000000000000DAC355AA24210000DAC355AA24210000",
-        "003D000A0001003500000DB878D84040212C487A0000C35078D840400000000001000000000000DAC355AA24210000000000000000"
-      ],
-      "DeleteRecipientMarker": 2027438144,
-      "DeleteQuestMarker": 1437213729,
       "DurationSeconds": 64800,
-      "ExpiryOffset": 323
+      "DeletePackets": [
+        "MissionAccomplished",
+        "QuestDelete"
+      ],
+      "ClientClockExpiryActionIndex": 0
     }
   },
   "TimedTurnIns": [
     {
       "Key": "doja-nascense",
-      "TurnInNpc": "SimpleChar:7A18B924",
       "Quest": "Mission:55AA2421",
       "Objective": "mission_55AA2421_turnin",
       "CooldownQuest": "Mission:55AA2803",

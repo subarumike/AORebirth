@@ -10,6 +10,7 @@ using ZoneEngine.Core.Missions;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.Helpers;
 using ZoneEngine_New.Core.Inventory;
+using ZoneEngine_New.Core.Knubot;
 using ZoneEngine_New.Core.Mobs;
 using ZoneEngine_New.Core.Network;
 using MissionLifecycleState = AORebirth.Interfaces.Persistence.Missions.MissionLifecycleState;
@@ -108,21 +109,24 @@ public sealed partial class AuthoredQuestService
     { AuthoredQuestJournal.Delete(player, quest, Content); }
     static void SendChat(Player player, string text) => player.Session?.Send(new ChatTextMessage { Identity = player.Identity, Text = text });
 
-    internal TimedTurnInDefinition? ResolveNpcTimedTurnIn(Player player, NpcCharacter npc, string key)
+    internal TimedTurnInDefinition? ResolveNpcTimedTurnIn(Player player, NpcCharacter npc, KnubotScript script)
     {
-        if (!IsCurrent(player) || !ReferenceEquals(player.Playfield, npc.Playfield)
-            || player.Playfield!.GetService<NpcContentActivationService>() is not { } activation
-            || !activation.TryGetBinding(npc, out var binding))
+        if (script.TimedTrade?.TimedTurnIn is not { } rule || !Content.TimedTurnIns.Contains(rule) || !IsCurrent(player)
+            || player.Playfield is not { } playfield || !ReferenceEquals(playfield, npc.Playfield)
+            || playfield.GetService<NpcContentActivationService>() is not { } activation
+            || !activation.TryGetBinding(npc, out var binding)
+            || !script.Npcs.Contains(binding.ContentNpcIdentity, StringComparer.Ordinal)
+            || !rule.TurnInPlayfields.Contains(binding.PlayfieldId)
+            || !rule.TurnInPlayfields.Contains(playfield.Identity.Instance))
             return null;
 
-        return Content.TimedTurnIns.FirstOrDefault(rule => rule.Key == key && rule.TurnInNpc != null
-            && rule.TurnInNpc == binding.ContentNpcIdentity
-            && rule.TurnInPlayfields.Contains(binding.PlayfieldId));
+        return rule;
     }
 
-    internal bool CanOpenTimedTrade(Player player, TimedTurnInDefinition rule)
+    internal bool CanOpenTimedTrade(Player player, NpcCharacter npc, KnubotScript script)
     {
-        if (!rule.Items.Any(item => item.Enabled && LevelEligible(item, player.Stats.GetOrOne(CharacterStat.Level))
+        if (ResolveNpcTimedTurnIn(player, npc, script) is not { } rule
+            || !rule.Items.Any(item => item.Enabled && LevelEligible(item, player.Stats.GetOrOne(CharacterStat.Level))
             && HasCarried(player, item.ItemId)))
             return false;
         string? account = Account(player);
