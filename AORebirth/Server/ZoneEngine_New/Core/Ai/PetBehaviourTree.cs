@@ -470,8 +470,12 @@ namespace ZoneEngine_New.Core.Ai
             }
 
             // Each pet closes in at its own spot around the enemy, so several pets do not stack on one point.
-            int index = _brain.Pet!.Owner.OwnedPets.FormationIndex(npc);
+            PetController pet = _brain.Pet!;
+            int index = pet.Owner.OwnedPets.FormationIndex(npc);
             _brain.PathTo(PetFormation.AttackPoint(npc, enemy, index, PetAi.AttackReach));
+            // A formation point can be off the mesh or already underfoot while the enemy is out of reach.
+            if (!npc.Motor.HasPath && !pet.WarpRequested)
+                _brain.PathTo(_brain.ApproachPoint(enemy));
             return _nodeState = NodeState.Running;
         }
     }
