@@ -199,11 +199,12 @@ namespace ZoneEngine_New.Core.Nanos
         {
             if (!spell.TryReadInt(0, out int nanoId) || nanoId <= 0)
                 return false;
+            if (!TryResolveChild(items, nanoId, out NanoSpell? child) || child == null)
+                return false;
 
             if (recipient is not Player player)
             {
-                if (!recipient.IsDead)
-                    NanoRuntime.TryApplyImmediate(caster, recipient, nanoId, items, inventory, nowUtc);
+                NanoRuntime.TryApplyTeamChild(caster, recipient, child, items, inventory, nowUtc);
                 return true;
             }
 
@@ -214,8 +215,7 @@ namespace ZoneEngine_New.Core.Nanos
             TeamSnapshot? team = teams?.GetImmediateTeam(player);
             if (team == null || manager == null)
             {
-                if (!player.IsDead)
-                    NanoRuntime.TryApplyImmediate(caster, player, nanoId, items, inventory, nowUtc);
+                NanoRuntime.TryApplyTeamChild(caster, player, child, items, inventory, nowUtc);
                 return true;
             }
 
@@ -230,7 +230,7 @@ namespace ZoneEngine_New.Core.Nanos
                     && (!ReferenceEquals(mate.Playfield, playfield) || locality == null || !locality.IsVisibleTo(mate, player)))
                     continue;
 
-                NanoRuntime.TryApplyImmediate(caster, mate, nanoId, items, inventory, nowUtc);
+                NanoRuntime.TryApplyTeamChild(caster, mate, child, items, inventory, nowUtc);
             }
 
             return true;
