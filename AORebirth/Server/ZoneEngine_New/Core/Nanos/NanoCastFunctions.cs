@@ -199,11 +199,12 @@ namespace ZoneEngine_New.Core.Nanos
         {
             if (!spell.TryReadInt(0, out int nanoId) || nanoId <= 0)
                 return false;
+            if (!TryResolveChild(items, nanoId, out NanoSpell? child) || child == null)
+                return false;
 
             if (recipient is not Player player)
             {
-                if (!recipient.IsDead)
-                    NanoRuntime.TryApplyImmediate(caster, recipient, nanoId, items, inventory, nowUtc);
+                ApplyTo(recipient);
                 return true;
             }
 
@@ -214,8 +215,7 @@ namespace ZoneEngine_New.Core.Nanos
             TeamSnapshot? team = teams?.GetImmediateTeam(player);
             if (team == null || manager == null)
             {
-                if (!player.IsDead)
-                    NanoRuntime.TryApplyImmediate(caster, player, nanoId, items, inventory, nowUtc);
+                ApplyTo(player);
                 return true;
             }
 
@@ -224,16 +224,25 @@ namespace ZoneEngine_New.Core.Nanos
             PlayfieldLocality? locality = playfield?.GetService<PlayfieldLocality>();
             for (int i = 0; i < team.MemberIds.Count; i++)
             {
-                if (!manager.FindPlayer(team.MemberIds[i], out Player? mate) || mate == null || mate.IsDead)
+                if (!manager.FindPlayer(team.MemberIds[i], out Player? mate) || mate == null)
                     continue;
                 if (!ReferenceEquals(mate, player)
                     && (!ReferenceEquals(mate.Playfield, playfield) || locality == null || !locality.IsVisibleTo(mate, player)))
                     continue;
 
-                NanoRuntime.TryApplyImmediate(caster, mate, nanoId, items, inventory, nowUtc);
+                ApplyTo(mate);
             }
 
             return true;
+
+            void ApplyTo(Character candidate)
+            {
+                if (candidate.IsDead
+                    || !child.MeetsActionRequirements(stat => candidate.Stats.Get(stat), ActionType.ToUse, candidate.ResolveRequirement))
+                    return;
+
+                NanoRuntime.TryApplyImmediate(caster, candidate, nanoId, items, inventory, nowUtc);
+            }
         }
 
         static bool PlayfieldNano(

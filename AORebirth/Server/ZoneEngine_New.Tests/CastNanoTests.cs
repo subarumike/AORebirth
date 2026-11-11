@@ -729,6 +729,48 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        public void TeamCastNanoChecksChildLevelPerRecipient()
+        {
+            NanoSpell restricted = Timed(BuffId);
+            restricted.Actions.Add(new ItemAction
+            {
+                ActionType = (int)ActionType.ToUse,
+                Requirements =
+                [
+                    new ItemRequirement
+                    {
+                        Target = (int)ItemTarget.Self,
+                        Operator = (int)Operator.GreaterThan,
+                        StatNumber = (int)CharacterStat.Level,
+                        Value = 24
+                    }
+                ]
+            });
+            var items = new StubItemBuilder().Add(restricted).Add(Timed(ChildId));
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            Player ineligible = world.Player(2, 10, 0, 0);
+            Player eligible = world.Player(3, 5, 0, 0);
+            caster.Stats.Set(CharacterStat.Level, 25);
+            ineligible.Stats.Set(CharacterStat.Level, 24);
+            eligible.Stats.Set(CharacterStat.Level, 25);
+            world.Join(caster, ineligible);
+            world.Join(caster, eligible);
+            world.MakeVisible(caster, ineligible, eligible);
+
+            TeamSnapshot? team = world.Playfield.GetRequiredService<TeamService>().GetImmediateTeam(caster);
+            Assert.IsNotNull(team);
+            CollectionAssert.AreEquivalent(new[] { 1, 2, 3 }, team.MemberIds.ToArray());
+            Assert.IsTrue(world.Playfield.GetRequiredService<PlayfieldLocality>().IsVisibleTo(ineligible, caster));
+            Assert.IsTrue(UseCast(caster, items, FunctionType.TeamCastNano, ChildId));
+            Assert.IsTrue(ineligible.TryGetBuff(ChildId, out _), "An unrestricted child must reach the lower-level teammate.");
+            Assert.IsTrue(UseCast(caster, items, FunctionType.TeamCastNano, BuffId));
+            Assert.IsTrue(caster.TryGetBuff(BuffId, out _));
+            Assert.IsTrue(eligible.TryGetBuff(BuffId, out _));
+            Assert.IsFalse(ineligible.TryGetBuff(BuffId, out _), "Level 24 must not receive a child that requires level 25.");
+        }
+
+        [TestMethod]
         public void PeriodicTeamCastNanoRefreshesTheCasterAndTeamAtTheConfiguredIntervalAndCount()
         {
             var refresh = new ItemSpell
@@ -1100,6 +1142,7 @@ namespace ZoneEngine_New.Tests
                     .AddSingleton(_registry)
                     .AddSingleton(_teams)
                     .AddSingleton(_manager)
+                    .AddSingleton(new PlayfieldLocality(1, metaData: null))
                     .AddSingleton<WorldSimulationAccess>()
                     .AddSingleton<IItemBuilder>(items)
                     .AddSingleton<IInventoryRepository>(new SilentInventory())
@@ -1156,6 +1199,15 @@ namespace ZoneEngine_New.Tests
                     Target = inviter.Identity,
                     Parameter2 = 1
                 });
+            }
+
+            public void MakeVisible(params Player[] players)
+            {
+                PlayfieldLocality locality = _services.GetRequiredService<PlayfieldLocality>();
+                foreach (Player player in players)
+                    locality.RegisterDynel(player);
+                foreach (Player player in players)
+                    locality.ActivatePlayerVisibility(player);
             }
 
             public void Dispose() => _services.Dispose();
