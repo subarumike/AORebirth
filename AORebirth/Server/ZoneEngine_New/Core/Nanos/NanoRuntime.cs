@@ -278,26 +278,30 @@ namespace ZoneEngine_New.Core.Nanos
         /// caster state, requirements, nano cost, target NCU and hostile-target legality.
         /// </summary>
         public static bool CanStartCast(Character caster, NanoSpell spell, Character recipient, DateTime nowUtc)
+            => PreviewStartCast(caster, spell, recipient, nowUtc) == NanoCastRefusal.None;
+
+        internal static NanoCastRefusal PreviewStartCast(Character caster, NanoSpell spell, Character recipient, DateTime nowUtc)
         {
             ArgumentNullException.ThrowIfNull(caster);
             ArgumentNullException.ThrowIfNull(spell);
             ArgumentNullException.ThrowIfNull(recipient);
 
             if (IsNoCombat(caster) || IsNoCombat(recipient))
-                return false;
+                return NanoCastRefusal.InvalidTarget;
 
             // A self-only nano would land on the caster instead.
             if (spell.IsSelfOnly && !ReferenceEquals(caster, recipient))
-                return false;
+                return NanoCastRefusal.InvalidTarget;
 
             NanoCastAttempt attempt = BuildAttempt(caster, spell, recipient, ResolveNanoCost(caster, spell), nowUtc);
-            if (NanoCastRules.Evaluate(attempt) != NanoCastRefusal.None)
-                return false;
+            NanoCastRefusal refusal = NanoCastRules.Evaluate(attempt);
+            if (refusal != NanoCastRefusal.None)
+                return refusal;
             if (!TargetCanHoldBuff(spell, recipient))
-                return false;
-            return spell.IsHostile
-                ? IsHostileNanoTarget(caster, recipient)
-                : FriendlyNanoTargetRefusal(caster, recipient) == NanoCastRefusal.None;
+                return NanoCastRefusal.NotEnoughNcu;
+            if (spell.IsHostile)
+                return IsHostileNanoTarget(caster, recipient) ? NanoCastRefusal.None : NanoCastRefusal.InvalidTarget;
+            return FriendlyNanoTargetRefusal(caster, recipient);
         }
 
         /// <summary>

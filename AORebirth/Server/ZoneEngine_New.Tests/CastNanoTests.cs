@@ -67,6 +67,49 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        [DataRow(3.0, true)]
+        [DataRow(60.0, false)]
+        public void HealPetKeepsInRangeOrderWhileNanoRecovers(double distance, bool inRange)
+        {
+            NanoSpell heal = TestNanos.Create(InstantId, durationCentiseconds: 0, nanoPointCost: 5,
+                modifiers:
+                [
+                    new ItemSpell
+                    {
+                        FunctionType = (int)FunctionType.Hit,
+                        Arguments = [(int)CharacterStat.Health, 12, 12]
+                    }
+                ]);
+            heal.Stats[CharacterStat.AttackRange] = 20;
+            using var world = new FanoutWorld(new StubItemBuilder().Add(heal));
+            Player owner = world.Player(1, 0, 0, 0);
+            Player teammate = world.Player(2, distance, 0, 0);
+            world.Join(owner, teammate);
+            teammate.Stats.Set(CharacterStat.MaxHealth, 100);
+            teammate.Stats.Set(CharacterStat.Health, 40);
+            NpcCharacter pet = world.Npc(3, 0, 0, 0, attackable: true);
+            pet.Stats.Set(CharacterStat.CurrentNano, 0);
+            pet.TryAddUploadedNano(heal.Id);
+            var controller = new PetController(owner, PetTypes.Heal, "TEST", 1, null);
+            pet.BindPet(controller);
+            controller.Heal(teammate.Identity);
+            var tend = new PetTendNode(NpcBrain.CreatePet(pet, controller));
+
+            tend.Evaluate(0.1f);
+
+            Assert.AreEqual(40, teammate.Stats.GetOrZero(CharacterStat.Health));
+            Assert.AreEqual(inRange ? teammate.Identity : Identity.None, controller.HealTarget,
+                "Low nano may postpone an in-range heal; an out-of-range order still ends.");
+            if (inRange)
+            {
+                pet.Stats.Set(CharacterStat.CurrentNano, 5);
+                tend.Evaluate(0.1f);
+                Assert.AreEqual(52, teammate.Stats.GetOrZero(CharacterStat.Health));
+                Assert.AreEqual(0, pet.Stats.GetOrZero(CharacterStat.CurrentNano));
+            }
+        }
+
+        [TestMethod]
         public void CastNanoLeavesAnExistingPendingCastUntouched()
         {
             var items = new StubItemBuilder().Add(Timed(BuffId));

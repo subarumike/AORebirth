@@ -96,8 +96,23 @@ namespace AORebirth.Database.Domain.CharacterCreation
                             throw InvalidCatalog("professionId=" + row.ProfessionId
                                 + " repeats inventory placement " + item.Placement + ".");
 
+                        Dictionary<int, int> genderTemplates = null;
+                        if (item.GenderTemplates != null)
+                        {
+                            genderTemplates = new Dictionary<int, int>();
+                            foreach (GenderTemplateRow variant in item.GenderTemplates)
+                            {
+                                if (variant == null || variant.Gender == (int)Gender.None
+                                    || !Enum.IsDefined(typeof(Gender), variant.Gender) || variant.TemplateId <= 0
+                                    || genderTemplates.ContainsKey(variant.Gender))
+                                    throw InvalidCatalog("professionId=" + row.ProfessionId + ", items[" + j
+                                        + "] needs unique playable genders and positive template IDs for genderTemplates.");
+                                genderTemplates.Add(variant.Gender, variant.TemplateId);
+                            }
+                        }
+
                         items.Add(new CharacterStartPackageItem(
-                            item.Placement, item.LowId, item.HighId, item.Quality, item.Count));
+                            item.Placement, item.LowId, item.HighId, item.Quality, item.Count, genderTemplates));
                     }
 
                     var nanos = new List<int>();
@@ -191,6 +206,19 @@ namespace AORebirth.Database.Domain.CharacterCreation
 
             [DataMember(Name = "count")]
             public int Count { get; set; }
+
+            [DataMember(Name = "genderTemplates")]
+            public GenderTemplateRow[] GenderTemplates { get; set; }
+        }
+
+        [DataContract]
+        sealed class GenderTemplateRow
+        {
+            [DataMember(Name = "gender")]
+            public int Gender { get; set; }
+
+            [DataMember(Name = "templateId")]
+            public int TemplateId { get; set; }
         }
     }
 }
