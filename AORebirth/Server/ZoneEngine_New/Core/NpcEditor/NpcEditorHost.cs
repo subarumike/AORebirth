@@ -6,6 +6,7 @@ namespace ZoneEngine_New.Core.NpcEditor
     using System.Net;
     using System.Security.Cryptography;
     using System.Security.Cryptography.X509Certificates;
+    using System.Threading;
     using System.Threading.RateLimiting;
     using System.Threading.Tasks;
 
@@ -34,6 +35,7 @@ namespace ZoneEngine_New.Core.NpcEditor
         const string PortVariable = "AO_REBIRTH_NPC_EDITOR_PORT";
         const string WriteVariable = "AO_REBIRTH_NPC_EDITOR_ALLOW_WRITES";
         const string LoginRatePolicy = "npc-editor-login";
+        const string SimulationRatePolicy = "npc-editor-simulation";
         static readonly object SessionKey = new();
 
         internal static NpcEditorHost? Start(IServiceProvider services, IZoneLogger logger)
@@ -51,7 +53,10 @@ namespace ZoneEngine_New.Core.NpcEditor
                 permissions.ActionLevel(GmPermissions.SetOtherCharacterAction, SetCommand.OtherCharacterGmLevel)));
             bool allowWrites = Environment.GetEnvironmentVariable(WriteVariable) == "1";
             var gameData = (GameDataStore)services.GetRequiredService<IGameData>();
-            var loot = new NpcEditorLoot(gameData, services.GetRequiredService<IItemTemplateCatalog>());
+            IItemTemplateCatalog items = services.GetRequiredService<IItemTemplateCatalog>();
+            var loot = new NpcEditorLoot(gameData, items, services.GetRequiredService<HashItemMinter>());
+            var equipment = new NpcEditorEquipment(gameData, items);
+            var itemBrowser = new NpcEditorItemBrowser(items, gameData);
             var sessions = new NpcEditorSessions(MySqlAccountSanctionRepository.LoadEditorCredentials,
                 TimeProvider.System, readLevel, writeLevel, allowWrites,
                 !string.IsNullOrWhiteSpace(GameDataPaths.ResolveOverrideRoot()));
@@ -62,7 +67,7 @@ namespace ZoneEngine_New.Core.NpcEditor
             try
             {
                 app = Build(port, certificate, sessions, logger);
-                MapEditorRoutes(app, runtime, loot);
+                MapEditorRoutes(app, runtime, loot, equipment, itemBrowser);
                 app.StartAsync().GetAwaiter().GetResult();
                 string fingerprint = certificate.GetCertHashString(HashAlgorithmName.SHA256);
                 logger.Info($"NPC Editor listening on https://127.0.0.1:{port} TLS SHA256={fingerprint}.");
@@ -136,6 +141,11 @@ namespace ZoneEngine_New.Core.NpcEditor
                 {
                     limit.Window = TimeSpan.FromMinutes(1);
                     limit.PermitLimit = 8;
+                    limit.QueueLimit = 0;
+                });
+                options.AddConcurrencyLimiter(SimulationRatePolicy, limit =>
+                {
+                    limit.PermitLimit = 2;
                     limit.QueueLimit = 0;
                 });
             });
@@ -219,7 +229,8 @@ namespace ZoneEngine_New.Core.NpcEditor
             return app;
         }
 
-        internal static void MapEditorRoutes(WebApplication app, NpcEditorRuntime runtime, NpcEditorLoot loot)
+        internal static void MapEditorRoutes(WebApplication app, NpcEditorRuntime runtime, NpcEditorLoot loot,
+            NpcEditorEquipment equipment, NpcEditorItemBrowser itemBrowser)
         {
             var api = app.MapGroup(Route);
             api.MapGet("/npcs", async (string? q, HttpContext ctx) =>
@@ -228,13 +239,16 @@ namespace ZoneEngine_New.Core.NpcEditor
                 Results.Ok(await runtime.ResolveAsync(playfieldId, identityType, instanceId, ctx.RequestAborted)));
             api.MapGet("/items", (string? q) => Results.Ok(runtime.SearchItems(q ?? string.Empty)));
             api.MapGet("/loot-items", (string? q) => Results.Ok(loot.SearchItemFamilies(q ?? string.Empty)));
+            api.MapGet("/item-catalog", (string? q, string? category, int? minQl, int? maxQl, int? offset, int? limit,
+                bool? families, HttpContext ctx) => Results.Ok(itemBrowser.Search(q, category, minQl, maxQl,
+                    offset ?? 0, limit ?? 40, families ?? false, ctx.RequestAborted)));
+            api.MapGet("/item-catalog/{id:int}", (int id) => Results.Ok(itemBrowser.Get(id)));
 
             var npc = api.MapGroup("/npcs/{playfieldId:int}/{identityType:int}/{instanceId:int}/{generation:guid}");
             npc.MapGet("", async (int playfieldId, int identityType, int instanceId, Guid generation, HttpContext ctx) =>
                 Results.Ok(await runtime.InspectAsync(new(playfieldId, identityType, instanceId, generation), ctx.RequestAborted)));
-            npc.MapGet("/loot", async (int playfieldId, int identityType, int instanceId, Guid generation, HttpContext ctx) =>
-                Results.Ok(await runtime.WithNpcAsync(new(playfieldId, identityType, instanceId, generation),
-                    loot.Describe, ctx.RequestAborted)));
+            npc.MapGet("/stats", async (int playfieldId, int identityType, int instanceId, Guid generation, HttpContext ctx) =>
+                Results.Ok(await runtime.ReadStatsAsync(new(playfieldId, identityType, instanceId, generation), ctx.RequestAborted)));
             npc.MapPost("/stats", async (int playfieldId, int identityType, int instanceId, Guid generation,
                 StatEdit edit, HttpContext ctx) =>
             {
@@ -243,7 +257,7 @@ namespace ZoneEngine_New.Core.NpcEditor
                 if (edit.StatId is not int stat || edit.ExpectedBase is not int expected || edit.Value is not int value)
                     return Error(400, "Supply statId, expectedBase and value.");
                 return Results.Ok(await runtime.ApplyStatAsync(new(playfieldId, identityType, instanceId, generation),
-                    stat, expected, value, ctx.RequestAborted));
+                    stat, expected, value, ctx.RequestAborted, Auth(ctx).Session.Username));
             });
             npc.MapPost("/equipment", async (int playfieldId, int identityType, int instanceId, Guid generation,
                 NpcEditorEquipmentEdit edit, HttpContext ctx) =>
@@ -251,7 +265,7 @@ namespace ZoneEngine_New.Core.NpcEditor
                 if (!CanMutate(ctx))
                     return WriteDenied();
                 return Results.Ok(await runtime.ApplyEquipmentAsync(new(playfieldId, identityType, instanceId, generation),
-                    edit, ctx.RequestAborted));
+                    edit, ctx.RequestAborted, Auth(ctx).Session.Username));
             });
             npc.MapPost("/revert", async (int playfieldId, int identityType, int instanceId, Guid generation,
                 LiveRevert edit, HttpContext ctx) =>
@@ -261,7 +275,25 @@ namespace ZoneEngine_New.Core.NpcEditor
                 if (edit.ChangeId == Guid.Empty)
                     return Error(400, "Supply a changeId.");
                 return Results.Ok(await runtime.RevertAsync(new(playfieldId, identityType, instanceId, generation),
-                    edit.ChangeId, ctx.RequestAborted));
+                    edit.ChangeId, ctx.RequestAborted, Auth(ctx).Session.Username));
+            });
+
+            MapLootRoutes(npc, runtime, loot);
+            MapEquipmentRoutes(npc, runtime, equipment);
+        }
+
+        static void MapLootRoutes(RouteGroupBuilder npc, NpcEditorRuntime runtime, NpcEditorLoot loot)
+        {
+            npc.MapGet("/loot", async (int playfieldId, int identityType, int instanceId, Guid generation, HttpContext ctx) =>
+            {
+                var identity = new NpcEditorIdentity(playfieldId, identityType, instanceId, generation);
+                NpcEditorLootView view = await runtime.WithNpcAsync(identity, loot.Describe, ctx.RequestAborted);
+                if (view.Saved.CanSave)
+                {
+                    int? count = await runtime.EstimateTemplateBandAsync(view.Saved.TemplateHash, view.Saved.BandIndex, ctx.RequestAborted);
+                    view = view with { Saved = view.Saved with { EstimatedAffectedNpcs = count } };
+                }
+                return Results.Ok(view);
             });
             npc.MapPost("/loot", (int playfieldId, int identityType, int instanceId, Guid generation,
                 NpcEditorLootSave edit, HttpContext ctx) => SaveLoot(ctx, runtime, loot,
@@ -269,16 +301,68 @@ namespace ZoneEngine_New.Core.NpcEditor
             npc.MapPost("/loot/revert", (int playfieldId, int identityType, int instanceId, Guid generation,
                 NpcEditorLootRevert edit, HttpContext ctx) => SaveLoot(ctx, runtime, loot,
                     new(playfieldId, identityType, instanceId, generation), (hash, actor) => loot.Revert(hash, edit, actor)));
+            npc.MapPost("/loot/live", (int playfieldId, int identityType, int instanceId, Guid generation,
+                NpcEditorLootLiveEdit edit, HttpContext ctx) => ApplyLoot(ctx, runtime,
+                    new(playfieldId, identityType, instanceId, generation), (mob, actor) => loot.ApplyLive(mob, edit, actor)));
+            npc.MapPost("/loot/live/revert", (int playfieldId, int identityType, int instanceId, Guid generation,
+                NpcEditorLootLiveRevert edit, HttpContext ctx) => ApplyLoot(ctx, runtime,
+                    new(playfieldId, identityType, instanceId, generation), (mob, actor) => loot.RevertLive(mob, edit, actor)));
+            npc.MapPost("/loot/simulate", async (int playfieldId, int identityType, int instanceId, Guid generation,
+                NpcEditorLootSimulationRequest edit, HttpContext ctx) =>
+            {
+                var identity = new NpcEditorIdentity(playfieldId, identityType, instanceId, generation);
+                var snapshot = await runtime.WithNpcAsync(identity, loot.CaptureSimulation, ctx.RequestAborted);
+                return Results.Ok(loot.Simulate(snapshot, edit.Rolls, ctx.RequestAborted));
+            }).RequireRateLimiting(SimulationRatePolicy);
         }
 
-        static async Task<IResult> SaveLoot(HttpContext context, NpcEditorRuntime runtime, NpcEditorLoot loot,
+        static Task<IResult> SaveLoot(HttpContext context, NpcEditorRuntime runtime, NpcEditorLoot loot,
             NpcEditorIdentity identity, Func<NpcEditorLootTarget, string, NpcEditorLootState> save)
+            => SaveOverlay(context, ct => runtime.WithNpcAsync(identity, loot.CaptureSaveTarget, ct), save);
+
+        static async Task<IResult> ApplyLoot(HttpContext context, NpcEditorRuntime runtime, NpcEditorIdentity identity,
+            Func<Entities.NpcCharacter, string, NpcEditorLootView> apply)
+        {
+            if (!CanMutate(context))
+                return WriteDenied();
+            string actor = Auth(context).Session.Username;
+            try
+            {
+                return Results.Ok(await runtime.WithNpcAsync(identity, npc => apply(npc, actor), context.RequestAborted));
+            }
+            catch (ArgumentException ex)
+            {
+                return Error(400, ex.Message);
+            }
+            catch (InvalidOperationException ex) when (ex.GetType() == typeof(InvalidOperationException))
+            {
+                return Error(409, ex.Message);
+            }
+        }
+
+        static void MapEquipmentRoutes(RouteGroupBuilder npc, NpcEditorRuntime runtime, NpcEditorEquipment equipment)
+        {
+            npc.MapGet("/equipment", async (int playfieldId, int identityType, int instanceId, Guid generation, HttpContext ctx) =>
+                Results.Ok(equipment.Describe(await runtime.CaptureEquipmentAsync(
+                    new(playfieldId, identityType, instanceId, generation), ctx.RequestAborted))));
+            npc.MapPost("/equipment/save", (int playfieldId, int identityType, int instanceId, Guid generation,
+                NpcEditorEquipmentSave edit, HttpContext ctx) => SaveOverlay(ctx,
+                    ct => runtime.CaptureEquipmentAsync(new(playfieldId, identityType, instanceId, generation), ct, estimate: false),
+                    (target, actor) => equipment.Save(target, edit, actor)));
+            npc.MapPost("/equipment/restore", (int playfieldId, int identityType, int instanceId, Guid generation,
+                NpcEditorEquipmentRestore edit, HttpContext ctx) => SaveOverlay(ctx,
+                    ct => runtime.CaptureEquipmentAsync(new(playfieldId, identityType, instanceId, generation), ct, estimate: false),
+                    (target, actor) => equipment.Restore(target, edit, actor)));
+        }
+
+        static async Task<IResult> SaveOverlay<TTarget, TState>(HttpContext context, Func<CancellationToken, Task<TTarget>> capture,
+            Func<TTarget, string, TState> save)
         {
             if (!CanMutate(context, save: true))
                 return WriteDenied();
             try
             {
-                NpcEditorLootTarget target = await runtime.WithNpcAsync(identity, loot.CaptureSaveTarget, context.RequestAborted);
+                TTarget target = await capture(context.RequestAborted);
                 context.RequestAborted.ThrowIfCancellationRequested();
                 return Results.Ok(save(target, Auth(context).Session.Username));
             }
@@ -290,9 +374,9 @@ namespace ZoneEngine_New.Core.NpcEditor
             {
                 return Error(409, ex.Message);
             }
-            catch (IOException)
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
             {
-                return Error(503, "Could not save the NPC loot overlay. Check the configured overlay folder.");
+                return Error(503, "Could not save the NPC overlay. Check the configured overlay folder.");
             }
         }
 

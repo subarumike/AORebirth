@@ -30,6 +30,7 @@ namespace ZoneEngine_New.Core.Inventory
 
             Id = other.Id;
             Name = other.Name;
+            Description = other.Description;
             Quality = other.Quality;
             Flags = other.Flags;
             ItemType = other.ItemType;
@@ -48,6 +49,8 @@ namespace ZoneEngine_New.Core.Inventory
         public int Id { get; init; }
 
         public string Name { get; init; } = string.Empty;
+
+        public string? Description { get; init; }
 
         public int Quality { get; init; }
 

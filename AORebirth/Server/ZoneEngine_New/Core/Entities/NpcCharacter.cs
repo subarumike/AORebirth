@@ -162,6 +162,11 @@ namespace ZoneEngine_New.Core.Entities
 
         internal IReadOnlyList<Item> InspectCarriedLoot() => _carriedLoot ?? (IReadOnlyList<Item>)Array.Empty<Item>();
 
+        internal MobItemTableEntry[]? LiveEditorLootTable { get; set; }
+
+        internal IReadOnlyList<MobItemTableEntry>? ActiveLootTable
+            => LiveEditorLootTable ?? (IReadOnlyList<MobItemTableEntry>?)MobTemplate?.ItemTable;
+
         /// <summary>
         /// Binds a shop to this NPC and flags the character so the client draws the vendor cart.
         /// </summary>
@@ -406,7 +411,7 @@ namespace ZoneEngine_New.Core.Entities
         /// Mints template equipment at this NPC's level and expands EquipMonsterWeapon hashes.
         /// Call after stats are applied and before <see cref="Rebase"/>.
         /// </summary>
-        public void FillEquipment(IGameData gameData, IZoneLogger? logger = null)
+        public void FillEquipment(IGameData gameData, IZoneLogger? logger = null, IItemTemplateCatalog? editorItems = null)
         {
             ArgumentNullException.ThrowIfNull(gameData);
 
@@ -418,6 +423,16 @@ namespace ZoneEngine_New.Core.Entities
             _combatWeaponSlots.Clear();
             int quality = Stats.GetOrOne(CharacterStat.Level);
             List<List<int>> pairs = template.Equipment;
+            if (template.EditorEquipmentEntries is { } edits && template.EditorLootLeaf is { } leaf
+                && (editorItems ?? Playfield?.GetService<IItemTemplateCatalog>()) is { } catalog)
+            {
+                NpcLevelBand band = leaf.Bands[template.AuthoredBandIndex];
+                if (NpcEditor.NpcEditorEquipmentPolicy.TryResolve(band, edits, catalog, out var configured, out string? error))
+                    pairs = configured;
+                else
+                    logger?.Warn($"NPC equipment override {template.Hash}:{template.AuthoredBandIndex} was rejected. {error}");
+            }
+            SpawnEquipment = pairs;
             TickStallWatch.Stage("equip.bossmod", Identity.Instance);
             (HashSet<int> bossModifiers, int keptBossModifier) = PickBossModifier(pairs, quality);
             for (int i = 0; i < pairs.Count; i++)
@@ -443,6 +458,8 @@ namespace ZoneEngine_New.Core.Entities
                 ApplyComboName(gameData, item);
             }
         }
+
+        internal IReadOnlyList<List<int>>? SpawnEquipment { get; private set; }
 
         /// <summary>A ComboNameGen item (the boss "Name Giver") renames the NPC from ComboNames.json by its Clan stat.</summary>
         void ApplyComboName(IGameData gameData, Item item)
@@ -559,7 +576,12 @@ namespace ZoneEngine_New.Core.Entities
             => item.Name.StartsWith(BossModifierPrefix, StringComparison.OrdinalIgnoreCase)
                 || IsLootGiver(item) || HasFunction(item, FunctionType.UploadNano)
                 || HasFunction(item, FunctionType.EquipMonsterWeapon) || HasFunction(item, FunctionType.ComboNameGen)
-                || System.Linq.Enumerable.Any(EquipmentLoot.SpawnFunctions(item));
+                || System.Linq.Enumerable.Any(EquipmentLoot.SpawnFunctions(item))
+                || HasWearCast(item, EventType.OnWear) || HasWearCast(item, EventType.OnWield);
+
+        static bool HasWearCast(Item item, EventType trigger)
+            => item.SpellList.TryGetValue(trigger, out List<ItemSpell>? spells)
+                && spells != null && spells.Exists(WearCastNano.IsCastFunction);
 
         static bool IsLootGiver(Item item)
             => item.Definition?.Name?.Contains("lootgiver", StringComparison.OrdinalIgnoreCase) == true;

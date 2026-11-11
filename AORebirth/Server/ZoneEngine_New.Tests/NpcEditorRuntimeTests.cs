@@ -1,6 +1,7 @@
 namespace ZoneEngine_New.Tests;
 
 using System;
+using System.Linq;
 using System.Runtime.CompilerServices;
 
 using AORebirth.Enums;
@@ -72,6 +73,8 @@ public sealed class NpcEditorRuntimeTests
         var catalog = new StubCatalog().Add(10, 25).Add(11, 25);
         catalog.Require(10).Stats[CharacterStat.ItemClass] = (int)ItemClass.Armor;
         catalog.Require(10).Stats[CharacterStat.DefaultPos] = 2;
+        catalog.Require(10).SpellList[EventType.OnWear] =
+            [new ItemSpell { FunctionType = (int)FunctionType.ChangeBodyMesh, Arguments = ["robe"] }];
         catalog.Require(11).Stats[CharacterStat.ItemClass] = (int)ItemClass.Armor;
         catalog.Require(11).Stats[CharacterStat.DefaultPos] = 2;
         var items = new ItemBuilder(catalog, new StubInstanceIdAllocator(), new StubLogger());
@@ -80,6 +83,7 @@ public sealed class NpcEditorRuntimeTests
         var change = NpcEditorRuntime.EditEquipment(npc, catalog, items, new(-1, 0, 10, 25));
         Assert.IsNotNull(change.After);
         Assert.AreSame(change.After, npc.Equipment.Content[change.Slot]);
+        Assert.AreEqual((byte)1, npc.BuildAppearanceUpdateMessage().Unknown1);
         Assert.AreEqual(400, Assert.ThrowsExactly<NpcEditorRuntimeException>(
             () => NpcEditorRuntime.EditEquipment(npc, catalog, items, new(-1, 0, 11, null))).StatusCode);
         Assert.AreEqual(409, Assert.ThrowsExactly<NpcEditorRuntimeException>(
@@ -88,6 +92,7 @@ public sealed class NpcEditorRuntimeTests
         var replaced = NpcEditorRuntime.EditEquipment(npc, catalog, items, new(change.Slot, change.After!.InstanceId, 11, null));
         Assert.AreEqual(11, npc.Equipment.Content[change.Slot].LowId);
         Assert.AreEqual(10, replaced.Before!.LowId);
+        Assert.AreEqual((byte)0, npc.BuildAppearanceUpdateMessage().Unknown1);
         NpcEditorRuntime.EditEquipment(npc, catalog, items, new(change.Slot, replaced.After!.InstanceId, null, null));
         Assert.AreEqual(0, npc.Equipment.Content.Count);
         Assert.AreEqual(0, npc.MobTemplate!.Equipment.Count);
@@ -120,6 +125,19 @@ public sealed class NpcEditorRuntimeTests
         Assert.AreSame(monster, npc.Weapons[WeaponSlot.Npc0].Item);
         Assert.AreEqual(400, Assert.ThrowsExactly<NpcEditorRuntimeException>(
             () => NpcEditorRuntime.EditEquipment(npc, catalog, items, new(1, monster.InstanceId, 10, null))).StatusCode);
+
+        Item visible = npc.VisualRightHand;
+        var removal = NpcEditorRuntime.EditEquipment(npc, catalog, items, new(0, visible.InstanceId, null, null));
+        Assert.IsNull(npc.VisualRightHand);
+        Assert.AreEqual(0, npc.BuildWeaponInstanceMessages().Count);
+        Assert.IsFalse(npc.BuildAppearanceUpdateMessage().Meshes.Any(mesh => mesh.Position == 1));
+        Assert.AreSame(monster, npc.Weapons[WeaponSlot.Npc0].Item);
+        Assert.IsNull(npc.Weapons[WeaponSlot.Npc0].VisualHand);
+
+        NpcEditorRuntime.UndoEquipment(npc, removal);
+        Assert.AreSame(visible, npc.VisualRightHand);
+        Assert.IsTrue(npc.BuildAppearanceUpdateMessage().Meshes.Any(mesh => mesh.Position == 1 && mesh.Id == 512));
+        Assert.AreSame(monster, npc.Weapons[WeaponSlot.Npc0].Item);
     }
 
     static NpcCharacter MakeNpc(int instance, IItemBuilder? items = null)

@@ -84,6 +84,7 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <DockPanel LastChildFill="True" Margin="0,0,0,8">
+                    <Button DockPanel.Dock="Right" Content="Browse items…" Click="BrowseItems_Click" />
                     <Button x:Name="RefreshDetail" DockPanel.Dock="Right" Content="Refresh NPC" Click="RefreshDetail_Click" IsEnabled="False" />
                     <StackPanel>
                         <TextBlock x:Name="DetailHeading" Text="Select a spawned NPC" FontSize="20" FontWeight="SemiBold" />
@@ -105,7 +106,7 @@
                             </StackPanel>
                         </ScrollViewer>
                     </TabItem>
-                    <TabItem Header="Stats">
+                    <TabItem x:Name="StatsTab" Header="Stats">
                         <Grid Margin="10">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto" />
@@ -131,148 +132,259 @@
                                 <WrapPanel>
                                     <TextBox x:Name="NewStatBase" Width="95" MaxLength="11" Margin="0,0,6,0" AutomationProperties.Name="New runtime base value" />
                                     <Button x:Name="ApplyStat" Content="Apply Live" Click="ApplyStat_Click" />
+                                    <Button x:Name="RevertStatDraft" Content="Revert draft" Click="RevertStatDraft_Click" />
                                     <Button Content="Save stats to GameData" IsEnabled="False" />
                                 </WrapPanel>
                                 <TextBlock Style="{StaticResource Caption}" Margin="0,6,0,0"
                                            Text="Select an editable stat and lock the NPC to apply its new base value. Live edits last until the NPC despawns. Persistent stat editing is unavailable." />
+                                <TextBlock x:Name="StatsStatus" Style="{StaticResource Caption}" Margin="0,4,0,0" />
                             </StackPanel>
                         </Grid>
                     </TabItem>
                     <TabItem Header="Loot">
-                        <TabControl Margin="8">
-                            <TabItem Header="Effective at spawn">
-                                <Grid Margin="8">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="*" />
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-                                    <TextBlock x:Name="EffectiveLootStatus" Style="{StaticResource Caption}" Margin="0,0,0,8" />
-                                    <DataGrid Grid.Row="1" x:Name="EffectiveLoot" SelectionChanged="EffectiveLoot_SelectionChanged">
-                                        <DataGrid.Columns>
-                                            <DataGridTextColumn Header="Source" Binding="{Binding Source}" Width="115" />
-                                            <DataGridTextColumn Header="Items" Binding="{Binding ItemNames}" Width="2*" />
-                                            <DataGridTextColumn Header="Chance %" Binding="{Binding Chance}" Width="75" />
-                                            <DataGridTextColumn Header="Repeats" Binding="{Binding Repeats}" Width="68" />
-                                            <DataGridTextColumn Header="QL" Binding="{Binding QualityRange}" Width="85" />
-                                            <DataGridTextColumn Header="Behavior" Binding="{Binding Behavior}" Width="*" />
-                                        </DataGrid.Columns>
-                                    </DataGrid>
-                                    <TextBox x:Name="EffectiveLootRow" Grid.Row="2" IsReadOnly="True" Height="90" Margin="0,8,0,0"
-                                             TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AutomationProperties.Name="Effective loot details" />
-                                </Grid>
-                            </TabItem>
-                            <TabItem Header="Template additions">
-                                <Grid Margin="8">
-                                    <Grid.RowDefinitions>
-                                        <RowDefinition Height="Auto" />
-                                        <RowDefinition Height="*" />
-                                        <RowDefinition Height="Auto" />
-                                    </Grid.RowDefinitions>
-                                    <TextBlock x:Name="SavedLootStatus" Style="{StaticResource Caption}" Margin="0,0,0,8" />
-                                    <DataGrid Grid.Row="1" x:Name="SavedLoot" SelectionChanged="SavedLoot_SelectionChanged" CanUserSortColumns="False">
-                                        <DataGrid.Columns>
-                                            <DataGridTextColumn Header="Item hash" Binding="{Binding ItemHash}" Width="*" />
-                                            <DataGridTextColumn Header="Chance %" Binding="{Binding Chance}" Width="100" />
-                                            <DataGridTextColumn Header="Repeats" Binding="{Binding Repeats}" Width="100" />
-                                            <DataGridTextColumn Header="QL variance %" Binding="{Binding LevelMod}" Width="120" />
-                                        </DataGrid.Columns>
-                                    </DataGrid>
-                                    <StackPanel Grid.Row="2" Margin="0,8,0,0">
-                                        <WrapPanel>
-                                            <Button x:Name="PickLootItem" Content="Pick item family…" Click="PickLootItem_Click" />
-                                            <Button x:Name="NewLootRow" Content="Start new row" Click="NewLootRow_Click" />
-                                            <TextBlock x:Name="LootItemLabel" Style="{StaticResource Caption}" VerticalAlignment="Center" />
-                                        </WrapPanel>
-                                        <WrapPanel Margin="0,8,0,0">
-                                            <TextBlock Text="Chance %" VerticalAlignment="Center" Margin="0,0,6,0" />
-                                            <TextBox x:Name="LootChance" Width="48" MaxLength="3" Margin="0,0,12,0" AutomationProperties.Name="Loot chance percent" />
-                                            <TextBlock Text="Repeats" VerticalAlignment="Center" Margin="0,0,6,0" />
-                                            <TextBox x:Name="LootRepeats" Width="48" MaxLength="2" Margin="0,0,12,0" AutomationProperties.Name="Loot repeat attempts" />
-                                            <TextBlock Text="QL variance %" VerticalAlignment="Center" Margin="0,0,6,0" />
-                                            <TextBox x:Name="LootVariance" Width="48" MaxLength="3" Margin="0,0,12,0" AutomationProperties.Name="Loot quality variance percent" />
-                                        </WrapPanel>
-                                        <WrapPanel Margin="0,8,0,0">
-                                            <Button x:Name="SaveLoot" Content="Save to GameData" Click="SaveLoot_Click" />
-                                            <Button x:Name="RemoveLoot" Content="Remove saved row" Click="RemoveLoot_Click" />
-                                            <Button x:Name="RevertLoot" Content="Roll back revision" Click="RevertLoot_Click" />
-                                        </WrapPanel>
-                                        <TextBlock Style="{StaticResource Caption}" Margin="0,6,0,0"
-                                                   Text="100% succeeds on the chance check. Eligibility and corpse capacity still apply. Use 0 QL variance for the server default." />
-                                    </StackPanel>
-                                </Grid>
-                            </TabItem>
-                            <TabItem Header="Loot history">
-                                <DockPanel Margin="8">
-                                    <Button x:Name="RestoreLootRevision" DockPanel.Dock="Bottom" Content="Restore selected revision"
-                                            Click="RestoreLootRevision_Click" HorizontalAlignment="Left" Margin="0,8,0,0" />
-                                    <DataGrid x:Name="LootHistory" SelectionChanged="LootHistory_SelectionChanged">
-                                        <DataGrid.Columns>
-                                            <DataGridTextColumn Header="Revision" Binding="{Binding Revision}" Width="*" />
-                                            <DataGridTextColumn Header="UTC" Binding="{Binding AtUtc, StringFormat=u}" Width="165" />
-                                            <DataGridTextColumn Header="Actor" Binding="{Binding Actor}" Width="*" />
-                                            <DataGridTextColumn Header="Action" Binding="{Binding Action}" Width="*" />
-                                            <DataGridTextColumn Header="Entries" Binding="{Binding EntryCount}" Width="75" />
-                                        </DataGrid.Columns>
-                                    </DataGrid>
-                                </DockPanel>
-                            </TabItem>
-                        </TabControl>
-                    </TabItem>
-                    <TabItem Header="Equipment">
-                        <Grid Margin="10">
+                        <Grid Margin="8">
                             <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="Auto" />
                                 <RowDefinition Height="*" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
-                            <TextBlock Text="Live equipment" FontWeight="SemiBold" Margin="0,0,0,5" />
-                            <DataGrid Grid.Row="1" x:Name="EquipmentGrid" SelectionChanged="Equipment_SelectionChanged">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Slot" Binding="{Binding Slot}" Width="55" />
-                                    <DataGridTextColumn Header="Item" Binding="{Binding Name}" Width="*" />
-                                    <DataGridTextColumn Header="QL" Binding="{Binding Quality}" Width="55" />
-                                    <DataGridTextColumn Header="Low ID" Binding="{Binding LowId}" Width="80" />
-                                    <DataGridTextColumn Header="High ID" Binding="{Binding HighId}" Width="80" />
-                                    <DataGridTextColumn Header="Role" Binding="{Binding Role}" Width="105" />
-                                </DataGrid.Columns>
-                            </DataGrid>
-                            <TextBlock Grid.Row="2" Text="Configured template equipment" FontWeight="SemiBold" Margin="0,8,0,5" />
-                            <DataGrid Grid.Row="3" x:Name="ConfiguredEquipmentGrid">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Item" Binding="{Binding Name}" Width="*" />
-                                    <DataGridTextColumn Header="Low ID" Binding="{Binding LowId}" Width="105" />
-                                    <DataGridTextColumn Header="High ID" Binding="{Binding HighId}" Width="105" />
-                                </DataGrid.Columns>
-                            </DataGrid>
-                            <StackPanel Grid.Row="4" Margin="0,8,0,0">
-                                <WrapPanel>
-                                    <Button x:Name="ReplaceEquipment" Content="Replace live item…" Click="ReplaceEquipment_Click" />
-                                    <Button x:Name="RemoveEquipment" Content="Remove live armor" Click="RemoveEquipment_Click" />
-                                    <Button x:Name="AddArmor" Content="Add live armor…" Click="AddArmor_Click" />
-                                    <Button Content="Save equipment to GameData" IsEnabled="False" />
+                            <TabControl x:Name="LootTabs" SelectionChanged="LootTab_SelectionChanged">
+                                <TabItem x:Name="EffectiveLootTab" Header="Selected NPC">
+                                    <DockPanel Margin="8">
+                                        <TextBlock x:Name="EffectiveLootStatus" DockPanel.Dock="Top" Style="{StaticResource Caption}" Margin="0,0,0,8" />
+                                        <DataGrid x:Name="EffectiveLoot" SelectionChanged="LootRow_SelectionChanged">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Definition" Binding="{Binding Source}" Width="140" />
+                                                <DataGridTextColumn Header="Items" Binding="{Binding ItemNames}" Width="2*" />
+                                                <DataGridTextColumn Header="Chance %" Binding="{Binding Chance}" Width="75" />
+                                                <DataGridTextColumn Header="Quantity" Binding="{Binding QuantityRange}" Width="70" />
+                                                <DataGridTextColumn Header="QL" Binding="{Binding QualityRange}" Width="80" />
+                                                <DataGridTextColumn Header="Roll behavior" Binding="{Binding Behavior}" Width="*" />
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </DockPanel>
+                                </TabItem>
+                                <TabItem x:Name="SavedLootTab" Header="Template band">
+                                    <DockPanel Margin="8">
+                                        <TextBlock x:Name="SavedLootStatus" DockPanel.Dock="Top" Style="{StaticResource Caption}" Margin="0,0,0,8" />
+                                        <DataGrid x:Name="SavedLoot" SelectionChanged="LootRow_SelectionChanged">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Definition" Binding="{Binding Source}" Width="140" />
+                                                <DataGridTextColumn Header="Items" Binding="{Binding ItemNames}" Width="2*" />
+                                                <DataGridTextColumn Header="Chance %" Binding="{Binding Chance}" Width="75" />
+                                                <DataGridTextColumn Header="Quantity" Binding="{Binding QuantityRange}" Width="70" />
+                                                <DataGridTextColumn Header="QL" Binding="{Binding QualityRange}" Width="80" />
+                                                <DataGridTextColumn Header="Roll behavior" Binding="{Binding Behavior}" Width="*" />
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </DockPanel>
+                                </TabItem>
+                                <TabItem Header="History">
+                                    <Grid Margin="8">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                        </Grid.RowDefinitions>
+                                        <TextBlock Text="Selected NPC changes" FontWeight="SemiBold" Margin="0,0,0,5" />
+                                        <DataGrid x:Name="LiveLootHistory" Grid.Row="1" SelectionChanged="LootHistory_SelectionChanged">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="UTC" Binding="{Binding AtUtc, StringFormat=u}" Width="155" />
+                                                <DataGridTextColumn Header="GM" Binding="{Binding Actor}" Width="*" />
+                                                <DataGridTextColumn Header="Action" Binding="{Binding Action}" Width="90" />
+                                                <DataGridTextColumn Header="Before" Binding="{Binding BeforeText}" Width="*" />
+                                                <DataGridTextColumn Header="After" Binding="{Binding AfterText}" Width="*" />
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                        <Button x:Name="RevertLiveLoot" Grid.Row="2" Content="Undo selected live change" Click="RevertLiveLoot_Click"
+                                                HorizontalAlignment="Left" Margin="0,6,0,6" />
+                                        <TextBlock Grid.Row="3" Text="Saved template band revisions" FontWeight="SemiBold" Margin="0,0,0,5" />
+                                        <DataGrid x:Name="LootHistory" Grid.Row="4" SelectionChanged="LootHistory_SelectionChanged">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Revision" Binding="{Binding Revision}" Width="75" />
+                                                <DataGridTextColumn Header="UTC" Binding="{Binding AtUtc, StringFormat=u}" Width="155" />
+                                                <DataGridTextColumn Header="GM" Binding="{Binding Actor}" Width="*" />
+                                                <DataGridTextColumn Header="Action" Binding="{Binding Action}" Width="*" />
+                                                <DataGridTextColumn Header="Entries" Binding="{Binding EntryCount}" Width="75" />
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                        <TextBox x:Name="LootHistoryDetails" Grid.Row="5" IsReadOnly="True" Height="64" Margin="0,6,0,0"
+                                                 TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AutomationProperties.Name="Saved loot change scope and values" />
+                                        <WrapPanel Grid.Row="6" Margin="0,6,0,0">
+                                            <Button x:Name="RestoreLootRevision" Content="Restore selected revision" Click="RestoreLootRevision_Click" />
+                                            <Button x:Name="RevertLoot" Content="Restore previous" Click="RevertLoot_Click" />
+                                        </WrapPanel>
+                                    </Grid>
+                                </TabItem>
+                                <TabItem Header="Simulation">
+                                    <Grid Margin="8">
+                                        <Grid.RowDefinitions>
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="Auto" />
+                                            <RowDefinition Height="*" />
+                                        </Grid.RowDefinitions>
+                                        <WrapPanel>
+                                            <TextBlock Text="Simulated corpses" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                            <TextBox x:Name="LootRollCount" Text="100" Width="65" MaxLength="5" Margin="0,0,6,0"
+                                                     AutomationProperties.Name="Simulation roll count" />
+                                            <Button x:Name="SimulateLoot" Content="Simulate selected NPC" Click="SimulateLoot_Click" />
+                                        </WrapPanel>
+                                        <TextBlock x:Name="LootSimulationStatus" Grid.Row="1" Style="{StaticResource Caption}" Margin="0,6,0,6"
+                                                   Text="Simulated frequencies use the current live loot definition. No corpse or persistent item is created." />
+                                        <DataGrid x:Name="LootSimulationGrid" Grid.Row="2">
+                                            <DataGrid.Columns>
+                                                <DataGridTextColumn Header="Item" Binding="{Binding Name}" Width="*" />
+                                                <DataGridTextColumn Header="Low ID" Binding="{Binding LowId}" Width="70" />
+                                                <DataGridTextColumn Header="High ID" Binding="{Binding HighId}" Width="70" />
+                                                <DataGridTextColumn Header="Drops" Binding="{Binding TotalDrops}" Width="60" />
+                                                <DataGridTextColumn Header="Corpses" Binding="{Binding CorpsesWithItem}" Width="65" />
+                                                <DataGridTextColumn Header="Observed %" Binding="{Binding CorpseFrequencyPercent, StringFormat=F2}" Width="85" />
+                                                <DataGridTextColumn Header="QL × count" Binding="{Binding QualityDistribution}" Width="*" />
+                                            </DataGrid.Columns>
+                                        </DataGrid>
+                                    </Grid>
+                                </TabItem>
+                            </TabControl>
+                            <StackPanel x:Name="LootDraft" Grid.Row="1" Margin="0,6,0,0">
+                                <TextBox x:Name="EffectiveLootRow" IsReadOnly="True" Height="58" TextWrapping="Wrap"
+                                         VerticalScrollBarVisibility="Auto" AutomationProperties.Name="Selected loot entry details" />
+                                <WrapPanel Margin="0,6,0,0">
+                                    <StackPanel Orientation="Horizontal" Margin="0,0,6,0">
+                                        <TextBlock Text="Item family or group hash" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                        <TextBox x:Name="LootItemHash" Width="155" MaxLength="64"
+                                                 AutomationProperties.Name="Item family or group hash" />
+                                    </StackPanel>
+                                    <Button x:Name="PickLootItem" Content="Choose item…" Click="PickLootItem_Click" />
+                                    <Button x:Name="NewLootRow" Content="Add entry" Click="NewLootRow_Click" />
+                                    <Button x:Name="RemoveLoot" Content="Stage removal" Click="RemoveLoot_Click" />
                                 </WrapPanel>
-                                <TextBlock Style="{StaticResource Caption}" Margin="0,6,0,0"
-                                           Text="Lock the NPC to edit a supported slot. Persistent equipment editing is unavailable." />
+                                <WrapPanel Margin="0,6,0,0">
+                                    <TextBlock Text="Chance %" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <TextBox x:Name="LootChance" Width="47" MaxLength="3" Margin="0,0,8,0" AutomationProperties.Name="Loot chance percent" />
+                                    <TextBlock Text="Attempts" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <TextBox x:Name="LootRepeats" Width="42" MaxLength="2" Margin="0,0,8,0" AutomationProperties.Name="Loot roll attempts" />
+                                    <TextBlock Text="QL variance %" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <TextBox x:Name="LootVariance" Width="47" MaxLength="3" Margin="0,0,8,0" AutomationProperties.Name="Loot quality variance percent" />
+                                    <TextBlock Text="Or QL range" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                    <TextBox x:Name="LootMinQuality" Width="47" MaxLength="10" AutomationProperties.Name="Minimum loot QL" />
+                                    <TextBlock Text="–" VerticalAlignment="Center" Margin="4,0" />
+                                    <TextBox x:Name="LootMaxQuality" Width="47" MaxLength="10" AutomationProperties.Name="Maximum loot QL" />
+                                </WrapPanel>
+                                <WrapPanel Margin="0,6,0,0">
+                                    <Button x:Name="ApplyLoot" Content="Apply Live" Click="ApplyLoot_Click" />
+                                    <Button x:Name="SaveLoot" Content="Save to GameData" Click="SaveLoot_Click" />
+                                    <Button x:Name="RevertLootDraft" Content="Revert draft" Click="RevertLootDraft_Click" />
+                                    <TextBlock x:Name="LootDraftStatus" Style="{StaticResource Caption}" VerticalAlignment="Center" />
+                                </WrapPanel>
                             </StackPanel>
                         </Grid>
+                    </TabItem>
+                    <TabItem Header="Equipment">
+                        <TabControl Margin="8">
+                            <TabItem Header="Loadouts">
+                                <Grid Margin="8">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock Text="Selected NPC equipment" FontWeight="SemiBold" Margin="0,0,0,5" />
+                                    <DataGrid Grid.Row="1" x:Name="EquipmentGrid" SelectionChanged="Equipment_SelectionChanged">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Slot" Binding="{Binding Slot}" Width="55" />
+                                            <DataGridTextColumn Header="Item" Binding="{Binding Name}" Width="*" />
+                                            <DataGridTextColumn Header="QL" Binding="{Binding Quality}" Width="55" />
+                                            <DataGridTextColumn Header="Low ID" Binding="{Binding LowId}" Width="70" />
+                                            <DataGridTextColumn Header="High ID" Binding="{Binding HighId}" Width="70" />
+                                            <DataGridTextColumn Header="Role" Binding="{Binding Role}" Width="90" />
+                                            <DataGridTextColumn Header="Position" Binding="{Binding DefaultPosition}" Width="70" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                    <StackPanel Grid.Row="2" Margin="0,6,0,0">
+                                        <WrapPanel>
+                                            <Button x:Name="ReplaceEquipment" Content="Replace item…" Click="ReplaceEquipment_Click" />
+                                            <Button x:Name="RemoveEquipment" Content="Remove item" Click="RemoveEquipment_Click" />
+                                            <Button x:Name="AddArmor" Content="Add armor…" Click="AddArmor_Click" />
+                                            <Button x:Name="ApplyEquipment" Content="Apply Live" Click="ApplyEquipment_Click" />
+                                            <Button x:Name="RevertEquipmentDraft" Content="Revert draft" Click="RevertEquipmentDraft_Click" />
+                                        </WrapPanel>
+                                        <TextBlock x:Name="LiveEquipmentDraftStatus" Style="{StaticResource Caption}" Margin="0,4,0,0" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Row="3" Margin="0,10,0,5">
+                                        <TextBlock Text="Configured template equipment" FontWeight="SemiBold" />
+                                        <TextBlock x:Name="SavedEquipmentStatus" Style="{StaticResource Caption}" />
+                                    </StackPanel>
+                                    <DataGrid Grid.Row="4" x:Name="ConfiguredEquipmentGrid" SelectionChanged="Equipment_SelectionChanged">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Row" Binding="{Binding Index}" Width="55" />
+                                            <DataGridTextColumn Header="Item" Binding="{Binding Name}" Width="*" />
+                                            <DataGridTextColumn Header="Low ID" Binding="{Binding LowId}" Width="90" />
+                                            <DataGridTextColumn Header="High ID" Binding="{Binding HighId}" Width="90" />
+                                            <DataGridTextColumn Header="Role" Binding="{Binding Role}" Width="90" />
+                                            <DataGridTextColumn Header="Position" Binding="{Binding DefaultPosition}" Width="70" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                    <StackPanel Grid.Row="5" Margin="0,6,0,0">
+                                        <WrapPanel>
+                                            <Button x:Name="ReplaceSavedEquipment" Content="Replace item…" Click="ReplaceSavedEquipment_Click" />
+                                            <Button x:Name="RemoveSavedEquipment" Content="Remove item" Click="RemoveSavedEquipment_Click" />
+                                            <Button x:Name="AddSavedArmor" Content="Add armor…" Click="AddSavedArmor_Click" />
+                                            <Button x:Name="SaveEquipment" Content="Save to GameData" Click="SaveEquipment_Click" />
+                                            <Button x:Name="RevertSavedEquipmentDraft" Content="Revert draft" Click="RevertSavedEquipmentDraft_Click" />
+                                        </WrapPanel>
+                                        <TextBlock x:Name="SavedEquipmentDraftStatus" Style="{StaticResource Caption}" Margin="0,4,0,0" />
+                                    </StackPanel>
+                                </Grid>
+                            </TabItem>
+                            <TabItem Header="Saved history">
+                                <Grid Margin="8">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <DataGrid x:Name="EquipmentHistory" SelectionChanged="EquipmentHistory_SelectionChanged">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Revision" Binding="{Binding Revision}" Width="75" />
+                                            <DataGridTextColumn Header="UTC" Binding="{Binding AtUtc, StringFormat=u}" Width="155" />
+                                            <DataGridTextColumn Header="GM" Binding="{Binding Actor}" Width="*" />
+                                            <DataGridTextColumn Header="Action" Binding="{Binding Action}" Width="*" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                    <TextBox x:Name="EquipmentHistoryDetails" Grid.Row="1" IsReadOnly="True" Height="90" Margin="0,6,0,0"
+                                             TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AutomationProperties.Name="Equipment change before and after" />
+                                    <WrapPanel Grid.Row="2" Margin="0,6,0,0">
+                                        <Button x:Name="RestoreEquipmentRevision" Content="Restore selected revision" Click="RestoreEquipmentRevision_Click" />
+                                        <Button x:Name="RestorePreviousEquipment" Content="Restore previous" Click="RestorePreviousEquipment_Click" />
+                                    </WrapPanel>
+                                </Grid>
+                            </TabItem>
+                        </TabControl>
                     </TabItem>
                     <TabItem Header="Live history">
                         <Grid Margin="10">
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="*" />
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <DataGrid x:Name="ChangesGrid" SelectionChanged="Change_SelectionChanged">
                                 <DataGrid.Columns>
                                     <DataGridTextColumn Header="UTC" Binding="{Binding AtUtc, StringFormat=u}" Width="165" />
                                     <DataGridTextColumn Header="Change" Binding="{Binding Description}" Width="*" />
+                                    <DataGridTextColumn Header="GM" Binding="{Binding Actor}" Width="100" />
                                     <DataGridCheckBoxColumn Header="Reverted" Binding="{Binding Reverted, Mode=OneWay}" Width="80" />
                                 </DataGrid.Columns>
                             </DataGrid>
-                            <Button Grid.Row="1" x:Name="RevertChange" Content="Revert selected live change" Click="RevertChange_Click"
+                            <TextBox Grid.Row="1" x:Name="LiveChangeDetails" IsReadOnly="True" Height="80" Margin="0,8,0,0"
+                                     TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AutomationProperties.Name="Live change scope and values" />
+                            <Button Grid.Row="2" x:Name="RevertChange" Content="Revert selected live change" Click="RevertChange_Click"
                                     Margin="0,8,0,0" HorizontalAlignment="Left" />
                         </Grid>
                     </TabItem>

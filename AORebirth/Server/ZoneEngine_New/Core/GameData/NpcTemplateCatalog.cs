@@ -15,7 +15,7 @@ namespace ZoneEngine_New.Core.GameData
     /// Parents never have stats. Leaves never have children.
     /// Optional <c>SpawnAll</c> on a parent spawns every child branch instead of one random child.
     /// </summary>
-    public sealed class NpcTemplateCatalog
+    public sealed partial class NpcTemplateCatalog
     {
         static readonly JsonSerializerOptions JsonOptions = new()
         {
@@ -55,7 +55,12 @@ namespace ZoneEngine_New.Core.GameData
         internal NpcEditorLootJournal EditorLoot { get; private init; } = NpcEditorLootJournal.Empty;
 
         internal NpcTemplateCatalog WithEditorLoot(NpcEditorLootJournal journal)
-            => new(_families, _leaves, _random, _spawnAll) { RuleFeatures = RuleFeatures, EditorLoot = journal };
+            => new(_families, _leaves, _random, _spawnAll)
+            {
+                RuleFeatures = RuleFeatures,
+                EditorLoot = journal,
+                EditorEquipment = EditorEquipment
+            };
 
         internal bool TryGetEditableLootLeaf(string hash, out NpcLeaf leaf)
         {
@@ -135,7 +140,7 @@ namespace ZoneEngine_New.Core.GameData
                 return false;
             if (TryResolveLeaf(hash, level, out NpcLeaf leaf))
             {
-                template = MaterializeWithEditorLoot(leaf, level);
+                template = MaterializeWithEditorOverrides(leaf, level);
                 return true;
             }
 
@@ -243,7 +248,7 @@ namespace ZoneEngine_New.Core.GameData
                 }
 
                 if (_leaves.TryGetValue(hash, out NpcLeaf? leaf))
-                    into.Add(MaterializeWithEditorLoot(leaf, level));
+                    into.Add(MaterializeWithEditorOverrides(leaf, level));
             }
             finally
             {
@@ -352,23 +357,15 @@ namespace ZoneEngine_New.Core.GameData
             return found;
         }
 
-        internal MobTemplate MaterializeWithEditorLoot(NpcLeaf leaf, int? desiredLevel)
+        internal MobTemplate MaterializeWithEditorOverrides(NpcLeaf leaf, int? desiredLevel)
         {
             MobTemplate template = Materialize(leaf, desiredLevel, RuleFeatures?.Invoke(leaf.Hash));
             template.EditorLootLeaf = leaf;
-            if (!EditorLoot.Templates.TryGetValue(leaf.Hash, out NpcEditorLootHistory? history))
-                return template;
-
-            template.EditorLootEntryCount = history.Revisions[^1].Entries.Length;
-            foreach (var entry in history.Revisions[^1].Entries)
+            ApplyEditorEquipment(template, leaf);
+            if (EditorLoot.Templates.TryGetValue(leaf.Hash, out NpcEditorLootHistory? history))
             {
-                template.ItemTable.Add(new MobItemTableEntry
-                {
-                    Hash = entry.ItemHash,
-                    Chance = entry.Chance,
-                    Repeats = entry.Repeats,
-                    LevelMod = entry.LevelMod
-                });
+                template.ItemTable = NpcEditorLootJournal.MaterializeBand(leaf.Bands[template.AuthoredBandIndex],
+                    template.AuthoredBandIndex, history.Revisions[^1]);
             }
 
             return template;
@@ -402,6 +399,7 @@ namespace ZoneEngine_New.Core.GameData
             return new MobTemplate
             {
                 Hash = leaf.Hash,
+                AuthoredBandIndex = Array.IndexOf(bands, nearest),
                 Name = nearest.Name ?? string.Empty,
                 TemplateId = nearest.TemplateId,
                 HasHeadMesh = nearest.HasHeadMesh,

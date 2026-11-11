@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading;
 
 using AORebirth.Core.GameData;
 using AORebirth.Enums;
@@ -184,6 +185,96 @@ public sealed class NpcEditorLootTests
         Assert.AreEqual(1, editor.Save(editor.CaptureSaveTarget(fixture.Spawn(data, TargetHash)), new(0, null, Drop), Actor).Revision);
     }
 
+    [TestMethod]
+    public void AuthoredBandEditAndRestoreKeepOtherBandsAndOriginalRowsIntact()
+    {
+        using var fixture = new Fixture();
+        GameDataStore data = fixture.Open();
+        var editor = new NpcEditorLoot(data, fixture.Items);
+        string original = File.ReadAllText(fixture.TemplateFile);
+        NpcCharacter low = fixture.Spawn(data, TargetHash);
+        NpcCharacter high = fixture.Spawn(data, TargetHash, 40);
+        NpcEditorLootTarget lowScope = editor.CaptureSaveTarget(low);
+        NpcEditorLootTarget highScope = editor.CaptureSaveTarget(high);
+        NpcEditorLootRowKey lowRow = editor.Describe(low).ConfiguredRows.Single().Edit!;
+        NpcEditorLootRowKey highRow = editor.Describe(high).ConfiguredRows.Single().Edit!;
+
+        NpcEditorLootState replaced = editor.Save(lowScope, new(0, null, Drop, lowRow, "templateBand"), Actor);
+        Assert.AreEqual("POOL", replaced.History[^1].Before!.ItemHash);
+        Assert.AreEqual(Drop, replaced.History[^1].After);
+        Assert.AreEqual("POOL", editor.Describe(low).Rows.Single().Hash);
+        Assert.ThrowsExactly<NpcEditorLootConflictException>(() =>
+            editor.Save(lowScope, new(1, null, null, lowRow, "templateBand"), Actor));
+        editor.Save(highScope, new(1, null, null, highRow, "templateBand"), Actor);
+
+        GameDataStore restarted = fixture.Open();
+        Assert.AreEqual("ITM1", fixture.Spawn(restarted, TargetHash).ActiveLootTable!.Single().Hash);
+        Assert.AreEqual(0, fixture.Spawn(restarted, TargetHash, 40).ActiveLootTable!.Count);
+        var restartedEditor = new NpcEditorLoot(restarted, fixture.Items);
+        NpcEditorLootState restored = restartedEditor.Revert(lowScope, new(2, 0, "templateBand"), Actor);
+        Assert.AreEqual(3, restored.Revision);
+        Assert.AreEqual(0, restored.History[^1].RestoredRevision);
+
+        GameDataStore reopened = fixture.Open();
+        Assert.AreEqual("POOL", fixture.Spawn(reopened, TargetHash).ActiveLootTable!.Single().Hash);
+        Assert.AreEqual(0, fixture.Spawn(reopened, TargetHash, 40).ActiveLootTable!.Count);
+        Assert.AreEqual(original, File.ReadAllText(fixture.TemplateFile));
+    }
+
+    [TestMethod]
+    public void LiveLootEditUsesNativeCorpseRollAndUndoRestoresTheSelectedInstance()
+    {
+        using var fixture = new Fixture();
+        GameDataStore data = fixture.Open();
+        var minter = new HashItemMinter(data, fixture.Items, new StubItemBuilder());
+        var editor = new NpcEditorLoot(data, fixture.Items, minter);
+        NpcCharacter first = fixture.Spawn(data, TargetHash);
+        NpcCharacter other = fixture.Spawn(data, TargetHash);
+        other.MobTemplate = first.MobTemplate;
+        NpcEditorLootRowKey old = editor.Describe(first).Rows.Single().Edit!;
+
+        NpcEditorLootView applied = editor.ApplyLive(first, new(0, old, new("ITM2", 100, 2, 0, 20, 20)), Actor);
+        Assert.AreEqual(1, applied.Live.Revision);
+        Assert.AreEqual("POOL", other.ActiveLootTable!.Single().Hash);
+        Assert.IsFalse(File.Exists(fixture.OverlayFile));
+        Assert.ThrowsExactly<NpcEditorLootConflictException>(() => editor.ApplyLive(first, new(1, old, null), Actor));
+
+        var corpse = new Corpse(new Identity { Type = IdentityType.Corpse, Instance = 77501 }, first, data);
+        corpse.ResolveLoot(minter, 0);
+        Assert.AreEqual(2, corpse.Loot.Content.Count);
+        Assert.IsTrue(corpse.Loot.Content.Values.All(item => item.LowId == 1002 && item.Quality == 20 && !item.IsPersisted));
+
+        NpcEditorLootLiveChange change = applied.Live.History.Single();
+        NpcEditorLootView reverted = editor.RevertLive(first, new(1, change.ChangeId), Actor);
+        Assert.AreEqual("POOL", reverted.Rows.Single().Hash);
+        Assert.IsFalse(reverted.Live.History.Any(row => row.Revertible));
+        Assert.AreEqual(2, corpse.Loot.Content.Count, "Undo does not retroactively mutate generated corpses.");
+    }
+
+    [TestMethod]
+    public void SimulationCountsCorpsesSeparatelyFromNativeExclusiveRolls()
+    {
+        using var fixture = new Fixture();
+        GameDataStore data = fixture.Open();
+        var editor = new NpcEditorLoot(data, fixture.Items, new HashItemMinter(data, fixture.Items, new StubItemBuilder()));
+        NpcCharacter npc = fixture.Spawn(data, TargetHash);
+        Assert.AreEqual(100.0, editor.Simulate(editor.CaptureSimulation(npc), 20, CancellationToken.None).EmptyPercent);
+
+        editor.ApplyLive(npc, new(0, null, new("PICK", 100, 2, 0, 20, 20)), Actor);
+        NpcEditorLootSimulationSnapshot snapshot = editor.CaptureSimulation(npc);
+        NpcEditorLootSimulationResult result = editor.Simulate(snapshot, 50, CancellationToken.None);
+        Assert.AreEqual(0, result.EmptyCorpses);
+        Assert.AreEqual(2.0, result.AverageItemsPerCorpse);
+        NpcEditorLootSimulationItem item = result.Items.Single();
+        Assert.AreEqual(1002, item.LowId);
+        Assert.AreEqual(100, item.TotalDrops);
+        Assert.AreEqual(50, item.CorpsesWithItem);
+        Assert.AreEqual(100.0, item.CorpseFrequencyPercent);
+        Assert.AreEqual(new NpcEditorLootSimulationQuality(20, 100), item.Qualities.Single());
+        Assert.ThrowsExactly<ArgumentException>(() => editor.Simulate(snapshot, 10001, CancellationToken.None));
+        Assert.ThrowsExactly<OperationCanceledException>(() => editor.Simulate(snapshot, 1, new CancellationToken(true)));
+    }
+
     sealed class Fixture : IDisposable
     {
         readonly string _root = Path.Combine(Path.GetTempPath(), "aorebirth-npc-editor-loot-" + Guid.NewGuid().ToString("N"));
@@ -197,6 +288,8 @@ public sealed class NpcEditorLootTests
                   "FAMY": {"Children": ["MOB1"]},
                   "MOB1": {"Templates": [{"Name": "Mob One", "Level": 20, "LootTable": [
                     {"Hash": "POOL", "Repeats": 1, "Chance": 0, "LevelMod": 10}
+                  ]}, {"Name": "Mob One (high)", "Level": 40, "LootTable": [
+                    {"Hash": "ITM2", "Repeats": 1, "Chance": 0, "LevelMod": 10}
                   ]}]},
                   "MOB2": {"Templates": [{"Name": "Mob Two", "Level": 20}]}
                 }
@@ -220,13 +313,14 @@ public sealed class NpcEditorLootTests
 
         internal GameDataStore Open() => new(new StubLogger(), null, GameData, Overlay);
 
-        internal NpcCharacter Spawn(GameDataStore data, string hash)
+        internal NpcCharacter Spawn(GameDataStore data, string hash, int level = 20)
         {
+            Assert.IsTrue(data.TryResolveMobTemplate(hash, level, out MobTemplate template));
             var npc = new NpcCharacter(new Identity { Type = IdentityType.CanbeAffected, Instance = 77001 }, new StubItemBuilder())
             {
-                MobTemplate = data.RequireMobTemplate(hash)
+                MobTemplate = template
             };
-            npc.Stats.Set(CharacterStat.Level, 20);
+            npc.Stats.Set(CharacterStat.Level, level);
             return npc;
         }
 

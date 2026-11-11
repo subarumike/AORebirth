@@ -71,7 +71,7 @@ namespace ZoneEngine_New.Core.Entities
             LootLevel = dead.Stats.GetOrOne(CharacterStat.Level);
             if (dead is NpcCharacter npc)
             {
-                ItemTable = npc.MobTemplate?.ItemTable;
+                ItemTable = npc.ActiveLootTable;
                 CarriedItems = npc.TakeCarriedLoot();
                 LootEquipment = new List<Inventory.Item>(npc.Equipment.Content.Values);
                 CorpseFullUpdateTemplate = CopyCorpseFullUpdateTemplate(npc.MobTemplate?.CorpseFullUpdateTemplate);

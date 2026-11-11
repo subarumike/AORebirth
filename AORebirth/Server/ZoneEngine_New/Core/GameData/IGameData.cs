@@ -112,6 +112,9 @@ namespace ZoneEngine_New.Core.GameData
         void CollectHashSpawns(string hash, List<HashInstance> into, Func<string, string, bool> canPick)
             => CollectHashSpawns(hash, into);
 
+        void CollectHashSpawns(string hash, List<HashInstance> into, Func<string, string, bool> canPick, Random random)
+            => CollectHashSpawns(hash, into, canPick);
+
         /// <summary>True when the item hash is a category flagged SpawnAll (every child branch spawns).</summary>
         bool IsSpawnAllItemHash(string hash) => false;
 

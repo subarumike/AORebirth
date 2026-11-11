@@ -103,7 +103,7 @@ namespace ZoneEngine_New.Core.Inventory
         }
 
         /// <summary>The ids and QL <see cref="TryMintHighestUpTo"/> would mint, without creating an <see cref="Item"/>.</summary>
-        public bool TryRollHighestUpTo(string hash, int desiredQuality, out int lowId, out int highId, out int quality)
+        public bool TryRollHighestUpTo(string hash, int desiredQuality, out int lowId, out int highId, out int quality, Random? random = null)
         {
             lowId = 0;
             highId = 0;
@@ -129,7 +129,7 @@ namespace ZoneEngine_New.Core.Inventory
                     ties = 1;
                     picked = leaf.Instance;
                 }
-                else if (reached == best && Random.Shared.Next(++ties) == 0)
+                else if (reached == best && (random ?? Random.Shared).Next(++ties) == 0)
                 {
                     picked = leaf.Instance;
                 }
@@ -232,7 +232,7 @@ namespace ZoneEngine_New.Core.Inventory
             int minQuality,
             int maxQuality,
             int rolledQuality,
-            List<(int LowId, int HighId, int Quality)> into)
+            List<(int LowId, int HighId, int Quality)> into, Random? random = null)
         {
             ArgumentNullException.ThrowIfNull(into);
             if (string.IsNullOrEmpty(hash))
@@ -244,7 +244,11 @@ namespace ZoneEngine_New.Core.Inventory
 
             // A random category pick only lands on families the window can drop.
             var instances = new List<HashInstance>();
-            _gameData.CollectHashSpawns(hash, instances, (parent, child) => CanPick(parent, child, min, max));
+            bool CanPickChild(string parent, string child) => CanPick(parent, child, min, max);
+            if (random == null)
+                _gameData.CollectHashSpawns(hash, instances, CanPickChild);
+            else
+                _gameData.CollectHashSpawns(hash, instances, CanPickChild, random);
             for (int i = 0; i < instances.Count; i++)
             {
                 // A leaf listed directly is not filtered by the pick above.

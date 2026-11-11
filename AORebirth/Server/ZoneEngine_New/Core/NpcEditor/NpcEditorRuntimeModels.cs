@@ -30,7 +30,8 @@ internal sealed record NpcEditorBrain(
     NpcEditorPoint[] PatrolWaypoints, string[] Features, string? ScriptKey);
 
 internal sealed record NpcEditorChange(
-    Guid ChangeId, DateTime AtUtc, string Description, bool Reverted, bool Revertible);
+    Guid ChangeId, DateTime AtUtc, string Description, bool Reverted, bool Revertible,
+    string Scope, string? Actor, string Before, string After, string? RevertedBy);
 
 internal sealed record NpcEditorNpcDetails(
     NpcEditorNpc Npc, double X, double Y, double Z, string? SpawnPointKey, NpcEditorRespawn? Respawn,

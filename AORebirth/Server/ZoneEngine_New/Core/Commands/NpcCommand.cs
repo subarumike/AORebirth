@@ -23,7 +23,7 @@ namespace ZoneEngine_New.Core.Commands
     public sealed class NpcCommand : IGmCommand
     {
         /// <summary>Upper bound for one .npc loot roll simulation.</summary>
-        const int MaxLootRolls = 10000;
+        internal const int MaxLootRolls = 10000;
 
         private readonly IGameData _gameData;
         private readonly IItemTemplateCatalog _items;
@@ -582,7 +582,7 @@ namespace ZoneEngine_New.Core.Commands
                 }
             }
 
-            List<MobItemTableEntry> itemTable = template.ItemTable;
+            IReadOnlyList<MobItemTableEntry>? itemTable = npc.ActiveLootTable;
             if ((itemTable == null || itemTable.Count == 0) && rows.Count == 0)
                 return [GetStatsAomlBuilder.BuildLink("(no item table)", title)];
 
@@ -661,7 +661,7 @@ namespace ZoneEngine_New.Core.Commands
                 rolled.Clear();
                 // The corpse's own order: what the equipment spawns first, then the item table into what is left.
                 EquipmentLoot.Roll(npc.Equipment.Content.Values, _minter, Corpse.LootCapacity, variance, rolled);
-                LootableDynel.RollItemTable(template.ItemTable, level, _minter, Corpse.LootCapacity - rolled.Count, variance, rolled);
+                LootableDynel.RollItemTable(npc.ActiveLootTable, level, _minter, Corpse.LootCapacity - rolled.Count, variance, rolled);
                 if (rolled.Count == 0)
                     emptyCorpses++;
                 totalItems += rolled.Count;

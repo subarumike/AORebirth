@@ -18,6 +18,7 @@ namespace ZoneEngine_New.Tests
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using ZoneEngine_New.Core.Logging;
+    using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.NpcEditor;
 
     using static ZoneEngine_New.Core.Accounts.MySqlAccountSanctionRepository;
@@ -88,7 +89,8 @@ namespace ZoneEngine_New.Tests
             await using var app = NpcEditorHost.Build(0, cert, auth, new QuietLogger());
             app.MapGet("/npc-editor/check", () => Results.Ok());
             // The authorization gates must reject these mutations before using either runtime service.
-            NpcEditorHost.MapEditorRoutes(app, null!, null!);
+            var itemBrowser = new NpcEditorItemBrowser(new StubCatalog().Add(21, 45), new StubGameData(HashItemCatalog.Parse(null)));
+            NpcEditorHost.MapEditorRoutes(app, null!, null!, null!, itemBrowser);
             string statPath = $"/npc-editor/npcs/1/{(int)IdentityType.CanbeAffected}/100/{Guid.NewGuid():D}/stats";
             var statEdit = new { statId = (int)CharacterStat.Health, expectedBase = 100, value = 75 };
             await app.StartAsync(timeout.Token);
@@ -120,6 +122,9 @@ namespace ZoneEngine_New.Tests
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", session.Token);
             using var accepted = await client.GetAsync("/npc-editor/check", timeout.Token);
             Assert.AreEqual(HttpStatusCode.OK, accepted.StatusCode);
+            NpcEditorItemPage? page = await client.GetFromJsonAsync<NpcEditorItemPage>(
+                "/npc-editor/item-catalog?q=21&minQl=40&maxQl=50", timeout.Token);
+            Assert.AreEqual(21, page!.Rows.Single().Id);
             using var readOnlyEdit = await client.PostAsJsonAsync(statPath, statEdit, timeout.Token);
             Assert.AreEqual(HttpStatusCode.Forbidden, readOnlyEdit.StatusCode);
             using var logout = await client.DeleteAsync("/npc-editor/session", timeout.Token);

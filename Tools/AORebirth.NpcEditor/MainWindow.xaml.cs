@@ -13,13 +13,16 @@ namespace AORebirth.NpcEditor;
 public partial class MainWindow : Window
 {
     private readonly DispatcherTimer bridgeTimer = new() { Interval = TimeSpan.FromSeconds(1) };
+    private readonly DispatcherTimer statsTimer = new() { Interval = TimeSpan.FromSeconds(5) };
     private EditorApi? api;
     private EditorSession? session;
     private NpcDetail? detail;
-    private LootDetail? loot;
     private TargetHint? lastHint;
     private long nextTargetResolve;
-    private string? draftLootHash;
+    private int? statDraftBase;
+    private bool updatingStats;
+    private bool statsReading;
+    private bool pickerOpen;
     private bool busy;
     private bool bridgeReading;
     private bool settingNpcSelection;
@@ -29,9 +32,12 @@ public partial class MainWindow : Window
         InitializeComponent();
         bridgeTimer.Tick += BridgeTimer_Tick;
         bridgeTimer.Start();
+        statsTimer.Tick += StatsTimer_Tick;
+        statsTimer.Start();
         Closed += (_, _) =>
         {
             bridgeTimer.Stop();
+            statsTimer.Stop();
             api?.Dispose();
         };
     }
@@ -39,8 +45,6 @@ public partial class MainWindow : Window
     private EditorApi Api => api ?? throw new InvalidOperationException("Connect to ZoneEngine first.");
 
     private bool CanWrite => !busy && session is { CanWrite: true } && LockNpc.IsChecked == true && detail != null;
-
-    private bool CanSaveLoot => CanWrite && session is { CanSave: true } && loot?.Saved?.CanSave == true;
 
     private async void Connect_Click(object sender, RoutedEventArgs e) => await RunAsync(async () =>
     {
@@ -136,40 +140,24 @@ public partial class MainWindow : Window
 
     private async Task LoadDetailAsync(NpcIdentity identity)
     {
-        bool keepLock = LockNpc.IsChecked == true && detail?.Npc.Identity == identity;
-        ClearDetail();
+        bool sameSpawn = detail?.Npc.Identity == identity;
+        if (!sameSpawn)
+            ClearDetail();
+
         NpcDetail next = await Api.GetAsync<NpcDetail>(identity.Path);
         if (next.Npc.Identity != identity)
             throw new InvalidDataException("ZoneEngine returned an unexpected NPC identity. Select the spawn again.");
 
-        RenderDetail(next);
-        LockNpc.IsChecked = keepLock;
+        RenderDetail(next, preserveStatDraft: sameSpawn);
         Status.Text = $"Loaded {next.Npc.Name}.";
-        await LoadLootAsync(identity);
-    }
-
-    private async Task LoadLootAsync(NpcIdentity identity)
-    {
-        try
-        {
-            loot = await Api.GetAsync<LootDetail>(identity.Path + "/loot");
-            EffectiveLoot.ItemsSource = loot.Rows;
-            EffectiveLootStatus.Text = $"Runtime loot for this spawn · {FormatHash(loot.TemplateHash)} · {loot.Rows.Length} entries";
-            RenderSavedLoot();
-        }
-        catch (Exception ex) when (ex is not EditorApiException { Status: HttpStatusCode.Unauthorized })
-        {
-            loot = null;
-            EffectiveLoot.ItemsSource = null;
-            RenderSavedLoot();
-            EffectiveLootStatus.Text = DescribeError(ex);
-        }
+        await Task.WhenAll(LoadLootAsync(identity), LoadSavedEquipmentAsync(identity));
+        if (sameSpawn && LootSimulationGrid.ItemsSource != null)
+            ClearLootSimulation("NPC refreshed. Run a new simulation for the current loot inputs.");
     }
 
     private void ClearDetail()
     {
         detail = null;
-        loot = null;
         LockNpc.IsChecked = false;
         DetailHeading.Text = "Select a spawned NPC";
         DetailIdentity.Text = "";
@@ -178,18 +166,14 @@ public partial class MainWindow : Window
         ActiveNanos.Text = "";
         Brain.Text = "";
         StatsGrid.ItemsSource = null;
+        StatsStatus.Text = "";
         EquipmentGrid.ItemsSource = null;
-        ConfiguredEquipmentGrid.ItemsSource = null;
         ChangesGrid.ItemsSource = null;
-        EffectiveLoot.ItemsSource = null;
-        EffectiveLootStatus.Text = "";
-        SavedLootStatus.Text = "";
-        SavedLoot.ItemsSource = null;
-        LootHistory.ItemsSource = null;
-        ResetLootFields();
+        ClearLoot();
+        ClearEquipment();
     }
 
-    private void RenderDetail(NpcDetail next)
+    private void RenderDetail(NpcDetail next, bool preserveStatDraft = false)
     {
         detail = next;
         NpcSummary npc = next.Npc;
@@ -207,9 +191,10 @@ public partial class MainWindow : Window
         UploadedNanos.Text = FormatNanos(next.UploadedNanos);
         ActiveNanos.Text = FormatNanos(next.ActiveNanos);
         Brain.Text = FormatFields(next.Brain);
-        RefreshStats();
+        RefreshStats(preserveStatDraft);
         EquipmentGrid.ItemsSource = next.Equipment;
-        ConfiguredEquipmentGrid.ItemsSource = next.ConfiguredEquipment;
+        if (savedEquipment == null)
+            RenderSavedEquipment();
         ChangesGrid.ItemsSource = next.Changes;
     }
 
@@ -236,23 +221,88 @@ public partial class MainWindow : Window
             RefreshStats();
     }
 
-    private void RefreshStats()
+    private void RefreshStats(bool preserveDraft = false)
     {
         string query = StatQuery.Text.Trim();
-        StatsGrid.ItemsSource = detail?.Stats.Where(stat =>
+        var prior = StatsGrid.SelectedItem as StatRow;
+        bool keepDraft = preserveDraft && prior != null
+            && (NewStatBase.IsKeyboardFocusWithin || NewStatBase.Text != FormatStatValue(statDraftBase));
+        StatRow[]? rows = detail?.Stats.Where(stat =>
             stat.Name.Contains(query, StringComparison.OrdinalIgnoreCase)
             || stat.StatId.ToString(CultureInfo.InvariantCulture).Contains(query, StringComparison.Ordinal)).ToArray();
+        var selected = rows?.FirstOrDefault(row => row.StatId == prior?.StatId);
+        updatingStats = true;
+        try
+        {
+            StatsGrid.ItemsSource = rows;
+            StatsGrid.SelectedItem = selected;
+        }
+        finally
+        {
+            updatingStats = false;
+        }
+        if (!keepDraft || selected == null)
+            SetStatDraft(selected);
     }
 
     private void Stat_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        NewStatBase.Text = (StatsGrid.SelectedItem as StatRow)?.RuntimeBase?.ToString(CultureInfo.InvariantCulture) ?? "";
+        if (updatingStats)
+            return;
+        SetStatDraft(StatsGrid.SelectedItem as StatRow);
         RefreshControls();
+    }
+
+    private void SetStatDraft(StatRow? row)
+    {
+        statDraftBase = row?.RuntimeBase;
+        NewStatBase.Text = FormatStatValue(statDraftBase);
+    }
+
+    private static string FormatStatValue(int? value) => value?.ToString(CultureInfo.InvariantCulture) ?? "";
+
+    private void RevertStatDraft_Click(object sender, RoutedEventArgs e)
+    {
+        SetStatDraft(StatsGrid.SelectedItem as StatRow);
+        RefreshControls();
+    }
+
+    private async void StatsTimer_Tick(object? sender, EventArgs e)
+    {
+        if (api == null || detail == null || busy || statsReading || pickerOpen || !IsActive || Details.SelectedItem != StatsTab)
+            return;
+
+        var connection = api;
+        var snapshot = detail;
+        statsReading = true;
+        try
+        {
+            StatRow[] rows = await connection.GetAsync<StatRow[]>(snapshot.Npc.Identity.Path + "/stats");
+            if (connection == api && snapshot == detail && !busy)
+            {
+                detail = snapshot with { Stats = rows };
+                RefreshStats(preserveDraft: true);
+                StatsStatus.Text = StatsGrid.SelectedItem is StatRow stat && stat.RuntimeBase != statDraftBase
+                    ? "The runtime base changed. Revert the draft before applying a new value."
+                    : $"Live values refreshed {DateTime.Now:T}";
+                RefreshControls();
+            }
+        }
+        catch (Exception ex)
+        {
+            if (connection == api && snapshot == detail && !busy)
+                StatsStatus.Text = DescribeError(ex);
+        }
+        finally
+        {
+            statsReading = false;
+        }
     }
 
     private async void ApplyStat_Click(object sender, RoutedEventArgs e)
     {
-        if (!CanWrite || StatsGrid.SelectedItem is not StatRow { Editable: true, RuntimeBase: int expectedBase } stat)
+        if (!CanWrite || statDraftBase is not int expectedBase
+            || StatsGrid.SelectedItem is not StatRow { Editable: true, RuntimeBase: not null } stat)
             return;
 
         if (!int.TryParse(NewStatBase.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out int value))
@@ -264,7 +314,7 @@ public partial class MainWindow : Window
         await ApplyLiveAsync("stats", new { statId = stat.StatId, expectedBase, value }, "Applied live stat change.");
     }
 
-    private async Task ApplyLiveAsync(string route, object payload, string success)
+    private async Task ApplyLiveAsync(string route, object payload, string success, Action? onApplied = null)
     {
         if (!CanWrite)
             return;
@@ -276,46 +326,15 @@ public partial class MainWindow : Window
             if (next.Npc.Identity != identity)
                 throw new InvalidDataException("ZoneEngine returned an unexpected NPC identity. Refresh before further edits.");
 
-            RenderDetail(next);
+            RenderDetail(next, preserveStatDraft: route != "stats");
+            onApplied?.Invoke();
             Status.Text = success;
             if (route != "stats")
+            {
                 await LoadLootAsync(identity);
+                ClearLootSimulation("Live inputs changed. Run a new simulation for the current loot inputs.");
+            }
         });
-    }
-
-    private void Equipment_SelectionChanged(object sender, SelectionChangedEventArgs e) => RefreshControls();
-
-    private void Change_SelectionChanged(object sender, SelectionChangedEventArgs e) => RefreshControls();
-
-    private async void ReplaceEquipment_Click(object sender, RoutedEventArgs e)
-    {
-        if (CanWrite && EquipmentGrid.SelectedItem is EquipmentRow { Replaceable: true } row)
-        {
-            if (PickEquipmentItem("Choose live replacement") is ItemRow choice)
-                await ApplyLiveAsync("equipment", new EquipmentEdit(row.Slot, row.InstanceId, choice.Id, choice.Quality), "Replaced live NPC equipment.");
-        }
-    }
-
-    private async void RemoveEquipment_Click(object sender, RoutedEventArgs e)
-    {
-        if (CanWrite && EquipmentGrid.SelectedItem is EquipmentRow { Removable: true } row)
-            await ApplyLiveAsync("equipment", new EquipmentEdit(row.Slot, row.InstanceId, null, null), "Removed live NPC armor.");
-    }
-
-    private async void AddArmor_Click(object sender, RoutedEventArgs e)
-    {
-        if (CanWrite && detail?.CanAddArmor == true && PickEquipmentItem("Choose armor to equip live") is ItemRow choice)
-            await ApplyLiveAsync("equipment", new EquipmentEdit(-1, 0, choice.Id, choice.Quality), "Equipped live NPC armor.");
-    }
-
-    private ItemRow? PickEquipmentItem(string title)
-    {
-        var dialog = new ItemPicker(title, async query =>
-        {
-            var rows = await Api.GetAsync<ItemRow[]>($"items?q={Uri.EscapeDataString(query)}");
-            return rows.Select(row => new PickerRow(row.Name, row.Id.ToString(CultureInfo.InvariantCulture), row.Preview, row)).ToArray();
-        }) { Owner = this };
-        return dialog.ShowDialog() == true ? dialog.Selected as ItemRow : null;
     }
 
     private async void RevertChange_Click(object sender, RoutedEventArgs e)
@@ -324,137 +343,16 @@ public partial class MainWindow : Window
             await ApplyLiveAsync("revert", new { changeId = row.ChangeId }, "Reverted the selected live change.");
     }
 
-    private void EffectiveLoot_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private void Change_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
-        if (EffectiveLoot.SelectedItem is not LootRow row)
-        {
-            EffectiveLootRow.Text = "";
+        if (!IsLoaded)
             return;
-        }
 
-        string quantities = row.MaxQuantity.HasValue ? $"{row.MinQuantity} – {row.MaxQuantity}" : "Varies by eligible branches";
-        EffectiveLootRow.Text = string.Join(Environment.NewLine,
-            new[] { $"{row.Source} · {row.Behavior} · {FormatHash(row.Hash)}",
-                $"Provenance  {row.Provenance}", $"QL variance %  {row.LevelMod?.ToString() ?? "Unavailable"}",
-                $"Quantity  {quantities}", row.Conditions }
-            .Concat(row.Groups.Select(group => group.Preview))
-            .Concat(row.Items.Select(item => item.Preview)));
-    }
-
-    private void RenderSavedLoot()
-    {
-        var saved = loot?.Saved;
-        SavedLoot.ItemsSource = saved?.Entries;
-        LootHistory.ItemsSource = saved?.History;
-        ResetLootFields();
-        SavedLootStatus.Text = saved?.CanSave == true
-            ? $"Exact template {FormatHash(saved.TemplateHash)} · revision {saved.Revision}. Applies on future spawns. Original entries stay in place."
-                + (session?.CanSave == true ? "" : " This session has no save permission.")
-            : saved?.UnavailableReason ?? "No writable template overlay for this NPC.";
-    }
-
-    private void SavedLoot_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (SavedLoot.SelectedItem is LootEntry row)
-        {
-            draftLootHash = row.ItemHash;
-            LootItemLabel.Text = FormatHash(row.ItemHash);
-            LootChance.Text = row.Chance.ToString(CultureInfo.InvariantCulture);
-            LootRepeats.Text = row.Repeats.ToString(CultureInfo.InvariantCulture);
-            LootVariance.Text = row.LevelMod.ToString(CultureInfo.InvariantCulture);
-        }
-        else
-        {
-            ResetLootFields();
-        }
+        var row = ChangesGrid.SelectedItem as ChangeRow;
+        LiveChangeDetails.Text = row == null ? "" : string.Join(Environment.NewLine,
+            $"Scope  {row.Scope ?? "Selected NPC"}", $"Before  {row.Before}", $"After  {row.After}",
+            row.RevertedBy == null ? "" : $"Reverted by  {row.RevertedBy}");
         RefreshControls();
-    }
-
-    private void ResetLootFields()
-    {
-        draftLootHash = null;
-        LootItemLabel.Text = "Select a row or pick a family.";
-        LootChance.Text = "";
-        LootRepeats.Text = "";
-        LootVariance.Text = "";
-    }
-
-    private void NewLootRow_Click(object sender, RoutedEventArgs e)
-    {
-        SavedLoot.SelectedItem = null;
-        ResetLootFields();
-    }
-
-    private void PickLootItem_Click(object sender, RoutedEventArgs e)
-    {
-        if (!CanSaveLoot)
-            return;
-
-        var dialog = new ItemPicker("Choose loot item family", async query =>
-        {
-            var rows = await Api.GetAsync<LootItem[]>($"loot-items?q={Uri.EscapeDataString(query)}");
-            return rows.Select(row => new PickerRow(row.Name, FormatHash(row.Hash), row.Preview, row)).ToArray();
-        }) { Owner = this };
-        if (dialog.ShowDialog() == true && dialog.Selected is LootItem row)
-        {
-            draftLootHash = row.Hash;
-            LootItemLabel.Text = row.Preview;
-        }
-    }
-
-    private async void SaveLoot_Click(object sender, RoutedEventArgs e)
-    {
-        if (!CanSaveLoot || loot?.Saved is not SavedLootState saved)
-            return;
-
-        if (draftLootHash is not string itemHash
-            || !int.TryParse(LootChance.Text, NumberStyles.None, CultureInfo.InvariantCulture, out int chance)
-            || !int.TryParse(LootRepeats.Text, NumberStyles.None, CultureInfo.InvariantCulture, out int repeats)
-            || !int.TryParse(LootVariance.Text, NumberStyles.None, CultureInfo.InvariantCulture, out int levelMod))
-        {
-            Status.Text = "Choose an item family and enter whole numbers for chance, repeats, and QL variance.";
-            return;
-        }
-
-        int? rowIndex = SavedLoot.SelectedIndex >= 0 ? SavedLoot.SelectedIndex : null;
-        await EditLootAsync("loot", saved, new { expectedRevision = saved.Revision, rowIndex, entry = new LootEntry(itemHash, chance, repeats, levelMod) });
-    }
-
-    private async void RemoveLoot_Click(object sender, RoutedEventArgs e)
-    {
-        if (CanSaveLoot && loot?.Saved is SavedLootState saved && SavedLoot.SelectedIndex >= 0)
-            await EditLootAsync("loot", saved, new { expectedRevision = saved.Revision, rowIndex = SavedLoot.SelectedIndex, entry = (LootEntry?)null });
-    }
-
-    private async void RevertLoot_Click(object sender, RoutedEventArgs e)
-    {
-        if (CanSaveLoot && loot?.Saved is SavedLootState saved)
-            await EditLootAsync("loot/revert", saved, new { expectedRevision = saved.Revision });
-    }
-
-    private void LootHistory_SelectionChanged(object sender, SelectionChangedEventArgs e) => RefreshControls();
-
-    private async void RestoreLootRevision_Click(object sender, RoutedEventArgs e)
-    {
-        if (CanSaveLoot && loot?.Saved is SavedLootState saved
-            && LootHistory.SelectedItem is LootHistoryRow revision && revision.Revision < saved.Revision)
-            await EditLootAsync("loot/revert", saved, new { expectedRevision = saved.Revision, revision = revision.Revision });
-    }
-
-    private async Task EditLootAsync(string route, SavedLootState saved, object payload)
-    {
-        var message = $"Change editor-owned loot for all future spawns of template {FormatHash(saved.TemplateHash)}?";
-        if (MessageBox.Show(this, message, "Confirm exact template scope", MessageBoxButton.OKCancel, MessageBoxImage.Question) != MessageBoxResult.OK)
-            return;
-
-        string path = detail!.Npc.Identity.Path;
-        await RunAsync(async () =>
-        {
-            SavedLootState next = await Api.PostAsync<SavedLootState>($"{path}/{route}", payload);
-            loot = loot! with { Saved = next };
-            RenderSavedLoot();
-            Status.Text = $"Saved template loot revision {next.Revision} for future spawns.";
-        });
     }
 
     private void Lock_Changed(object sender, RoutedEventArgs e)
@@ -481,7 +379,7 @@ public partial class MainWindow : Window
 
     private async void BridgeTimer_Tick(object? sender, EventArgs e)
     {
-        if (api == null || busy || bridgeReading || FollowTarget.IsChecked != true || LockNpc.IsChecked == true)
+        if (api == null || busy || bridgeReading || pickerOpen || FollowTarget.IsChecked != true || LockNpc.IsChecked == true)
             return;
 
         bridgeReading = true;
@@ -489,7 +387,7 @@ public partial class MainWindow : Window
         try
         {
             var (hint, status) = await Task.Run(TargetBridge.Read);
-            if (connection != api || busy || FollowTarget.IsChecked != true || LockNpc.IsChecked == true)
+            if (connection != api || busy || pickerOpen || FollowTarget.IsChecked != true || LockNpc.IsChecked == true)
                 return;
 
             long now = Environment.TickCount64;
@@ -566,21 +464,28 @@ public partial class MainWindow : Window
         NpcGrid.IsEnabled = LockNpc.IsChecked != true;
         RefreshDetail.IsEnabled = detail != null || NpcGrid.SelectedItem != null;
         Details.IsEnabled = detail != null;
-        ApplyStat.IsEnabled = CanWrite && StatsGrid.SelectedItem is StatRow { Editable: true, RuntimeBase: not null };
-        ReplaceEquipment.IsEnabled = CanWrite && EquipmentGrid.SelectedItem is EquipmentRow { Replaceable: true };
-        RemoveEquipment.IsEnabled = CanWrite && EquipmentGrid.SelectedItem is EquipmentRow { Removable: true };
-        AddArmor.IsEnabled = CanWrite && detail?.CanAddArmor == true;
+        ApplyStat.IsEnabled = CanWrite && statDraftBase.HasValue
+            && StatsGrid.SelectedItem is StatRow { Editable: true } stat && stat.RuntimeBase == statDraftBase;
+        RevertStatDraft.IsEnabled = !busy && StatsGrid.SelectedItem is StatRow;
         RevertChange.IsEnabled = CanWrite && ChangesGrid.SelectedItem is ChangeRow { Revertible: true, Reverted: false };
-        PickLootItem.IsEnabled = CanSaveLoot;
-        NewLootRow.IsEnabled = CanSaveLoot;
-        SaveLoot.IsEnabled = CanSaveLoot;
-        RemoveLoot.IsEnabled = CanSaveLoot && SavedLoot.SelectedIndex >= 0;
-        RevertLoot.IsEnabled = CanSaveLoot && loot!.Saved!.History.Length > 0;
-        RestoreLootRevision.IsEnabled = CanSaveLoot && LootHistory.SelectedItem is LootHistoryRow revision
-            && revision.Revision < loot!.Saved!.Revision;
-        LootChance.IsEnabled = CanSaveLoot;
-        LootRepeats.IsEnabled = CanSaveLoot;
-        LootVariance.IsEnabled = CanSaveLoot;
+        RefreshLootControls();
+        RefreshEquipmentControls();
+    }
+
+    private void BrowseItems_Click(object sender, RoutedEventArgs e) => OpenCatalog("Item catalog", browseOnly: true);
+
+    private ItemRow? OpenCatalog(string title, bool families = false, string? category = null, bool browseOnly = false)
+    {
+        var dialog = new ItemPicker(Api, title, families, category, browseOnly) { Owner = this };
+        pickerOpen = true;
+        try
+        {
+            return dialog.ShowDialog() == true ? dialog.Selected : null;
+        }
+        finally
+        {
+            pickerOpen = false;
+        }
     }
 
     internal static string DescribeError(Exception ex) => ex switch

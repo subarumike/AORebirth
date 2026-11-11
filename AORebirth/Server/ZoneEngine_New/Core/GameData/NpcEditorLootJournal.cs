@@ -4,11 +4,11 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
 using ZoneEngine_New.Core.Entities;
+using ZoneEngine_New.Core.Mobs;
 using ZoneEngine_New.Core.NpcEditor;
 
 internal sealed record NpcEditorLootHistory(string TemplateSignature, NpcEditorLootRevision[] Revisions);
@@ -27,57 +27,48 @@ internal sealed record NpcEditorLootJournal(
 
     internal NpcEditorLootRevision[] HistoryFor(string hash)
         => Templates.TryGetValue(hash, out NpcEditorLootHistory? history) ? history.Revisions : [];
+
+    internal static NpcEditorLootBandRow[] BandRows(NpcLevelBand band, int bandIndex, NpcEditorLootRevision? revision)
+    {
+        NpcEditorLootBand? saved = revision?.Bands?.FirstOrDefault(candidate => candidate.BandIndex == bandIndex);
+        if (saved != null)
+            return saved.Rows;
+
+        List<MobItemTableEntry> authored = band.LootTable ?? [];
+        return [.. Enumerable.Range(0, authored.Count).Where(index => authored[index] != null)
+            .Select(index => new NpcEditorLootBandRow(index, null)),
+            .. (revision?.Entries ?? []).Select(entry => new NpcEditorLootBandRow(null, entry))];
+    }
+
+    internal static List<MobItemTableEntry> MaterializeBand(NpcLevelBand band, int bandIndex, NpcEditorLootRevision? revision)
+        => BandRows(band, bandIndex, revision).Select(row => row.Materialize(band)).ToList();
 }
 
 /// <summary>Writes the editor's own versioned document to a separately configured GameData overlay.</summary>
-internal sealed class NpcEditorLootJournalFile
+internal sealed class NpcEditorLootJournalFile(string dataRoot, string? overlayRoot)
 {
     internal const string FileName = "NpcEditorLootOverrides.json";
     internal const int MaxRowsPerTemplate = 64;
     internal const int MaxRevisionsPerTemplate = 256;
-    const int MaxDocumentBytes = 8 * 1024 * 1024;
     static readonly JsonSerializerOptions JsonOptions = new(JsonSerializerDefaults.Web)
     {
         UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
         WriteIndented = true
     };
 
-    readonly string? _overlayRoot;
-    readonly string _dataRoot;
+    readonly NpcEditorOverrideFile _file = new(dataRoot, overlayRoot, FileName, "loot");
 
-    internal NpcEditorLootJournalFile(string dataRoot, string? overlayRoot)
-    {
-        _dataRoot = dataRoot;
-        _overlayRoot = overlayRoot;
-        ConfigurationProblem = CheckConfiguration();
-    }
-
-    internal string? ConfigurationProblem { get; }
-
-    string? CheckConfiguration()
-    {
-        if (_overlayRoot == null)
-            return "Configure a separate AO_REBIRTH_GAMEDATA_OVERRIDE_PATH on ZoneEngine to save loot.";
-        if (IsInside(_overlayRoot, _dataRoot) || IsInside(_dataRoot, _overlayRoot))
-            return "The GameData override and runtime GameData folders must be separate.";
-        if (!Directory.Exists(_overlayRoot))
-            return "The configured GameData override folder does not exist.";
-        return null;
-    }
+    internal string? ConfigurationProblem => _file.ConfigurationProblem;
 
     internal NpcEditorLootJournal Read(NpcTemplateCatalog catalog, Func<string, bool> itemExists)
     {
-        if (ConfigurationProblem != null)
-            return NpcEditorLootJournal.Empty;
-
-        string path = RequirePath();
-        byte[]? bytes = ReadBytes(path);
+        byte[]? bytes = _file.Read();
         if (bytes == null)
             return NpcEditorLootJournal.Empty;
 
         NpcEditorLootJournal journal = JsonSerializer.Deserialize<NpcEditorLootJournal>(bytes, JsonOptions)
             ?? throw new InvalidDataException("The NPC loot override document is empty.");
-        if (journal.Version != 1 || journal.Templates == null)
+        if (journal.Version is not (1 or 2) || journal.Templates == null)
             throw new InvalidDataException("Unsupported NPC loot override document.");
 
         foreach ((string hash, NpcEditorLootHistory history) in journal.Templates)
@@ -96,115 +87,75 @@ internal sealed class NpcEditorLootJournalFile
                     || string.IsNullOrWhiteSpace(revision.Actor) || revision.Actor.Length > 128
                     || revision.Action is not ("save" or "revert")
                     || revision.Entries == null || revision.Entries.Length > MaxRowsPerTemplate
-                    || revision.Entries.Any(entry => !ValidEntry(entry)))
+                    || revision.Entries.Any(entry => !ValidEntry(entry)) || !ValidBands(leaf, revision.Bands))
                 {
                     throw new InvalidDataException("Invalid NPC loot override revision for " + hash + ".");
                 }
             }
 
-            if (history.Revisions[^1].Entries.Any(entry => !itemExists(entry.ItemHash)))
+            if (history.Revisions[^1].Overrides.Any(entry => !itemExists(entry.ItemHash)))
                 throw new InvalidDataException("The NPC loot override references an unavailable item family: " + hash);
         }
 
-        return journal with { FileFingerprint = Fingerprint(bytes) };
+        return journal with { FileFingerprint = NpcEditorOverrideFile.Fingerprint(bytes) };
     }
 
     internal NpcEditorLootJournal Write(NpcEditorLootJournal current, NpcEditorLootJournal updated)
     {
-        string path = RequirePath();
-        string lockPath = path + ".lock";
-        RejectReparsePoint(lockPath);
-        using var writeLock = new FileStream(lockPath, FileMode.OpenOrCreate, FileAccess.ReadWrite, FileShare.None);
-
-        byte[]? disk = ReadBytes(path);
-        string? diskFingerprint = disk == null ? null : Fingerprint(disk);
-        if (diskFingerprint != current.FileFingerprint)
-            throw new NpcEditorLootConflictException("The loot override file changed. Reload NpcTemplates and refresh before saving.");
-
-        byte[] bytes = JsonSerializer.SerializeToUtf8Bytes(updated, JsonOptions);
-        if (bytes.Length > MaxDocumentBytes)
-            throw new InvalidOperationException("The loot override history has reached the document size limit.");
-
-        string temporary = path + "." + Guid.NewGuid().ToString("N") + ".tmp";
         try
         {
-            using (var file = new FileStream(temporary, FileMode.CreateNew, FileAccess.Write, FileShare.None))
-            {
-                file.Write(bytes);
-                file.Flush(flushToDisk: true);
-            }
-
-            File.Move(temporary, path, overwrite: true);
+            NpcEditorLootJournal next = updated with { Version = 2 };
+            return next with { FileFingerprint = _file.Write(current.FileFingerprint, next, JsonOptions).Fingerprint };
         }
-        finally
+        catch (NpcEditorRuntimeException exception) when (exception.StatusCode == 409)
         {
-            File.Delete(temporary);
+            throw new NpcEditorLootConflictException(exception.Message);
         }
-
-        return updated with { FileFingerprint = Fingerprint(bytes) };
     }
 
     internal static bool ValidEntry(NpcEditorLootEntry? entry)
         => entry != null && !string.IsNullOrWhiteSpace(entry.ItemHash) && entry.ItemHash.Length <= 64
             && entry.Chance is >= 0 and <= 100 && entry.Repeats is >= 1 and <= Corpse.LootCapacity
-            && entry.LevelMod is >= 0 and <= 100;
+            && entry.LevelMod is >= 0 and <= 100
+            && ((entry.MinQuality == null && entry.MaxQuality == null)
+                || (entry.LevelMod == 0 && entry.MinQuality is > 0 && entry.MaxQuality >= entry.MinQuality
+                    && entry.MaxQuality < int.MaxValue));
+
+    internal static bool ValidBands(NpcLeaf leaf, NpcEditorLootBand[]? bands)
+    {
+        var seen = new HashSet<int>();
+        foreach (NpcEditorLootBand band in bands ?? [])
+        {
+            if (band == null || band.BandIndex < 0 || band.BandIndex >= leaf.Bands.Length
+                || !seen.Add(band.BandIndex) || band.Rows == null)
+                return false;
+
+            List<MobItemTableEntry> authored = leaf.Bands[band.BandIndex].LootTable ?? [];
+            if (band.Rows.Length > authored.Count + MaxRowsPerTemplate)
+                return false;
+            int lastIndex = -1;
+            bool customRowsStarted = false;
+            foreach (NpcEditorLootBandRow row in band.Rows)
+            {
+                if (row == null || (row.Entry != null && !ValidEntry(row.Entry)))
+                    return false;
+                if (row.AuthoredIndex is not int index)
+                {
+                    if (row.Entry == null)
+                        return false;
+                    customRowsStarted = true;
+                    continue;
+                }
+
+                if (customRowsStarted || index <= lastIndex || index >= authored.Count || authored[index] == null)
+                    return false;
+                lastIndex = index;
+            }
+        }
+
+        return true;
+    }
 
     internal static string TemplateSignature(NpcLeaf leaf)
-        => Fingerprint(JsonSerializer.SerializeToUtf8Bytes(leaf.Bands, JsonOptions));
-
-    string RequirePath()
-    {
-        if (ConfigurationProblem is string problem)
-            throw new InvalidOperationException(problem);
-
-        RejectDirectoryLinks(_overlayRoot!);
-        RejectDirectoryLinks(_dataRoot);
-        return Path.Combine(_overlayRoot!, FileName);
-    }
-
-    static byte[]? ReadBytes(string path)
-    {
-        RejectReparsePoint(path);
-        try
-        {
-            using var file = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read | FileShare.Delete);
-            if (file.Length is < 1 or > MaxDocumentBytes)
-                throw new InvalidDataException("Invalid NPC loot override document size.");
-            byte[] bytes = new byte[file.Length];
-            file.ReadExactly(bytes);
-            return bytes;
-        }
-        catch (FileNotFoundException)
-        {
-            return null;
-        }
-    }
-
-    static bool IsInside(string path, string root)
-    {
-        string relative = Path.GetRelativePath(root, path);
-        return !Path.IsPathRooted(relative) && relative != ".."
-            && !relative.StartsWith(".." + Path.DirectorySeparatorChar, StringComparison.Ordinal);
-    }
-
-    static void RejectDirectoryLinks(string path)
-    {
-        for (DirectoryInfo? directory = new(path); directory != null; directory = directory.Parent)
-            RejectReparsePoint(directory.FullName);
-    }
-
-    static void RejectReparsePoint(string path)
-    {
-        try
-        {
-            if ((File.GetAttributes(path) & FileAttributes.ReparsePoint) != 0)
-                throw new InvalidDataException("NPC loot overrides require paths without symlinks or junctions.");
-        }
-        catch (FileNotFoundException)
-        {
-            // An override or lock file can be absent before the first save.
-        }
-    }
-
-    static string Fingerprint(byte[] bytes) => Convert.ToHexString(SHA256.HashData(bytes));
+        => NpcEditorOverrideFile.Fingerprint(JsonSerializer.SerializeToUtf8Bytes(leaf.Bands, JsonOptions));
 }

@@ -41,12 +41,31 @@ namespace ZoneEngine_New.Core.Entities
                     if (!TryReadSpawn(spell, out string hash, out int quality))
                         continue;
 
-                    (int min, int max) = LootableDynel.QualityWindow(quality, qualityVariancePercent);
-                    if (!minter.TryRollHighestUpTo(hash, Random.Shared.Next(min, max + 1), out int lowId, out int highId, out int rolledQuality))
-                        continue;
-
-                    into.Add((lowId, highId, rolledQuality));
+                    RollSpawn(hash, quality, minter, qualityVariancePercent, into, null);
                 }
+            }
+        }
+
+        internal static void Roll(IEnumerable<(string Hash, int Quality)> inputs, HashItemMinter minter,
+            int capacity, int variance, List<(int LowId, int HighId, int Quality)> into, Random random)
+        {
+            int start = into.Count;
+            foreach ((string hash, int quality) in inputs)
+            {
+                if (into.Count - start >= capacity)
+                    return;
+                RollSpawn(hash, quality, minter, variance, into, random);
+            }
+        }
+
+        static void RollSpawn(string hash, int quality, HashItemMinter minter, int variance,
+            List<(int LowId, int HighId, int Quality)> into, Random? random)
+        {
+            (int min, int max) = LootableDynel.QualityWindow(quality, variance);
+            if (minter.TryRollHighestUpTo(hash, (random ?? Random.Shared).Next(min, max + 1),
+                out int lowId, out int highId, out int rolledQuality, random))
+            {
+                into.Add((lowId, highId, rolledQuality));
             }
         }
 

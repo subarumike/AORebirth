@@ -16,6 +16,12 @@ namespace ZoneEngine_New.Core.Mobs
         public int Chance { get; set; }
 
         public int LevelMod { get; set; }
+
+        internal int? EditorMinQuality { get; init; }
+
+        internal int? EditorMaxQuality { get; init; }
+
+        internal bool EditorOverride { get; init; }
     }
 
     /// <summary>
@@ -75,7 +81,8 @@ namespace ZoneEngine_New.Core.Mobs
 
         public List<MobItemTableEntry> ItemTable { get; set; } = new();
         internal NpcLeaf? EditorLootLeaf { get; set; }
-        internal int EditorLootEntryCount { get; set; }
+        internal int AuthoredBandIndex { get; init; } = -1;
+        internal NpcEditorEquipmentEntry[]? EditorEquipmentEntries { get; set; }
 
         public string BinaryListData { get; set; } = string.Empty;
 

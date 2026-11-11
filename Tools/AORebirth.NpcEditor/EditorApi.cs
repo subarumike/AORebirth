@@ -11,6 +11,7 @@ namespace AORebirth.NpcEditor;
 internal sealed class EditorApi : IDisposable
 {
     private static readonly JsonSerializerOptions Json = new(JsonSerializerDefaults.Web);
+    private static readonly TimeSpan RequestTimeout = TimeSpan.FromSeconds(12);
     private readonly HttpClient client;
 
     public EditorApi(int port, string fingerprint)
@@ -32,7 +33,7 @@ internal sealed class EditorApi : IDisposable
         })
         {
             BaseAddress = new Uri($"https://127.0.0.1:{port}/npc-editor/"),
-            Timeout = TimeSpan.FromSeconds(12),
+            Timeout = Timeout.InfiniteTimeSpan,
             MaxResponseContentBufferSize = 12 * 1024 * 1024
         };
     }
@@ -49,22 +50,28 @@ internal sealed class EditorApi : IDisposable
 
     public async Task LogOutAsync()
     {
-        using var response = await client.DeleteAsync("session");
+        using var deadline = new CancellationTokenSource(RequestTimeout);
+        using var response = await client.DeleteAsync("session", deadline.Token);
         await EnsureSuccessAsync(response);
     }
 
-    public Task<T> GetAsync<T>(string path) where T : class => SendAsync<T>(HttpMethod.Get, path, null);
+    public Task<T> GetAsync<T>(string path, CancellationToken cancellationToken = default) where T : class =>
+        SendAsync<T>(HttpMethod.Get, path, null, cancellationToken);
 
-    public Task<T> PostAsync<T>(string path, object body) where T : class => SendAsync<T>(HttpMethod.Post, path, body);
+    public Task<T> PostAsync<T>(string path, object body, TimeSpan? timeout = null) where T : class =>
+        SendAsync<T>(HttpMethod.Post, path, body, timeout: timeout);
 
-    private async Task<T> SendAsync<T>(HttpMethod method, string path, object? body) where T : class
+    private async Task<T> SendAsync<T>(HttpMethod method, string path, object? body,
+        CancellationToken cancellationToken = default, TimeSpan? timeout = null) where T : class
     {
+        using var deadline = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+        deadline.CancelAfter(timeout ?? RequestTimeout);
         using var request = new HttpRequestMessage(method, path);
         if (body != null)
             request.Content = JsonContent.Create(body, options: Json);
-        using var response = await client.SendAsync(request);
+        using var response = await client.SendAsync(request, deadline.Token);
         await EnsureSuccessAsync(response);
-        return await response.Content.ReadFromJsonAsync<T>(Json)
+        return await response.Content.ReadFromJsonAsync<T>(Json, deadline.Token)
             ?? throw new InvalidDataException("ZoneEngine returned an empty response.");
     }
 

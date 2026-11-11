@@ -17,8 +17,8 @@ Tools\AORebirth.NpcEditor\bin\Debug\net10.0-windows\AORebirth.NpcEditor.exe
 For a local development server, configure these variables in the CMD session
 that starts ZoneEngine. Use the normal [AORebirth startup workflow](../../docs/ai/WORKFLOW.md)
 with a development database and GameData. Start with just the first setting for
-inspection. Add the second for live changes. Add the third for durable loot
-changes, pointing it to a pre-created, access-controlled folder separate from
+inspection. Add the second for live changes. Add the third for durable loot and
+equipment changes, pointing it to a pre-created, access-controlled folder separate from
 the GameData root. Use a separate port and overlay folder for each Zone process.
 
 ```cmd
@@ -38,37 +38,49 @@ also honors `set` and `setOtherCharacter` in `GmPermissions.json`, which default
 to GM level 100 for modifying another character. Account sanctions and legacy
 login flags apply. Writes recheck the account in the server's account store.
 
-## Inspect, apply, and revert
+## Inspect, edit, and restore
 
 - **Browse** searches loaded NPCs. Select one and lock it before editing.
   Instance identity includes an opaque spawn generation. A despawned NPC or a
-  replacement with a reused ID requires a new selection.
-- **Stats and equipment** show runtime and configured values where the active
-  template supplies them. Edit the enabled stats or equipment slots with
-  **Apply Live**. The live history supports rollback while the same NPC is
-  spawned and the modified value or item still matches the recorded change.
-- **Loot** shows the current NPC's materialized loot rolls, nested item
-  families, equipment-triggered entries and carried items. The editor labels
-  configured rows and live inputs separately from GM-authored rows. Chance and
-  repeats use the server's existing independent-roll rules. Level variance is
-  the existing level-relative percentage field. Zero variance selects the
-  gameplay default. Set a chance of 100 to pass the chance check on every roll.
-  Item eligibility, corpse capacity and spoils rules still apply.
-- **Save to GameData** on the Loot tab appends, replaces or removes a row in
-  the separate `NpcEditorLootOverrides.json` file. It applies to future NPCs
-  resolved from the displayed exact template hash, including respawns that
-  resolve the catalog again. Other spawns that share this hash also receive the
-  new rows. The selected live NPC keeps the loot it spawned with. The original
-  authored rows stay in place. The saved history records the GM account and
-  revisions. Reverting an earlier saved revision records a new revision.
-  Keep the overlay configured across restarts to retain it.
+  replacement with a reused ID requires a new selection. Runtime stat values
+  refresh while the NPC is selected. Apply Live uses the base value captured
+  when the edit began and rejects a stale value.
+- **Item Catalog** pages through `items.dat` by name, AO template ID, category
+  and QL. Select a row to preview its RDB description and available stats.
+  Loot selection shows item families from `ItemTemplates.json`.
+- **Loot** displays potential corpse loot for the selected NPC, including
+  configured rows, nested hash groups, equipment-triggered drops and carried
+  items. Select a native table row to change or remove it, or add a row to the
+  table. Select an item family from the picker or enter an existing group hash.
+  Chance is an independent percentage per repeat. Chance 100 passes every
+  chance check. Item eligibility, corpse capacity and spoils rules still apply.
+  Use a level-relative variance or explicit minimum and maximum QL. Native
+  groups pick one eligible child uniformly or use `SpawnAll`, as configured.
+- **Simulate** runs up to 10,000 rolls against the selected NPC's current loot.
+  The results give observed frequency per corpse, average items, empty corpse
+  frequency and QL counts. Simulation rolls item identities without minting
+  items or creating a corpse.
+- **Equipment** shows live items and the configured template band separately.
+  Replace or remove a supported visible weapon, or add, replace or remove
+  supported armor. Monster combat weapons and special equipment have their own
+  runtime roles and stay read-only. Live changes use the NPC's existing
+  equipment and appearance publication paths.
+- **Apply Live** updates the selected spawn. **Revert Draft** discards pending
+  form edits. Live history can undo an applied edit while its recorded state
+  still matches. **Save to GameData** updates the displayed exact template
+  band and shows an estimate of loaded NPCs using it. Newly resolved spawns
+  use the saved loot and equipment. Existing spawns keep their materialized
+  configuration until edited or replaced. A frozen spawn roll keeps its
+  snapshot until its owning subsystem rebuilds it.
+- **Restore Previous** records a new revision using the selected saved
+  configuration. The separate overlay stores GM history in
+  `NpcEditorLootOverrides.json` and `NpcEditorEquipmentOverrides.json`.
+  Keep the same overlay folder configured after restart.
 
-Live stat and equipment edits expire with the selected NPC. Durable stat and
-equipment authoring, live loot edits, authored base-row replacement, new global
-tables, and family or spawn-specific loot assignments are outside this slice.
-The active corpse generator uses NPC materialization and native hash-family
-resolution. The global assignment and weighted-roll models in the test fixtures
-have no active ZoneEngine resolver. The editor leaves those controls disabled.
+Durable stat edits and independent named loot tables remain unavailable.
+The native resolver has no assignment layer for spawn, family, playfield or
+global loot overrides, and its hash groups have no per-child weight field.
+The editor supports the selected live instance and the exact authored template band.
 
 The override folder is a local development input. Moving approved changes into
 canonical GameData requires the existing private content review and intake
@@ -77,7 +89,10 @@ workflow.
 ## Focused validation
 
 Use the existing development-only wrapper with the owning checkout's private
-profile and GameData. These tests exercise temporary content and offline NPCs.
+profile. The tests exercise an isolated HTTPS endpoint and a temporary
+playfield, including native NPC spawning and corpse generation. Set
+`AO_REBIRTH_NPC_EDITOR_VERIFY_ITEMS_ROOT` to an existing RDB-derived GameData
+root to include the read-only real item search check.
 
 ```cmd
 cmd /d /c tools\windows_release_contract.cmd run-feature-validation -- "C:\Program Files\dotnet\dotnet.exe" test AORebirth\Server\ZoneEngine_New.Tests\ZoneEngine_New.Tests.csproj -p:NpcEditorFocusedTests=true --filter "FullyQualifiedName~NpcEditor"

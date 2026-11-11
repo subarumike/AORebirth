@@ -1,7 +1,7 @@
 <Window x:Class="AORebirth.NpcEditor.ItemPicker"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Width="720" Height="505" MinWidth="465" MinHeight="340" ShowInTaskbar="False"
+        Width="780" Height="655" MinWidth="560" MinHeight="470" ShowInTaskbar="False"
         WindowStartupLocation="CenterOwner" Style="{StaticResource EditorWindowStyle}">
     <Grid Margin="14">
         <Grid.RowDefinitions>
@@ -11,21 +11,38 @@
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <TextBlock Style="{StaticResource Caption}" Margin="0,0,0,8" Text="Search the ZoneEngine item catalog by name or identifier." />
+        <TextBlock Style="{StaticResource Caption}" Margin="0,0,0,8" Text="Search the ZoneEngine item catalog by name, template ID, or category." />
         <DockPanel Grid.Row="1" Margin="0,0,0,8">
             <Button x:Name="SearchButton" DockPanel.Dock="Right" Content="Search" Click="Search_Click" Margin="8,0,0,0" />
-            <TextBox x:Name="Query" MaxLength="128" AutomationProperties.Name="Item catalog query" KeyDown="Query_KeyDown" />
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" Margin="8,0,0,0">
+                <ComboBox x:Name="Category" Width="104" Margin="0,0,8,0" AutomationProperties.Name="Item category" />
+                <TextBlock Text="QL" VerticalAlignment="Center" Margin="0,0,5,0" />
+                <TextBox x:Name="MinQuality" Width="48" MaxLength="10" AutomationProperties.Name="Minimum QL" KeyDown="Query_KeyDown" />
+                <TextBlock Text="–" VerticalAlignment="Center" Margin="3,0" />
+                <TextBox x:Name="MaxQuality" Width="48" MaxLength="10" AutomationProperties.Name="Maximum QL" KeyDown="Query_KeyDown" />
+            </StackPanel>
+            <TextBox x:Name="Query" MaxLength="128" AutomationProperties.Name="Item name or template ID" KeyDown="Query_KeyDown" />
         </DockPanel>
         <DataGrid x:Name="Results" Grid.Row="2" SelectionChanged="Results_SelectionChanged">
             <DataGrid.Columns>
                 <DataGridTextColumn Header="Item or family" Binding="{Binding Name}" Width="*" />
-                <DataGridTextColumn Header="Identifier" Binding="{Binding Identifier}" Width="110" />
+                <DataGridTextColumn Header="Template ID" Binding="{Binding Id}" Width="90" />
+                <DataGridTextColumn Header="Category" Binding="{Binding ItemClass}" Width="96" />
+                <DataGridTextColumn Header="QL" Binding="{Binding QualityRange}" Width="100" />
             </DataGrid.Columns>
         </DataGrid>
-        <TextBlock x:Name="ResultText" Grid.Row="3" Style="{StaticResource Caption}" Margin="0,8,0,0" Text="Enter a search above." />
-        <StackPanel Grid.Row="4" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,8,0,0">
-            <Button x:Name="Choose" Content="Use selected item" Click="Choose_Click" IsEnabled="False" />
-            <Button Content="Cancel" IsCancel="True" Margin="0" />
-        </StackPanel>
+        <TextBox x:Name="PreviewText" Grid.Row="3" IsReadOnly="True" Height="124" Margin="0,8,0,0"
+                 VerticalScrollBarVisibility="Auto" TextWrapping="Wrap" AutomationProperties.Name="Selected item details" />
+        <DockPanel Grid.Row="4" Margin="0,8,0,0">
+            <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                <Button x:Name="Choose" Content="Use selected item" Click="Choose_Click" IsEnabled="False" />
+                <Button x:Name="ClosePicker" Content="Cancel" IsCancel="True" Margin="0" />
+            </StackPanel>
+            <StackPanel DockPanel.Dock="Left" Orientation="Horizontal">
+                <Button x:Name="Previous" Content="Previous" Click="Previous_Click" IsEnabled="False" />
+                <Button x:Name="Next" Content="Next" Click="Next_Click" IsEnabled="False" />
+            </StackPanel>
+            <TextBlock x:Name="ResultText" Style="{StaticResource Caption}" VerticalAlignment="Center" Text="Enter a search or browse all items." />
+        </DockPanel>
     </Grid>
 </Window>

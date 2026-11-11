@@ -19,6 +19,7 @@ namespace ZoneEngine_New.Core.Inventory.Dat
             {
                 Id = dat.ID,
                 Name = name,
+                Description = dat.Rdb?.Description,
                 Quality = dat.Quality > 0 ? dat.Quality : 1,
                 Flags = dat.Flags,
                 ItemType = dat.ItemType,

@@ -2,6 +2,7 @@ namespace ZoneEngine_New.Core.NpcEditor;
 
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -23,39 +24,42 @@ internal sealed partial class NpcEditorRuntime
         internal List<LiveChange> History { get; } = new();
     }
 
-    sealed record LiveChange(string Description, StatChange? Stat, EquipmentChange? Equipment)
+    sealed record LiveChange(string Description, string? Actor, string Before, string After, StatChange? Stat, EquipmentChange? Equipment)
     {
         internal Guid Id { get; } = Guid.NewGuid();
         internal DateTime AtUtc { get; } = DateTime.UtcNow;
         internal bool Reverted { get; set; }
+        internal string? RevertedBy { get; set; }
     }
 
     sealed record StatChange(CharacterStat Stat, int Before, int After);
     internal sealed record EquipmentChange(int Slot, Item? Before, Item? After);
 
     public Task<NpcEditorNpcDetails> ApplyStatAsync(
-        NpcEditorIdentity identity, int statId, int expectedBase, int value, CancellationToken cancellationToken)
+        NpcEditorIdentity identity, int statId, int expectedBase, int value, CancellationToken cancellationToken, string? actor = null)
         => WithNpcAsync(identity, npc =>
         {
             var stat = (CharacterStat)statId;
             ApplyStat(npc, stat, expectedBase, value);
-            Record(npc, new LiveChange($"{stat}: {expectedBase} to {value}", new StatChange(stat, expectedBase, value), null));
+            Record(npc, new LiveChange($"{stat}: {expectedBase} to {value}", actor,
+                expectedBase.ToString(CultureInfo.InvariantCulture), value.ToString(CultureInfo.InvariantCulture),
+                new StatChange(stat, expectedBase, value), null));
             return Snapshot(npc);
         }, cancellationToken);
 
     public Task<NpcEditorNpcDetails> ApplyEquipmentAsync(
-        NpcEditorIdentity identity, NpcEditorEquipmentEdit edit, CancellationToken cancellationToken)
+        NpcEditorIdentity identity, NpcEditorEquipmentEdit edit, CancellationToken cancellationToken, string? actor = null)
         => WithNpcAsync(identity, npc =>
         {
             EquipmentChange change = EditEquipment(npc, _catalog, npc.Playfield!.GetRequiredService<IItemBuilder>(), edit);
-            string before = change.Before?.Name ?? "Empty";
-            string after = change.After?.Name ?? "Empty";
-            Record(npc, new LiveChange($"Equipment slot {change.Slot}: {before} to {after}", null, change));
+            string before = DescribeEquipment(change.Before);
+            string after = DescribeEquipment(change.After);
+            Record(npc, new LiveChange($"Equipment slot {change.Slot}: {before} to {after}", actor, before, after, null, change));
             return Snapshot(npc);
         }, cancellationToken);
 
     public Task<NpcEditorNpcDetails> RevertAsync(
-        NpcEditorIdentity identity, Guid changeId, CancellationToken cancellationToken)
+        NpcEditorIdentity identity, Guid changeId, CancellationToken cancellationToken, string? actor = null)
         => WithNpcAsync(identity, npc =>
         {
             LiveChange? change = State(npc).History.Find(entry => entry.Id == changeId);
@@ -67,8 +71,9 @@ internal sealed partial class NpcEditorRuntime
             if (change.Stat is { } stat)
                 SetStat(npc, stat.Stat, stat.Before, restoring: true);
             else if (change.Equipment is { } equipment)
-                SetEquipmentSlot(npc, equipment.Slot, equipment.After, equipment.Before);
+                UndoEquipment(npc, equipment);
             change.Reverted = true;
+            change.RevertedBy = actor;
             return Snapshot(npc);
         }, cancellationToken);
 
@@ -162,10 +167,12 @@ internal sealed partial class NpcEditorRuntime
     static ItemClass GetClass(Item item) => (ItemClass)item.GetStat(CharacterStat.ItemClass);
     static int DefaultPosition(Item item) => StatCollection.Normalize(item.GetStat(CharacterStat.DefaultPos));
     static bool IsEditableArmor(Item item) => NpcCharacter.EditableArmorPosition(item) > 0;
+    static string DescribeEquipment(Item? item) => item == null
+        ? "Empty" : $"{item.Name} ({item.LowId}/{item.HighId}, QL {item.Quality})";
 
     static bool CanReplaceItem(NpcCharacter npc, int slot, Item item)
         => CanEditEquipment(npc) && !item.Locked && !npc.IsMonsterCombatSlot(slot)
-            && (IsEditableArmor(item) || ReferenceEquals(npc.VisualRightHand, item))
+            && (IsEditableArmor(item) || (GetClass(item) == ItemClass.Weapon && ReferenceEquals(npc.VisualRightHand, item)))
             && !NpcCharacter.IsProtectedNpcEquipment(item);
 
     static bool ArmorPositionTaken(NpcCharacter npc, int slot, Item item)
@@ -180,7 +187,7 @@ internal sealed partial class NpcEditorRuntime
             : IsEditableArmor(item) ? "Armor" : "Other";
         bool replaceable = CanReplaceItem(npc, slot, item);
         return new NpcEditorEquippedItem(slot, item.InstanceId, item.LowId, item.HighId, item.Quality, item.Name,
-            GetClass(item).ToString(), role, DefaultPosition(item), replaceable, replaceable && IsEditableArmor(item));
+            GetClass(item).ToString(), role, DefaultPosition(item), replaceable, replaceable);
     }
 
     internal static EquipmentChange EditEquipment(
@@ -229,14 +236,17 @@ internal sealed partial class NpcEditorRuntime
             }
             replacement = builder.CreateWithNewInstance(id, id, template.Quality, ItemSource.Other);
         }
-        else if (previous == null || !IsEditableArmor(previous) || edit.Quality.HasValue)
+        else if (previous == null || edit.Quality.HasValue)
         {
-            throw new NpcEditorRuntimeException(400, "Only supported armor can be removed.");
+            throw new NpcEditorRuntimeException(400, "Select an equipped NPC armor or visual weapon to remove.");
         }
 
         SetEquipmentSlot(npc, slot, previous, replacement);
         return new EquipmentChange(slot, previous, replacement);
     }
+
+    internal static void UndoEquipment(NpcCharacter npc, EquipmentChange equipment)
+        => SetEquipmentSlot(npc, equipment.Slot, equipment.After, equipment.Before);
 
     static void SetEquipmentSlot(NpcCharacter npc, int slot, Item? before, Item? after)
     {

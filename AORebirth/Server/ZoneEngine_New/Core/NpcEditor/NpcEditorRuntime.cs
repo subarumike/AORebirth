@@ -12,6 +12,7 @@ using AORebirth.Enums;
 using SmokeLounge.AOtomation.Messaging.GameData;
 
 using ZoneEngine_New.Core.Entities;
+using ZoneEngine_New.Core.GameData;
 using ZoneEngine_New.Core.Inventory;
 using ZoneEngine_New.Core.Mobs;
 using ZoneEngine_New.Core.Playfield;
@@ -92,6 +93,59 @@ internal sealed partial class NpcEditorRuntime(PlayfieldManager playfields)
 
     public Task<NpcEditorNpcDetails> InspectAsync(NpcEditorIdentity identity, CancellationToken cancellationToken)
         => WithNpcAsync(identity, Snapshot, cancellationToken);
+
+    public Task<NpcEditorStat[]> ReadStatsAsync(NpcEditorIdentity identity, CancellationToken cancellationToken)
+        => WithNpcAsync(identity, StatRows, cancellationToken);
+
+    public async Task<NpcEditorEquipmentTarget> CaptureEquipmentAsync(
+        NpcEditorIdentity identity, CancellationToken cancellationToken, bool estimate = true)
+    {
+        NpcEditorEquipmentTarget target = await WithNpcAsync(identity, CaptureEquipmentTarget, cancellationToken)
+            .ConfigureAwait(false);
+        if (estimate && target.UnavailableReason == null)
+        {
+            int? affected = await EstimateTemplateBandAsync(target.TemplateHash, target.BandIndex, cancellationToken)
+                .ConfigureAwait(false);
+            target = target with { EstimatedAffectedNpcs = affected };
+        }
+        return target;
+    }
+
+    internal static NpcEditorEquipmentTarget CaptureEquipmentTarget(NpcCharacter npc)
+    {
+        if (npc.MobTemplate is not { UnresolvedPlaceholder: false, EditorLootLeaf: { } leaf } template
+            || template.AuthoredBandIndex < 0 || template.AuthoredBandIndex >= leaf.Bands.Length
+            || !npc.Attackable || npc.Pet != null || npc.Shop != null)
+            return new(npc.MobTemplate?.Hash ?? string.Empty, -1, string.Empty,
+                "Select an attackable, authored template NPC without a pet owner or shop.");
+        return new(leaf.Hash, template.AuthoredBandIndex,
+            NpcEditorEquipmentJournalFile.Signature(leaf.Bands[template.AuthoredBandIndex]), null);
+    }
+
+    public async Task<int?> EstimateTemplateBandAsync(string hash, int bandIndex, CancellationToken cancellationToken)
+    {
+        int matches = 0;
+        foreach (Playfield field in playfields.SnapshotPlayfields())
+        {
+            try
+            {
+                matches += await OnTickAsync(field, () => field.GetRequiredService<DynelRegistry>().Dynels()
+                    .OfType<NpcCharacter>()
+                    .Count(npc => IsLive(field, npc) && npc.MobTemplate is { } template
+                        && template.Hash == hash && template.AuthoredBandIndex == bandIndex), cancellationToken)
+                    .ConfigureAwait(false);
+            }
+            catch (NpcEditorRuntimeException error) when (error.StatusCode == 404)
+            {
+                // A playfield can retire before this estimate reaches its tick.
+            }
+            catch (NpcEditorRuntimeException error) when (error.StatusCode == 503)
+            {
+                return null;
+            }
+        }
+        return matches;
+    }
 
     public Task<T> WithNpcAsync<T>(
         NpcEditorIdentity identity, Func<NpcCharacter, T> operation, CancellationToken cancellationToken)
@@ -188,21 +242,9 @@ internal sealed partial class NpcEditorRuntime(PlayfieldManager playfields)
         }
 
         MobTemplate? template = npc.MobTemplate;
-        IReadOnlyDictionary<int, int>? configured = template?.Stats ?? WorldNpcFactory.DefinitionFor(npc)?.Stats;
-        int[] statIds = npc.Stats.GetEntries().Select(entry => (int)entry.Stat)
-            .Union(configured?.Keys ?? Enumerable.Empty<int>()).Order().ToArray();
-        NpcEditorStat[] stats = statIds.Select(id =>
-        {
-            var stat = (CharacterStat)id;
-            int? liveBase = ReadStat(npc, stat, StatDetail.Base);
-            int? configuredValue = configured != null && configured.TryGetValue(id, out int value) ? value : null;
-            return new NpcEditorStat(id, stat.ToString(), liveBase, ReadStat(npc, stat, StatDetail.Bonus),
-                ReadStat(npc, stat, StatDetail.Full), configuredValue, liveBase.HasValue && CanEditStat(npc, stat));
-        }).ToArray();
-
         NpcEditorEquippedItem[] equipment = npc.Equipment.EnumerateSlots()
             .Select(slot => EquipmentRow(npc, slot.Key, slot.Value)).ToArray();
-        NpcEditorConfiguredItem[] configuredEquipment = template?.Equipment.Where(pair => pair?.Count > 0)
+        NpcEditorConfiguredItem[] configuredEquipment = (npc.SpawnEquipment ?? template?.Equipment)?.Where(pair => pair?.Count > 0)
             .Select(pair => new NpcEditorConfiguredItem(pair[0], pair.Count > 1 ? pair[1] : pair[0],
                 ItemName(pair[0]))).ToArray() ?? [];
 
@@ -213,10 +255,25 @@ internal sealed partial class NpcEditorRuntime(PlayfieldManager playfields)
 
         var position = npc.Position;
         return new NpcEditorNpcDetails(Summarize(field, npc), position.x, position.y, position.z, npc.SpawnPointKey,
-            respawn, stats, equipment, configuredEquipment, npc.UploadedNanoIds.Select(NanoRow).ToArray(),
+            respawn, StatRows(npc), equipment, configuredEquipment, npc.UploadedNanoIds.Select(NanoRow).ToArray(),
             npc.Buffs.Select(buff => NanoRow(buff.Id)).ToArray(), brain, CanEditEquipment(npc) && npc.Equipment.FindFreeSlot() >= 0,
             State(npc).History.AsEnumerable().Reverse().Select(change => new NpcEditorChange(
-                change.Id, change.AtUtc, change.Description, change.Reverted, CanRevert(npc, change))).ToArray());
+                change.Id, change.AtUtc, change.Description, change.Reverted, CanRevert(npc, change), "liveInstance",
+                change.Actor, change.Before, change.After, change.RevertedBy)).ToArray());
+    }
+
+    static NpcEditorStat[] StatRows(NpcCharacter npc)
+    {
+        IReadOnlyDictionary<int, int>? configured = npc.MobTemplate?.Stats ?? WorldNpcFactory.DefinitionFor(npc)?.Stats;
+        return npc.Stats.GetEntries().Select(entry => (int)entry.Stat)
+            .Union(configured?.Keys ?? Enumerable.Empty<int>()).Order().Select(id =>
+            {
+                var stat = (CharacterStat)id;
+                int? liveBase = ReadStat(npc, stat, StatDetail.Base);
+                int? configuredValue = configured != null && configured.TryGetValue(id, out int value) ? value : null;
+                return new NpcEditorStat(id, stat.ToString(), liveBase, ReadStat(npc, stat, StatDetail.Bonus),
+                    ReadStat(npc, stat, StatDetail.Full), configuredValue, liveBase.HasValue && CanEditStat(npc, stat));
+            }).ToArray();
     }
 
     static int? ReadStat(NpcCharacter npc, CharacterStat stat, StatDetail detail)

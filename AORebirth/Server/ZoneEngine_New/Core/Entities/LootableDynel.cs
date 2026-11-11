@@ -67,7 +67,7 @@ namespace ZoneEngine_New.Core.Entities
 
         protected int LootLevel { get; set; } = 1;
 
-        protected List<MobItemTableEntry>? ItemTable { get; set; }
+        protected IReadOnlyList<MobItemTableEntry>? ItemTable { get; set; }
 
         /// <summary>Items the owner already carried (SpawnItem on an NPC); placed ahead of the item table roll.</summary>
         protected IReadOnlyList<Item>? CarriedItems { get; set; }
@@ -119,13 +119,15 @@ namespace ZoneEngine_New.Core.Entities
             HashItemMinter minter,
             int capacity,
             int qualityVariancePercent,
-            List<(int LowId, int HighId, int Quality)> into)
+            List<(int LowId, int HighId, int Quality)> into,
+            Random? random = null)
         {
             ArgumentNullException.ThrowIfNull(minter);
             ArgumentNullException.ThrowIfNull(into);
             if (itemTable == null)
                 return;
 
+            Random rolls = random ?? LootRandom;
             int start = into.Count;
             var spawned = new List<(int LowId, int HighId, int Quality)>();
             foreach (MobItemTableEntry entry in itemTable)
@@ -138,14 +140,13 @@ namespace ZoneEngine_New.Core.Entities
                     if (into.Count - start >= capacity)
                         return;
 
-                    if (!RollChance(entry.Chance))
+                    if (!RollChance(entry.Chance, rolls))
                         continue;
 
                     spawned.Clear();
-                    (int minQuality, int maxQuality) = QualityWindow(
-                        level, entry.LevelMod > 0 ? entry.LevelMod : qualityVariancePercent);
+                    (int minQuality, int maxQuality) = ItemTableQualityWindow(entry, level, qualityVariancePercent);
                     minter.RollSpawnIds(
-                        entry.Hash, minQuality, maxQuality, LootRandom.Next(minQuality, maxQuality + 1), spawned);
+                        entry.Hash, minQuality, maxQuality, rolls.Next(minQuality, maxQuality + 1), spawned, random);
                     for (int i = 0; i < spawned.Count; i++)
                     {
                         if (into.Count - start >= capacity)
@@ -285,15 +286,20 @@ namespace ZoneEngine_New.Core.Entities
             }
         }
 
-        static bool RollChance(int chance)
+        static bool RollChance(int chance, Random random)
         {
             if (chance >= 100)
                 return true;
             if (chance <= 0)
                 return false;
 
-            return LootRandom.Next(1, 101) <= chance;
+            return random.Next(1, 101) <= chance;
         }
+
+        internal static (int Min, int Max) ItemTableQualityWindow(MobItemTableEntry entry, int level, int variance)
+            => entry.EditorMinQuality is int min && entry.EditorMaxQuality is int max
+                ? (min, max)
+                : QualityWindow(level, entry.LevelMod > 0 ? entry.LevelMod : variance);
 
         /// <summary>The QL window a drop centred on <paramref name="level"/> rolls in: ± <paramref name="percent"/>.</summary>
         internal static (int Min, int Max) QualityWindow(int level, int percent)

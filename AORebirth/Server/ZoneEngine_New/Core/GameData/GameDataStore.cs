@@ -25,7 +25,7 @@ namespace ZoneEngine_New.Core.GameData
     /// <see cref="GameDataPaths.EnvironmentVariableName"/> overrides the directory beside the process.
     /// There is no path search. Missing root files log and degrade gracefully.
     /// </summary>
-    public sealed class GameDataStore : IGameData
+    public sealed partial class GameDataStore : IGameData
     {
         private static readonly JsonSerializerOptions CatalogJsonOptions = new()
         {
@@ -91,6 +91,7 @@ namespace ZoneEngine_New.Core.GameData
             RootPath = Path.GetFullPath(gameDataRoot);
             PlayfieldsPath = Path.Combine(RootPath, GameDataPaths.PlayfieldsFolderName);
             _editorLootFile = new NpcEditorLootJournalFile(RootPath, editorLootOverrideRoot);
+            _editorEquipmentFile = new NpcEditorEquipmentJournalFile(RootPath, editorLootOverrideRoot);
 
             EnsureRootExists();
             RespawnContent = RespawnContentCatalog.Load(RootPath);
@@ -170,7 +171,7 @@ namespace ZoneEngine_New.Core.GameData
             if (string.IsNullOrEmpty(hash) || !templates.TryGetLeaf(hash, out NpcLeaf leaf))
                 return false;
 
-            template = templates.MaterializeWithEditorLoot(leaf, leaf.MinLevel);
+            template = templates.MaterializeWithEditorOverrides(leaf, leaf.MinLevel);
             return true;
         }
 
@@ -236,6 +237,9 @@ namespace ZoneEngine_New.Core.GameData
 
         public void CollectHashSpawns(string hash, List<HashInstance> into, Func<string, string, bool> canPick)
             => _hashItems.CollectSpawns(hash, into, canPick);
+
+        public void CollectHashSpawns(string hash, List<HashInstance> into, Func<string, string, bool> canPick, Random random)
+            => _hashItems.CollectSpawns(hash, into, canPick, random);
 
         public bool IsSpawnAllItemHash(string hash)
             => _hashItems.IsSpawnAll(hash);
@@ -547,12 +551,14 @@ namespace ZoneEngine_New.Core.GameData
                     Mobs.MonsterCombatRulesCatalog.For(rulesRoot).TryGet(hash, out Mobs.MonsterCombatRules rules) ? rules.Features : null;
                 try
                 {
-                    _npcTemplates = loaded.WithEditorLoot(_editorLootFile.Read(loaded, IsEditorLootItem));
+                    _npcTemplates = WithLoadedEditorEquipment(loaded.WithEditorLoot(_editorLootFile.Read(loaded, IsEditorLootItem)));
                     _loadedNpcTemplates = true;
+                    if (_npcTemplates.EditorEquipment.LoadError is string equipmentError)
+                        return new(name, false, _npcTemplates.LeafCount, [equipmentError]);
                 }
                 catch (Exception exception) when (exception is IOException or InvalidDataException or UnauthorizedAccessException or JsonException)
                 {
-                    NpcTemplateCatalog keep = _loadedNpcTemplates ? _npcTemplates : loaded;
+                    NpcTemplateCatalog keep = _loadedNpcTemplates ? _npcTemplates : WithLoadedEditorEquipment(loaded);
                     const string error = "The NPC loot overlay failed validation. See the ZoneEngine log and reload NpcTemplates after repair.";
                     _npcTemplates = keep.WithEditorLoot(keep.EditorLoot with { LoadError = error });
                     _loadedNpcTemplates = true;
@@ -583,23 +589,46 @@ namespace ZoneEngine_New.Core.GameData
         internal NpcEditorLootState GetEditorLoot(NpcEditorLootTarget target)
             => GetEditorLoot(_npcTemplates, target);
 
+        internal (NpcEditorLootState State, List<MobItemTableEntry> Rows) DescribeEditorLoot(NpcEditorLootTarget target)
+        {
+            NpcTemplateCatalog catalog = _npcTemplates;
+            NpcEditorLootState state = GetEditorLoot(catalog, target);
+            if (!MatchesLootBand(catalog, target, out NpcLeaf leaf))
+                return (state, []);
+            NpcEditorLootRevision[] history = catalog.EditorLoot.HistoryFor(target.TemplateHash);
+            return (state, NpcEditorLootJournal.MaterializeBand(leaf.Bands[target.BandIndex], target.BandIndex,
+                history.LastOrDefault()));
+        }
+
         private NpcEditorLootState GetEditorLoot(NpcTemplateCatalog catalog, NpcEditorLootTarget target)
         {
             string? unavailable = _editorLootFile.ConfigurationProblem ?? catalog.EditorLoot.LoadError;
             if (!catalog.TryGetEditableLootLeaf(target.TemplateHash, out NpcLeaf leaf))
                 unavailable = "Select an NPC with an authored, resolved leaf template.";
-            else if (unavailable == null && target.TemplateSignature != leaf.EditorLootTemplateSignature)
+            else if (unavailable == null && !MatchesLootBand(catalog, target, out _))
                 unavailable = "The authored NPC template changed. Select a new spawn before editing its loot.";
             NpcEditorLootRevision[] history = catalog.EditorLoot.HistoryFor(target.TemplateHash);
             NpcEditorLootRevision? latest = history.Length > 0 ? history[^1] : null;
+            string? definition = target.BandIndex >= 0 && leaf != null && target.BandIndex < leaf.Bands.Length
+                ? $"NpcTemplates.json / {target.TemplateHash} / level {leaf.Bands[target.BandIndex].Level} (band {target.BandIndex + 1})"
+                : null;
             return new(target.TemplateHash, unavailable == null, unavailable, latest?.Revision ?? 0,
                 latest == null ? [] : (NpcEditorLootEntry[])latest.Entries.Clone(),
                 history.Select(revision => new NpcEditorLootRevisionSummary(revision.Revision, revision.Actor,
-                    revision.AtUtc, revision.Action, revision.Entries.Length)).ToArray());
+                    revision.AtUtc, revision.Action, revision.Overrides.Count(),
+                    revision.Audit?.BandIndex == null ? "template" : "templateBand", revision.Audit?.BandIndex,
+                    revision.Audit?.RowIndex, revision.Audit?.Before, revision.Audit?.After,
+                    revision.Audit?.RestoredRevision)).ToArray(), definition, target.BandIndex);
         }
 
+        static bool MatchesLootBand(NpcTemplateCatalog catalog, NpcEditorLootTarget target, out NpcLeaf leaf)
+            => catalog.TryGetEditableLootLeaf(target.TemplateHash, out leaf)
+                && target.BandIndex >= 0 && target.BandIndex < leaf.Bands.Length
+                && target.TemplateSignature == leaf.EditorLootTemplateSignature;
+
         internal NpcEditorLootState ChangeEditorLoot(NpcEditorLootTarget target, int expectedRevision, string actor, string action,
-            Func<NpcEditorLootRevision[], NpcEditorLootEntry[]> edit, Func<string, bool> hasRdbTemplates)
+            Func<NpcLeaf, NpcEditorLootRevision[], NpcEditorLootRevisionEdit> edit,
+            Func<string, bool> hasRdbTemplates)
         {
             if (string.IsNullOrWhiteSpace(actor) || actor.Length > 128)
                 throw new ArgumentException("A valid GM actor is required.", nameof(actor));
@@ -608,8 +637,7 @@ namespace ZoneEngine_New.Core.GameData
             {
                 NpcTemplateCatalog catalog = _npcTemplates;
                 string hash = target.TemplateHash;
-                if (!catalog.TryGetEditableLootLeaf(hash, out NpcLeaf leaf)
-                    || target.TemplateSignature != leaf.EditorLootTemplateSignature)
+                if (!MatchesLootBand(catalog, target, out NpcLeaf leaf))
                 {
                     throw new NpcEditorLootConflictException("The authored NPC template changed. Select a new spawn before editing its loot.");
                 }
@@ -623,21 +651,20 @@ namespace ZoneEngine_New.Core.GameData
                 if (history.Length >= NpcEditorLootJournalFile.MaxRevisionsPerTemplate)
                     throw new InvalidOperationException("The template's loot history has reached its revision limit.");
 
-                NpcEditorLootEntry[] edited = edit(history);
-                if (edited.Length > NpcEditorLootJournalFile.MaxRowsPerTemplate
-                    || edited.Any(entry => !NpcEditorLootJournalFile.ValidEntry(entry)
+                NpcEditorLootRevisionEdit edited = edit(leaf, history);
+                var revision = new NpcEditorLootRevision(current.Revision + 1, actor, DateTimeOffset.UtcNow,
+                    action, edited.Entries, edited.Bands, edited.Audit);
+                if (edited.Entries.Length > NpcEditorLootJournalFile.MaxRowsPerTemplate
+                    || !NpcEditorLootJournalFile.ValidBands(leaf, edited.Bands)
+                    || revision.Overrides.Any(entry => !NpcEditorLootJournalFile.ValidEntry(entry)
                         || !IsEditorLootItem(entry.ItemHash) || !hasRdbTemplates(entry.ItemHash)))
                 {
                     throw new ArgumentException("Loot rows require a current item family and valid chance, repeats and level variance.");
                 }
 
-                if (current.Entries.SequenceEqual(edited))
-                    throw new ArgumentException("The loot rows already match this revision.");
-
                 var templates = new Dictionary<string, NpcEditorLootHistory>(catalog.EditorLoot.Templates, StringComparer.Ordinal)
                 {
-                    [hash] = new(target.TemplateSignature,
-                        [.. history, new(current.Revision + 1, actor, DateTimeOffset.UtcNow, action, edited)])
+                    [hash] = new(target.TemplateSignature, [.. history, revision])
                 };
                 NpcEditorLootJournal updated = _editorLootFile.Write(catalog.EditorLoot, catalog.EditorLoot with { Templates = templates });
                 NpcTemplateCatalog revised = catalog.WithEditorLoot(updated);
@@ -646,8 +673,7 @@ namespace ZoneEngine_New.Core.GameData
             }
         }
 
-        private bool IsEditorLootItem(string hash) => _hashItems.TryGetInstance(hash, out HashInstance item)
-            && item.TemplateIds.All(id => id > 0);
+        private bool IsEditorLootItem(string hash) => _hashItems.CanResolveItem(hash);
 
         private void LoadMonsterWeapons()
         {
@@ -729,8 +755,8 @@ namespace ZoneEngine_New.Core.GameData
             try
             {
                 HashItemCatalog loaded = HashItemCatalog.Parse(File.ReadAllText(path));
-                if (_npcTemplates.EditorLoot.Templates.Values.Any(history => history.Revisions[^1].Entries.Any(
-                    entry => !loaded.TryGetInstance(entry.ItemHash, out HashInstance item) || item.TemplateIds.Any(id => id <= 0))))
+                if (_npcTemplates.EditorLoot.Templates.Values.Any(history => history.Revisions[^1].Overrides.Any(
+                    entry => !loaded.CanResolveItem(entry.ItemHash))))
                 {
                     throw new InvalidDataException("ItemTemplates would invalidate a saved NPC loot item family.");
                 }
