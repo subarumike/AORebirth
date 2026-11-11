@@ -15,6 +15,7 @@ namespace ZoneEngine_New.Core.NpcEditor
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Hosting;
     using Microsoft.AspNetCore.Http;
+    using Microsoft.AspNetCore.Http.Features;
     using Microsoft.AspNetCore.RateLimiting;
     using Microsoft.AspNetCore.Routing;
     using Microsoft.Extensions.DependencyInjection;
@@ -57,6 +58,9 @@ namespace ZoneEngine_New.Core.NpcEditor
             var loot = new NpcEditorLoot(gameData, items, services.GetRequiredService<HashItemMinter>());
             var equipment = new NpcEditorEquipment(gameData, items);
             var itemBrowser = new NpcEditorItemBrowser(items, gameData);
+            var named = new NpcEditorNamedLoot(gameData, items);
+            var evidence = new NpcEditorLootEvidence(gameData.RootPath, GameDataPaths.ResolveOverrideRoot(), logger);
+            var coverage = new NpcEditorLootCoverage(gameData, items, named, evidence);
             var sessions = new NpcEditorSessions(MySqlAccountSanctionRepository.LoadEditorCredentials,
                 TimeProvider.System, readLevel, writeLevel, allowWrites,
                 !string.IsNullOrWhiteSpace(GameDataPaths.ResolveOverrideRoot()));
@@ -68,7 +72,7 @@ namespace ZoneEngine_New.Core.NpcEditor
             {
                 app = Build(port, certificate, sessions, logger);
                 MapEditorRoutes(app, runtime, loot, equipment, itemBrowser,
-                    new NpcEditorStats(gameData), new NpcEditorSpawn(gameData));
+                    new NpcEditorStats(gameData), new NpcEditorSpawn(gameData), named, evidence, coverage);
                 app.StartAsync().GetAwaiter().GetResult();
                 string fingerprint = certificate.GetCertHashString(HashAlgorithmName.SHA256);
                 logger.Info($"NPC Editor listening on https://127.0.0.1:{port} TLS SHA256={fingerprint}.");
@@ -180,6 +184,13 @@ namespace ZoneEngine_New.Core.NpcEditor
 
                 try
                 {
+                    if (context.Features.Get<IHttpMaxRequestBodySizeFeature>() is { IsReadOnly: false } bodyLimit)
+                    {
+                        if (context.Request.Path == Route + "/loot-evidence/import")
+                            bodyLimit.MaxRequestBodySize = NpcEditorLootEvidence.MaxRequestBytes;
+                        else if (context.Request.Path == Route + "/loot-tables/save")
+                            bodyLimit.MaxRequestBodySize = 256 * 1024;
+                    }
                     await next(context);
                 }
                 catch (NpcEditorRuntimeException ex)
@@ -232,7 +243,8 @@ namespace ZoneEngine_New.Core.NpcEditor
 
         internal static void MapEditorRoutes(WebApplication app, NpcEditorRuntime runtime, NpcEditorLoot loot,
             NpcEditorEquipment equipment, NpcEditorItemBrowser itemBrowser,
-            NpcEditorStats? stats = null, NpcEditorSpawn? spawn = null)
+            NpcEditorStats? stats = null, NpcEditorSpawn? spawn = null, NpcEditorNamedLoot? named = null,
+            NpcEditorLootEvidence? evidence = null, NpcEditorLootCoverage? coverage = null)
         {
             var api = app.MapGroup(Route);
             api.MapGet("/npcs", async (string? q, HttpContext ctx) =>
@@ -286,6 +298,10 @@ namespace ZoneEngine_New.Core.NpcEditor
             });
 
             MapLootRoutes(npc, runtime, loot);
+            if (named != null && coverage != null)
+                MapNamedLootRoutes(api, npc, runtime, loot, named, coverage);
+            if (evidence != null && coverage != null)
+                MapLootEvidenceRoutes(api, npc, runtime, loot, evidence, coverage);
             MapEquipmentRoutes(npc, runtime, equipment);
             MapBehaviorRoutes(npc, runtime);
             if (stats != null)
@@ -327,7 +343,7 @@ namespace ZoneEngine_New.Core.NpcEditor
             {
                 var identity = new NpcEditorIdentity(playfieldId, identityType, instanceId, generation);
                 var snapshot = await runtime.WithNpcAsync(identity, loot.CaptureSimulation, ctx.RequestAborted);
-                return Results.Ok(loot.Simulate(snapshot, edit.Rolls, ctx.RequestAborted));
+                return Results.Ok(loot.Simulate(snapshot, edit.Rolls, ctx.RequestAborted, edit.Seed));
             }).RequireRateLimiting(SimulationRatePolicy);
         }
 

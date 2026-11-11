@@ -1,0 +1,50 @@
+<Window x:Class="AORebirth.NpcEditor.NamedLootTargetPicker"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Width="760" Height="495" MinWidth="515" MinHeight="360" ShowInTaskbar="False"
+        WindowStartupLocation="CenterOwner" Style="{StaticResource EditorWindowStyle}">
+    <Grid Margin="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <DockPanel Margin="0,0,0,8">
+            <Button x:Name="SearchButton" DockPanel.Dock="Right" Content="Find" Click="Find_Click" />
+            <StackPanel x:Name="PlayfieldField" DockPanel.Dock="Right" Orientation="Horizontal" Margin="6,0">
+                <TextBlock Text="Resource playfield" VerticalAlignment="Center" Margin="0,0,6,0" />
+                <TextBox x:Name="Playfield" Width="84" MaxLength="10" AutomationProperties.Name="Resource playfield ID" KeyDown="Query_KeyDown" />
+            </StackPanel>
+            <TextBox x:Name="Query" MaxLength="128" AutomationProperties.Name="Template name or hash" KeyDown="Query_KeyDown" />
+        </DockPanel>
+        <DataGrid Grid.Row="1" x:Name="Templates" SelectionChanged="Row_SelectionChanged">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Template" Binding="{Binding Name}" Width="*" />
+                <DataGridTextColumn Header="Hash" Binding="{Binding Hash}" Width="*" />
+                <DataGridTextColumn Header="Band" Binding="{Binding BandIndex}" Width="60" />
+                <DataGridTextColumn Header="Level" Binding="{Binding Level}" Width="65" />
+                <DataGridCheckBoxColumn Header="Boss" Binding="{Binding IsBoss, Mode=OneWay}" Width="65" />
+            </DataGrid.Columns>
+        </DataGrid>
+        <DataGrid Grid.Row="1" x:Name="Spawns" SelectionChanged="Row_SelectionChanged">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="Playfield" Binding="{Binding PlayfieldId}" Width="80" />
+                <DataGridTextColumn Header="Authored point" Binding="{Binding AuthoredIndex}" Width="105" />
+                <DataGridTextColumn Header="Template hash" Binding="{Binding Hash}" Width="*" />
+                <DataGridTextColumn Header="Min level" Binding="{Binding MinimumLevel}" Width="90" />
+                <DataGridTextColumn Header="Max level" Binding="{Binding MaximumLevel}" Width="90" />
+            </DataGrid.Columns>
+        </DataGrid>
+        <StackPanel Grid.Row="2" Margin="0,8,0,0">
+            <TextBlock x:Name="TargetStatus" Style="{StaticResource Caption}" Margin="0,0,0,6" />
+            <DockPanel LastChildFill="False">
+                <Button DockPanel.Dock="Right" Content="Cancel" IsCancel="True" Margin="0" />
+                <Button DockPanel.Dock="Right" x:Name="Choose" Content="Use selected target" Click="Choose_Click" />
+                <StackPanel x:Name="FamilyField" Orientation="Horizontal">
+                    <TextBlock Text="Verified family" VerticalAlignment="Center" Margin="0,0,6,0" />
+                    <ComboBox x:Name="Families" Width="150" SelectionChanged="Family_SelectionChanged" AutomationProperties.Name="Verified family" />
+                </StackPanel>
+            </DockPanel>
+        </StackPanel>
+    </Grid>
+</Window>

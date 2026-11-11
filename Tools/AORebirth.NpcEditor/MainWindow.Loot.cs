@@ -29,6 +29,9 @@ public partial class MainWindow
             RenderLoot(null);
             EffectiveLootStatus.Text = DescribeError(ex);
         }
+        namedEffective = null;
+        if (LootTabs.SelectedItem == NamedEffectiveTab)
+            await LoadNamedEffectiveAsync(identity);
     }
 
     private void ClearLoot()
@@ -36,8 +39,8 @@ public partial class MainWindow
         lootDraft = null;
         RenderLoot(null);
         SetLootDraft(null);
-        LootSimulationGrid.ItemsSource = null;
-        LootSimulationStatus.Text = "Simulated frequencies use the current live loot definition. No corpse or persistent item is created.";
+        RenderNamedEffective(null);
+        ClearLootSimulation("Simulations use the selected NPC’s current loot inputs without creating a corpse or item.");
     }
 
     private void RenderLoot(LootDetail? view)
@@ -74,7 +77,7 @@ public partial class MainWindow
     private static LootRow? FindLootRow(LootRow[]? rows, LootRowKey? key) =>
         key == null ? null : rows?.FirstOrDefault(row => row.Edit == key);
 
-    private void LootTab_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    private async void LootTab_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (!IsLoaded || e.Source != LootTabs)
             return;
@@ -88,6 +91,8 @@ public partial class MainWindow
             ShowLootRow(SelectedLootRow);
         }
         RefreshControls();
+        if (LootTabs.SelectedItem == NamedEffectiveTab && namedEffective == null && detail?.Npc.Identity is { } identity)
+            await RunAsync(() => LoadNamedEffectiveAsync(identity));
     }
 
     private void LootRow_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -299,6 +304,16 @@ public partial class MainWindow
             Status.Text = "Enter a simulation count from 1 to 10,000.";
             return;
         }
+        int? seed = null;
+        if (LootSeed.Text.Trim().Length > 0)
+        {
+            if (!int.TryParse(LootSeed.Text, NumberStyles.Integer, CultureInfo.InvariantCulture, out int parsedSeed))
+            {
+                Status.Text = "Enter a whole-number seed or leave it blank.";
+                return;
+            }
+            seed = parsedSeed;
+        }
 
         string path = detail.Npc.Identity.Path;
         await RunAsync(async () =>
@@ -306,11 +321,14 @@ public partial class MainWindow
             ClearLootSimulation($"Simulating {rolls:N0} corpses…");
             try
             {
-                LootSimulation result = await Api.PostAsync<LootSimulation>(path + "/loot/simulate", new { rolls },
+                LootSimulation result = await Api.PostAsync<LootSimulation>(path + "/loot/simulate", new { rolls, seed },
                     TimeSpan.FromSeconds(45));
                 LootSimulationGrid.ItemsSource = result.Items;
+                LootSimulationGroups.ItemsSource = result.Groups;
+                LootSimulationGroups.SelectedIndex = result.Groups is { Length: > 0 } ? 0 : -1;
                 LootSimulationStatus.Text = $"{result.Rolls:N0} simulated corpses · {result.AverageItemsPerCorpse:F2} items/corpse · "
-                    + $"{result.EmptyCorpses:N0} empty ({result.EmptyPercent:F2}%). Observed simulation frequencies are shown below.";
+                    + $"{result.EmptyCorpses:N0} empty ({result.EmptyPercent:F2}%)."
+                    + (result.Seed is int actualSeed ? $" Seed {actualSeed}." : "");
             }
             catch
             {
@@ -323,7 +341,15 @@ public partial class MainWindow
     private void ClearLootSimulation(string message)
     {
         LootSimulationGrid.ItemsSource = null;
+        LootSimulationGroups.ItemsSource = null;
+        LootSimulationEntries.ItemsSource = null;
         LootSimulationStatus.Text = message;
+    }
+
+    private void SimulationGroup_SelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (IsLoaded)
+            LootSimulationEntries.ItemsSource = (LootSimulationGroups.SelectedItem as LootSimulationGroup)?.Entries;
     }
 
     private void RefreshLootControls()

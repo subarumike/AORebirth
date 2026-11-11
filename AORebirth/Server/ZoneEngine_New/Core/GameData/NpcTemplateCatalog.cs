@@ -407,7 +407,7 @@ namespace ZoneEngine_New.Core.GameData
                 TemplateId = nearest.TemplateId,
                 HasHeadMesh = nearest.HasHeadMesh,
                 Stats = stats,
-                Features = ResolveFeatures(ruleFeatures, stats, isFallback),
+                Features = ResolveFeatures(ruleFeatures, stats.TryGetValue((int)CharacterStat.Flags, out int flags) ? flags : null, isFallback),
                 MinLevel = min,
                 MaxLevel = max,
                 UnresolvedPlaceholder = isFallback,
@@ -423,10 +423,11 @@ namespace ZoneEngine_New.Core.GameData
         /// The hash's features from MonsterCombatRules.json. The unresolved placeholder and blue-named NPCs (friendly,
         /// non-combat) are always NoCombat, and a template with the <see cref="BossTemplateFlag"/> Flags bit is a Boss.
         /// </summary>
-        static HashSet<NpcFeature> ResolveFeatures(IReadOnlyCollection<NpcFeature>? ruleFeatures, Dictionary<int, int> stats, bool isFallback)
+        static HashSet<NpcFeature> ResolveFeatures(IReadOnlyCollection<NpcFeature>? ruleFeatures, int? rawFlags, bool isFallback)
         {
             var features = new HashSet<NpcFeature>(ruleFeatures ?? Array.Empty<NpcFeature>());
-            bool hasFlags = stats.TryGetValue((int)CharacterStat.Flags, out int flags) && !Entities.StatCollection.IsUnset(flags);
+            int flags = rawFlags.GetValueOrDefault();
+            bool hasFlags = rawFlags.HasValue && !Entities.StatCollection.IsUnset(flags);
             if (isFallback || (hasFlags && Helpers.CombatRules.IsBlueNameNpc(flags)))
                 features.Add(NpcFeature.NoCombat);
             if (!isFallback && hasFlags && (flags & BossTemplateFlag) != 0)

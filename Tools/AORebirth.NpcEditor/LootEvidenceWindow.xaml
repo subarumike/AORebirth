@@ -1,0 +1,129 @@
+<Window x:Class="AORebirth.NpcEditor.LootEvidenceWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Loot evidence and coverage" Width="1150" Height="690" MinWidth="820" MinHeight="530"
+        ShowInTaskbar="False" WindowStartupLocation="CenterOwner" Style="{StaticResource EditorWindowStyle}">
+    <Grid Margin="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TabControl x:Name="Views">
+            <TabItem Header="Evidence">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <StackPanel>
+                        <WrapPanel Margin="0,0,0,6">
+                            <TextBox x:Name="CaptureSource" Width="240" MaxLength="128" Margin="0,0,6,0"
+                                     ToolTip="Stable capture label or source ID" AutomationProperties.Name="Capture source label" />
+                            <Button x:Name="ImportEvidence" Content="Import capture file…" Click="ImportEvidence_Click" />
+                            <TextBlock Style="{StaticResource Caption}" VerticalAlignment="Center" Text="Use the same capture label when reimporting." />
+                        </WrapPanel>
+                        <WrapPanel Margin="0,0,0,6">
+                            <TextBox x:Name="EvidenceQuery" Width="220" MaxLength="128" Margin="0,0,6,0"
+                                     ToolTip="NPC, template, item ID, or capture source" AutomationProperties.Name="Evidence search" />
+                            <ComboBox x:Name="EvidenceClass" Width="225" Margin="0,0,6,0" ItemTemplate="{StaticResource EditorOptionLabel}"
+                                      AutomationProperties.Name="Evidence classification" />
+                            <ComboBox x:Name="EvidenceDecision" Width="125" Margin="0,0,6,0" ItemTemplate="{StaticResource EditorOptionLabel}"
+                                      AutomationProperties.Name="Review status" />
+                            <Button Content="Find observations" Click="FindEvidence_Click" />
+                        </WrapPanel>
+                    </StackPanel>
+                    <DataGrid x:Name="EvidenceGrid" Grid.Row="1" SelectionChanged="EvidenceSelection_Changed">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="NPC" Binding="{Binding EnemyName}" Width="1.5*" />
+                            <DataGridTextColumn Header="PF" Binding="{Binding PlayfieldId}" Width="75" />
+                            <DataGridTextColumn Header="Low ID" Binding="{Binding LowId}" Width="85" />
+                            <DataGridTextColumn Header="High ID" Binding="{Binding HighId}" Width="85" />
+                            <DataGridTextColumn Header="QL" Binding="{Binding Quality}" Width="55" />
+                            <DataGridTextColumn Header="Classification" Binding="{Binding Classification}" Width="2*" />
+                            <DataGridTextColumn Header="Capture source" Binding="{Binding CaptureSource}" Width="1.5*" />
+                            <DataGridTextColumn Header="Review" Binding="{Binding Review}" Width="95" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <TextBox x:Name="EvidenceDetail" Grid.Row="2" IsReadOnly="True" Height="72" TextWrapping="Wrap"
+                             VerticalScrollBarVisibility="Auto" Margin="0,6,0,6" AutomationProperties.Name="Observation provenance" />
+                    <WrapPanel Grid.Row="3">
+                        <Button x:Name="EvidencePrevious" Content="Previous" Click="EvidencePrevious_Click" />
+                        <Button x:Name="EvidenceNext" Content="Next" Click="EvidenceNext_Click" />
+                        <Button x:Name="ApproveEvidence" Content="Approve observation" Click="ApproveEvidence_Click" />
+                        <Button x:Name="RejectEvidence" Content="Reject observation" Click="RejectEvidence_Click" />
+                        <TextBlock x:Name="EvidenceCount" Style="{StaticResource Caption}" VerticalAlignment="Center" />
+                    </WrapPanel>
+                </Grid>
+            </TabItem>
+            <TabItem x:Name="ComparisonTab" Header="Selected NPC comparison">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <DockPanel Margin="0,0,0,6">
+                        <Button DockPanel.Dock="Right" Content="Compare selected NPC" Click="Compare_Click" />
+                        <TextBlock x:Name="ComparisonNote" Style="{StaticResource Caption}" VerticalAlignment="Center" />
+                    </DockPanel>
+                    <DataGrid x:Name="ComparisonGrid" Grid.Row="1">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="2*" />
+                            <DataGridTextColumn Header="Item" Binding="{Binding Item}" Width="2*" />
+                            <DataGridTextColumn Header="Low ID" Binding="{Binding LowId}" Width="80" />
+                            <DataGridTextColumn Header="High ID" Binding="{Binding HighId}" Width="80" />
+                            <DataGridTextColumn Header="QL" Binding="{Binding Quality}" Width="50" />
+                            <DataGridTextColumn Header="Capture source" Binding="{Binding CaptureSource}" Width="*" />
+                            <DataGridTextColumn Header="Details" Binding="{Binding Detail}" Width="3*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Coverage">
+                <Grid Margin="10">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Margin="0,0,0,6">
+                        <WrapPanel Margin="0,0,0,5">
+                            <TextBox x:Name="CoverageQuery" Width="185" MaxLength="128" Margin="0,0,6,0" ToolTip="Search coverage" AutomationProperties.Name="Coverage search" />
+                            <TextBox x:Name="CoveragePlayfield" Width="92" MaxLength="10" Margin="0,0,6,0" ToolTip="Resource playfield ID" AutomationProperties.Name="Resource playfield ID" />
+                            <TextBox x:Name="CoverageFamily" Width="100" MaxLength="64" Margin="0,0,6,0" ToolTip="Family hash" AutomationProperties.Name="Family hash" />
+                            <TextBox x:Name="CoverageMinLevel" Width="50" MaxLength="5" Margin="0,0,6,0" ToolTip="Minimum level" AutomationProperties.Name="Minimum level" />
+                            <TextBox x:Name="CoverageMaxLevel" Width="50" MaxLength="5" Margin="0,0,6,0" ToolTip="Maximum level" AutomationProperties.Name="Maximum level" />
+                            <ComboBox x:Name="CoverageBoss" Width="135" Margin="0,0,6,0" ItemTemplate="{StaticResource EditorOptionLabel}" AutomationProperties.Name="Boss classification" />
+                            <ComboBox x:Name="CoverageCategory" Width="155" Margin="0,0,6,0" ItemTemplate="{StaticResource EditorOptionLabel}" AutomationProperties.Name="Table category" />
+                            <ComboBox x:Name="CoverageStatus" Width="190" Margin="0,0,6,0" ItemTemplate="{StaticResource EditorOptionLabel}" AutomationProperties.Name="Coverage status" />
+                            <Button Content="Scan coverage" Click="FindCoverage_Click" />
+                        </WrapPanel>
+                        <TextBlock x:Name="CoverageNote" Style="{StaticResource Caption}" />
+                    </StackPanel>
+                    <DataGrid x:Name="CoverageGrid" Grid.Row="1">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Kind" Binding="{Binding Kind}" Width="120" />
+                            <DataGridTextColumn Header="Name" Binding="{Binding Name}" Width="2*" />
+                            <DataGridTextColumn Header="PF" Binding="{Binding PlayfieldId}" Width="70" />
+                            <DataGridTextColumn Header="Level" Binding="{Binding Level}" Width="55" />
+                            <DataGridTextColumn Header="Boss" Binding="{Binding Boss}" Width="95" />
+                            <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="2*" />
+                            <DataGridTextColumn Header="Details" Binding="{Binding Detail}" Width="3*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <WrapPanel Grid.Row="2" Margin="0,6,0,0">
+                        <Button x:Name="CoveragePrevious" Content="Previous" Click="CoveragePrevious_Click" />
+                        <Button x:Name="CoverageNext" Content="Next" Click="CoverageNext_Click" />
+                        <Button x:Name="ExportCoverage" Content="Export filtered CSV or JSON…" Click="ExportCoverage_Click" />
+                        <TextBlock x:Name="CoverageCount" Style="{StaticResource Caption}" VerticalAlignment="Center" />
+                    </WrapPanel>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <DockPanel Grid.Row="1" Margin="0,10,0,0">
+            <Button DockPanel.Dock="Right" IsCancel="True" Content="Close" />
+            <TextBlock x:Name="Status" Style="{StaticResource Caption}" VerticalAlignment="Center" />
+        </DockPanel>
+    </Grid>
+</Window>

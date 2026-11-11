@@ -90,15 +90,22 @@ internal sealed record SavedLootState(string TemplateHash, bool CanSave, int Rev
     LootHistoryRow[] History, string? UnavailableReason, string? Definition, int? EstimatedAffectedNpcs);
 
 internal sealed record LootSimulation(int Rolls, int EmptyCorpses, double EmptyPercent, double AverageItemsPerCorpse,
-    LootSimulationItem[] Items);
+    LootSimulationItem[] Items, int? Seed, LootSimulationGroup[]? Groups);
 
 internal sealed record LootSimulationItem(int LowId, int HighId, string Name, int TotalDrops, int CorpsesWithItem,
-    double CorpseFrequencyPercent, LootQualityCount[] Qualities)
+    double CorpseFrequencyPercent, LootQualityCount[] Qualities, double? AverageQuantity)
 {
     public string QualityDistribution => string.Join(", ", Qualities.Select(row => $"{row.Quality} × {row.Count}"));
 }
 
 internal sealed record LootQualityCount(int Quality, int Count);
+
+internal sealed record LootSimulationGroup(string QualifiedId, string TableId, string AssignmentId, string GroupId,
+    int EntriesSelected, int EmptySelections, int ItemsGenerated, int Ineligible, int ChanceMisses, int CapacitySkips,
+    LootSimulationEntry[] Entries);
+
+internal sealed record LootSimulationEntry(string EntryId, int Selections, int ItemsGenerated,
+    bool InitiallyEligible, double? InitialConditionalPercent);
 
 internal sealed record EquipmentEdit(int Slot, int ExpectedInstanceId, int? ItemId, int? Quality);
 

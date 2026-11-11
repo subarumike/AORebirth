@@ -356,6 +356,24 @@ namespace ZoneEngine_New.Core.Inventory
             return family.Special || (family.Min <= quality && quality <= family.Max);
         }
 
+        internal bool TryGetNamedLootQualityWindow(int lowId, int highId, int minQuality, int maxQuality, out int min, out int max)
+            => TryGetNamedLootQualityWindow(_gameData, _catalog, lowId, highId, minQuality, maxQuality, out min, out max);
+
+        /// <summary>Named outcomes require real catalog endpoints and a known native pairing before interpolation.</summary>
+        internal static bool TryGetNamedLootQualityWindow(IGameData gameData, IItemTemplateCatalog catalog,
+            int lowId, int highId, int minQuality, int maxQuality, out int min, out int max)
+        {
+            min = 0;
+            max = 0;
+            if (!catalog.TryGet(lowId, out ItemTemplate low) || !catalog.TryGet(highId, out ItemTemplate high)
+                || low.Quality < 1 || high.Quality < low.Quality
+                || (lowId != highId && !gameData.TryGetAssignedItemHash(lowId, highId, out _)))
+                return false;
+            min = Math.Max(minQuality, low.Quality);
+            max = Math.Min(maxQuality, high.Quality);
+            return min <= max;
+        }
+
         public Item CreateWithNewInstance(int lowId, int highId, int quality, ItemSource source)
             => _items.CreateWithNewInstance(lowId, highId, quality, source);
 

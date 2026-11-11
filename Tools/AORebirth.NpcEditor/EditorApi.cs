@@ -55,8 +55,8 @@ internal sealed class EditorApi : IDisposable
         await EnsureSuccessAsync(response);
     }
 
-    public Task<T> GetAsync<T>(string path, CancellationToken cancellationToken = default) where T : class =>
-        SendAsync<T>(HttpMethod.Get, path, null, cancellationToken);
+    public Task<T> GetAsync<T>(string path, CancellationToken cancellationToken = default, TimeSpan? timeout = null) where T : class =>
+        SendAsync<T>(HttpMethod.Get, path, null, cancellationToken, timeout);
 
     public Task<T> PostAsync<T>(string path, object body, TimeSpan? timeout = null) where T : class =>
         SendAsync<T>(HttpMethod.Post, path, body, timeout: timeout);

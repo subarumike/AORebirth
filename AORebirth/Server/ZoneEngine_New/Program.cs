@@ -93,6 +93,8 @@ namespace ZoneEngine_New
                 rootServices = BuildRootServices();
                 IZoneLogger logger = rootServices.GetRequiredService<IZoneLogger>();
                 IGameData gameData = rootServices.GetRequiredService<IGameData>();
+                if (gameData is GameDataStore store)
+                    store.InitializeNamedLoot(rootServices.GetRequiredService<IItemTemplateCatalog>());
                 DestinationsCatalog.Instance.ConfigureRoot(gameData.RootPath);
                 LogLocalityStartup();
                 logger.Info(

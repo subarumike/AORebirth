@@ -30,24 +30,23 @@ namespace ZoneEngine_New.Core.Entities
             ArgumentNullException.ThrowIfNull(minter);
             ArgumentNullException.ThrowIfNull(into);
 
-            int start = into.Count;
+            Roll(ReadInputs(equipment), minter, capacity, qualityVariancePercent, into, null);
+        }
+
+        internal static IEnumerable<(string Hash, int Quality)> ReadInputs(IEnumerable<Item> equipment)
+        {
             foreach (Item item in equipment)
             {
                 foreach (ItemSpell spell in SpawnFunctions(item))
                 {
-                    if (into.Count - start >= capacity)
-                        return;
-
-                    if (!TryReadSpawn(spell, out string hash, out int quality))
-                        continue;
-
-                    RollSpawn(hash, quality, minter, qualityVariancePercent, into, null);
+                    if (TryReadSpawn(spell, out string hash, out int quality))
+                        yield return (hash, quality);
                 }
             }
         }
 
         internal static void Roll(IEnumerable<(string Hash, int Quality)> inputs, HashItemMinter minter,
-            int capacity, int variance, List<(int LowId, int HighId, int Quality)> into, Random random)
+            int capacity, int variance, List<(int LowId, int HighId, int Quality)> into, Random? random)
         {
             int start = into.Count;
             foreach ((string hash, int quality) in inputs)

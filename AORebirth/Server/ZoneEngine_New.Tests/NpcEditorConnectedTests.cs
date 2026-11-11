@@ -101,9 +101,12 @@ public sealed class NpcEditorConnectedTests
             var sessions = new NpcEditorSessions(_ => account, TimeProvider.System, 1, 100, true, true);
             using var certificate = NpcEditorHost.CreateCertificate();
             await using var app = NpcEditorHost.Build(0, certificate, sessions, logger);
+            var namedLoot = new NpcEditorNamedLoot(data, catalog);
+            var lootEvidence = new NpcEditorLootEvidence(root, overlay, logger);
             NpcEditorHost.MapEditorRoutes(app, new NpcEditorRuntime(world, data), new NpcEditorLoot(data, catalog, minter),
                 new NpcEditorEquipment(data, catalog), new NpcEditorItemBrowser(catalog, data),
-                new NpcEditorStats(data), new NpcEditorSpawn(data));
+                new NpcEditorStats(data), new NpcEditorSpawn(data), namedLoot, lootEvidence,
+                new NpcEditorLootCoverage(data, catalog, namedLoot, lootEvidence));
             await app.StartAsync(ct);
             byte[] fingerprint = certificate.GetCertHash(HashAlgorithmName.SHA256);
             using var http = new HttpClient(new HttpClientHandler
@@ -386,8 +389,68 @@ public sealed class NpcEditorConnectedTests
         Assert.AreEqual(0, (await ReadPoint(2)).Revision);
         Assert.AreEqual(authored, File.ReadAllText(source));
 
+        await VerifyNamedLootAssignment(http, actor, targets[0], targets[1], await ReadPoint(0), logger, ct);
+
         async Task<NpcEditorSpawnView> ReadPoint(int index)
             => (await http.GetFromJsonAsync<NpcEditorSpawnView>(pointsPath + "/" + index, ct))!;
+    }
+
+    static async Task VerifyNamedLootAssignment(HttpClient http, string actor, NpcEditorIdentity selected,
+        NpcEditorIdentity neighbor, NpcEditorSpawnView point, ConnectedLogger logger, CancellationToken ct)
+    {
+        const string tables = "/npc-editor/loot-tables";
+        var table = new NamedLootTable("connected-table", "Connected named loot", "Fixture-only authored loot", "ordinaryNpc",
+            [new NamedLootGroup("guaranteed", "GUARANTEED_ALL", 1, 10_000, 0, null,
+                [new NamedLootEntry("item", DropId, DropId, Quality, Quality, false, 1, 1, 10_000, 0, false)])]);
+        var saved = await Post<NamedLootRegistryState>(http, tables + "/save", new NamedLootTableSave(0, table), ct, logger);
+        Assert.AreEqual(1, saved.Revision);
+        Assert.AreEqual(actor, saved.History.Single().Actor);
+        Assert.AreEqual(table.Id, saved.Tables.Single().Id);
+
+        var targets = (await http.GetFromJsonAsync<LootTargets>(tables + "/targets?playfieldId=" + point.ResourcePlayfieldId, ct))!;
+        LootTargetSpawn exact = targets.Spawns.Single(spawn => spawn.AuthoredIndex == point.AuthoredIndex);
+        Assert.AreEqual(point.AuthoredSignature, exact.AuthoredSignature);
+        var assignment = new NamedLootAssignment("connected-placement", "authoredPoint", 0, "append", table.Id,
+            PlayfieldId: exact.PlayfieldId, AuthoredIndex: exact.AuthoredIndex, AuthoredSignature: exact.AuthoredSignature);
+        var edit = new NamedLootAssignmentSave(saved.Revision, assignment);
+        using (HttpResponseMessage previewResponse = await http.PostAsJsonAsync(tables + "/assignments/preview", edit, ct))
+        {
+            Assert.IsTrue(previewResponse.IsSuccessStatusCode, await previewResponse.Content.ReadAsStringAsync(ct));
+            JsonElement preview = await previewResponse.Content.ReadFromJsonAsync<JsonElement>(cancellationToken: ct);
+            Assert.AreEqual(1, preview.GetProperty("loadedMatches").GetInt32());
+        }
+        Assert.AreEqual(0, (await http.GetFromJsonAsync<NamedLootRegistryState>(tables, ct))!.Assignments.Length);
+
+        var assigned = await Post<NamedLootRegistryState>(http, tables + "/assignments/save", edit, ct, logger);
+        Assert.AreEqual(2, assigned.Revision);
+        Assert.AreEqual(assignment, assigned.Assignments.Single());
+        var selectedLoot = (await http.GetFromJsonAsync<NpcEditorEffectiveLootView>(NpcPath(selected) + "/loot/effective", ct))!;
+        var neighborLoot = (await http.GetFromJsonAsync<NpcEditorEffectiveLootView>(NpcPath(neighbor) + "/loot/effective", ct))!;
+        Assert.AreEqual(assignment.Id, selectedLoot.Resolution.Groups.Single().AssignmentId);
+        Assert.AreEqual(exact.AuthoredIndex, selectedLoot.Resolution.Context.AuthoredIndex);
+        Assert.AreEqual(DropId, selectedLoot.Candidates.Single(candidate => candidate.Eligible).LowId);
+        Assert.AreEqual(0, neighborLoot.Resolution.Groups.Length);
+
+        var simulation = await Post<NpcEditorLootSimulationResult>(http, NpcPath(selected) + "/loot/simulate",
+            new NpcEditorLootSimulationRequest(24, 713), ct, logger);
+        Assert.AreEqual(713, simulation.Seed);
+        Assert.AreEqual(24, simulation.Groups.Single().ItemsGenerated);
+
+        using HttpResponseMessage stale = await http.PostAsJsonAsync(tables + "/save",
+            new NamedLootTableSave(saved.Revision, table), ct);
+        Assert.AreEqual(HttpStatusCode.Conflict, stale.StatusCode);
+        using HttpResponseMessage referenced = await http.PostAsJsonAsync(tables + "/delete",
+            new NamedLootDelete(assigned.Revision, table.Id), ct);
+        Assert.AreEqual(HttpStatusCode.Conflict, referenced.StatusCode);
+
+        var restored = await Post<NamedLootRegistryState>(http, tables + "/restore",
+            new NamedLootRestore(assigned.Revision, saved.Revision), ct, logger);
+        Assert.AreEqual(3, restored.Revision);
+        Assert.AreEqual("restore", restored.History[^1].Action);
+        Assert.AreEqual(table.Id, restored.Tables.Single().Id);
+        Assert.AreEqual(0, restored.Assignments.Length);
+        var afterRestore = (await http.GetFromJsonAsync<NpcEditorEffectiveLootView>(NpcPath(selected) + "/loot/effective", ct))!;
+        Assert.AreEqual(0, afterRestore.Resolution.Groups.Length);
     }
 
     static async Task<T> Post<T>(HttpClient http, string path, object body, CancellationToken ct, ConnectedLogger? logger = null) where T : class

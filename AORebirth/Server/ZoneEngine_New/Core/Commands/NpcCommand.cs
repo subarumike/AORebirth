@@ -652,6 +652,10 @@ namespace ZoneEngine_New.Core.Commands
             int level = npc.Stats.GetOrOne(CharacterStat.Level);
             int variance = npc.Playfield?.GetService<Configuration.GameplaySettings>()?.Loot.QualityVariancePercent
                 ?? new Configuration.GameplayLoot().QualityVariancePercent;
+            (string Hash, int Quality)[] equipment = EquipmentLoot.ReadInputs(npc.Equipment.Content.Values).ToArray();
+            (int LowId, int HighId, int Quality)[] carried = npc.InspectCarriedLoot()
+                .Take(Corpse.LootCapacity).Select(item => (item.LowId, item.HighId, item.Quality)).ToArray();
+            NamedLootResolution? named = (_gameData as GameDataStore)?.ResolveNamedLoot(npc);
             var drops = new Dictionary<(int LowId, int HighId, int Quality), int>();
             var rolled = new List<(int LowId, int HighId, int Quality)>();
             int emptyCorpses = 0;
@@ -659,9 +663,9 @@ namespace ZoneEngine_New.Core.Commands
             for (int roll = 0; roll < rolls; roll++)
             {
                 rolled.Clear();
-                // The corpse's own order: what the equipment spawns first, then the item table into what is left.
-                EquipmentLoot.Roll(npc.Equipment.Content.Values, _minter, Corpse.LootCapacity, variance, rolled);
-                LootableDynel.RollItemTable(npc.ActiveLootTable, level, _minter, Corpse.LootCapacity - rolled.Count, variance, rolled);
+                rolled.AddRange(carried);
+                LootableDynel.RollLoot(npc.ActiveLootTable, level, equipment, named, carried, _minter,
+                    Corpse.LootCapacity - rolled.Count, variance, rolled);
                 if (rolled.Count == 0)
                     emptyCorpses++;
                 totalItems += rolled.Count;

@@ -1,7 +1,8 @@
 # AORebirth NPC Editor
 
 The standalone WPF editor connects to a local `ZoneEngine_New` built from this
-branch. It works with manual NPC selection. The optional [AOSharp target bridge](../AORebirth.NpcEditor.AOSharp/README.md)
+branch. It works with manual NPC selection. Named loot and coverage can be
+managed with the local server running and no AO client open. The optional [AOSharp target bridge](../AORebirth.NpcEditor.AOSharp/README.md)
 adds selection following for an AO client connected to the same local server.
 
 ## Build and launch on Windows
@@ -128,6 +129,72 @@ loot resolver uses authored hash groups and independent per-row chances.
 The override folder is a local development input. Moving approved changes into
 canonical GameData requires the existing private content review and intake
 workflow.
+
+## Named loot
+
+Open **Named loot** from the NPC browser to create, copy, edit or delete a table,
+or edit its assignments. Tables have stable IDs, display metadata, provenance
+and ordered groups. Use the RDB picker to add an item at its native QL or choose
+a low/high pair from the same registered family. The quality window is limited
+to those endpoints. Level-based quality clamps the NPC level within the window.
+Quantities consume one corpse slot per generated item.
+
+- **Independent** evaluates each eligible entry's chance on each group roll.
+- **Weighted one** selects one eligible outcome. **Weighted many** repeats
+  weighted selection. Empty weight adds an explicit no-item outcome.
+- **Guaranteed all** emits every eligible entry on each group roll after group
+  activation. Entry and group conditions can restrict level, resource playfield
+  and boss status. Unique entries share the corpse's exact item-pair limit.
+
+Assignment precedence runs from global to family, exact template, template
+band, resource playfield, boss template and exact authored point. Lower
+priorities within a scope are processed first. An assignment can append a
+table, replace an inherited named group or suppress it. The editor rejects
+ambiguous replacements, duplicate overlapping appends and deletion of referenced
+tables. The assignment preview shows the selected stable definition and loaded
+matches. Use **Effective loot** on a selected NPC to inspect the same resolver
+trace used by native corpse generation.
+
+Existing carried items, equipment loot and ordinary item table rows retain
+their order. Named groups fill the remaining slots in the same 20-slot corpse.
+Named replacement and suppression affect named groups. Existing template-band
+controls manage ordinary rows. A corpse resolves its loot once at death.
+Simulation takes an optional seed and returns per-item and named-group outcomes
+without allocating items. Weight and initial conditional selection chance are
+separate from observed per-corpse frequency.
+
+The `NpcEditorNamedLoot.json` overlay stores atomic registry revisions, GM
+attribution and restore history. No migration is required for existing loot.
+The active runtime identifies boss templates through its existing boss feature.
+Use a verified authored point to give a particular placement special loot.
+Dyna, dungeon, mission, raid, quest and event table categories are available
+for organization. Dedicated Dyna, mission-instance, encounter and event
+assignment scopes require authoritative runtime identities.
+
+## Loot evidence and coverage
+
+Open **Loot evidence** to stage a decoded AOSharp
+`corpse-loot-observations.csv`, the decoded packet export
+`loot_drop_observations.csv`, or a JSON array of observations. A single import
+accepts up to 256 KiB and 2,000 item observations. Use a stable capture label
+when reimporting. The JSON fields include `enemyName`, `enemyIdentity`,
+`playfieldId`, `monsterData`, `templateHash`, `level`, `lowId`, `highId`,
+`quality`, `observationCount`, `capturedUtc`, `classification`, `patch`
+and `sourceRow`. Provide patch attribution only where the source supports it.
+
+The separate `NpcEditorLootEvidence.json` overlay records capture provenance
+and GM review. Linked initial corpse observations support availability only.
+Unlinked records stay unresolved. Imported guarantee claims remain unresolved
+with the original claim preserved. Approval records review of the observation.
+It creates no loot entries or assignments.
+
+**Selected NPC comparison** distinguishes exact template observations, possible
+name/MonsterData matches, unresolved item IDs, and configured candidates with
+missing supporting evidence. **Coverage** scans catalog bands, authored spawn
+points, named assignments and staged observations. Placement results use
+representative levels for the applicable bands. Use the filters and export up
+to 10,000 matching rows to CSV or JSON. A missing observation or unconfigured
+row is a review finding. The report does not estimate retail completeness.
 
 ## Focused validation
 

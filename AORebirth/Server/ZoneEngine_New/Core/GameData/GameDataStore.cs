@@ -93,6 +93,7 @@ namespace ZoneEngine_New.Core.GameData
             _editorLootFile = new NpcEditorLootJournalFile(RootPath, editorLootOverrideRoot);
             _editorEquipmentFile = new NpcEditorEquipmentJournalFile(RootPath, editorLootOverrideRoot);
             _editorStatsFile = new NpcEditorStatsJournalFile(RootPath, editorLootOverrideRoot);
+            _namedLootFile = new NamedLootJournalFile(RootPath, editorLootOverrideRoot);
 
             EnsureRootExists();
             RespawnContent = RespawnContentCatalog.Load(RootPath);
@@ -560,6 +561,8 @@ namespace ZoneEngine_New.Core.GameData
                     _npcTemplates = WithLoadedEditorStats(
                         WithLoadedEditorEquipment(loaded.WithEditorLoot(_editorLootFile.Read(loaded, IsEditorLootItem))));
                     _loadedNpcTemplates = true;
+                    if (ReloadNamedLoot() is string namedLootError)
+                        return new(name, false, _npcTemplates.LeafCount, [namedLootError]);
                     if (_npcTemplates.EditorEquipment.LoadError is string equipmentError)
                         return new(name, false, _npcTemplates.LeafCount, [equipmentError]);
                     if (_npcTemplates.EditorStats.LoadError is string statError)

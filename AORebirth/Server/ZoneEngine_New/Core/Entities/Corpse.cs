@@ -72,6 +72,7 @@ namespace ZoneEngine_New.Core.Entities
             if (dead is NpcCharacter npc)
             {
                 ItemTable = npc.ActiveLootTable;
+                NamedLoot = (gameData as GameDataStore)?.ResolveNamedLoot(npc);
                 CarriedItems = npc.TakeCarriedLoot();
                 LootEquipment = new List<Inventory.Item>(npc.Equipment.Content.Values);
                 CorpseFullUpdateTemplate = CopyCorpseFullUpdateTemplate(npc.MobTemplate?.CorpseFullUpdateTemplate);
@@ -102,6 +103,7 @@ namespace ZoneEngine_New.Core.Entities
         public void ForfeitSpoils()
         {
             ItemTable = null;
+            NamedLoot = null;
             LootEquipment = null;
             SourceStats[CharacterStat.Cash] = 0;
         }

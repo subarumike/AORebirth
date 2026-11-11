@@ -84,6 +84,7 @@
                         <TextBlock x:Name="BatchSelectionStatus" Style="{StaticResource Caption}" Margin="0,3,0,0" />
                     </StackPanel>
                     <TextBlock x:Name="BridgeStatus" Style="{StaticResource Caption}" Text="Manual selection" />
+                    <Button Content="Named loot…" Click="BrowseNamedLoot_Click" HorizontalAlignment="Left" Margin="0,6,0,0" />
                 </StackPanel>
                 <DataGrid Grid.Row="2" x:Name="NpcGrid" SelectionChanged="Npc_SelectionChanged">
                     <DataGrid.Columns>
@@ -101,6 +102,7 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <DockPanel LastChildFill="True" Margin="0,0,0,8">
+                    <Button DockPanel.Dock="Right" Content="Loot evidence…" Click="BrowseLootEvidence_Click" />
                     <Button DockPanel.Dock="Right" Content="Browse items…" Click="BrowseItems_Click" />
                     <Button x:Name="BrowseSpawnPoints" DockPanel.Dock="Right" Content="Spawn points…" Click="BrowseSpawnPoints_Click" />
                     <Button x:Name="RefreshDetail" DockPanel.Dock="Right" Content="Refresh NPC" Click="RefreshDetail_Click" IsEnabled="False" />
@@ -307,6 +309,57 @@
                                         </WrapPanel>
                                     </Grid>
                                 </TabItem>
+                                <TabItem x:Name="NamedEffectiveTab" Header="Resolved assignments">
+                                    <TabControl Margin="8">
+                                        <TabItem Header="Groups and candidates">
+                                            <Grid Margin="6">
+                                                <Grid.RowDefinitions>
+                                                    <RowDefinition Height="Auto" />
+                                                    <RowDefinition Height="*" />
+                                                    <RowDefinition Height="2*" />
+                                                    <RowDefinition Height="Auto" />
+                                                </Grid.RowDefinitions>
+                                                <TextBlock x:Name="NamedEffectiveStatus" Style="{StaticResource Caption}" Margin="0,0,0,6" />
+                                                <DataGrid Grid.Row="1" x:Name="EffectiveNamedGroups" SelectionChanged="EffectiveNamedGroup_SelectionChanged">
+                                                    <DataGrid.Columns>
+                                                        <DataGridTextColumn Header="Table / group" Binding="{Binding QualifiedId}" Width="*" />
+                                                        <DataGridTextColumn Header="Assignment" Binding="{Binding AssignmentId}" Width="*" />
+                                                        <DataGridTextColumn Header="Mode" Binding="{Binding Group.Mode}" Width="*" />
+                                                        <DataGridTextColumn Header="Rolls" Binding="{Binding Group.RollCount}" Width="60" />
+                                                        <DataGridTextColumn Header="Group chance (bp)" Binding="{Binding Group.ChanceBasisPoints}" Width="114" />
+                                                    </DataGrid.Columns>
+                                                </DataGrid>
+                                                <DataGrid Grid.Row="2" x:Name="EffectiveNamedCandidates" Margin="0,6,0,0"
+                                                          SelectionChanged="EffectiveNamedCandidate_SelectionChanged">
+                                                    <DataGrid.Columns>
+                                                        <DataGridTextColumn Header="Item" Binding="{Binding Name}" Width="*" />
+                                                        <DataGridTextColumn Header="Entry" Binding="{Binding EntryId}" Width="*" />
+                                                        <DataGridTextColumn Header="AOIDs" Binding="{Binding ItemIds}" Width="90" />
+                                                        <DataGridTextColumn Header="QL" Binding="{Binding QualityRange}" Width="75" />
+                                                        <DataGridTextColumn Header="Weight" Binding="{Binding Weight}" Width="64" />
+                                                        <DataGridTextColumn Header="Initial %" Binding="{Binding ConditionalProbabilityPercent, StringFormat=F2}" Width="72" />
+                                                        <DataGridCheckBoxColumn Header="Eligible" Binding="{Binding Eligible, Mode=OneWay}" Width="66" />
+                                                        <DataGridTextColumn Header="Eligibility reason" Binding="{Binding Reason}" Width="*" />
+                                                    </DataGrid.Columns>
+                                                </DataGrid>
+                                                <TextBox Grid.Row="3" x:Name="EffectiveNamedDetails" Height="66" IsReadOnly="True" Margin="0,6,0,0"
+                                                         TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AutomationProperties.Name="Selected named loot conditions and provenance" />
+                                            </Grid>
+                                        </TabItem>
+                                        <TabItem Header="Resolution trace">
+                                            <DataGrid x:Name="NamedLootTrace" Margin="6">
+                                                <DataGrid.Columns>
+                                                    <DataGridTextColumn Header="Assignment" Binding="{Binding AssignmentId}" Width="*" />
+                                                    <DataGridTextColumn Header="Scope" Binding="{Binding Scope}" Width="100" />
+                                                    <DataGridTextColumn Header="Table" Binding="{Binding TableId}" Width="*" />
+                                                    <DataGridTextColumn Header="Action" Binding="{Binding Action}" Width="85" />
+                                                    <DataGridTextColumn Header="Group" Binding="{Binding GroupId}" Width="*" />
+                                                    <DataGridTextColumn Header="Reason" Binding="{Binding Reason}" Width="2*" />
+                                                </DataGrid.Columns>
+                                            </DataGrid>
+                                        </TabItem>
+                                    </TabControl>
+                                </TabItem>
                                 <TabItem Header="Simulation">
                                     <Grid Margin="8">
                                         <Grid.RowDefinitions>
@@ -318,21 +371,57 @@
                                             <TextBlock Text="Simulated corpses" VerticalAlignment="Center" Margin="0,0,6,0" />
                                             <TextBox x:Name="LootRollCount" Text="100" Width="65" MaxLength="5" Margin="0,0,6,0"
                                                      AutomationProperties.Name="Simulation roll count" />
+                                            <TextBlock Text="Seed" VerticalAlignment="Center" Margin="6,0,6,0" />
+                                            <TextBox x:Name="LootSeed" Width="95" MaxLength="11" Margin="0,0,6,0"
+                                                     AutomationProperties.Name="Simulation seed" ToolTip="Leave blank to generate a seed" />
                                             <Button x:Name="SimulateLoot" Content="Simulate selected NPC" Click="SimulateLoot_Click" />
                                         </WrapPanel>
                                         <TextBlock x:Name="LootSimulationStatus" Grid.Row="1" Style="{StaticResource Caption}" Margin="0,6,0,6"
                                                    Text="Simulated frequencies use the current live loot definition. No corpse or persistent item is created." />
-                                        <DataGrid x:Name="LootSimulationGrid" Grid.Row="2">
-                                            <DataGrid.Columns>
-                                                <DataGridTextColumn Header="Item" Binding="{Binding Name}" Width="*" />
-                                                <DataGridTextColumn Header="Low ID" Binding="{Binding LowId}" Width="70" />
-                                                <DataGridTextColumn Header="High ID" Binding="{Binding HighId}" Width="70" />
-                                                <DataGridTextColumn Header="Drops" Binding="{Binding TotalDrops}" Width="60" />
-                                                <DataGridTextColumn Header="Corpses" Binding="{Binding CorpsesWithItem}" Width="65" />
-                                                <DataGridTextColumn Header="Observed %" Binding="{Binding CorpseFrequencyPercent, StringFormat=F2}" Width="85" />
-                                                <DataGridTextColumn Header="QL × count" Binding="{Binding QualityDistribution}" Width="*" />
-                                            </DataGrid.Columns>
-                                        </DataGrid>
+                                        <TabControl Grid.Row="2">
+                                            <TabItem Header="Items">
+                                                <DataGrid x:Name="LootSimulationGrid" Margin="6">
+                                                    <DataGrid.Columns>
+                                                        <DataGridTextColumn Header="Item" Binding="{Binding Name}" Width="*" />
+                                                        <DataGridTextColumn Header="Low ID" Binding="{Binding LowId}" Width="70" />
+                                                        <DataGridTextColumn Header="High ID" Binding="{Binding HighId}" Width="70" />
+                                                        <DataGridTextColumn Header="Drops" Binding="{Binding TotalDrops}" Width="60" />
+                                                        <DataGridTextColumn Header="Avg. qty" Binding="{Binding AverageQuantity, StringFormat=F2}" Width="72" />
+                                                        <DataGridTextColumn Header="Corpses" Binding="{Binding CorpsesWithItem}" Width="65" />
+                                                        <DataGridTextColumn Header="Observed %" Binding="{Binding CorpseFrequencyPercent, StringFormat=F2}" Width="85" />
+                                                        <DataGridTextColumn Header="QL × count" Binding="{Binding QualityDistribution}" Width="*" />
+                                                    </DataGrid.Columns>
+                                                </DataGrid>
+                                            </TabItem>
+                                            <TabItem Header="Group outcomes">
+                                                <Grid Margin="6">
+                                                    <Grid.RowDefinitions>
+                                                        <RowDefinition Height="*" />
+                                                        <RowDefinition Height="*" />
+                                                    </Grid.RowDefinitions>
+                                                    <DataGrid x:Name="LootSimulationGroups" SelectionChanged="SimulationGroup_SelectionChanged">
+                                                        <DataGrid.Columns>
+                                                            <DataGridTextColumn Header="Table / group" Binding="{Binding QualifiedId}" Width="*" />
+                                                            <DataGridTextColumn Header="Entry picks" Binding="{Binding EntriesSelected}" Width="80" />
+                                                            <DataGridTextColumn Header="Empty picks" Binding="{Binding EmptySelections}" Width="80" />
+                                                            <DataGridTextColumn Header="Items" Binding="{Binding ItemsGenerated}" Width="56" />
+                                                            <DataGridTextColumn Header="Ineligible" Binding="{Binding Ineligible}" Width="70" />
+                                                            <DataGridTextColumn Header="Missed chance" Binding="{Binding ChanceMisses}" Width="94" />
+                                                            <DataGridTextColumn Header="Capacity skips" Binding="{Binding CapacitySkips}" Width="92" />
+                                                        </DataGrid.Columns>
+                                                    </DataGrid>
+                                                    <DataGrid Grid.Row="1" x:Name="LootSimulationEntries" Margin="0,6,0,0">
+                                                        <DataGrid.Columns>
+                                                            <DataGridTextColumn Header="Entry" Binding="{Binding EntryId}" Width="*" />
+                                                            <DataGridTextColumn Header="Observed selections" Binding="{Binding Selections}" Width="140" />
+                                                            <DataGridTextColumn Header="Items generated" Binding="{Binding ItemsGenerated}" Width="110" />
+                                                            <DataGridTextColumn Header="Initial conditional %" Binding="{Binding InitialConditionalPercent, StringFormat=F2}" Width="136" />
+                                                            <DataGridCheckBoxColumn Header="Initially eligible" Binding="{Binding InitiallyEligible, Mode=OneWay}" Width="110" />
+                                                        </DataGrid.Columns>
+                                                    </DataGrid>
+                                                </Grid>
+                                            </TabItem>
+                                        </TabControl>
                                     </Grid>
                                 </TabItem>
                             </TabControl>

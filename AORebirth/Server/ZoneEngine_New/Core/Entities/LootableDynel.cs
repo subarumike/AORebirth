@@ -9,6 +9,7 @@ namespace ZoneEngine_New.Core.Entities
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine_New.Core.Data;
+    using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Mobs;
     using ZoneEngine_New.Core.Playfield;
@@ -27,6 +28,7 @@ namespace ZoneEngine_New.Core.Entities
         static readonly Random LootRandom = new();
 
         int _inventoryHandle;
+        bool _lootResolved;
         bool _wasOpened;
         DateTime? _emptyDespawnAtUtc;
         // Everyone given a client handle for this loot, so despawn can hand the handles back to their pools.
@@ -69,6 +71,8 @@ namespace ZoneEngine_New.Core.Entities
 
         protected IReadOnlyList<MobItemTableEntry>? ItemTable { get; set; }
 
+        private protected NamedLootResolution? NamedLoot { get; set; }
+
         /// <summary>Items the owner already carried (SpawnItem on an NPC); placed ahead of the item table roll.</summary>
         protected IReadOnlyList<Item>? CarriedItems { get; set; }
 
@@ -83,6 +87,9 @@ namespace ZoneEngine_New.Core.Entities
         public void ResolveLoot(HashItemMinter minter, int qualityVariancePercent)
         {
             ArgumentNullException.ThrowIfNull(minter);
+            if (_lootResolved)
+                return;
+            _lootResolved = true;
 
             int slot = 0;
             if (CarriedItems != null)
@@ -96,14 +103,41 @@ namespace ZoneEngine_New.Core.Entities
             }
 
             var rolled = new List<(int LowId, int HighId, int Quality)>();
-            if (LootEquipment != null)
-                EquipmentLoot.Roll(LootEquipment, minter, Loot.Capacity - slot, qualityVariancePercent, rolled);
-            RollItemTable(ItemTable, LootLevel, minter, Loot.Capacity - slot - rolled.Count, qualityVariancePercent, rolled);
+            IReadOnlyList<(int LowId, int HighId, int Quality)> carriedInputs = [];
+            if (NamedLoot?.Groups.Length > 0 && CarriedItems != null)
+            {
+                var ids = new (int LowId, int HighId, int Quality)[CarriedItems.Count];
+                for (int index = 0; index < ids.Length; index++)
+                {
+                    Item item = CarriedItems[index];
+                    ids[index] = (item.LowId, item.HighId, item.Quality);
+                }
+                carriedInputs = ids;
+            }
+            RollLoot(ItemTable, LootLevel, LootEquipment == null ? [] : EquipmentLoot.ReadInputs(LootEquipment),
+                NamedLoot, carriedInputs, minter, Loot.Capacity - slot, qualityVariancePercent, rolled);
             for (int i = 0; i < rolled.Count; i++, slot++)
             {
                 (int lowId, int highId, int quality) = rolled[i];
                 if (!Loot.Add(slot, minter.CreateWithNewInstance(lowId, highId, quality, ItemSource.Loot)))
                     return;
+            }
+        }
+
+        /// <summary>Shared slot-budgeted equipment, ordinary, and named loot roll. Builds no items.</summary>
+        internal static void RollLoot(IReadOnlyList<MobItemTableEntry>? table, int level,
+            IEnumerable<(string Hash, int Quality)> equipment, NamedLootResolution? named,
+            IReadOnlyList<(int LowId, int HighId, int Quality)> carried,
+            HashItemMinter minter, int capacity, int variance, List<(int LowId, int HighId, int Quality)> into,
+            Random? random = null, NamedLootRollObserver? observe = null)
+        {
+            int start = into.Count;
+            EquipmentLoot.Roll(equipment, minter, capacity, variance, into, random);
+            RollItemTable(table, level, minter, capacity - (into.Count - start), variance, into, random);
+            if (named?.Groups.Length > 0)
+            {
+                NamedLootRoller.Roll(named, minter, capacity - (into.Count - start), carried, into,
+                    random ?? Random.Shared, observe);
             }
         }
 
