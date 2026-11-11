@@ -10,6 +10,8 @@ using ZoneEngine.Core.Missions;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.Helpers;
 using ZoneEngine_New.Core.Inventory;
+using ZoneEngine_New.Core.Knubot;
+using ZoneEngine_New.Core.Mobs;
 using ZoneEngine_New.Core.Network;
 using MissionLifecycleState = AORebirth.Interfaces.Persistence.Missions.MissionLifecycleState;
 
@@ -107,7 +109,49 @@ public sealed partial class AuthoredQuestService
     { AuthoredQuestJournal.Delete(player, quest, Content); }
     static void SendChat(Player player, string text) => player.Session?.Send(new ChatTextMessage { Identity = player.Identity, Text = text });
 
-        public bool TryTurnInTimedItem(Player player, Identity slot, Item chip, Action publishAcceptedTrade, TimedTurnInDefinition rule)
+    internal TimedTurnInDefinition? ResolveNpcTimedTurnIn(Player player, NpcCharacter npc, KnubotScript script)
+    {
+        if (script.TimedTrade?.TimedTurnIn is not { } rule || !Content.TimedTurnIns.Contains(rule) || !IsCurrent(player)
+            || player.Playfield is not { } playfield || !ReferenceEquals(playfield, npc.Playfield)
+            || playfield.GetService<NpcContentActivationService>() is not { } activation
+            || !activation.TryGetBinding(npc, out var binding)
+            || !script.Npcs.Contains(binding.ContentNpcIdentity, StringComparer.Ordinal)
+            || !rule.TurnInPlayfields.Contains(binding.PlayfieldId)
+            || !rule.TurnInPlayfields.Contains(playfield.Identity.Instance))
+            return null;
+
+        return rule;
+    }
+
+    internal bool CanOpenTimedTrade(Player player, NpcCharacter npc, KnubotScript script)
+    {
+        if (ResolveNpcTimedTurnIn(player, npc, script) is not { } rule
+            || !rule.Items.Any(item => item.Enabled && LevelEligible(item, player.Stats.GetOrOne(CharacterStat.Level))
+            && HasCarried(player, item.ItemId)))
+            return false;
+        string? account = Account(player);
+        if (account == null)
+            return false;
+        try
+        {
+            return _dao.Execute(player.Identity.Instance, account, tx =>
+                tx.GetMission(new(player.Identity.Instance, rule.Quest))?.State == MissionLifecycleState.Active
+                && !HasCooldown(tx, player.Identity.Instance, rule, out _));
+        }
+        catch (Exception exception)
+        {
+            _logger.Error(exception, "Timed turn-in eligibility could not be read.");
+            return false;
+        }
+    }
+
+    public bool TryTurnInTimedItem(Player player, Identity slot, Item chip, Action publishAcceptedTrade, TimedTurnInDefinition rule)
+        => TryCompleteTimedTurnIn(player, slot, chip, publishAcceptedTrade, rule);
+
+    internal bool TryTurnInOfferedTimedItem(Player player, Item chip, Action publishAcceptedTrade, TimedTurnInDefinition rule)
+        => TryCompleteTimedTurnIn(player, null, chip, publishAcceptedTrade, rule);
+
+    bool TryCompleteTimedTurnIn(Player player, Identity? inventorySlot, Item chip, Action publishAcceptedTrade, TimedTurnInDefinition rule)
     {
         if (!IsCurrent(player) || !rule.TurnInPlayfields.Contains(player.Playfield!.Identity.Instance)
             || !TryResolveTimedItem(rule, chip, out var turnInItem) || !turnInItem.Enabled) return false;
@@ -116,7 +160,19 @@ public sealed partial class AuthoredQuestService
         if (account == null) return false;
         return Mutate(player, account, tx =>
         {
-            RequireSource(player, slot, chip);
+            if (inventorySlot is { } slot)
+            {
+                RequireSource(player, slot, chip);
+            }
+            else
+            {
+                // The trade service owns the locked offer. HardFlush in Mutate has persisted its parking location.
+                if (!chip.Locked || !chip.IsPersisted || chip.InstanceId <= 0 || chip.StackCount != 1
+                    || InventoryMoveService.IsBagItem(chip) || tx is not IMissionInventoryMutationTransaction inventory)
+                    throw new InvalidOperationException("Authored turn-in requires the exact parked NPC trade offer.");
+                var parking = new Identity { Type = IdentityType.OverflowWindow, Instance = player.Identity.Instance };
+                inventory.RetireNpcTradeOffer(ToMissionItem(chip.ToRecord(parking, chip.InstanceId, chip.StackCount)));
+            }
             if (!TryResolveTimedItem(rule, chip, out var definition)
                 || !LevelEligible(definition, player.Stats.GetOrOne(CharacterStat.Level))
                 || tx.GetMission(new(player.Identity.Instance, rule.Quest))?.State != AORebirth.Interfaces.Persistence.Missions.MissionLifecycleState.Active
@@ -152,14 +208,21 @@ public sealed partial class AuthoredQuestService
             AuthoredMissionProgression.SetFlag(tx, Definition(rule.Quest), rule.CooldownFlag, until, _now().Ticks);
             SaveAccountCooldown(tx, account, until, rule);
             AuthoredMissionProgression.SetFlag(tx, Definition(rule.CooldownQuest), rule.GrantedFlag, "1", _now().Ticks);
-            ApplyRows(tx, Plan(player, []), player, slot, chip);
+            if (inventorySlot is { } sourceSlot)
+            {
+                ApplyRows(tx, Plan(player, []), player, sourceSlot, chip);
+            }
             return () =>
             {
                 publishAcceptedTrade();
-                player.Inventory.Inventory.Content.Remove(slot.Instance);
-                player.Session?.Send(new CharacterActionMessage { Identity = player.Identity, Action = CharacterActionType.DeleteItem, Target = slot });
-                Modules.ModuleHooks.ItemMoved(player, chip, Modules.ModuleHooks.Place(AORebirth.Modules.Events.ItemPlaceKind.Inventory),
-                    Modules.ModuleHooks.Place(AORebirth.Modules.Events.ItemPlaceKind.Destroyed));
+                if (inventorySlot is { } originalSlot)
+                {
+                    player.Inventory.Inventory.Content.Remove(originalSlot.Instance);
+                    player.Session?.Send(new CharacterActionMessage
+                        { Identity = player.Identity, Action = CharacterActionType.DeleteItem, Target = originalSlot });
+                    Modules.ModuleHooks.ItemMoved(player, chip, Modules.ModuleHooks.Place(AORebirth.Modules.Events.ItemPlaceKind.Inventory),
+                        Modules.ModuleHooks.Place(AORebirth.Modules.Events.ItemPlaceKind.Destroyed));
+                }
                 if (snapshot.SideTokenReward > 0) player.Stats.Set((CharacterStat)snapshot.SideTokenStatId, (int)tokens, StatDetail.Base, dirty: false);
                 progression.PublishAfterCommit(player);
                 if (snapshot.SideTokenReward > 0) SendTokens(player, snapshot.SideTokenStatId, snapshot.SideTokenReward, tokens, rule.TokenText);

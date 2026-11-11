@@ -11,6 +11,7 @@ using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.GameData;
 using ZoneEngine_New.Core.Inventory;
 using ZoneEngine_New.Core.Logging;
+using ZoneEngine_New.Core.Missions;
 using ZoneEngine_New.Core.Mobs;
 using ZoneEngine_New.Core.Quests;
 
@@ -20,7 +21,7 @@ using ZoneEngine_New.Core.Quests;
 /// <para>
 /// <see cref="OverrideVariable"/> names a second folder laid over that one: a script there replaces the GameData
 /// script with the same id (its path under the folder) and takes its NPCs from any other. <see cref="Reload"/> rebuilds
-/// both while the zone runs; a chat already open keeps the script it started with.
+/// both while the zone runs. Timed hand-ins must still use the current selected script at completion.
 /// </para>
 /// </summary>
 public sealed class KnubotCatalog
@@ -48,7 +49,8 @@ public sealed class KnubotCatalog
     // Swapped whole by Reload; a lookup reads the reference once.
     volatile Dictionary<string, KnubotScript> _byNpc;
 
-    public KnubotCatalog(IGameData gameData, QuestCatalog quests, IItemTemplateCatalog items, IZoneLogger logger)
+    public KnubotCatalog(IGameData gameData, QuestCatalog quests, IItemTemplateCatalog items, IZoneLogger logger,
+        AuthoredQuestCatalog? authoredQuests = null)
     {
         ArgumentNullException.ThrowIfNull(gameData);
         ArgumentNullException.ThrowIfNull(logger);
@@ -56,7 +58,7 @@ public sealed class KnubotCatalog
         _root = Path.Combine(gameData.RootPath, DirectoryName);
         string? overrideRoot = Environment.GetEnvironmentVariable(OverrideVariable);
         OverrideRoot = string.IsNullOrWhiteSpace(overrideRoot) ? null : Path.GetFullPath(overrideRoot.Trim());
-        _load = new KnubotLoadContext(quests, gameData, items);
+        _load = new KnubotLoadContext(quests, gameData, items, authoredQuests);
         _logger = logger;
         _byNpc = Build(_load).ByNpc;
     }
@@ -348,17 +350,30 @@ public sealed class KnubotCatalog
         if (byNpc.Count == 0 || npc == null)
             return false;
 
-        if (npc.Playfield?.GetRequiredService<NpcContentActivationService>().TryGetBinding(npc, out NpcContentBinding binding) == true
-            && (Find(byNpc, binding.ContentNpcIdentity, out script) || Find(byNpc, binding.PlacementIdentity, out script)))
-            return true;
+        if (npc.Playfield?.GetRequiredService<NpcContentActivationService>().TryGetBinding(npc, out NpcContentBinding binding) == true)
+        {
+            if ((Find(byNpc, binding.ContentNpcIdentity, out script)
+                    && (script.TimedTrade?.TimedTurnIn is not { } rule || rule.TurnInPlayfields.Contains(binding.PlayfieldId)))
+                || FindOrdinary(byNpc, binding.PlacementIdentity, out script))
+                return true;
+        }
 
-        return Find(byNpc, npc.SpawnHash, out script) || Find(byNpc, npc.MobTemplate?.Hash, out script);
+        return FindOrdinary(byNpc, npc.SpawnHash, out script) || FindOrdinary(byNpc, npc.MobTemplate?.Hash, out script);
     }
 
     static bool Find(IReadOnlyDictionary<string, KnubotScript> byNpc, string? key, out KnubotScript script)
     {
         script = null!;
         return !string.IsNullOrEmpty(key) && byNpc.TryGetValue(key, out script!);
+    }
+
+    static bool FindOrdinary(IReadOnlyDictionary<string, KnubotScript> byNpc, string? key, out KnubotScript script)
+    {
+        if (Find(byNpc, key, out script) && script.TimedTrade == null)
+            return true;
+
+        script = null!;
+        return false;
     }
 
     static KnubotScript? Compile(string id, KnubotScriptFile file, KnubotLoadContext load, List<string> errors)
@@ -418,7 +433,8 @@ public sealed class KnubotCatalog
                 errors.Add("line '" + lineId + "': " + error);
 
             lines[lineId] = new KnubotLine(lineId, parsed.Pieces.ToArray(), parsed.Effects.ToArray(),
-                string.IsNullOrWhiteSpace(source.Fail) ? null : source.Fail.Trim(), replies.ToArray(), parsed.Goto, parsed.CloseSeconds);
+                string.IsNullOrWhiteSpace(source.Fail) ? null : source.Fail.Trim(), replies.ToArray(), parsed.Goto,
+                parsed.CloseSeconds, source.ShowGoodbye);
         }
 
         var openers = new List<KnubotOpener>();
@@ -466,11 +482,22 @@ public sealed class KnubotCatalog
 
             if (source.Credits < 0)
                 tradeErrors.Add("Credits cannot be negative");
-            if (items.Count == 0 && source.Credits == 0 && tradeErrors.Count == 0)
+            if (source.TimedTurnIn == null && items.Count == 0 && source.Credits == 0 && tradeErrors.Count == 0)
                 tradeErrors.Add("needs Items or Credits");
             // An inspection hands everything back, so it has items to look at and no credits it would pretend to take.
             if (source.InspectItems && (items.Count == 0 || source.Credits != 0) && tradeErrors.Count == 0)
                 tradeErrors.Add("InspectItems needs Items and no Credits");
+            if (source.TimedTurnIn != null && (string.IsNullOrWhiteSpace(source.TimedTurnIn)
+                || string.IsNullOrWhiteSpace(source.Prompt) || file.Trades?.Count != 1
+                || source.Credits != 0 || source.InspectItems || items.Count != 0))
+            {
+                tradeErrors.Add("TimedTurnIn needs a prompt and must be the script's only trade, without item or credit rules");
+            }
+            if (source.TimedTurnIn != null && file.DialogueTradeOnly == null)
+                tradeErrors.Add("TimedTurnIn requires an explicit DialogueTradeOnly value");
+            string? timedKey = source.TimedTurnIn?.Trim();
+            TimedTurnInDefinition? timed = string.IsNullOrEmpty(timedKey) ? null
+                : ResolveTimedTurnIn(load, timedKey, npcs, tradeErrors);
 
             string target = (source.Goto ?? string.Empty).Trim();
             if (target is not (KnubotScript.CloseTarget or KnubotScript.OpenerTarget) && !lines.ContainsKey(target))
@@ -480,7 +507,8 @@ public sealed class KnubotCatalog
             foreach (string error in tradeErrors)
                 errors.Add("trade '" + pair.Key + "': " + error);
 
-            trades.Add(new KnubotTrade(pair.Key, conditions, items.ToArray(), source.Credits, target, source.InspectItems));
+            trades.Add(new KnubotTrade(pair.Key, conditions, items.ToArray(), source.Credits, target, source.InspectItems,
+                timed, source.Prompt));
         }
 
         foreach (KnubotLine line in lines.Values)
@@ -496,8 +524,41 @@ public sealed class KnubotCatalog
         string? tradeRefused = string.IsNullOrWhiteSpace(file.TradeRefused) ? null : file.TradeRefused.Trim();
         if (tradeRefused != null && !lines.ContainsKey(tradeRefused))
             errors.Add("TradeRefused names unknown line '" + tradeRefused + "'");
+        string? tradeDeclined = string.IsNullOrWhiteSpace(file.TradeDeclined) ? null : file.TradeDeclined.Trim();
+        if (tradeDeclined != null && !lines.ContainsKey(tradeDeclined))
+            errors.Add("TradeDeclined names unknown line '" + tradeDeclined + "'");
 
-        return new KnubotScript(id, npcs, openers.ToArray(), lines, trades.ToArray(), tradeRefused);
+        return new KnubotScript(id, npcs, openers.ToArray(), lines, trades.ToArray(), tradeRefused, tradeDeclined,
+            file.DialogueTradeOnly == true);
+    }
+
+    static TimedTurnInDefinition? ResolveTimedTurnIn(KnubotLoadContext load, string key, string[] npcs, List<string> errors)
+    {
+        TimedTurnInDefinition? rule = load.AuthoredQuests?.Content.TimedTurnIns.FirstOrDefault(candidate => candidate.Key == key);
+        if (rule == null)
+        {
+            errors.Add("TimedTurnIn names unknown authored rule '" + key + "'");
+            return null;
+        }
+
+        try
+        {
+            var allowed = new HashSet<string>(StringComparer.Ordinal);
+            foreach (int playfield in rule.TurnInPlayfields)
+            {
+                foreach (WorldNpcDefinition npc in load.GameData.GetPlayfieldNpcs(playfield).Npcs)
+                    allowed.Add(npc.ContentNpcIdentity);
+            }
+
+            foreach (string npc in npcs)
+                if (!allowed.Contains(npc))
+                    errors.Add("TimedTurnIn NPC '" + npc + "' needs an exact selected content identity on an allowed playfield");
+        }
+        catch (Exception exception) when (exception is IOException or InvalidDataException or JsonException or UnauthorizedAccessException)
+        {
+            errors.Add("TimedTurnIn NPC content could not be validated: " + exception.Message);
+        }
+        return rule;
     }
 
     static KnubotCondition[] Conditions(string[]? texts, KnubotRequirementFile[]? requirements, KnubotLoadContext load, List<string> errors)

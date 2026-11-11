@@ -12,5 +12,8 @@ namespace AORebirth.Interfaces.Persistence.Missions
         void ApplyInventoryMutation(
             IReadOnlyList<MissionItemInstanceData> grants,
             IReadOnlyList<MissionItemInstanceData> consumed);
+
+        /// <summary>Retires the exact owner-bound row parked for an active NPC trade.</summary>
+        void RetireNpcTradeOffer(MissionItemInstanceData offered);
     }
 }

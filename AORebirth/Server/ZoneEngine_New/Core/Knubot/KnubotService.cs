@@ -233,6 +233,9 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
             // A script with only a TradeRefused line still opens the window: the NPC takes nothing and says it.
             if ((script.Trades.Length == 0 && script.TradeRefused == null) || !InReach(player, npc))
                 return true;
+            if (script.DialogueTradeOnly || (script.TimedTrade != null
+                && !effects.AuthoredQuests.CanOpenTimedTrade(player, npc, script)))
+                return true;
 
             if (_sessions.TryGetValue(player.Identity.Instance, out Conversation? conversation))
             {
@@ -264,7 +267,8 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
             }
 
             conversation.LastActivityAt = _milliseconds();
-            effects.Trades.TryOpenKnubot(player, npc, TradeText(npc), script.TradeSlots);
+            effects.Trades.TryOpenKnubot(player, npc, script.TimedTrade?.Prompt ?? TradeText(npc), script.TradeSlots,
+                usesAuthoredTurnIn: script.TimedTrade != null);
             return true;
         }
     }
@@ -320,6 +324,7 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
             if (decline)
             {
                 effects.Trades.EndKnubot(player, npc, refund, "declined");
+                ResumeAfterTrade(conversation, conversation.Script.TradeDeclined);
                 return true;
             }
 
@@ -327,23 +332,26 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
             if (!Valid(conversation) || conversation.Closing || conversation.Packets.Count != 0)
             {
                 effects.Trades.EndKnubot(player, npc, refund, "npc busy");
+                if (conversation.Script.TimedTrade != null)
+                    ResumeAfterTrade(conversation, conversation.Script.TradeRefused);
                 return true;
             }
 
             KnubotContext context = Context(conversation);
             ZoneEngine_New.Core.Inventory.Item[] offered = session.InitiatorOffer.Items.Values.ToArray();
             KnubotTrade? trade = conversation.Script.Trades.FirstOrDefault(x => KnubotCondition.All(x.If, context) && x.Matches(offered, credits));
-            if (trade == null || (!trade.InspectItems && !effects.Trades.TryCommitKnubot(player, npc, credits)))
+            if (trade == null || (!trade.InspectItems && !CommitTrade(conversation, trade, credits)))
             {
-                effects.Trades.EndKnubot(player, npc, refund, trade == null ? "no matching trade" : "commit failed");
-                // The items are back with the player; a script may have the NPC say why.
-                if (trade == null && conversation.Script.TradeRefused is string refused)
+                if (player.IsPersistenceQuarantined)
                 {
-                    conversation.LastActivityAt = _milliseconds();
-                    conversation.Replies = [];
-                    Continue(conversation, refused);
-                    Pump(conversation);
+                    // The durable result is unknown. The trade service has drained the offer and closed the session.
+                    Remove(conversation);
+                    return true;
                 }
+
+                effects.Trades.EndKnubot(player, npc, refund, trade == null ? "no matching trade" : "commit failed");
+                if (trade == null || trade.TimedTurnIn != null)
+                    ResumeAfterTrade(conversation, conversation.Script.TradeRefused);
 
                 return true;
             }
@@ -360,6 +368,30 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
             Pump(conversation);
             return true;
         }
+    }
+
+    void ResumeAfterTrade(Conversation conversation, string? line)
+    {
+        if (line == null || conversation.Closing || !Valid(conversation))
+            return;
+
+        conversation.LastActivityAt = _milliseconds();
+        conversation.Packets.Clear();
+        conversation.Replies = [];
+        Continue(conversation, line);
+        Pump(conversation);
+    }
+
+    bool CommitTrade(Conversation conversation, KnubotTrade trade, int credits)
+    {
+        Player player = conversation.Player;
+        NpcCharacter npc = conversation.Npc;
+        if (trade.TimedTurnIn == null)
+            return effects.Trades.TryCommitKnubot(player, npc, credits);
+
+        return effects.AuthoredQuests.ResolveNpcTimedTurnIn(player, npc, conversation.Script) is { } rule
+            && effects.Trades.TryCommitAuthoredKnubot(player, npc, (item, acknowledge) =>
+                effects.AuthoredQuests.TryTurnInOfferedTimedItem(player, item, acknowledge, rule));
     }
 
     /// <summary>True when the close belongs to this player's Knubot chat with <paramref name="target"/>.</summary>
@@ -483,17 +515,18 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
         // A line that opened the Give Item window waits for the trade rather than closing (which would cancel it).
         if (line.CloseSeconds == null && visible.Length == 0 && effects.Trades.TryGetKnubot(conversation.Player, conversation.Npc, out _))
         {
-            QueueReplies(conversation, [KnubotScript.Goodbye]);
+            if (line.ShowGoodbye != false)
+                QueueReplies(conversation, [KnubotScript.Goodbye]);
             return;
         }
 
-        if (line.CloseSeconds != null || visible.Length == 0)
+        if (line.CloseSeconds != null || (visible.Length == 0 && line.ShowGoodbye != true))
         {
             QueueClose(conversation, line.CloseSeconds ?? DefaultCloseSeconds);
             return;
         }
 
-        QueueReplies(conversation, [.. visible, KnubotScript.Goodbye]);
+        QueueReplies(conversation, line.ShowGoodbye == false ? visible : [.. visible, KnubotScript.Goodbye]);
     }
 
     /// <summary>The wire index is the position in this list; hidden replies can never be picked.</summary>
@@ -661,6 +694,8 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
     bool Valid(Conversation conversation) => Current(conversation.Transport, out Player player, out Playfield playfield)
         && ReferenceEquals(player, conversation.Player) && ReferenceEquals(playfield, conversation.Playfield)
         && InReach(player, conversation.Npc)
+        && (conversation.Script.TimedTrade == null || (catalog.TryResolve(conversation.Npc, out KnubotScript selected)
+            && ReferenceEquals(selected, conversation.Script)))
         && _sessions.TryGetValue(player.Identity.Instance, out Conversation? current) && ReferenceEquals(current, conversation);
 
     static bool InReach(Player player, NpcCharacter npc)

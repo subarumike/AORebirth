@@ -6,6 +6,8 @@ using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
+using ZoneEngine_New.Core.Missions;
+
 /// <summary>One GameData/Knubot/*.json script as authored.</summary>
 public sealed class KnubotScriptFile
 {
@@ -27,11 +29,18 @@ public sealed class KnubotScriptFile
     public Dictionary<string, KnubotTradeFile> Trades { get; set; } = new(StringComparer.Ordinal);
 
     /// <summary>
-    /// Line said when the player accepts a Give Item window no trade takes: the items go back and the NPC says this
+    /// Line said when no trade takes the accepted Give Item window or a timed hand-in is known to be rejected.
+    /// The items go back and the NPC says this
     /// (Brandon Thorn: "Hm? No, I need three of those."). Empty: the window just closes. A script with no Trades and
     /// a TradeRefused still opens the window, so the NPC can turn down whatever is offered (Travis Molen).
     /// </summary>
     public string? TradeRefused { get; set; }
+
+    /// <summary>Line said after the player declines the trade and the offer has been returned.</summary>
+    public string? TradeDeclined { get; set; }
+
+    /// <summary>Open the Give Item window through a dialogue effect only.</summary>
+    public bool? DialogueTradeOnly { get; set; }
 }
 
 /// <summary>
@@ -50,6 +59,9 @@ public sealed class KnubotTradeFile
     /// and the trade's line runs (Alex Gibbs' FOUD, "You should hold onto that trinket"). Needs Items and no Credits.
     /// </summary>
     public bool InspectItems { get; set; }
+
+    public string? TimedTurnIn { get; set; }
+    public string? Prompt { get; set; }
 
     /// <summary>A line id, <c>close</c>, or <c>opener</c>, as on a reply.</summary>
     public string Goto { get; set; } = string.Empty;
@@ -89,6 +101,7 @@ public sealed class KnubotLineFile
 
     /// <summary>Ids from the script's <see cref="KnubotScriptFile.Replies"/>, offered in this order.</summary>
     public string[] Replies { get; set; } = [];
+    public bool? ShowGoodbye { get; set; }
 }
 
 /// <summary>Reads a string, or an array of strings joined with \n.</summary>
@@ -141,7 +154,7 @@ public sealed class KnubotRequirementFile
 
 /// <summary>A validated, read-only script.</summary>
 public sealed class KnubotScript(string id, string[] npcs, KnubotOpener[] openers, IReadOnlyDictionary<string, KnubotLine> lines,
-    KnubotTrade[] trades, string? tradeRefused = null)
+    KnubotTrade[] trades, string? tradeRefused = null, string? tradeDeclined = null, bool dialogueTradeOnly = false)
 {
     public const string CloseTarget = "close";
     public const string OpenerTarget = "opener";
@@ -154,9 +167,12 @@ public sealed class KnubotScript(string id, string[] npcs, KnubotOpener[] opener
     public KnubotOpener[] Openers { get; } = openers;
     public IReadOnlyDictionary<string, KnubotLine> Lines { get; } = lines;
     public KnubotTrade[] Trades { get; } = trades;
+    public KnubotTrade? TimedTrade => Trades.Length == 1 && Trades[0].TimedTurnIn != null ? Trades[0] : null;
 
-    /// <summary>Line id said when an accepted Give Item window matches no trade; null when the script has none.</summary>
+    /// <summary>Line after an unmatched trade or known timed-hand-in rejection; null when the script has none.</summary>
     public string? TradeRefused { get; } = tradeRefused;
+    public string? TradeDeclined { get; } = tradeDeclined;
+    public bool DialogueTradeOnly { get; } = dialogueTradeOnly;
 
     /// <summary>
     /// The Give Item window's slots: enough for the largest trade, counting every wanted item as its own slot (an
@@ -164,7 +180,8 @@ public sealed class KnubotScript(string id, string[] npcs, KnubotOpener[] opener
     /// credits (live Perk-Reset Service Provider KnubotStartTrade slots=0); 1 for a script with no trades.
     /// </summary>
     public int TradeSlots { get; } = Math.Clamp(
-        trades.Length == 0 ? 1 : trades.Max(trade => trade.Items.Sum(item => Math.Max(1, item.Count))),
+        trades.Length == 0 ? 1 : trades.Max(trade => trade.TimedTurnIn == null
+            ? trade.Items.Sum(item => Math.Max(1, item.Count)) : 1),
         0, Trade.TradeOffer.Capacity);
 
     /// <summary>A reply with no content behind it yet: the engine says a debug line and offers the same replies again.</summary>
@@ -187,7 +204,7 @@ public sealed record KnubotReply(string Id, KnubotTextPiece[] Text, KnubotCondit
 /// nothing and hands everything back (<see cref="KnubotTradeFile.InspectItems"/>).
 /// </summary>
 public sealed record KnubotTrade(string Id, KnubotCondition[] If, KnubotTradeItem[] Items, int Credits, string Goto,
-    bool InspectItems)
+    bool InspectItems, TimedTurnInDefinition? TimedTurnIn = null, string? Prompt = null)
 {
     /// <summary>
     /// True when <paramref name="offered"/> is exactly this trade: every item counts toward one wanted hash, every
@@ -197,6 +214,8 @@ public sealed record KnubotTrade(string Id, KnubotCondition[] If, KnubotTradeIte
     {
         if (credits != Credits)
             return false;
+        if (TimedTurnIn != null)
+            return offered.Count() == 1;
 
         int[] missing = new int[Items.Length];
         for (int i = 0; i < Items.Length; i++)
@@ -233,7 +252,8 @@ public sealed record KnubotLine(
     string? Fail,
     KnubotReply[] Replies,
     string? Goto,
-    int? CloseSeconds);
+    int? CloseSeconds,
+    bool? ShowGoodbye = null);
 
 /// <summary>Text or pacing inside a line, in the order written.</summary>
 public abstract record KnubotPiece;
