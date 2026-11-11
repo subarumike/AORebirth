@@ -204,7 +204,7 @@ namespace ZoneEngine_New.Core.Nanos
 
             if (recipient is not Player player)
             {
-                NanoRuntime.TryApplyTeamChild(caster, recipient, child, items, inventory, nowUtc);
+                ApplyTo(recipient);
                 return true;
             }
 
@@ -215,7 +215,7 @@ namespace ZoneEngine_New.Core.Nanos
             TeamSnapshot? team = teams?.GetImmediateTeam(player);
             if (team == null || manager == null)
             {
-                NanoRuntime.TryApplyTeamChild(caster, player, child, items, inventory, nowUtc);
+                ApplyTo(player);
                 return true;
             }
 
@@ -224,16 +224,25 @@ namespace ZoneEngine_New.Core.Nanos
             PlayfieldLocality? locality = playfield?.GetService<PlayfieldLocality>();
             for (int i = 0; i < team.MemberIds.Count; i++)
             {
-                if (!manager.FindPlayer(team.MemberIds[i], out Player? mate) || mate == null || mate.IsDead)
+                if (!manager.FindPlayer(team.MemberIds[i], out Player? mate) || mate == null)
                     continue;
                 if (!ReferenceEquals(mate, player)
                     && (!ReferenceEquals(mate.Playfield, playfield) || locality == null || !locality.IsVisibleTo(mate, player)))
                     continue;
 
-                NanoRuntime.TryApplyTeamChild(caster, mate, child, items, inventory, nowUtc);
+                ApplyTo(mate);
             }
 
             return true;
+
+            void ApplyTo(Character candidate)
+            {
+                if (candidate.IsDead
+                    || !child.MeetsActionRequirements(stat => candidate.Stats.Get(stat), ActionType.ToUse, candidate.ResolveRequirement))
+                    return;
+
+                NanoRuntime.TryApplyTeamChild(caster, candidate, child, items, inventory, nowUtc);
+            }
         }
 
         static bool PlayfieldNano(
