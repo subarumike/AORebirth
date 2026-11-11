@@ -241,7 +241,7 @@ namespace ZoneEngine_New.Core.Nanos
                     || !child.MeetsActionRequirements(stat => candidate.Stats.Get(stat), ActionType.ToUse, candidate.ResolveRequirement))
                     return;
 
-                NanoRuntime.TryApplyImmediate(caster, candidate, nanoId, items, inventory, nowUtc);
+                NanoRuntime.TryApplyTeamChild(caster, candidate, child, items, inventory, nowUtc);
             }
         }
 

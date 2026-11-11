@@ -537,6 +537,34 @@ namespace ZoneEngine_New.Core.Nanos
         }
 
         /// <summary>
+        /// Applies a child to a recipient selected by TeamCastNano. The Leadership, Governance and Director children
+        /// are positive XP buffs with the hostile bit set. Keep their NCU and cancel semantics while landing them
+        /// without hostile combat checks or debuff effects in this fan-out.
+        /// </summary>
+        internal static bool TryApplyTeamChild(
+            Character source,
+            Character target,
+            NanoSpell spell,
+            IItemBuilder items,
+            IInventoryRepository inventory,
+            DateTime nowUtc)
+            => !target.IsDead && LandImmediate(source, target, spell, inventory, items, nowUtc,
+                teamExperienceBonus: spell.IsHostile && IsTeamExperienceBonus(spell));
+
+        static bool IsTeamExperienceBonus(NanoSpell spell)
+        {
+            if (!spell.IsBuff || spell.SpellList.Count != 1
+                || !spell.SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? effects) || effects.Count != 1)
+                return false;
+
+            ItemSpell effect = effects[0];
+            return (FunctionType)effect.FunctionType == FunctionType.Modify
+                && (ItemTarget)effect.Target is ItemTarget.User or ItemTarget.Wearer
+                && effect.TryReadInt(0, out int stat) && stat == (int)CharacterStat.XPModifier
+                && effect.TryReadInt(1, out int amount) && amount > 0;
+        }
+
+        /// <summary>
         /// Lands <paramref name="spell"/> at once. <paramref name="gmApply"/> (a GM's .give nano): combat legality does
         /// not apply, so a hostile-flagged nano such as PvP Enabled (202732) lands on any living character, and the
         /// target does not treat the GM as an attacker. NCU and strain rules still apply.
@@ -549,24 +577,26 @@ namespace ZoneEngine_New.Core.Nanos
             IItemBuilder items,
             DateTime nowUtc,
             bool gmApply = false,
-            bool areaSpread = false)
+            bool areaSpread = false,
+            bool teamExperienceBonus = false)
         {
+            bool isHostileApplication = spell.IsHostile && !teamExperienceBonus;
             if (!gmApply)
             {
                 if (IsNoCombat(source) || IsNoCombat(target))
                     return false;
 
                 // An area spread never lands on its source; anything else it reaches must be one the source could attack.
-                if (spell.IsHostile && (areaSpread
+                if (isHostileApplication && (areaSpread
                         ? !NanoCastFunctions.IsCaughtByHostileArea(source, target)
                         : !IsHostileNanoTarget(source, target)))
                     return false;
 
-                if (spell.IsHostile && target.IsEvading)
+                if (isHostileApplication && target.IsEvading)
                     return false;
 
                 // A proc or a nano's child resists by strain like a cast does.
-                if (spell.IsHostile && target.ResistsNanoStrain(spell.NanoStrain))
+                if (isHostileApplication && target.ResistsNanoStrain(spell.NanoStrain))
                     return false;
 
                 // Team buffs, auras and other nanos a player's nano lands: helping a PvP-enabled player flags them.
@@ -601,7 +631,7 @@ namespace ZoneEngine_New.Core.Nanos
 
             SendNanoDuration(source, target, applied);
             ExecuteOnUseEffects(source, target, spell, skipPassiveModifiers: true, inventory, items);
-            if (spell.IsHostile && !gmApply)
+            if (isHostileApplication && !gmApply)
                 OnDebuffLanded(source, target, applied);
             return true;
         }
