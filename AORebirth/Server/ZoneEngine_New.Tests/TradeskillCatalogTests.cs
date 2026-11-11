@@ -1,6 +1,7 @@
 namespace ZoneEngine_New.Tests;
 
 using System;
+using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ZoneEngine_New.Core.Tradeskills;
 
@@ -45,5 +46,29 @@ public sealed class TradeskillCatalogTests
         Assert.AreEqual(TradeskillResultQl.Fixed, recipe.ResultQl);
         Assert.IsTrue(catalog.CanBeSource(1, 1));
         Assert.IsTrue(catalog.CanBeTarget(150922, 150922), "an any-order source can be a target");
+    }
+
+    [TestMethod]
+    public void JensenCutsRubiKaPearlWithShippedRecipe()
+    {
+        DirectoryInfo? root = new(AppContext.BaseDirectory);
+        while (root != null && !File.Exists(Path.Combine(root.FullName, "AI_START_HERE.md")))
+            root = root.Parent;
+        if (root == null)
+            throw new DirectoryNotFoundException("The tradeskill tests must run from this repository's build output.");
+
+        string path = Path.Combine(root.FullName, "AORebirth", "GameData", "Tradeskills.json");
+        TradeskillCatalog catalog = TradeskillCatalog.Parse(File.ReadAllText(path));
+        Assert.IsTrue(catalog.TryMatch(151366, 151366, 136646, 136647, out TradeskillRecipe recipe, out bool swapped),
+            "The shipped catalog must let Jensen Gem Cutter cut Pearl of Rubi-Ka.");
+        Assert.IsFalse(swapped);
+        Assert.IsFalse(catalog.TryMatch(136646, 136647, 151366, 151366, out _, out _));
+        Assert.AreEqual((151423, 151424), (recipe.Result.LowId, recipe.Result.HighId));
+        Assert.AreEqual(TradeskillResultQl.Target, recipe.ResultQl);
+        Assert.IsFalse(recipe.ConsumeSource);
+        Assert.IsTrue(recipe.ConsumeTarget);
+        Assert.AreEqual(0, recipe.QlRangePercent);
+        CollectionAssert.AreEqual(new[] { (125, 500, 0), (17, 190, 0) },
+            recipe.Skills.ConvertAll(skill => (skill.Stat, skill.Percent, skill.PerBump)).ToArray());
     }
 }
