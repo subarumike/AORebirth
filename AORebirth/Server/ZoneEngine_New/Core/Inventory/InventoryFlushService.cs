@@ -218,9 +218,11 @@ namespace ZoneEngine_New.Core.Inventory
                 int[] nanos = player.DrainDirtyUploadedNanos();
                 List<ActiveNanoRecord>? activeNanos = player.TakeDirtyActiveNanos();
                 List<SkillLockRecord>? skillLocks = player.SkillLocks.TakeDirty(DateTime.UtcNow);
+                // Completion adds the trained perk before it removes the progress row on the playfield tick.
+                // Take progress first so an omitted row cannot be paired with a perk snapshot from before completion.
+                ResearchProgressRecord[]? research = _research == null ? null : player.Research.TakeDirty();
                 int[]? trainedPerks = _trainedPerks == null ? null : player.TrainedPerks.TakeDirty();
                 List<SkillLockRecord>? perkLocks = _perkLocks == null ? null : player.PerkLocks.TakeDirty(DateTime.UtcNow);
-                ResearchProgressRecord[]? research = _research == null ? null : player.Research.TakeDirty();
                 List<SkillLockRecord>? nanoLineLocks = _nanoLineLocks == null ? null : player.NanoLineLocks.TakeDirty(DateTime.UtcNow);
                 PetNameRecord[]? petNames = _petNames == null ? null : player.PetNames.TakeDirty();
                 if (inventory == null && nanos.Length == 0 && activeNanos == null && skillLocks == null && trainedPerks == null

@@ -425,6 +425,68 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(0, w.Session.Messages.Count);
         }
 
+        [TestMethod]
+        public void ResearchCompletionDuringFlushCannotDropProgressBeforePerkIsStored()
+        {
+            const int researchId = 101;
+            var research = new RecordingResearch();
+            Player player = TestWorld.CreatePlayer(111);
+            using var flush = new InventoryFlushService(new Lazy<PlayfieldManager>(() => throw new InvalidOperationException()),
+                research, new StubLogger(), trainedPerks: research, research: research);
+            player.TrainedPerks.Add(100);
+            player.Research.Set(researchId, 10);
+            var item = TestWorld.CreateItem(instanceId: 37, persisted: false);
+            player.Inventory.MarkDirty(item, player.Inventory.Inventory, 64);
+
+            // Hold the progress lock to pause the writer at the precise snapshot boundary.
+            object progressGate = typeof(ResearchProgress).GetField("_gate", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .GetValue(player.Research)!;
+            Exception? flushFailure = null;
+            var writer = new Thread(() =>
+            {
+                try { flush.HardFlush(player); }
+                catch (Exception error) { flushFailure = error; }
+            }) { IsBackground = true };
+            try
+            {
+                lock (progressGate)
+                {
+                    writer.Start();
+                    Assert.IsTrue(SpinWait.SpinUntil(
+                        () => (writer.ThreadState & ThreadState.WaitSleepJoin) != 0, TimeSpan.FromSeconds(5)));
+                    player.TrainedPerks.Add(researchId);
+                    player.Research.Set(researchId, 0);
+                }
+            }
+            finally
+            {
+                Assert.IsTrue(writer.Join(TimeSpan.FromSeconds(5)));
+            }
+
+            Assert.IsNull(flushFailure);
+            Assert.IsNotNull(research.SavedRows);
+            Assert.AreEqual(0, research.SavedRows.Count);
+            Assert.IsTrue(research.PerksWhenRowsSaved.Contains(researchId),
+                "The completed tier must be stored before its research progress row is removed.");
+        }
+
+        sealed class RecordingResearch : ITrainedPerkRepository, IResearchRepository, ICharacterCoalesceCommit
+        {
+            int[] _storedPerks = [];
+            public int[] PerksWhenRowsSaved { get; private set; } = [];
+            public IReadOnlyList<ResearchProgressRecord>? SavedRows { get; private set; }
+            IReadOnlyList<int> ITrainedPerkRepository.GetForCharacter(int characterId) => _storedPerks;
+            IReadOnlyList<ResearchProgressRecord> IResearchRepository.GetForCharacter(int characterId) => [];
+            public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates,
+                int characterId, IReadOnlyList<int> uploadedNanoIds, IReadOnlyList<ActiveNanoRecord>? activeNanos,
+                IReadOnlyList<SkillLockRecord>? skillLocks) { }
+            public void Save(int characterId, IReadOnlyList<int> perkIds) => _storedPerks = perkIds.ToArray();
+            public void Save(int characterId, IReadOnlyList<ResearchProgressRecord> research)
+            {
+                PerksWhenRowsSaved = _storedPerks;
+                SavedRows = research;
+            }
+        }
         internal sealed class World : IDisposable
         {
             public readonly Player Player = TestWorld.CreatePlayer(111);
