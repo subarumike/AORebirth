@@ -325,7 +325,7 @@ namespace ZoneEngine_New.Core.Playfield
                     if (!ReferenceEquals(player.Playfield, source) || player.Session == null) return;
                     if (remote.Prepare != null && !remote.Prepare()) return;
                     _crossInstance.Start(player, playfieldId, remote.Landing, remote.Heading ?? player.Rotation,
-                        remote.Kind, remote.ExitProxyDoor);
+                        remote.Kind, remote.ExitProxyDoor, remote.ClearReturnDoor);
                 });
             }, CancellationToken.None, TaskContinuationOptions.None, TaskScheduler.Default);
         }

@@ -158,7 +158,10 @@ namespace ZoneEngine_New.Tests
             => PlayfieldNpcContentCatalog.Load(DataRoot, playfieldId);
 
 
-        public PlayfieldMetaData? GetPlayfieldMetaData(int playfieldId) => throw new NotSupportedException();
+        public IReadOnlyDictionary<int, PlayfieldMetaData>? PlayfieldMetadata { get; init; }
+
+        public PlayfieldMetaData? GetPlayfieldMetaData(int playfieldId)
+            => PlayfieldMetadata is { } metadata ? metadata.GetValueOrDefault(playfieldId) : throw new NotSupportedException();
 
         public PlayfieldSpawnsData GetPlayfieldSpawns(int playfieldId) => throw new NotSupportedException();
 

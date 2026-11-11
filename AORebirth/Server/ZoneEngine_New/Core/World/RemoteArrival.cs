@@ -13,7 +13,7 @@ namespace ZoneEngine_New.Core.World
     /// (a respawn revives first); false cancels it.
     /// </summary>
     public sealed record RemoteArrival(Vector3 Landing, Quaternion? Heading = null, ArrivalKind Kind = ArrivalKind.ArrivalZone,
-        int ExitProxyDoor = 0, Func<bool>? Prepare = null);
+        int ExitProxyDoor = 0, Func<bool>? Prepare = null, bool ClearReturnDoor = false);
 
     /// <summary>
     /// A login resolved to a playfield another instance runs (a dungeon that ended, a retired mission world): the

@@ -352,7 +352,7 @@ namespace ZoneEngine_New.Core.Network
         /// session that cannot move at all (no player, closed, not in play, quarantined, same playfield).
         /// </summary>
         internal bool TransferToPlayfield(Playfield destination, Vector3 landing,
-            AORebirth.Core.Vector.Quaternion heading, Func<bool>? stillAuthorized)
+            AORebirth.Core.Vector.Quaternion heading, Func<bool>? stillAuthorized, bool clearReturnDoor = false)
         {
             ArgumentNullException.ThrowIfNull(destination);
             ArgumentNullException.ThrowIfNull(landing);
@@ -383,7 +383,7 @@ namespace ZoneEngine_New.Core.Network
                     if (ReferenceEquals(source, destination))
                         throw new InvalidOperationException("Destination playfield matches current playfield.");
                     var transfer = new PlayfieldTransfer(this, player, source, destination, landing, heading,
-                        destinationAdmission, stillAuthorized);
+                        destinationAdmission, stillAuthorized, clearReturnDoor);
                     _transfer = transfer;
                     if (!source.ScheduleTransfer(transfer))
                     {

@@ -6,12 +6,15 @@ using System.Globalization;
 using System.Linq;
 using System.Text;
 
+using AORebirth.Core.Vector;
+
+using ZoneEngine.Core.Missions;
 using ZoneEngine_New.Core.Inventory;
 
 /// <summary>
 /// Turns line text into ordered pieces and effects. Tags:
 /// text <c>{name}</c> <c>{npc}</c> <c>{itemref LOW HIGH QL}</c> <c>{emote}…{/emote}</c> <c>{delay SECONDS}</c>;
-/// effects (applied when the text reaches them) <c>{givequest HASH}</c> <c>{completequest HASH}</c> <c>{spawn ITEMHASH QL|level [count]}</c> <c>{take ITEMHASH [count]}</c> <c>{shop}</c> <c>{opentrade}</c> <c>{givebuff NANOID}</c> <c>{useitem ITEMID}</c>; flow <c>{goto LINE}</c> <c>{close [SECONDS]}</c>.
+/// effects (applied when the text reaches them) <c>{givequest HASH}</c> <c>{completequest HASH}</c> <c>{spawn ITEMHASH QL|level [count]}</c> <c>{take ITEMHASH [count]}</c> <c>{shop}</c> <c>{opentrade}</c> <c>{givebuff NANOID}</c> <c>{useitem ITEMID}</c> <c>{teleport FROM TO X Y Z QX QY QZ QW}</c>; flow <c>{goto LINE}</c> <c>{close [SECONDS]}</c>.
 /// <c>{{</c> and <c>}}</c> write literal braces. Reply text allows only the text tags without delay.
 /// </summary>
 public static class KnubotParser
@@ -227,6 +230,24 @@ public static class KnubotParser
                     Effect(new KnubotUseItem(useItemId));
                     break;
 
+                case "teleport":
+                    if (words.Length != 10
+                        || !TryOrdinaryPlayfield(words[1], out int from)
+                        || !TryOrdinaryPlayfield(words[2], out int to)
+                        || from == to
+                        || !TryFinite(words[3], out float x) || !TryFinite(words[4], out float y)
+                        || !TryFinite(words[5], out float z)
+                        || !TryFinite(words[6], out float qx) || !TryFinite(words[7], out float qy)
+                        || !TryFinite(words[8], out float qz) || !TryFinite(words[9], out float qw)
+                        || Math.Abs(qx * qx + qy * qy + qz * qz + qw * qw - 1) > 0.002f)
+                    {
+                        errors.Add("expected {teleport FROM TO X Y Z QX QY QZ QW} with distinct ordinary playfields and a unit heading: {" + body + "}");
+                        break;
+                    }
+
+                    Effect(new KnubotTeleport(from, to, new Vector3(x, y, z), new Quaternion(qx, qy, qz, qw)));
+                    break;
+
                 case "goto":
                     if (words.Length != 2 || parsed.Goto != null)
                     {
@@ -268,4 +289,10 @@ public static class KnubotParser
         if (words.Length < min || words.Length > max)
             errors.Add("wrong argument count in {" + body + "}");
     }
+
+    static bool TryOrdinaryPlayfield(string word, out int id)
+        => KnubotCondition.TryPositive(word, out id) && id < GeneratedMissionIdentitySpace.MinimumLivePlayfield2;
+
+    static bool TryFinite(string word, out float value)
+        => float.TryParse(word, NumberStyles.Float, CultureInfo.InvariantCulture, out value) && float.IsFinite(value);
 }

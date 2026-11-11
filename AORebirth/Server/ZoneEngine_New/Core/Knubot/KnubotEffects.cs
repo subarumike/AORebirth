@@ -13,8 +13,16 @@ using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.Inventory;
 using ZoneEngine_New.Core.Modules;
+using ZoneEngine_New.Core.Network;
 using ZoneEngine_New.Core.Quests;
 using ZoneEngine_New.Core.Trade;
+using ZoneEngine_New.Core.World;
+
+using ArrivalKind = AORebirth.World.Contracts.V1.ArrivalKind;
+using PlayfieldInstance = ZoneEngine_New.Core.Playfield.Playfield;
+using PlayfieldManager = ZoneEngine_New.Core.Playfield.PlayfieldManager;
+using Quaternion = AORebirth.Core.Vector.Quaternion;
+using Vector3 = AORebirth.Core.Vector.Vector3;
 
 /// <summary>Services a line's effects are applied through.</summary>
 public sealed class KnubotEffectServices(QuestService quests, HashItemMinter minter, InventoryFlushService flush, TradeService trades,
@@ -254,6 +262,44 @@ public sealed record KnubotUseItem(int ItemId) : KnubotEffect
         Item item = items.Create(ItemId, ItemId, 1, ItemSource.Quest);
         item.Definition.ExecuteOnUseSpells(context.Player, playfield.GetRequiredService<Data.IInventoryRepository>(), items, source: context.Player);
         context.Player.FlushDirtyStats();
+    }
+}
+
+/// <summary>One-way conversation transfer to a captured position and heading on another playfield.</summary>
+public sealed record KnubotTeleport(int SourceId, int DestinationId, Vector3 Landing, Quaternion Heading) : KnubotEffect
+{
+    public override bool Check(KnubotContext context, KnubotPlan plan, KnubotEffectServices services)
+        => AvailableSource(context) != null;
+
+    public override void Apply(KnubotContext context, KnubotEffectServices services)
+    {
+        if (AvailableSource(context) is not { } source)
+            return;
+
+        Player player = context.Player;
+        var session = player.Session!;
+        bool StillAtSource() => ReferenceEquals(AvailableSource(context), source) && ReferenceEquals(player.Session, session);
+
+        source.GetRequiredService<PlayfieldManager>().WithPlayfield(DestinationId, player, destination =>
+        {
+            if (session is ZoneSession local && StillAtSource()
+                && local.TransferToPlayfield(destination, Landing, Heading, stillAuthorized: null, clearReturnDoor: true))
+                source.WorldAccess.Instance?.ForgetCharacterTriggers(player.Identity.Instance);
+        }, new RemoteArrival(Landing, Heading, ArrivalKind.ArrivalTeleport, Prepare: StillAtSource, ClearReturnDoor: true));
+    }
+
+    PlayfieldInstance? AvailableSource(KnubotContext context)
+    {
+        Player player = context.Player;
+        if (player.IsDead || player.IsPersistenceQuarantined || context.Npc.IsDead
+            || player.Session is not { State: SessionState.InPlay, IsTransferring: false } session
+            || !ReferenceEquals(session.Player, player)
+            || player.Playfield is not { } source || source.Identity.Instance != SourceId
+            || !ReferenceEquals(context.Npc.Playfield, source)
+            || player.GetEdgeDistanceTo(context.Npc) > LootableDynel.OpenRange)
+            return null;
+
+        return source;
     }
 }
 

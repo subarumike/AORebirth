@@ -400,6 +400,11 @@ public sealed class KnubotCatalog
 
             var lineErrors = new List<string>();
             KnubotParser.Parsed parsed = KnubotParser.Parse(source.Text, reply: false, load, lineErrors);
+            foreach (KnubotTeleport teleport in parsed.Effects.OfType<KnubotTeleport>())
+            {
+                RequireTeleportPlayfield(load.GameData, teleport.SourceId, "source", lineErrors);
+                RequireTeleportPlayfield(load.GameData, teleport.DestinationId, "destination", lineErrors);
+            }
             if (parsed.Goto != null && (source.Replies?.Length ?? 0) != 0)
                 lineErrors.Add("{goto} and Replies cannot both be set");
             if (parsed.Goto != null && parsed.CloseSeconds != null)
@@ -498,6 +503,19 @@ public sealed class KnubotCatalog
             errors.Add("TradeRefused names unknown line '" + tradeRefused + "'");
 
         return new KnubotScript(id, npcs, openers.ToArray(), lines, trades.ToArray(), tradeRefused);
+    }
+
+    static void RequireTeleportPlayfield(IGameData data, int playfieldId, string role, List<string> errors)
+    {
+        try
+        {
+            if (data.GetPlayfieldMetaData(playfieldId) == null)
+                errors.Add("teleport " + role + " playfield " + playfieldId + " has no GameData metadata");
+        }
+        catch (InvalidDataException exception)
+        {
+            errors.Add("teleport " + role + " playfield " + playfieldId + " has invalid GameData metadata: " + exception.Message);
+        }
     }
 
     static KnubotCondition[] Conditions(string[]? texts, KnubotRequirementFile[]? requirements, KnubotLoadContext load, List<string> errors)
