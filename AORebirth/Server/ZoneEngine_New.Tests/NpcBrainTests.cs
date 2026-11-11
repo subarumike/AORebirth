@@ -3,6 +3,8 @@ namespace ZoneEngine_New.Tests
     using System.Reflection;
     using System.Runtime.CompilerServices;
 
+    using AORebirth.Enums;
+
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -10,6 +12,7 @@ namespace ZoneEngine_New.Tests
 
     using ZoneEngine_New.Core.Ai;
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.WorldSimulation;
 
@@ -18,6 +21,60 @@ namespace ZoneEngine_New.Tests
     [TestClass]
     public sealed class NpcBrainTests
     {
+        [TestMethod]
+        public void NpcOnTerminateRequirementReadsHateWithoutAnIncomingAttacker()
+        {
+            using ServiceProvider services = CombatServices();
+            Playfield playfield = Playfield(services);
+            Player player = TestWorld.CreatePlayer(18);
+            NpcCharacter npc = CreateNpc();
+            Place(playfield, services, player, npc);
+            NpcBrain brain = NpcBrain.Create(npc);
+            npc.SetFightingTarget(player.Identity);
+            npc.Stats.Set(CharacterStat.MaxHealth, 100);
+            npc.Stats.Set(CharacterStat.Health, 40);
+
+            var template = new ItemTemplate();
+            template.SpellList[EventType.OnTerminate] =
+            [
+                new ItemSpell
+                {
+                    FunctionType = (int)FunctionType.Hit,
+                    Target = (int)ItemTarget.Self,
+                    Arguments = [(int)CharacterStat.Health, 5, 5],
+                    Requirements =
+                    [
+                        new ItemRequirement
+                        {
+                            StatNumber = (int)CharacterStat.NumberOfFightingOpponents,
+                            Operator = (int)Operator.GreaterThan,
+                            Value = 0
+                        },
+                        new ItemRequirement
+                        {
+                            StatNumber = (int)CharacterStat.NPCHatelistSize,
+                            Operator = (int)Operator.GreaterThan,
+                            Value = 0
+                        },
+                        new ItemRequirement { Operator = (int)Operator.Or }
+                    ]
+                }
+            ];
+            var inventory = new StubInventoryRepository();
+            var items = new StubItemBuilder();
+
+            Assert.AreEqual(0, npc.Stats.Get(CharacterStat.NumberOfFightingOpponents));
+            Assert.AreEqual(1, player.Stats.Get(CharacterStat.NumberOfFightingOpponents));
+            Assert.IsFalse(template.ExecuteTerminateSpells(npc, inventory, items));
+
+            brain.AddThreatFrom(player, 1f);
+            Assert.IsTrue(template.ExecuteTerminateSpells(npc, inventory, items));
+            Assert.AreEqual(45, npc.Stats.GetOrZero(CharacterStat.Health));
+
+            brain.ClearHate();
+            Assert.IsFalse(template.ExecuteTerminateSpells(npc, inventory, items));
+        }
+
         [TestMethod]
         public void ProximityAggroAddsOneHateWhenBreedHostilityIsPositive()
         {
