@@ -19,12 +19,67 @@ namespace ZoneEngine_New.Tests
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
+    using ZoneEngine_New.Core.Trade;
     using Vector3 = AORebirth.Core.Vector.Vector3;
 
     [TestClass]
     public sealed class InventoryActionTests
     {
         static Identity Slot(int placement = 64) => new() { Type = IdentityType.Inventory, Instance = placement };
+
+        [TestMethod]
+        public void DetachedQuarantinedShopperDoesNotPinStockOrCloseAnotherShopper()
+        {
+            using var world = new World();
+            Playfield playfield = world.Player.Playfield!;
+            world.Player.Stats.Set(CharacterStat.Health, 100);
+            var other = TestWorld.CreatePlayer(222);
+            other.Playfield = playfield;
+            var otherSession = new Session();
+            other.Session = otherSession;
+            otherSession.BindPlayer(other);
+            other.Stats.Set(CharacterStat.Health, 100);
+
+            var data = new StubGameData(HashItemCatalog.Parse("""{"TOOL":{"Templates":[1000]}}"""));
+            var catalog = new StubCatalog().Add(1000, 1);
+            var minter = new HashItemMinter(data, catalog, new StubItemBuilder());
+            var trades = new TradeService(new StubLogger(), data, catalog, minter,
+                world.Ids, world.Flush, new RejectingTradePersistence());
+            var machine = new VendingMachine(new Identity { Type = IdentityType.VendingMachine, Instance = 7 },
+                new ItemTemplate
+                {
+                    Id = 2000,
+                    Quality = 1,
+                    ShopInventory = [new ShopInventoryEntry { Hash = "TOOL", MinQl = 1, MaxQl = 1, Amount = 1, Chance = 100 }]
+                }) { Playfield = playfield };
+            Assert.IsTrue(trades.TryOpenShop(world.Player, machine));
+            Assert.IsTrue(trades.TryGetSession(world.Player, out TradeSession detachedTrade));
+            Assert.IsTrue(trades.TryOpenShop(other, machine));
+            Assert.IsTrue(trades.TryGetSession(other, out TradeSession otherTrade));
+            Assert.AreEqual(2, machine.Stock.OpenTrades);
+            Assert.AreEqual(1000, machine.Stock.Slots.Single().LowId);
+
+            // Logout intentionally skips normal cancellation for quarantined state.
+            world.Player.QuarantinePersistence();
+            world.Player.Session = null;
+            world.Player.Playfield = null;
+            var unrelated = (Playfield)RuntimeHelpers.GetUninitializedObject(typeof(Playfield));
+            trades.Tick(unrelated, 0);
+            Assert.AreEqual(2, machine.Stock.OpenTrades);
+
+            trades.Tick(playfield, 0);
+            Assert.IsFalse(trades.TryGetSession(world.Player, out _));
+            Assert.IsTrue(trades.TryGetSession(other, out TradeSession active));
+            Assert.AreSame(otherTrade, active);
+            Assert.AreEqual(1, machine.Stock.OpenTrades);
+            trades.Tick(playfield, 0);
+            trades.Decline(world.Player, detachedTrade);
+            Assert.AreEqual(1, machine.Stock.OpenTrades);
+            Assert.AreEqual(1000, machine.Stock.Slots.Single().LowId);
+
+            trades.Cancel(other, "fixture complete");
+            Assert.AreEqual(0, machine.Stock.OpenTrades);
+        }
 
         [TestMethod]
         public void SplitPreservesQuantityAndOriginalInstanceAndPublishesOnlyAfterCommit()
@@ -388,6 +443,7 @@ namespace ZoneEngine_New.Tests
                 typeof(PlayfieldManager).GetField("_playersByCharacterId", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(manager, new Dictionary<int, Player>());
                 Flush = new InventoryFlushService(new Lazy<PlayfieldManager>(() => manager), new Coalesce(), new StubLogger());
                 _services = new ServiceCollection()
+                    .AddSingleton(new DynelRegistry())
                     .AddSingleton(new PlayfieldLocality(4582, null))
                     .AddSingleton(Flush)
                     .BuildServiceProvider();
@@ -411,6 +467,10 @@ namespace ZoneEngine_New.Tests
         sealed class Coalesce : ICharacterCoalesceCommit
         {
             public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int characterId, IReadOnlyList<int> uploadedNanoIds, IReadOnlyList<ActiveNanoRecord>? activeNanos, IReadOnlyList<SkillLockRecord>? skillLocks) => throw new InvalidOperationException("No unexpected independent flush.");
+        }
+        sealed class RejectingTradePersistence : ITradePersistence
+        {
+            public void Persist(TradePersistenceBatch batch) => throw new InvalidOperationException("No shop transaction is expected.");
         }
         internal sealed class Persistence : IInventoryMutationPersistence
         {
