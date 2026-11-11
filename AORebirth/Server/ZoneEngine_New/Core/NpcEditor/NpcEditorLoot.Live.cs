@@ -27,6 +27,31 @@ public sealed partial class NpcEditorLoot
     public NpcEditorLootView ApplyLive(NpcCharacter npc, NpcEditorLootLiveEdit edit, string actor)
     {
         LiveState state = RequireLiveState(npc, edit.ExpectedRevision, actor);
+        (int index, NpcEditorLootEntry? before, IReadOnlyList<MobItemTableEntry> current) = ValidateLiveEdit(npc, edit);
+        MobItemTableEntry[]? previousTable = npc.LiveEditorLootTable;
+        MobItemTableEntry[] changed = EditRow(current, index, edit.Entry?.ToNative());
+        var change = new NpcEditorLootLiveChange(Guid.NewGuid(), actor, DateTimeOffset.UtcNow, "apply", index, before, edit.Entry);
+        state.Undo.Add(new(change, previousTable));
+        if (state.Undo.Count > MaxLiveChanges)
+            state.Undo.RemoveAt(0);
+        state.Record(change);
+        npc.LiveEditorLootTable = changed;
+        return Describe(npc);
+    }
+
+    internal NpcEditorLootLiveEdit PrepareLiveAppend(NpcCharacter npc, NpcEditorLootEntry entry)
+    {
+        NpcEditorLootLiveView current = LiveView(npc);
+        if (!current.CanApply)
+            throw new NpcEditorRuntimeException(409, "Live loot editing requires a living, non-pet NPC with a resolved template.");
+        var edit = new NpcEditorLootLiveEdit(current.Revision, null, entry);
+        ValidateLiveEdit(npc, edit);
+        return edit;
+    }
+
+    (int Index, NpcEditorLootEntry? Before, IReadOnlyList<MobItemTableEntry> Current)
+        ValidateLiveEdit(NpcCharacter npc, NpcEditorLootLiveEdit edit)
+    {
         IReadOnlyList<MobItemTableEntry> current = npc.ActiveLootTable ?? [];
         int index = edit.Row?.Index ?? current.Count;
         if (edit.Row != null && (index < 0 || index >= current.Count || Key(index, current[index]) != edit.Row))
@@ -41,15 +66,7 @@ public sealed partial class NpcEditorLoot
         if (edit.Entry != null && before == edit.Entry)
             throw new ArgumentException("The selected live loot row already has these values.");
 
-        MobItemTableEntry[]? previousTable = npc.LiveEditorLootTable;
-        MobItemTableEntry[] changed = EditRow(current, index, edit.Entry?.ToNative());
-        var change = new NpcEditorLootLiveChange(Guid.NewGuid(), actor, DateTimeOffset.UtcNow, "apply", index, before, edit.Entry);
-        state.Undo.Add(new(change, previousTable));
-        if (state.Undo.Count > MaxLiveChanges)
-            state.Undo.RemoveAt(0);
-        state.Record(change);
-        npc.LiveEditorLootTable = changed;
-        return Describe(npc);
+        return (index, before, current);
     }
 
     public NpcEditorLootView RevertLive(NpcCharacter npc, NpcEditorLootLiveRevert edit, string actor)

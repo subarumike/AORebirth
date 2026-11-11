@@ -82,6 +82,7 @@ namespace ZoneEngine_New.Core.Mobs
         public List<MobItemTableEntry> ItemTable { get; set; } = new();
         internal NpcLeaf? EditorLootLeaf { get; set; }
         internal int AuthoredBandIndex { get; init; } = -1;
+        internal IReadOnlyDictionary<int, string>? EditorStatSources { get; set; }
         internal NpcEditorEquipmentEntry[]? EditorEquipmentEntries { get; set; }
 
         public string BinaryListData { get; set; } = string.Empty;

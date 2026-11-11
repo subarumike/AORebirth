@@ -41,6 +41,7 @@ namespace ZoneEngine_New.Core.Entities
 
         /// <summary>Source mob template when this NPC was spawned from GameData mob templates.</summary>
         public MobTemplate? MobTemplate { get; set; }
+        internal IReadOnlyDictionary<int, (int Value, string Source)>? EditorScopedStats { get; set; }
 
         /// <summary>Granted only by an accepted runtime combat adapter, never by a template or name.</summary>
         public virtual bool AcceptsPlayerCombatNanos => false;
@@ -585,6 +586,22 @@ namespace ZoneEngine_New.Core.Entities
 
         static bool IsLootGiver(Item item)
             => item.Definition?.Name?.Contains("lootgiver", StringComparison.OrdinalIgnoreCase) == true;
+
+        internal bool HasBaseDependentPercentageBonus(CharacterStat stat)
+        {
+            foreach (Item item in Equipment.Content.Values)
+            {
+                if (IsLootGiver(item) && !item.PlayshiftSuppressed
+                    && StatModifierSpells.HasBaseDependentPercentage(item.WearSpells, stat))
+                    return true;
+            }
+            foreach (Nanos.Buff buff in Buffs)
+            {
+                if (StatModifierSpells.HasBaseDependentPercentage(buff.ModifierSpells, stat))
+                    return true;
+            }
+            return false;
+        }
 
         bool TryAddEquipment(Item item, IZoneLogger? logger, bool combatWeapon = false, string? sawHash = null)
         {

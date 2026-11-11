@@ -16,7 +16,6 @@ using ZoneEngine_New.Core.Playfield.Locality;
 internal sealed partial class NpcEditorRuntime
 {
     const int MaxHistory = 50;
-    const int MaxCombatStat = 100_000;
 
     sealed class SpawnState
     {
@@ -32,7 +31,7 @@ internal sealed partial class NpcEditorRuntime
         internal string? RevertedBy { get; set; }
     }
 
-    sealed record StatChange(CharacterStat Stat, int Before, int After);
+    sealed record StatChange(CharacterStat Stat, int Before, int After, int? DependentBefore, int? DependentAfter);
     internal sealed record EquipmentChange(int Slot, Item? Before, Item? After);
 
     public Task<NpcEditorNpcDetails> ApplyStatAsync(
@@ -40,23 +39,46 @@ internal sealed partial class NpcEditorRuntime
         => WithNpcAsync(identity, npc =>
         {
             var stat = (CharacterStat)statId;
-            ApplyStat(npc, stat, expectedBase, value);
-            Record(npc, new LiveChange($"{stat}: {expectedBase} to {value}", actor,
-                expectedBase.ToString(CultureInfo.InvariantCulture), value.ToString(CultureInfo.InvariantCulture),
-                new StatChange(stat, expectedBase, value), null));
+            ApplyStatWithHistory(npc, stat, expectedBase, value, actor);
             return Snapshot(npc);
         }, cancellationToken);
+
+    Guid ApplyStatWithHistory(NpcCharacter npc, CharacterStat stat, int expectedBase, int value, string? actor)
+    {
+        CharacterStat? dependent = NpcEditorStatPolicy.DependentVital(stat);
+        int? before = dependent is { } current ? ReadStat(npc, current, StatDetail.Base) : null;
+        ApplyStat(npc, stat, expectedBase, value);
+        int? after = dependent is { } changed ? ReadStat(npc, changed, StatDetail.Base) : null;
+        var change = new LiveChange($"{stat}: {expectedBase} to {value}", actor,
+            DescribeStat(expectedBase, dependent, before), DescribeStat(value, dependent, after),
+            new StatChange(stat, expectedBase, value, before, after), null);
+        Record(npc, change);
+        return change.Id;
+    }
+
+    static string DescribeStat(int value, CharacterStat? dependent, int? dependentValue)
+        => dependent is { } current
+            ? string.Create(CultureInfo.InvariantCulture, $"{value} ({current} {dependentValue})")
+            : value.ToString(CultureInfo.InvariantCulture);
 
     public Task<NpcEditorNpcDetails> ApplyEquipmentAsync(
         NpcEditorIdentity identity, NpcEditorEquipmentEdit edit, CancellationToken cancellationToken, string? actor = null)
         => WithNpcAsync(identity, npc =>
         {
-            EquipmentChange change = EditEquipment(npc, _catalog, npc.Playfield!.GetRequiredService<IItemBuilder>(), edit);
-            string before = DescribeEquipment(change.Before);
-            string after = DescribeEquipment(change.After);
-            Record(npc, new LiveChange($"Equipment slot {change.Slot}: {before} to {after}", actor, before, after, null, change));
+            ApplyEquipmentWithHistory(npc, edit, actor);
             return Snapshot(npc);
         }, cancellationToken);
+
+    Guid ApplyEquipmentWithHistory(NpcCharacter npc, NpcEditorEquipmentEdit edit, string? actor, int? expectedFreeSlot = null)
+    {
+        EquipmentChange change = EditEquipment(npc, _catalog, npc.Playfield!.GetRequiredService<IItemBuilder>(), edit,
+            expectedFreeSlot: expectedFreeSlot);
+        string before = DescribeEquipment(change.Before);
+        string after = DescribeEquipment(change.After);
+        var history = new LiveChange($"Equipment slot {change.Slot}: {before} to {after}", actor, before, after, null, change);
+        Record(npc, history);
+        return history.Id;
+    }
 
     public Task<NpcEditorNpcDetails> RevertAsync(
         NpcEditorIdentity identity, Guid changeId, CancellationToken cancellationToken, string? actor = null)
@@ -69,7 +91,7 @@ internal sealed partial class NpcEditorRuntime
                 throw new NpcEditorRuntimeException(409, "That change can no longer be reverted. Refresh or revert later changes first.");
 
             if (change.Stat is { } stat)
-                SetStat(npc, stat.Stat, stat.Before, restoring: true);
+                SetStat(npc, stat.Stat, stat.Before, restoring: true, restoreDependent: stat.DependentBefore);
             else if (change.Equipment is { } equipment)
                 UndoEquipment(npc, equipment);
             change.Reverted = true;
@@ -92,9 +114,12 @@ internal sealed partial class NpcEditorRuntime
         List<LiveChange> history = State(npc).History;
         if (change.Stat is { } stat)
         {
-            return ReferenceEquals(history.FindLast(entry => !entry.Reverted && entry.Stat?.Stat == stat.Stat), change)
+            return ReferenceEquals(history.FindLast(entry => !entry.Reverted && entry.Stat is { } previous
+                    && NpcEditorStatPolicy.AreRelated(previous.Stat, stat.Stat)), change)
                 && ReadStat(npc, stat.Stat, StatDetail.Base) == stat.After
-                && StatValidationError(npc, stat.Stat, stat.Before, restoring: true) == null;
+                && (NpcEditorStatPolicy.DependentVital(stat.Stat) is not { } dependent
+                    || ReadStat(npc, dependent, StatDetail.Base) == stat.DependentAfter)
+                && PlanLiveStat(npc, stat.Stat, stat.Before, restoring: true, stat.DependentBefore, out _) == null;
         }
 
         return change.Equipment is { } equipment && CanEditEquipment(npc)
@@ -104,22 +129,32 @@ internal sealed partial class NpcEditorRuntime
             && (equipment.Before == null || !ArmorPositionTaken(npc, equipment.Slot, equipment.Before));
     }
 
-    static bool IsSignedCombatStat(CharacterStat stat)
-        => stat is CharacterStat.AMSModifier or CharacterStat.DMSModifier or CharacterStat.ProjectileDamageModifier
-            or CharacterStat.MeleeDamageModifier or CharacterStat.EnergyDamageModifier or CharacterStat.ChemicalDamageModifier
-            or CharacterStat.RadiationDamageModifier or CharacterStat.ColdDamageModifier or CharacterStat.FireDamageModifier
-            or CharacterStat.PoisonDamageModifier or CharacterStat.NanoDamageModifier;
-
     static bool CanEditStat(NpcCharacter npc, CharacterStat stat)
-        => !npc.IsDead && npc.Attackable && npc.Pet == null
-            && (IsSignedCombatStat(stat) || stat is CharacterStat.Health or CharacterStat.CurrentNano
-                or CharacterStat.ProjectileAC or CharacterStat.MeleeAC or CharacterStat.EnergyAC or CharacterStat.ChemicalAC
-                or CharacterStat.RadiationAC or CharacterStat.ColdAC or CharacterStat.PoisonAC or CharacterStat.FireAC
-                or CharacterStat.DuckExp or CharacterStat.DodgeRanged or CharacterStat.EvadeClsC or CharacterStat.NanoAC);
+        => LiveStatAvailabilityError(npc, stat) == null;
+
+    static string? LiveStatAvailabilityError(NpcCharacter npc, CharacterStat stat)
+    {
+        CharacterStat? current = NpcEditorStatPolicy.DependentVital(stat);
+        if (npc.IsDead || !npc.Attackable || npc.Pet != null || !NpcEditorStatPolicy.Supports(stat)
+            || (NpcEditorStatPolicy.IsBehaviorStat(stat) && npc.IsInCombat)
+            || (current is { } currentStat && ReadStat(npc, currentStat, StatDetail.Base) == null))
+            return "This stat does not support live editing on the selected NPC.";
+        if (npc.HasBaseDependentPercentageBonus(stat)
+            || (current is { } dependent && npc.HasBaseDependentPercentageBonus(dependent)))
+            return "An active percentage modifier depends on this base value. Use a saved edit for future spawns.";
+        return null;
+    }
 
     static string? StatValidationError(NpcCharacter npc, CharacterStat stat, int value, bool restoring)
+        => PlanLiveStat(npc, stat, value, restoring, null, out _);
+
+    static string? PlanLiveStat(
+        NpcCharacter npc, CharacterStat stat, int value, bool restoring, int? restoreDependent, out int? dependentBase)
     {
-        if (!CanEditStat(npc, stat) || ReadStat(npc, stat, StatDetail.Base) == null)
+        dependentBase = null;
+        if (LiveStatAvailabilityError(npc, stat) is string unavailable)
+            return unavailable;
+        if (ReadStat(npc, stat, StatDetail.Base) == null)
             return "This stat does not support live editing on the selected NPC.";
 
         long effective = (long)value + npc.Stats.GetOrZero(stat, StatDetail.Bonus);
@@ -127,27 +162,57 @@ internal sealed partial class NpcEditorRuntime
             || StatCollection.IsUnset((int)effective))
             return "The result is outside the stat's supported range.";
 
-        if (stat is CharacterStat.Health or CharacterStat.CurrentNano)
+        if (NpcEditorStatPolicy.DependentVital(stat) is { } dependent)
+        {
+            int minimum = dependent == CharacterStat.Health ? 1 : 0;
+            int oldMaximum = npc.Stats.GetOrZero(stat);
+            int oldCurrent = npc.Stats.GetOrZero(dependent);
+            if ((!restoring && !NpcEditorStatPolicy.IsAllowedValue(stat, value))
+                || value < minimum || effective < minimum
+                || !NpcEditorStatPolicy.ValidVitalPair(oldCurrent, oldMaximum, minimum))
+                return "The live maximum and current values must be within the supported vital range.";
+
+            int currentBonus = npc.Stats.GetOrZero(dependent, StatDetail.Bonus);
+            long baseValue = restoreDependent ?? (long)NpcEditorStatPolicy.ResizeVital(
+                oldCurrent, oldMaximum, (int)effective, minimum) - currentBonus;
+            long fullValue = baseValue + currentBonus;
+            if (baseValue < 0 || baseValue > int.MaxValue || fullValue < minimum || fullValue > effective
+                || StatCollection.IsUnset((int)baseValue) || StatCollection.IsUnset((int)fullValue))
+                return "The active current-vital modifiers prevent a safe edit to that maximum.";
+            dependentBase = (int)baseValue;
+        }
+        else if (stat is CharacterStat.Health or CharacterStat.CurrentNano)
         {
             bool health = stat == CharacterStat.Health;
             int max = npc.Stats.GetOrZero(health ? CharacterStat.MaxHealth : CharacterStat.MaxNanoEnergy);
-            if (max <= 0 || value < 0 || effective < (health ? 1 : 0) || effective > max)
+            if (value < 0 || !NpcEditorStatPolicy.ValidVitalPair((int)effective, max, health ? 1 : 0))
                 return "The resulting vital must remain within the live maximum and keep the NPC alive.";
         }
-        else if (!restoring && (value < (IsSignedCombatStat(stat) ? -MaxCombatStat : 0) || value > MaxCombatStat))
+        else if (!restoring && !NpcEditorStatPolicy.IsAllowedValue(stat, value))
         {
-            return "The combat stat is outside the editor's supported range.";
+            return "The stat value is outside the editor's supported range.";
         }
         return null;
     }
 
-    internal static void SetStat(NpcCharacter npc, CharacterStat stat, int value, bool restoring = false)
+    internal static void SetStat(
+        NpcCharacter npc, CharacterStat stat, int value, bool restoring = false, int? restoreDependent = null)
     {
-        string? error = StatValidationError(npc, stat, value, restoring);
+        string? error = PlanLiveStat(npc, stat, value, restoring, restoreDependent, out int? dependentBase);
         if (error != null)
             throw new NpcEditorRuntimeException(400, error);
 
         npc.Stats.Set(stat, value, StatDetail.Base, dirty: true);
+        if (dependentBase is { } baseValue && NpcEditorStatPolicy.DependentVital(stat) is { } current)
+        {
+            npc.Stats.Set(current, baseValue, StatDetail.Base, dirty: true);
+            CharacterStat percent = current == CharacterStat.Health
+                ? CharacterStat.PercentRemainingHealth : CharacterStat.PercentRemainingNano;
+            if (npc.Stats.GetOrZero(stat) == 0)
+                npc.Stats.Set(percent, 0, StatDetail.Base, dirty: true);
+            else
+                npc.SyncVitalPercent(npc.Stats.GetOrZero(current), stat, percent);
+        }
         npc.FlushDirtyStats();
     }
 
@@ -191,13 +256,16 @@ internal sealed partial class NpcEditorRuntime
     }
 
     internal static EquipmentChange EditEquipment(
-        NpcCharacter npc, IItemTemplateCatalog catalog, IItemBuilder builder, NpcEditorEquipmentEdit edit)
+        NpcCharacter npc, IItemTemplateCatalog catalog, IItemBuilder builder, NpcEditorEquipmentEdit edit,
+        bool preview = false, int? expectedFreeSlot = null)
     {
         if (!CanEditEquipment(npc))
             throw new NpcEditorRuntimeException(409, "Live equipment editing requires a living template NPC out of combat, without a pet owner or shop.");
 
         bool addingArmor = edit.Slot == -1;
         int slot = addingArmor ? npc.Equipment.FindFreeSlot() : edit.Slot;
+        if (expectedFreeSlot is int expected && slot != expected)
+            throw new NpcEditorRuntimeException(409, "The available armor slot changed. Preview the batch again.");
         if (slot < npc.Equipment.Offset || slot >= npc.Equipment.Offset + npc.Equipment.Capacity)
             throw new NpcEditorRuntimeException(400, "No supported equipment slot is available.");
 
@@ -234,14 +302,15 @@ internal sealed partial class NpcEditorRuntime
             {
                 throw new NpcEditorRuntimeException(400, "Select a visible weapon compatible with the NPC hand.");
             }
-            replacement = builder.CreateWithNewInstance(id, id, template.Quality, ItemSource.Other);
+            replacement = preview ? candidate : builder.CreateWithNewInstance(id, id, template.Quality, ItemSource.Other);
         }
         else if (previous == null || edit.Quality.HasValue)
         {
             throw new NpcEditorRuntimeException(400, "Select an equipped NPC armor or visual weapon to remove.");
         }
 
-        SetEquipmentSlot(npc, slot, previous, replacement);
+        if (!preview)
+            SetEquipmentSlot(npc, slot, previous, replacement);
         return new EquipmentChange(slot, previous, replacement);
     }
 

@@ -7,14 +7,14 @@ internal sealed record NpcEditorIdentity(int PlayfieldId, int IdentityType, int 
 
 internal sealed record NpcEditorNpc(
     NpcEditorIdentity Identity, int ClientPlayfieldId, string Name, int Level,
-    int? TemplateId, string? TemplateHash, string? SpawnHash, int? MonsterData, string SpawnSource);
+    int? TemplateId, string? TemplateHash, string? SpawnHash, int? MonsterData, string SpawnSource, string[]? FamilyHashes = null);
 
 internal sealed record NpcEditorRespawn(
     int Seconds, int Chance, bool RespawnsAfterDeath, string State, DateTime? NextSpawnUtc);
 
 internal sealed record NpcEditorStat(
     int StatId, string Name, int? RuntimeBase, int? RuntimeBonus, int? RuntimeValue,
-    int? ConfiguredValue, bool Editable);
+    int? ConfiguredValue, bool Editable, string? ConfiguredSource = null);
 
 internal sealed record NpcEditorEquippedItem(
     int Slot, int InstanceId, int LowId, int HighId, int Quality, string Name, string ItemClass,

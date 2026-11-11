@@ -37,6 +37,7 @@ namespace ZoneEngine_New.Core.GameData
             ArgumentNullException.ThrowIfNull(families);
             ArgumentNullException.ThrowIfNull(leaves);
             _families = families;
+            _familyParents = new(() => IndexFamilyParents(families));
             _leaves = leaves;
             _spawnAll = spawnAll ?? new HashSet<string>(StringComparer.Ordinal);
             _random = random ?? Random.Shared;
@@ -59,7 +60,8 @@ namespace ZoneEngine_New.Core.GameData
             {
                 RuleFeatures = RuleFeatures,
                 EditorLoot = journal,
-                EditorEquipment = EditorEquipment
+                EditorEquipment = EditorEquipment,
+                EditorStats = EditorStats
             };
 
         internal bool TryGetEditableLootLeaf(string hash, out NpcLeaf leaf)
@@ -362,6 +364,7 @@ namespace ZoneEngine_New.Core.GameData
             MobTemplate template = Materialize(leaf, desiredLevel, RuleFeatures?.Invoke(leaf.Hash));
             template.EditorLootLeaf = leaf;
             ApplyEditorEquipment(template, leaf);
+            ApplyEditorStats(template, leaf);
             if (EditorLoot.Templates.TryGetValue(leaf.Hash, out NpcEditorLootHistory? history))
             {
                 template.ItemTable = NpcEditorLootJournal.MaterializeBand(leaf.Bands[template.AuthoredBandIndex],

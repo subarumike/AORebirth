@@ -29,7 +29,7 @@ namespace ZoneEngine_New.Core.NpcEditor
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Playfield;
 
-    internal sealed class NpcEditorHost(WebApplication app, X509Certificate2 certificate) : IAsyncDisposable
+    internal sealed partial class NpcEditorHost(WebApplication app, X509Certificate2 certificate) : IAsyncDisposable
     {
         const string Route = "/npc-editor";
         const string PortVariable = "AO_REBIRTH_NPC_EDITOR_PORT";
@@ -60,14 +60,15 @@ namespace ZoneEngine_New.Core.NpcEditor
             var sessions = new NpcEditorSessions(MySqlAccountSanctionRepository.LoadEditorCredentials,
                 TimeProvider.System, readLevel, writeLevel, allowWrites,
                 !string.IsNullOrWhiteSpace(GameDataPaths.ResolveOverrideRoot()));
-            var runtime = new NpcEditorRuntime(services.GetRequiredService<PlayfieldManager>());
+            var runtime = new NpcEditorRuntime(services.GetRequiredService<PlayfieldManager>(), gameData);
 
             X509Certificate2 certificate = CreateCertificate();
             WebApplication? app = null;
             try
             {
                 app = Build(port, certificate, sessions, logger);
-                MapEditorRoutes(app, runtime, loot, equipment, itemBrowser);
+                MapEditorRoutes(app, runtime, loot, equipment, itemBrowser,
+                    new NpcEditorStats(gameData), new NpcEditorSpawn(gameData));
                 app.StartAsync().GetAwaiter().GetResult();
                 string fingerprint = certificate.GetCertHashString(HashAlgorithmName.SHA256);
                 logger.Info($"NPC Editor listening on https://127.0.0.1:{port} TLS SHA256={fingerprint}.");
@@ -211,7 +212,7 @@ namespace ZoneEngine_New.Core.NpcEditor
                 }
                 catch (Exception ex) when (!context.Response.HasStarted)
                 {
-                    logger.Warn($"NPC Editor request failed ({ex.GetType().Name}).");
+                    logger.Error(ex, "NPC Editor request failed.");
                     await Error(500, "NPC Editor request failed. See the ZoneEngine log.").ExecuteAsync(context);
                 }
             });
@@ -230,7 +231,8 @@ namespace ZoneEngine_New.Core.NpcEditor
         }
 
         internal static void MapEditorRoutes(WebApplication app, NpcEditorRuntime runtime, NpcEditorLoot loot,
-            NpcEditorEquipment equipment, NpcEditorItemBrowser itemBrowser)
+            NpcEditorEquipment equipment, NpcEditorItemBrowser itemBrowser,
+            NpcEditorStats? stats = null, NpcEditorSpawn? spawn = null)
         {
             var api = app.MapGroup(Route);
             api.MapGet("/npcs", async (string? q, HttpContext ctx) =>
@@ -247,6 +249,11 @@ namespace ZoneEngine_New.Core.NpcEditor
             var npc = api.MapGroup("/npcs/{playfieldId:int}/{identityType:int}/{instanceId:int}/{generation:guid}");
             npc.MapGet("", async (int playfieldId, int identityType, int instanceId, Guid generation, HttpContext ctx) =>
                 Results.Ok(await runtime.InspectAsync(new(playfieldId, identityType, instanceId, generation), ctx.RequestAborted)));
+            npc.MapGet("/presence", async (int playfieldId, int identityType, int instanceId, Guid generation, HttpContext ctx) =>
+            {
+                var identity = new NpcEditorIdentity(playfieldId, identityType, instanceId, generation);
+                return Results.Ok(await runtime.WithNpcAsync(identity, _ => identity, ctx.RequestAborted));
+            });
             npc.MapGet("/stats", async (int playfieldId, int identityType, int instanceId, Guid generation, HttpContext ctx) =>
                 Results.Ok(await runtime.ReadStatsAsync(new(playfieldId, identityType, instanceId, generation), ctx.RequestAborted)));
             npc.MapPost("/stats", async (int playfieldId, int identityType, int instanceId, Guid generation,
@@ -280,6 +287,14 @@ namespace ZoneEngine_New.Core.NpcEditor
 
             MapLootRoutes(npc, runtime, loot);
             MapEquipmentRoutes(npc, runtime, equipment);
+            MapBehaviorRoutes(npc, runtime);
+            if (stats != null)
+                MapStatsRoutes(npc, runtime, stats);
+            if (spawn != null)
+            {
+                MapSpawnRoutes(api, npc, runtime, spawn);
+                MapBatchRoutes(api, new NpcEditorBatch(runtime, loot, spawn, app.Logger));
+            }
         }
 
         static void MapLootRoutes(RouteGroupBuilder npc, NpcEditorRuntime runtime, NpcEditorLoot loot)

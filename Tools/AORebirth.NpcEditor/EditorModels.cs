@@ -11,14 +11,14 @@ internal sealed record NpcIdentity(int PlayfieldId, int IdentityType, int Instan
 }
 
 internal sealed record NpcSummary(NpcIdentity Identity, string Name, int Level, int? TemplateId,
-    string? TemplateHash, string? SpawnHash, int? MonsterData, string? SpawnSource, int ClientPlayfieldId);
+    string? TemplateHash, string? SpawnHash, int? MonsterData, string? SpawnSource, int ClientPlayfieldId, string[]? FamilyHashes);
 
 internal sealed record NpcDetail(NpcSummary Npc, double X, double Y, double Z, string? SpawnPointKey,
     JsonElement? Respawn, StatRow[] Stats, EquipmentRow[] Equipment, ConfiguredEquipmentRow[] ConfiguredEquipment,
     NanoRow[] UploadedNanos, NanoRow[] ActiveNanos, JsonElement Brain, ChangeRow[] Changes, bool CanAddArmor);
 
 internal sealed record StatRow(int StatId, string Name, int? RuntimeBase, int? RuntimeBonus, int? RuntimeValue,
-    int? ConfiguredValue, bool Editable);
+    int? ConfiguredValue, bool Editable, string? ConfiguredSource);
 
 internal sealed record EquipmentRow(int Slot, int InstanceId, int LowId, int HighId, int Quality, string Name,
     string ItemClass, string Role, int DefaultPosition, bool Replaceable, bool Removable);

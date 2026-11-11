@@ -28,6 +28,9 @@
             <Setter Property="Foreground" Value="{StaticResource Muted}" />
             <Setter Property="TextWrapping" Value="Wrap" />
         </Style>
+        <DataTemplate x:Key="EditorOptionLabel">
+            <TextBlock Text="{Binding Label}" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+        </DataTemplate>
         <Style TargetType="TextBox">
             <Setter Property="Foreground" Value="{StaticResource Text}" />
             <Setter Property="Background" Value="{StaticResource Input}" />

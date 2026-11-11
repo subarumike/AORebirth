@@ -18,6 +18,7 @@ public partial class MainWindow : Window
     private EditorSession? session;
     private NpcDetail? detail;
     private TargetHint? lastHint;
+    private NpcIdentity? followedNpc;
     private long nextTargetResolve;
     private int? statDraftBase;
     private bool updatingStats;
@@ -26,6 +27,7 @@ public partial class MainWindow : Window
     private bool busy;
     private bool bridgeReading;
     private bool settingNpcSelection;
+    private bool selectedNpcStale;
 
     public MainWindow()
     {
@@ -44,7 +46,8 @@ public partial class MainWindow : Window
 
     private EditorApi Api => api ?? throw new InvalidOperationException("Connect to ZoneEngine first.");
 
-    private bool CanWrite => !busy && session is { CanWrite: true } && LockNpc.IsChecked == true && detail != null;
+    private bool CanWrite => !busy && !BatchSelectionActive && !selectedNpcStale && session is { CanWrite: true }
+        && LockNpc.IsChecked == true && detail != null;
 
     private async void Connect_Click(object sender, RoutedEventArgs e) => await RunAsync(async () =>
     {
@@ -94,6 +97,7 @@ public partial class MainWindow : Window
         session = null;
         lastHint = null;
         FollowTarget.IsChecked = false;
+        BatchMode.IsChecked = false;
         NpcGrid.ItemsSource = null;
         ClearDetail();
     }
@@ -109,13 +113,22 @@ public partial class MainWindow : Window
     private async Task SearchNpcsAsync()
     {
         string query = Uri.EscapeDataString(NpcQuery.Text.Trim());
+        if (!TryGetBatchFilter(out string family, out int? minLevel, out int? maxLevel))
+            return;
+
         NpcSummary[] matches = await Api.GetAsync<NpcSummary[]>($"npcs?q={query}");
+        if (BatchSelectionActive)
+        {
+            matches = matches.Where(row => (family.Length == 0 || row.FamilyHashes?.Contains(family, StringComparer.OrdinalIgnoreCase) == true)
+                && (minLevel == null || row.Level >= minLevel) && (maxLevel == null || row.Level <= maxLevel)).ToArray();
+        }
         NpcIdentity? displayed = detail?.Npc.Identity;
         settingNpcSelection = true;
         try
         {
             NpcGrid.ItemsSource = matches;
-            NpcGrid.SelectedItem = matches.FirstOrDefault(npc => npc.Identity == displayed);
+            if (!BatchSelectionActive)
+                NpcGrid.SelectedItem = matches.FirstOrDefault(npc => npc.Identity == displayed);
         }
         finally
         {
@@ -127,12 +140,22 @@ public partial class MainWindow : Window
 
     private async void Npc_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+        if (BatchSelectionActive)
+        {
+            RefreshBatchControls();
+            return;
+        }
         if (!settingNpcSelection && LockNpc.IsChecked != true && NpcGrid.SelectedItem is NpcSummary npc)
             await RunAsync(() => LoadDetailAsync(npc.Identity));
     }
 
     private async void RefreshDetail_Click(object sender, RoutedEventArgs e)
     {
+        if (standaloneSpawn is { } point)
+        {
+            await RunAsync(() => LoadStandaloneSpawnAsync(point));
+            return;
+        }
         var identity = detail?.Npc.Identity ?? (NpcGrid.SelectedItem as NpcSummary)?.Identity;
         if (identity != null)
             await RunAsync(() => LoadDetailAsync(identity));
@@ -144,13 +167,24 @@ public partial class MainWindow : Window
         if (!sameSpawn)
             ClearDetail();
 
-        NpcDetail next = await Api.GetAsync<NpcDetail>(identity.Path);
+        NpcDetail next;
+        try
+        {
+            next = await Api.GetAsync<NpcDetail>(identity.Path);
+        }
+        catch (EditorApiException ex) when (sameSpawn && ex.Status is HttpStatusCode.NotFound or HttpStatusCode.Gone or HttpStatusCode.Conflict)
+        {
+            MarkSelectedNpcStale();
+            throw;
+        }
         if (next.Npc.Identity != identity)
             throw new InvalidDataException("ZoneEngine returned an unexpected NPC identity. Select the spawn again.");
 
         RenderDetail(next, preserveStatDraft: sameSpawn);
+        if (!sameSpawn)
+            SetConfiguredStatScopes(next.Npc);
         Status.Text = $"Loaded {next.Npc.Name}.";
-        await Task.WhenAll(LoadLootAsync(identity), LoadSavedEquipmentAsync(identity));
+        await Task.WhenAll(LoadLootAsync(identity), LoadSavedEquipmentAsync(identity), LoadSelectedConfigurationAsync(refresh: true));
         if (sameSpawn && LootSimulationGrid.ItemsSource != null)
             ClearLootSimulation("NPC refreshed. Run a new simulation for the current loot inputs.");
     }
@@ -158,6 +192,9 @@ public partial class MainWindow : Window
     private void ClearDetail()
     {
         detail = null;
+        followedNpc = null;
+        standaloneSpawn = null;
+        selectedNpcStale = false;
         LockNpc.IsChecked = false;
         DetailHeading.Text = "Select a spawned NPC";
         DetailIdentity.Text = "";
@@ -171,11 +208,15 @@ public partial class MainWindow : Window
         ChangesGrid.ItemsSource = null;
         ClearLoot();
         ClearEquipment();
+        ClearConfiguredStats();
+        ClearSpawn();
+        ClearBehavior();
     }
 
     private void RenderDetail(NpcDetail next, bool preserveStatDraft = false)
     {
         detail = next;
+        selectedNpcStale = false;
         NpcSummary npc = next.Npc;
         DetailHeading.Text = $"{npc.Name}  ·  Level {npc.Level}";
         DetailIdentity.Text = $"{npc.Identity}  ·  Client PF {npc.ClientPlayfieldId}";
@@ -269,7 +310,9 @@ public partial class MainWindow : Window
 
     private async void StatsTimer_Tick(object? sender, EventArgs e)
     {
-        if (api == null || detail == null || busy || statsReading || pickerOpen || !IsActive || Details.SelectedItem != StatsTab)
+        bool showLiveStats = Details.SelectedItem == StatsTab && StatsViews.SelectedItem == LiveStatsTab;
+        if (api == null || detail == null || selectedNpcStale || busy || statsReading || pickerOpen || !IsActive
+            || !showLiveStats && LockNpc.IsChecked != true)
             return;
 
         var connection = api;
@@ -277,6 +320,12 @@ public partial class MainWindow : Window
         statsReading = true;
         try
         {
+            if (!showLiveStats)
+            {
+                await connection.GetAsync<NpcIdentity>(snapshot.Npc.Identity.Path + "/presence");
+                return;
+            }
+
             StatRow[] rows = await connection.GetAsync<StatRow[]>(snapshot.Npc.Identity.Path + "/stats");
             if (connection == api && snapshot == detail && !busy)
             {
@@ -291,12 +340,25 @@ public partial class MainWindow : Window
         catch (Exception ex)
         {
             if (connection == api && snapshot == detail && !busy)
-                StatsStatus.Text = DescribeError(ex);
+            {
+                if (showLiveStats)
+                    StatsStatus.Text = DescribeError(ex);
+                if (ex is EditorApiException { Status: HttpStatusCode.NotFound or HttpStatusCode.Gone or HttpStatusCode.Conflict })
+                    MarkSelectedNpcStale();
+            }
         }
         finally
         {
             statsReading = false;
         }
+    }
+
+    private void MarkSelectedNpcStale()
+    {
+        selectedNpcStale = true;
+        if (detail?.Npc is { } npc)
+            DetailHeading.Text = $"{npc.Name}  ·  Spawn unavailable";
+        RefreshControls();
     }
 
     private async void ApplyStat_Click(object sender, RoutedEventArgs e)
@@ -379,7 +441,8 @@ public partial class MainWindow : Window
 
     private async void BridgeTimer_Tick(object? sender, EventArgs e)
     {
-        if (api == null || busy || bridgeReading || pickerOpen || FollowTarget.IsChecked != true || LockNpc.IsChecked == true)
+        if (api == null || busy || bridgeReading || pickerOpen || BatchSelectionActive
+            || FollowTarget.IsChecked != true || LockNpc.IsChecked == true)
             return;
 
         bridgeReading = true;
@@ -387,7 +450,8 @@ public partial class MainWindow : Window
         try
         {
             var (hint, status) = await Task.Run(TargetBridge.Read);
-            if (connection != api || busy || pickerOpen || FollowTarget.IsChecked != true || LockNpc.IsChecked == true)
+            if (connection != api || busy || pickerOpen || BatchSelectionActive
+                || FollowTarget.IsChecked != true || LockNpc.IsChecked == true)
                 return;
 
             long now = Environment.TickCount64;
@@ -397,14 +461,36 @@ public partial class MainWindow : Window
             BridgeStatus.Text = status;
             lastHint = hint;
             if (hint == null)
+            {
+                ClearFollowedNpc();
                 return;
+            }
             nextTargetResolve = now + 5_000;
+
+            NpcIdentity identity;
+            try
+            {
+                identity = await connection.GetAsync<NpcIdentity>(hint.ResolvePath);
+            }
+            catch (EditorApiException ex) when (ex.Status is HttpStatusCode.NotFound or HttpStatusCode.Conflict)
+            {
+                if (CanFollow(connection))
+                {
+                    BridgeStatus.Text = ex.Message;
+                    ClearFollowedNpc();
+                }
+                return;
+            }
+            if (!CanFollow(connection))
+                return;
+            if (detail?.Npc.Identity == identity && !selectedNpcStale)
+            {
+                followedNpc = identity;
+                return;
+            }
 
             await RunAsync(async () =>
             {
-                NpcIdentity identity = await Api.GetAsync<NpcIdentity>(hint.ResolvePath);
-                if (detail?.Npc.Identity == identity)
-                    return;
                 settingNpcSelection = true;
                 try
                 {
@@ -416,12 +502,35 @@ public partial class MainWindow : Window
                 }
 
                 await LoadDetailAsync(identity);
+                followedNpc = identity;
             });
+        }
+        catch (Exception ex)
+        {
+            if (CanFollow(connection))
+            {
+                if (ex is EditorApiException { Status: HttpStatusCode.Unauthorized })
+                    ResetConnection();
+                Status.Text = DescribeError(ex);
+            }
         }
         finally
         {
             bridgeReading = false;
         }
+    }
+
+    private bool CanFollow(EditorApi connection) => connection == api && !busy && !pickerOpen && !BatchSelectionActive
+        && FollowTarget.IsChecked == true && LockNpc.IsChecked != true;
+
+    private void ClearFollowedNpc()
+    {
+        if (followedNpc == null || detail?.Npc.Identity != followedNpc)
+            return;
+
+        NpcGrid.SelectedItem = null;
+        ClearDetail();
+        RefreshControls();
     }
 
     private async Task RunAsync(Func<Task> action)
@@ -460,16 +569,24 @@ public partial class MainWindow : Window
         UserName.IsEnabled = api == null && !busy;
         Password.IsEnabled = api == null && !busy;
         Fingerprint.IsEnabled = api == null && !busy;
-        LockNpc.IsEnabled = detail != null;
+        LockNpc.IsEnabled = !BatchSelectionActive && detail != null;
         NpcGrid.IsEnabled = LockNpc.IsChecked != true;
-        RefreshDetail.IsEnabled = detail != null || NpcGrid.SelectedItem != null;
-        Details.IsEnabled = detail != null;
+        BrowseSpawnPoints.IsEnabled = !BatchSelectionActive && LockNpc.IsChecked != true && !busy;
+        RefreshDetail.Content = standaloneSpawn != null ? "Refresh point" : "Refresh NPC";
+        RefreshDetail.IsEnabled = !BatchSelectionActive && (detail != null || standaloneSpawn != null || NpcGrid.SelectedItem != null);
+        Details.IsEnabled = detail != null || standaloneSpawn != null;
+        foreach (TabItem tab in Details.Items)
+            tab.IsEnabled = detail != null || tab == SpawnTab;
         ApplyStat.IsEnabled = CanWrite && statDraftBase.HasValue
             && StatsGrid.SelectedItem is StatRow { Editable: true } stat && stat.RuntimeBase == statDraftBase;
         RevertStatDraft.IsEnabled = !busy && StatsGrid.SelectedItem is StatRow;
         RevertChange.IsEnabled = CanWrite && ChangesGrid.SelectedItem is ChangeRow { Revertible: true, Reverted: false };
         RefreshLootControls();
         RefreshEquipmentControls();
+        RefreshConfiguredStatControls();
+        RefreshSpawnControls();
+        RefreshBehaviorControls();
+        RefreshBatchControls();
     }
 
     private void BrowseItems_Click(object sender, RoutedEventArgs e) => OpenCatalog("Item catalog", browseOnly: true);

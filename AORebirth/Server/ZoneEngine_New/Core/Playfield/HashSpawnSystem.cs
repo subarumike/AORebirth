@@ -17,6 +17,7 @@ namespace ZoneEngine_New.Core.Playfield
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Mobs;
+    using ZoneEngine_New.Core.NpcEditor;
     using ZoneEngine_New.Core.Playfield.Locality;
 
     internal enum HashSpawnState
@@ -165,6 +166,9 @@ namespace ZoneEngine_New.Core.Playfield
         /// <summary>NpcScripts binding key (<see cref="NpcScripts.SpawnPointKey"/>): hash, position and stack ordinal.</summary>
         internal string? Key { get; set; }
 
+        /// <summary>Original Spawns.json row, independent of the effective runtime hash and coordinates.</summary>
+        internal int AuthoredSpawnIndex { get; init; } = -1;
+
         /// <summary>Accepted mission branches; keep their ordinals through sleep and reconstruction.</summary>
         internal MobTemplate[]? FrozenTemplates { get; init; }
 
@@ -246,6 +250,15 @@ namespace ZoneEngine_New.Core.Playfield
 
         internal int PointCount => _allPoints.Count;
 
+        internal int CountAuthoredSpawnNpcs(int authoredIndex)
+            => FindAuthoredNpcPoint(authoredIndex)?.MemberCount ?? 0;
+
+        internal HashSpawnPoint? FindAuthoredNpcPoint(int authoredIndex)
+            => authoredIndex < 0 ? null : _allPoints.Find(point => !point.IsStatic && point.AuthoredSpawnIndex == authoredIndex);
+
+        internal IEnumerable<HashSpawnPoint> AuthoredNpcPoints()
+            => _allPoints.Where(point => !point.IsStatic && point.AuthoredSpawnIndex >= 0);
+
         internal bool TryGetSpawnPoint(NpcCharacter npc, out HashSpawnPoint point)
         {
             ArgumentNullException.ThrowIfNull(npc);
@@ -290,8 +303,9 @@ namespace ZoneEngine_New.Core.Playfield
             int skipped = 0;
             int excluded = 0;
 
-            foreach (PlayfieldSpawnEntry entry in entries)
+            for (int authoredIndex = 0; authoredIndex < entries.Length; authoredIndex++)
             {
+                PlayfieldSpawnEntry entry = entries[authoredIndex];
                 if (!SpawnContentValidation.IsValid(entry))
                 {
                     skipped++;
@@ -345,7 +359,12 @@ namespace ZoneEngine_New.Core.Playfield
                     continue;
                 }
 
-                Vector3 primaryPosition = new Vector3(entry.Position[0], entry.Position[1], entry.Position[2]);
+                NpcEditorSpawnSettings? editor = isMob && _gameData is GameDataStore store
+                    ? store.SpawnEditor.Resolve(_playfield.ResourceId, authoredIndex, entry, grid)
+                    : null;
+                Vector3 primaryPosition = editor == null
+                    ? new Vector3(entry.Position[0], entry.Position[1], entry.Position[2])
+                    : new Vector3(editor.X, editor.Y, editor.Z);
                 if (!grid.TryResolveCell(primaryPosition, out Cell cell))
                 {
                     _logger.Warn(
@@ -361,7 +380,7 @@ namespace ZoneEngine_New.Core.Playfield
                     continue;
                 }
 
-                SpawnSite[] sites = BuildSites(entry, primaryPosition);
+                SpawnSite[] sites = BuildSites(entry, primaryPosition, editor);
                 if (sites.Length == 0)
                 {
                     skipped++;
@@ -369,15 +388,15 @@ namespace ZoneEngine_New.Core.Playfield
                 }
 
                 HashSpawnPoint point = new HashSpawnPoint(
-                    spawnHash,
+                    editor?.Hash ?? spawnHash,
                     sites,
-                    Math.Max(0, entry.RespawnTime),
-                    entry.RespawnChance,
-                    entry.MinLevel,
-                    entry.MaxLevel,
+                    Math.Max(0, editor?.RespawnSeconds ?? entry.RespawnTime),
+                    editor?.RespawnChance ?? entry.RespawnChance,
+                    editor?.MinLevel ?? entry.MinLevel,
+                    editor?.MaxLevel ?? entry.MaxLevel,
                     cell.Id,
                     entry,
-                    isStatic);
+                    isStatic) { AuthoredSpawnIndex = authoredIndex };
 
                 if (!_pointsByCell.TryGetValue(cell.Id, out List<HashSpawnPoint>? list))
                 {
@@ -440,9 +459,14 @@ namespace ZoneEngine_New.Core.Playfield
             foreach (HashSpawnPoint point in _allPoints)
             {
                 Vector3 centre = point.Sites[0].Centre;
-                string baseKey = NpcScripts.SpawnPointKey.Build(point.HashText, centre.xf, centre.yf, centre.zf, 1);
+                float[]? authoredPosition = point.AuthoredSpawnIndex >= 0 ? point.Source.Position : null;
+                string hash = authoredPosition == null ? point.HashText : point.Source.HashText;
+                float x = authoredPosition?[0] ?? centre.xf;
+                float y = authoredPosition?[1] ?? centre.yf;
+                float z = authoredPosition?[2] ?? centre.zf;
+                string baseKey = NpcScripts.SpawnPointKey.Build(hash, x, y, z, 1);
                 ordinals[baseKey] = ordinals.TryGetValue(baseKey, out int seen) ? seen + 1 : 1;
-                point.Key = NpcScripts.SpawnPointKey.Build(point.HashText, centre.xf, centre.yf, centre.zf, ordinals[baseKey]);
+                point.Key = NpcScripts.SpawnPointKey.Build(hash, x, y, z, ordinals[baseKey]);
                 keys.Add(point.Key);
             }
 
@@ -744,14 +768,14 @@ namespace ZoneEngine_New.Core.Playfield
             "halloween_decor" or "halloween_pvp_uph" or "halloween_pvp_uph_boss" or
             "halloween_quests" or "halloween_fc_shop" or "halloween_buttons";
 
-        private static SpawnSite[] BuildSites(PlayfieldSpawnEntry entry, Vector3 primaryPosition)
+        private static SpawnSite[] BuildSites(PlayfieldSpawnEntry entry, Vector3 primaryPosition, NpcEditorSpawnSettings? editor)
         {
             List<SpawnSite> sites = new()
             {
                 new SpawnSite(
                     primaryPosition,
-                    entry.Angle,
-                    entry.AngleW,
+                    editor?.FacingDegrees ?? entry.Angle,
+                    editor?.FacingWidthDegrees ?? entry.AngleW,
                     entry.Radius)
             };
 

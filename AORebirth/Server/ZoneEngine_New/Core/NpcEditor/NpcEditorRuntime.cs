@@ -17,7 +17,7 @@ using ZoneEngine_New.Core.Inventory;
 using ZoneEngine_New.Core.Mobs;
 using ZoneEngine_New.Core.Playfield;
 
-internal sealed partial class NpcEditorRuntime(PlayfieldManager playfields)
+internal sealed partial class NpcEditorRuntime(PlayfieldManager playfields, GameDataStore? gameData = null)
 {
     const int MaxBrowserRows = 10_000;
     const int MaxCatalogRows = 100;
@@ -166,6 +166,13 @@ internal sealed partial class NpcEditorRuntime(PlayfieldManager playfields)
         }, cancellationToken);
     }
 
+    internal Task<T> WithPlayfieldAsync<T>(int instanceId, Func<Playfield, T> operation, CancellationToken cancellationToken)
+    {
+        if (!playfields.TryGet(instanceId, out Playfield? field) || field == null)
+            throw new NpcEditorRuntimeException(404, "The selected playfield is no longer loaded.");
+        return OnTickAsync(field, () => operation(field), cancellationToken);
+    }
+
     internal static void RequireGeneration(NpcEditorIdentity identity, Guid currentGeneration)
     {
         if (currentGeneration != identity.Generation)
@@ -194,7 +201,7 @@ internal sealed partial class NpcEditorRuntime(PlayfieldManager playfields)
     static bool Matches(NpcEditorNpc row, string filter)
     {
         if (filter.Length == 0 || Contains(row.Name, filter) || Contains(row.TemplateHash, filter)
-            || Contains(row.SpawnHash, filter))
+            || Contains(row.SpawnHash, filter) || row.FamilyHashes?.Any(hash => Contains(hash, filter)) == true)
             return true;
         return int.TryParse(filter, NumberStyles.Integer, CultureInfo.InvariantCulture, out int id)
             && (row.TemplateId == id || row.MonsterData == id || row.Identity.InstanceId == id
@@ -228,7 +235,8 @@ internal sealed partial class NpcEditorRuntime(PlayfieldManager playfields)
     NpcEditorNpc Summarize(Playfield field, NpcCharacter npc)
         => new(Identify(field, npc), field.ClientPlayfieldId, npc.Name ?? string.Empty,
             npc.Stats.GetOrZero(CharacterStat.Level), npc.MobTemplate?.TemplateId, npc.MobTemplate?.Hash,
-            npc.SpawnHash, ReadStat(npc, CharacterStat.MonsterData, StatDetail.Full), npc.SpawnSource.ToString());
+            npc.SpawnHash, ReadStat(npc, CharacterStat.MonsterData, StatDetail.Full), npc.SpawnSource.ToString(),
+            npc.MobTemplate is { UnresolvedPlaceholder: false } template ? gameData?.EditorFamiliesFor(template.Hash) : null);
 
     NpcEditorNpcDetails Snapshot(NpcCharacter npc)
     {
@@ -264,15 +272,20 @@ internal sealed partial class NpcEditorRuntime(PlayfieldManager playfields)
 
     static NpcEditorStat[] StatRows(NpcCharacter npc)
     {
-        IReadOnlyDictionary<int, int>? configured = npc.MobTemplate?.Stats ?? WorldNpcFactory.DefinitionFor(npc)?.Stats;
+        MobTemplate? template = npc.MobTemplate;
+        IReadOnlyDictionary<int, int>? configured = template?.Stats ?? WorldNpcFactory.DefinitionFor(npc)?.Stats;
+        string authoredSource = template == null ? "Authored world NPC placement" : "Resolved NPC template";
         return npc.Stats.GetEntries().Select(entry => (int)entry.Stat)
-            .Union(configured?.Keys ?? Enumerable.Empty<int>()).Order().Select(id =>
+            .Union(configured?.Keys ?? Enumerable.Empty<int>()).Union(npc.EditorScopedStats?.Keys ?? []).Order().Select(id =>
             {
                 var stat = (CharacterStat)id;
                 int? liveBase = ReadStat(npc, stat, StatDetail.Base);
                 int? configuredValue = configured != null && configured.TryGetValue(id, out int value) ? value : null;
+                string? source = configuredValue.HasValue ? template?.EditorStatSources?.GetValueOrDefault(id) ?? authoredSource : null;
+                if (npc.EditorScopedStats?.TryGetValue(id, out var scoped) == true)
+                    (configuredValue, source) = scoped;
                 return new NpcEditorStat(id, stat.ToString(), liveBase, ReadStat(npc, stat, StatDetail.Bonus),
-                    ReadStat(npc, stat, StatDetail.Full), configuredValue, liveBase.HasValue && CanEditStat(npc, stat));
+                    ReadStat(npc, stat, StatDetail.Full), configuredValue, liveBase.HasValue && CanEditStat(npc, stat), source);
             }).ToArray();
     }
 

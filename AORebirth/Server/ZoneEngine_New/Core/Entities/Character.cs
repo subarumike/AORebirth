@@ -2704,7 +2704,7 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         /// <summary>0–100 remaining fraction of <paramref name="maxStat"/> after a current-vital change.</summary>
-        void SyncVitalPercent(int current, CharacterStat maxStat, CharacterStat percentStat)
+        internal void SyncVitalPercent(int current, CharacterStat maxStat, CharacterStat percentStat)
         {
             int max = Stats.GetOrZero(maxStat);
             if (max <= 0)
@@ -2712,9 +2712,14 @@ namespace ZoneEngine_New.Core.Entities
 
             // A living vital is never stored as 0%: 5 HP of 1,700 rounded down to 0, and that character logged back in
             // at 0 HP, alive on the server and dead on the client, with no respawn to clear it.
-            int percent = (int)Math.Clamp((long)current * 100 / max, current > 0 ? 1 : 0, 100);
-            Stats.Set(percentStat, percent, StatDetail.Base, dirty: true);
+            Stats.Set(percentStat, VitalPercent(current, max), StatDetail.Base, dirty: true);
         }
+
+        internal static int VitalPercent(int current, int max)
+            => max <= 0 ? 0 : (int)Math.Clamp((long)current * 100 / max, current > 0 ? 1 : 0, 100);
+
+        internal static long ScaleVital(int current, int oldMax, int max)
+            => max == oldMax ? current : current >= oldMax ? max : (long)current * max / oldMax;
 
         /// <summary>
         /// Stored percent when set; otherwise derive from current/max. Missing max → 100.
@@ -2760,11 +2765,7 @@ namespace ZoneEngine_New.Core.Entities
             _vitalMaxes[maxStat] = max;
             // Rounded down both ways, so swapping max-changing gear off and on can never gain a point; a full vital stays
             // full at the new max.
-            long scaled = max == oldMax
-                ? current
-                : current >= oldMax
-                    ? max
-                    : (long)current * max / oldMax;
+            long scaled = ScaleVital(current, oldMax, max);
             int value = (int)Math.Clamp(scaled, 0, Math.Max(0, max));
             if (value == current)
                 return;

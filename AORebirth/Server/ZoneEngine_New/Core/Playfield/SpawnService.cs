@@ -3,6 +3,7 @@ namespace ZoneEngine_New.Core.Playfield
     using System;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.Linq;
 
     using AORebirth.Core.Textures;
 
@@ -163,6 +164,7 @@ namespace ZoneEngine_New.Core.Playfield
             NpcTemplateValidation.RequireSpawnable(template);
             int? spawnLevel = NpcTemplateLevelPolicy.ClampRequestedLevel(template, level);
             var resolvedStats = _gameData.ComposeNpcStats(template, spawnLevel);
+            var scopedSources = (_gameData as GameDataStore)?.ApplyScopedEditorStats(template, _playfield.ResourceId, resolvedStats);
             NpcTemplateLevelPolicy.RequireExactLevel(template, spawnLevel, resolvedStats);
             Identity identity = fixedIdentity ?? _registry.AllocateNpcIdentity();
             if (fixedIdentity != null && _registry.TryGet(identity, out _))
@@ -175,6 +177,7 @@ namespace ZoneEngine_New.Core.Playfield
                 Playfield = _playfield,
                 Name = template.Name,
                 MobTemplate = template,
+                EditorScopedStats = scopedSources?.ToDictionary(entry => entry.Key, entry => (resolvedStats[entry.Key], entry.Value)),
                 SpawnHash = spawnHash ?? template.Hash,
                 SpawnPointKey = spawnPointKey,
                 Attackable = !template.Has(NpcFeature.NoCombat),

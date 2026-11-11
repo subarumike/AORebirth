@@ -11,7 +11,8 @@ public sealed partial class NpcTemplateCatalog
         {
             RuleFeatures = RuleFeatures,
             EditorLoot = EditorLoot,
-            EditorEquipment = journal
+            EditorEquipment = journal,
+            EditorStats = EditorStats
         };
 
     internal bool TryGetEquipmentBand(string hash, int bandIndex, out NpcLevelBand band)

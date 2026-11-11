@@ -385,6 +385,18 @@ namespace ZoneEngine_New.Core.Ai
         /// <summary>The patrol runs between its waypoints (Movement.Patrol.Run); without it the NPC walks.</summary>
         public bool PatrolRun { get; set; }
 
+        internal void ConfigurePatrol(IReadOnlyList<Vector3> waypoints, bool enabled, bool run)
+        {
+            if (PatrolAnchor is not null)
+                StopPathing();
+            LeavePatrolPace();
+            PatrolAnchor = null;
+            PatrolIndex = 0;
+            PatrolWaypoints = waypoints;
+            PatrolRun = run;
+            PatrolEnabled = enabled;
+        }
+
         /// <summary>
         /// The waypoint the patrol is heading for. Kept on the brain, not in PatrolNode: the node ends every think so
         /// the root re-checks leash and combat, and starts the route over only on a tree reset.

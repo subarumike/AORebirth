@@ -79,7 +79,7 @@ internal static class TargetBridge
             if (ticks < now - TimeSpan.FromSeconds(4).Ticks || ticks > now + TimeSpan.FromSeconds(1).Ticks)
                 return false;
 
-            if (playfieldId > 0 && type > 0 && instance != 0)
+            if (playfieldId > 0 && type > 0 && instance > 0)
                 hint = new TargetHint(path, playfieldId, type, instance);
             return true;
         }

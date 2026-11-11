@@ -12,7 +12,7 @@
         </Grid.RowDefinitions>
         <StackPanel Margin="0,0,0,12">
             <TextBlock Text="AORebirth NPC Editor" FontSize="29" FontWeight="SemiBold" />
-            <TextBlock Style="{StaticResource Caption}" Text="ZoneEngine administration · spawned NPCs and template loot" />
+            <TextBlock Style="{StaticResource Caption}" Text="ZoneEngine administration for spawned NPCs and GameData overrides" />
         </StackPanel>
         <Border Grid.Row="1" Background="{StaticResource Panel}" CornerRadius="6" Padding="12" Margin="0,0,0,10">
             <Grid>
@@ -65,7 +65,24 @@
                         <CheckBox x:Name="FollowTarget" Content="Follow local AOSharp" Checked="Follow_Changed" Unchecked="Follow_Changed"
                                   ToolTip="Enable only when the AO client is connected to this same local ZoneEngine." />
                         <CheckBox x:Name="LockNpc" Content="Lock NPC" Checked="Lock_Changed" Unchecked="Lock_Changed" IsEnabled="False" />
+                        <CheckBox x:Name="BatchMode" Content="Batch selection" Checked="BatchMode_Changed" Unchecked="BatchMode_Changed" />
                     </WrapPanel>
+                    <StackPanel x:Name="BatchSelectionPanel" Visibility="Collapsed" Margin="0,4,0,4">
+                        <WrapPanel>
+                            <TextBox x:Name="BatchFamilyFilter" Width="113" Margin="0,0,5,0" MaxLength="64"
+                                     AutomationProperties.Name="Family hash" ToolTip="Exact family hash" KeyDown="NpcQuery_KeyDown" />
+                            <TextBox x:Name="BatchMinLevel" Width="49" Margin="0,0,5,0" MaxLength="5"
+                                     AutomationProperties.Name="Minimum level" ToolTip="Minimum level" KeyDown="NpcQuery_KeyDown" />
+                            <TextBox x:Name="BatchMaxLevel" Width="49" MaxLength="5"
+                                     AutomationProperties.Name="Maximum level" ToolTip="Maximum level" KeyDown="NpcQuery_KeyDown" />
+                        </WrapPanel>
+                        <TextBlock Style="{StaticResource Caption}" Text="Family hash and min/max level · Find applies these filters" Margin="0,3,0,4" />
+                        <WrapPanel>
+                            <Button x:Name="SelectBatchResults" Content="Select results" Click="SelectBatchResults_Click" />
+                            <Button x:Name="ReviewBatch" Content="Review batch…" Click="ReviewBatch_Click" />
+                        </WrapPanel>
+                        <TextBlock x:Name="BatchSelectionStatus" Style="{StaticResource Caption}" Margin="0,3,0,0" />
+                    </StackPanel>
                     <TextBlock x:Name="BridgeStatus" Style="{StaticResource Caption}" Text="Manual selection" />
                 </StackPanel>
                 <DataGrid Grid.Row="2" x:Name="NpcGrid" SelectionChanged="Npc_SelectionChanged">
@@ -85,6 +102,7 @@
                 </Grid.RowDefinitions>
                 <DockPanel LastChildFill="True" Margin="0,0,0,8">
                     <Button DockPanel.Dock="Right" Content="Browse items…" Click="BrowseItems_Click" />
+                    <Button x:Name="BrowseSpawnPoints" DockPanel.Dock="Right" Content="Spawn points…" Click="BrowseSpawnPoints_Click" />
                     <Button x:Name="RefreshDetail" DockPanel.Dock="Right" Content="Refresh NPC" Click="RefreshDetail_Click" IsEnabled="False" />
                     <StackPanel>
                         <TextBlock x:Name="DetailHeading" Text="Select a spawned NPC" FontSize="20" FontWeight="SemiBold" />
@@ -92,7 +110,7 @@
                     </StackPanel>
                 </DockPanel>
 
-                <TabControl x:Name="Details" Grid.Row="1" IsEnabled="False">
+                <TabControl x:Name="Details" Grid.Row="1" IsEnabled="False" SelectionChanged="Details_SelectionChanged">
                     <TabItem Header="Overview">
                         <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="12">
                             <StackPanel>
@@ -107,39 +125,109 @@
                         </ScrollViewer>
                     </TabItem>
                     <TabItem x:Name="StatsTab" Header="Stats">
-                        <Grid Margin="10">
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="*" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <DockPanel LastChildFill="True" Margin="0,0,0,8">
-                                <TextBlock DockPanel.Dock="Right" Style="{StaticResource Caption}" Margin="10,5,0,0" Text="Runtime values and configured template values" />
-                                <TextBox x:Name="StatQuery" MaxLength="128" TextChanged="StatQuery_Changed" AutomationProperties.Name="Filter stats by name or ID" />
-                            </DockPanel>
-                            <DataGrid Grid.Row="1" x:Name="StatsGrid" SelectionChanged="Stat_SelectionChanged">
-                                <DataGrid.Columns>
-                                    <DataGridTextColumn Header="Stat" Binding="{Binding Name}" Width="*" />
-                                    <DataGridTextColumn Header="ID" Binding="{Binding StatId}" Width="55" />
-                                    <DataGridTextColumn Header="Base" Binding="{Binding RuntimeBase}" Width="75" />
-                                    <DataGridTextColumn Header="Bonus" Binding="{Binding RuntimeBonus}" Width="75" />
-                                    <DataGridTextColumn Header="Effective" Binding="{Binding RuntimeValue}" Width="80" />
-                                    <DataGridTextColumn Header="Configured" Binding="{Binding ConfiguredValue}" Width="95" />
-                                    <DataGridCheckBoxColumn Header="Editable" Binding="{Binding Editable, Mode=OneWay}" Width="75" />
-                                </DataGrid.Columns>
-                            </DataGrid>
-                            <StackPanel Grid.Row="2" Margin="0,8,0,0">
-                                <WrapPanel>
-                                    <TextBox x:Name="NewStatBase" Width="95" MaxLength="11" Margin="0,0,6,0" AutomationProperties.Name="New runtime base value" />
-                                    <Button x:Name="ApplyStat" Content="Apply Live" Click="ApplyStat_Click" />
-                                    <Button x:Name="RevertStatDraft" Content="Revert draft" Click="RevertStatDraft_Click" />
-                                    <Button Content="Save stats to GameData" IsEnabled="False" />
-                                </WrapPanel>
-                                <TextBlock Style="{StaticResource Caption}" Margin="0,6,0,0"
-                                           Text="Select an editable stat and lock the NPC to apply its new base value. Live edits last until the NPC despawns. Persistent stat editing is unavailable." />
-                                <TextBlock x:Name="StatsStatus" Style="{StaticResource Caption}" Margin="0,4,0,0" />
-                            </StackPanel>
-                        </Grid>
+                        <TabControl x:Name="StatsViews" Margin="8" SelectionChanged="StatsView_SelectionChanged">
+                            <TabItem x:Name="LiveStatsTab" Header="Selected NPC">
+                                <Grid Margin="10">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <DockPanel LastChildFill="True" Margin="0,0,0,8">
+                                        <TextBlock DockPanel.Dock="Right" Style="{StaticResource Caption}" Margin="10,5,0,0" Text="Runtime values and configured template values" />
+                                        <TextBox x:Name="StatQuery" MaxLength="128" TextChanged="StatQuery_Changed" AutomationProperties.Name="Filter stats by name or ID" />
+                                    </DockPanel>
+                                    <DataGrid Grid.Row="1" x:Name="StatsGrid" SelectionChanged="Stat_SelectionChanged">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Stat" Binding="{Binding Name}" Width="*" />
+                                            <DataGridTextColumn Header="ID" Binding="{Binding StatId}" Width="55" />
+                                            <DataGridTextColumn Header="Base" Binding="{Binding RuntimeBase}" Width="75" />
+                                            <DataGridTextColumn Header="Bonus" Binding="{Binding RuntimeBonus}" Width="75" />
+                                            <DataGridTextColumn Header="Effective" Binding="{Binding RuntimeValue}" Width="80" />
+                                            <DataGridTextColumn Header="Configured" Binding="{Binding ConfiguredValue}" Width="95" />
+                                            <DataGridTextColumn Header="Source" Binding="{Binding ConfiguredSource}" Width="*" />
+                                            <DataGridCheckBoxColumn Header="Editable" Binding="{Binding Editable, Mode=OneWay}" Width="75" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                    <StackPanel Grid.Row="2" Margin="0,8,0,0">
+                                        <WrapPanel>
+                                            <TextBox x:Name="NewStatBase" Width="95" MaxLength="11" Margin="0,0,6,0" AutomationProperties.Name="New runtime base value" />
+                                            <Button x:Name="ApplyStat" Content="Apply Live" Click="ApplyStat_Click" />
+                                            <Button x:Name="RevertStatDraft" Content="Revert draft" Click="RevertStatDraft_Click" />
+                                        </WrapPanel>
+                                        <TextBlock Style="{StaticResource Caption}" Margin="0,6,0,0"
+                                                   Text="Select an editable stat and lock the NPC to apply its new base value. Live edits last until the NPC despawns." />
+                                        <TextBlock x:Name="StatsStatus" Style="{StaticResource Caption}" Margin="0,4,0,0" />
+                                    </StackPanel>
+                                </Grid>
+                            </TabItem>
+                            <TabItem x:Name="ConfiguredStatsTab" Header="Future spawns">
+                                <Grid Margin="8">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <StackPanel Margin="0,0,0,8">
+                                        <DockPanel Margin="0,0,0,5">
+                                            <TextBlock DockPanel.Dock="Left" Text="Scope" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                            <ComboBox x:Name="ConfiguredStatScopePicker" MinWidth="200" MaxWidth="420" HorizontalAlignment="Left"
+                                                      ItemTemplate="{StaticResource EditorOptionLabel}" AutomationProperties.Name="Configured stat scope"
+                                                      SelectionChanged="ConfiguredStatScope_SelectionChanged" />
+                                        </DockPanel>
+                                        <TextBlock x:Name="ConfiguredStatsStatus" Style="{StaticResource Caption}" />
+                                        <TextBox x:Name="ConfiguredStatQuery" Margin="0,6,0,0" MaxLength="128"
+                                                 AutomationProperties.Name="Filter configured stats" TextChanged="ConfiguredStatQuery_Changed" />
+                                    </StackPanel>
+                                    <DataGrid x:Name="ConfiguredStatsGrid" Grid.Row="1" SelectionChanged="ConfiguredStat_SelectionChanged">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Stat" Binding="{Binding Name}" Width="*" />
+                                            <DataGridTextColumn Header="ID" Binding="{Binding StatId}" Width="50" />
+                                            <DataGridTextColumn Header="Authored" Binding="{Binding AuthoredValue}" Width="80" />
+                                            <DataGridTextColumn Header="Configured" Binding="{Binding ConfiguredValue}" Width="85" />
+                                            <DataGridTextColumn Header="Source" Binding="{Binding Source}" Width="2*" />
+                                            <DataGridCheckBoxColumn Header="Editable" Binding="{Binding Editable, Mode=OneWay}" Width="68" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                    <StackPanel Grid.Row="2" Margin="0,8,0,0">
+                                        <WrapPanel>
+                                            <TextBox x:Name="NewConfiguredStat" Width="95" MaxLength="11" Margin="0,0,6,0"
+                                                     AutomationProperties.Name="New configured base value" />
+                                            <Button x:Name="PreviewConfiguredStat" Content="Preview Changes" Click="PreviewConfiguredStat_Click" />
+                                            <Button x:Name="SaveConfiguredStat" Content="Save to GameData" Click="SaveConfiguredStat_Click" />
+                                            <Button x:Name="ResetConfiguredStat" Content="Remove override" Click="ResetConfiguredStat_Click" />
+                                            <Button x:Name="RevertConfiguredStatDraft" Content="Revert Draft" Click="RevertConfiguredStatDraft_Click" />
+                                        </WrapPanel>
+                                        <TextBlock x:Name="ConfiguredStatLimits" Style="{StaticResource Caption}" Margin="0,6,0,0" />
+                                    </StackPanel>
+                                </Grid>
+                            </TabItem>
+                            <TabItem x:Name="StatHistoryTab" Header="Saved history">
+                                <Grid Margin="8">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock x:Name="StatHistoryScope" Style="{StaticResource Caption}" Margin="0,0,0,6" />
+                                    <DataGrid x:Name="StatHistory" Grid.Row="1" SelectionChanged="StatHistory_SelectionChanged">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Revision" Binding="{Binding Revision}" Width="75" />
+                                            <DataGridTextColumn Header="UTC" Binding="{Binding AtUtc, StringFormat=u}" Width="155" />
+                                            <DataGridTextColumn Header="GM" Binding="{Binding Actor}" Width="*" />
+                                            <DataGridTextColumn Header="Action" Binding="{Binding Action}" Width="*" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                    <TextBox x:Name="StatHistoryDetails" Grid.Row="2" IsReadOnly="True" Height="84" Margin="0,6,0,0"
+                                             TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AutomationProperties.Name="Stat change before and after" />
+                                    <WrapPanel Grid.Row="3" Margin="0,6,0,0">
+                                        <Button x:Name="RestoreStatRevision" Content="Restore selected revision" Click="RestoreStatRevision_Click" />
+                                        <Button x:Name="RestorePreviousStat" Content="Restore previous" Click="RestorePreviousStat_Click" />
+                                    </WrapPanel>
+                                </Grid>
+                            </TabItem>
+                        </TabControl>
                     </TabItem>
                     <TabItem Header="Loot">
                         <Grid Margin="8">
@@ -363,6 +451,170 @@
                                         <Button x:Name="RestoreEquipmentRevision" Content="Restore selected revision" Click="RestoreEquipmentRevision_Click" />
                                         <Button x:Name="RestorePreviousEquipment" Content="Restore previous" Click="RestorePreviousEquipment_Click" />
                                     </WrapPanel>
+                                </Grid>
+                            </TabItem>
+                        </TabControl>
+                    </TabItem>
+                    <TabItem x:Name="SpawnTab" Header="Spawn">
+                        <TabControl Margin="8">
+                            <TabItem Header="Placement">
+                                <Grid Margin="8">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <ScrollViewer Margin="0,0,10,0" VerticalScrollBarVisibility="Auto">
+                                        <StackPanel>
+                                            <TextBlock x:Name="SpawnDescription" Style="{StaticResource Caption}" />
+                                            <TextBlock Text="Authored and loaded placement" FontWeight="SemiBold" Margin="0,10,0,4" />
+                                            <TextBlock x:Name="SpawnValues" Style="{StaticResource Caption}" />
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                    <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto">
+                                        <StackPanel>
+                                            <TextBlock Text="Specific spawn point · future placement" FontWeight="SemiBold" />
+                                            <TextBlock x:Name="SpawnStatus" Style="{StaticResource Caption}" Margin="0,4,0,8" />
+                                            <UniformGrid x:Name="SpawnFields" Columns="3">
+                                                <StackPanel Margin="0,0,6,6">
+                                                    <TextBlock Text="X" />
+                                                    <TextBox x:Name="SpawnX" MaxLength="11" AutomationProperties.Name="X" />
+                                                </StackPanel>
+                                                <StackPanel Margin="0,0,6,6">
+                                                    <TextBlock Text="Y" />
+                                                    <TextBox x:Name="SpawnY" MaxLength="11" AutomationProperties.Name="Y" />
+                                                </StackPanel>
+                                                <StackPanel Margin="0,0,6,6">
+                                                    <TextBlock Text="Z" />
+                                                    <TextBox x:Name="SpawnZ" MaxLength="11" AutomationProperties.Name="Z" />
+                                                </StackPanel>
+                                                <StackPanel Margin="0,0,6,6">
+                                                    <TextBlock Text="Facing °" />
+                                                    <TextBox x:Name="SpawnFacing" MaxLength="11" AutomationProperties.Name="Facing °" />
+                                                </StackPanel>
+                                                <StackPanel Margin="0,0,6,6">
+                                                    <TextBlock Text="Facing width °" />
+                                                    <TextBox x:Name="SpawnFacingWidth" MaxLength="11" AutomationProperties.Name="Facing width °" />
+                                                </StackPanel>
+                                                <StackPanel Margin="0,0,6,6">
+                                                    <TextBlock Text="Template hash" />
+                                                    <TextBox x:Name="SpawnHash" MaxLength="64" AutomationProperties.Name="Template hash" />
+                                                </StackPanel>
+                                                <StackPanel Margin="0,0,6,6">
+                                                    <TextBlock Text="Min level" />
+                                                    <TextBox x:Name="SpawnMinLevel" MaxLength="5" AutomationProperties.Name="Min level" />
+                                                </StackPanel>
+                                                <StackPanel Margin="0,0,6,6">
+                                                    <TextBlock Text="Max level" />
+                                                    <TextBox x:Name="SpawnMaxLevel" MaxLength="5" AutomationProperties.Name="Max level" />
+                                                </StackPanel>
+                                                <StackPanel Margin="0,0,6,6">
+                                                    <TextBlock Text="Respawn sec" />
+                                                    <TextBox x:Name="SpawnRespawn" MaxLength="10" AutomationProperties.Name="Respawn sec" />
+                                                </StackPanel>
+                                                <StackPanel Margin="0,0,6,6">
+                                                    <TextBlock Text="Spawn chance" />
+                                                    <TextBox x:Name="SpawnChance" MaxLength="4" AutomationProperties.Name="Spawn chance" />
+                                                </StackPanel>
+                                            </UniformGrid>
+                                            <WrapPanel Margin="0,3,0,0">
+                                                <Button x:Name="PreviewSpawnSave" Content="Preview Changes" Click="PreviewSpawnSave_Click" />
+                                                <Button x:Name="SaveSpawn" Content="Save to GameData" Click="SaveSpawn_Click" />
+                                                <Button x:Name="RevertSpawnDraft" Content="Revert Draft" Click="RevertSpawnDraft_Click" />
+                                            </WrapPanel>
+                                            <TextBlock Text="Selected NPC · live position preview" FontWeight="SemiBold" Margin="0,12,0,4" />
+                                            <TextBlock Text="Move the idle NPC to the draft X, Y, and Z. Saved spawn coordinates are edited separately above."
+                                                       Style="{StaticResource Caption}" Margin="0,0,0,6" />
+                                            <WrapPanel>
+                                                <Button x:Name="PreviewSpawnLive" Content="Move live NPC to draft position" Click="PreviewSpawnLive_Click" />
+                                                <Button x:Name="UndoSpawnLive" Content="Undo live move" Click="UndoSpawnLive_Click" />
+                                            </WrapPanel>
+                                            <TextBlock x:Name="SpawnLiveStatus" Style="{StaticResource Caption}" Margin="0,4,0,0" />
+                                        </StackPanel>
+                                    </ScrollViewer>
+                                </Grid>
+                            </TabItem>
+                            <TabItem Header="Saved history">
+                                <Grid Margin="8">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <TextBlock x:Name="SpawnHistoryScope" Style="{StaticResource Caption}" Margin="0,0,0,6" />
+                                    <DataGrid Grid.Row="1" x:Name="SpawnHistory" SelectionChanged="SpawnHistory_SelectionChanged">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Revision" Binding="{Binding Revision}" Width="75" />
+                                            <DataGridTextColumn Header="UTC" Binding="{Binding AtUtc, StringFormat=u}" Width="155" />
+                                            <DataGridTextColumn Header="GM" Binding="{Binding Actor}" Width="*" />
+                                            <DataGridTextColumn Header="Action" Binding="{Binding Action}" Width="*" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                    <TextBox Grid.Row="2" x:Name="SpawnHistoryDetails" IsReadOnly="True" Height="100" Margin="0,6,0,0"
+                                             TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AutomationProperties.Name="Spawn change before and after" />
+                                    <WrapPanel Grid.Row="3" Margin="0,6,0,0">
+                                        <Button x:Name="RestoreSpawnRevision" Content="Restore selected revision" Click="RestoreSpawnRevision_Click" />
+                                        <Button x:Name="RestorePreviousSpawn" Content="Restore previous" Click="RestorePreviousSpawn_Click" />
+                                    </WrapPanel>
+                                </Grid>
+                            </TabItem>
+                        </TabControl>
+                    </TabItem>
+                    <TabItem x:Name="BehaviorTab" Header="Behavior">
+                        <TabControl Margin="8">
+                            <TabItem Header="Selected NPC">
+                                <Grid Margin="8">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <DataGrid x:Name="BehaviorGrid">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="Setting" Binding="{Binding Name}" Width="2*" />
+                                            <DataGridTextColumn Header="Runtime" Binding="{Binding RuntimeText}" Width="*" />
+                                            <DataGridTextColumn Header="Configured" Binding="{Binding ConfiguredText}" Width="*" />
+                                            <DataGridTextColumn Header="Source" Binding="{Binding Source}" Width="2*" />
+                                            <DataGridCheckBoxColumn Header="Editable" Binding="{Binding Editable, Mode=OneWay}" Width="75" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                    <StackPanel Grid.Row="1" Margin="0,8,0,0">
+                                        <TextBlock x:Name="BehaviorStatus" Style="{StaticResource Caption}" Margin="0,0,0,6" />
+                                        <WrapPanel>
+                                            <TextBlock Text="Breed hostility" VerticalAlignment="Center" Margin="0,0,6,0" />
+                                            <TextBox x:Name="BreedHostility" Width="80" MaxLength="11" Margin="0,0,12,0"
+                                                     AutomationProperties.Name="Breed hostility" />
+                                            <CheckBox x:Name="PatrolEnabled" Content="Enable patrol" />
+                                            <CheckBox x:Name="PatrolRun" Content="Run patrol" />
+                                        </WrapPanel>
+                                        <TextBlock Text="Patrol waypoints, one X Y Z position per line" Style="{StaticResource Caption}" Margin="0,6,0,3" />
+                                        <TextBox x:Name="PatrolWaypoints" AcceptsReturn="True" Height="68" MaxLength="8192"
+                                                 VerticalScrollBarVisibility="Auto" AutomationProperties.Name="Patrol waypoint coordinates" />
+                                        <WrapPanel Margin="0,6,0,0">
+                                            <Button x:Name="PreviewBehavior" Content="Preview Changes" Click="PreviewBehavior_Click" />
+                                            <Button x:Name="ApplyBehavior" Content="Apply Live" Click="ApplyBehavior_Click" />
+                                            <Button x:Name="RevertBehaviorDraft" Content="Revert Draft" Click="RevertBehaviorDraft_Click" />
+                                        </WrapPanel>
+                                    </StackPanel>
+                                </Grid>
+                            </TabItem>
+                            <TabItem Header="Live history">
+                                <Grid Margin="8">
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*" />
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <DataGrid x:Name="BehaviorHistory" SelectionChanged="BehaviorHistory_SelectionChanged">
+                                        <DataGrid.Columns>
+                                            <DataGridTextColumn Header="UTC" Binding="{Binding AtUtc, StringFormat=u}" Width="155" />
+                                            <DataGridTextColumn Header="GM" Binding="{Binding Actor}" Width="*" />
+                                            <DataGridCheckBoxColumn Header="Reverted" Binding="{Binding Reverted, Mode=OneWay}" Width="80" />
+                                        </DataGrid.Columns>
+                                    </DataGrid>
+                                    <TextBox Grid.Row="1" x:Name="BehaviorHistoryDetails" IsReadOnly="True" Height="84" Margin="0,6,0,0"
+                                             TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" AutomationProperties.Name="Behavior change before and after" />
+                                    <Button Grid.Row="2" x:Name="UndoBehavior" Content="Undo selected live change" Click="UndoBehavior_Click"
+                                            Margin="0,6,0,0" HorizontalAlignment="Left" />
                                 </Grid>
                             </TabItem>
                         </TabControl>

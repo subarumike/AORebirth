@@ -132,14 +132,29 @@ namespace ZoneEngine_New.Core.Inventory
         /// </summary>
         static void ApplyModifyPercentage(ItemSpell spell, StatCollection stats)
         {
-            if (!TryReadModify(spell, out CharacterStat stat, out int percent) || percent == 0)
-                return;
-            if (stat == CharacterStat.Cash || stat == CharacterStat.Health)
+            if (!TryReadPercentageModifier(spell, out CharacterStat stat, out int percent))
                 return;
 
             long delta = (long)stats.GetOrZero(stat, StatDetail.Base) * percent / 100;
             if (delta != 0)
                 stats.AddBonus(stat, (int)delta, dirty: true);
+        }
+
+        static bool TryReadPercentageModifier(ItemSpell spell, out CharacterStat stat, out int percent)
+            => TryReadModify(spell, out stat, out percent) && percent != 0
+                && stat is not (CharacterStat.Cash or CharacterStat.Health);
+
+        internal static bool HasBaseDependentPercentage(IReadOnlyList<ItemSpell>? spells, CharacterStat stat)
+        {
+            if (spells == null)
+                return false;
+            foreach (ItemSpell spell in spells)
+            {
+                if (spell.Is(FunctionType.ModifyPercentage)
+                    && TryReadPercentageModifier(spell, out CharacterStat modified, out _) && modified == stat)
+                    return true;
+            }
+            return false;
         }
 
         /// <summary>Total flat Modify these functions add to <paramref name="stat"/>.</summary>

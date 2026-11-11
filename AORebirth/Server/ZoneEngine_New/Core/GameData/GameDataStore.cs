@@ -92,6 +92,7 @@ namespace ZoneEngine_New.Core.GameData
             PlayfieldsPath = Path.Combine(RootPath, GameDataPaths.PlayfieldsFolderName);
             _editorLootFile = new NpcEditorLootJournalFile(RootPath, editorLootOverrideRoot);
             _editorEquipmentFile = new NpcEditorEquipmentJournalFile(RootPath, editorLootOverrideRoot);
+            _editorStatsFile = new NpcEditorStatsJournalFile(RootPath, editorLootOverrideRoot);
 
             EnsureRootExists();
             RespawnContent = RespawnContentCatalog.Load(RootPath);
@@ -108,7 +109,12 @@ namespace ZoneEngine_New.Core.GameData
             LoadMonsterData();
             LoadXpLevels();
             LoadAlienXpLevels();
+            SpawnEditor = new NpcEditorSpawnStore(this, editorLootOverrideRoot, _logger);
         }
+
+        internal NpcEditorSpawnStore SpawnEditor { get; }
+
+        internal PlayfieldSpawnsData ReadAuthoredEditorSpawns(int playfieldId) => ReadPlayfieldSpawns(playfieldId);
 
         public string RootPath { get; }
 
@@ -551,14 +557,17 @@ namespace ZoneEngine_New.Core.GameData
                     Mobs.MonsterCombatRulesCatalog.For(rulesRoot).TryGet(hash, out Mobs.MonsterCombatRules rules) ? rules.Features : null;
                 try
                 {
-                    _npcTemplates = WithLoadedEditorEquipment(loaded.WithEditorLoot(_editorLootFile.Read(loaded, IsEditorLootItem)));
+                    _npcTemplates = WithLoadedEditorStats(
+                        WithLoadedEditorEquipment(loaded.WithEditorLoot(_editorLootFile.Read(loaded, IsEditorLootItem))));
                     _loadedNpcTemplates = true;
                     if (_npcTemplates.EditorEquipment.LoadError is string equipmentError)
                         return new(name, false, _npcTemplates.LeafCount, [equipmentError]);
+                    if (_npcTemplates.EditorStats.LoadError is string statError)
+                        return new(name, false, _npcTemplates.LeafCount, [statError]);
                 }
                 catch (Exception exception) when (exception is IOException or InvalidDataException or UnauthorizedAccessException or JsonException)
                 {
-                    NpcTemplateCatalog keep = _loadedNpcTemplates ? _npcTemplates : WithLoadedEditorEquipment(loaded);
+                    NpcTemplateCatalog keep = _loadedNpcTemplates ? _npcTemplates : WithLoadedEditorStats(WithLoadedEditorEquipment(loaded));
                     const string error = "The NPC loot overlay failed validation. See the ZoneEngine log and reload NpcTemplates after repair.";
                     _npcTemplates = keep.WithEditorLoot(keep.EditorLoot with { LoadError = error });
                     _loadedNpcTemplates = true;

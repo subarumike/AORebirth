@@ -1,0 +1,76 @@
+<Window x:Class="AORebirth.NpcEditor.BatchEditor"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Review NPC batch" Width="880" Height="615" MinWidth="685" MinHeight="485"
+        ShowInTaskbar="False" WindowStartupLocation="CenterOwner" Style="{StaticResource EditorWindowStyle}">
+    <Grid Margin="14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <TextBlock x:Name="ScopeText" Style="{StaticResource Caption}" Margin="0,0,0,8" />
+        <StackPanel x:Name="DraftFields" Grid.Row="1" Margin="0,0,0,8">
+            <ComboBox x:Name="Operation" Width="205" HorizontalAlignment="Left" ItemTemplate="{StaticResource EditorOptionLabel}"
+                      SelectionChanged="Operation_Changed" AutomationProperties.Name="Batch operation" />
+            <WrapPanel x:Name="StatFields" Margin="0,6,0,0">
+                <ComboBox x:Name="Stat" Width="225" Margin="0,0,6,0" ItemTemplate="{StaticResource EditorOptionLabel}"
+                          SelectionChanged="Draft_Changed" AutomationProperties.Name="Stat to change" />
+                <TextBox x:Name="StatValue" Width="85" MaxLength="11" TextChanged="Draft_Changed"
+                         AutomationProperties.Name="New stat base" ToolTip="New stat base" />
+            </WrapPanel>
+            <WrapPanel x:Name="AggressionFields" Margin="0,6,0,0">
+                <TextBlock Text="Breed hostility (0–100)" Margin="0,0,6,0" VerticalAlignment="Center" />
+                <TextBox x:Name="Hostility" Width="85" MaxLength="3" TextChanged="Draft_Changed" AutomationProperties.Name="New breed hostility" />
+            </WrapPanel>
+            <WrapPanel x:Name="ArmorFields" Margin="0,6,0,0">
+                <Button Content="Choose armor…" Click="PickArmor_Click" />
+                <TextBlock x:Name="ArmorChoice" Text="Select a catalog item." VerticalAlignment="Center" />
+            </WrapPanel>
+            <StackPanel x:Name="LootFields" Margin="0,6,0,0">
+                <WrapPanel>
+                    <TextBlock Text="Item family or group hash" Margin="0,0,6,0" VerticalAlignment="Center" />
+                    <TextBox x:Name="LootHash" Width="125" MaxLength="64" Margin="0,0,6,0" TextChanged="Draft_Changed"
+                             AutomationProperties.Name="Loot family or group hash" />
+                    <Button Content="Choose item…" Click="PickLoot_Click" />
+                </WrapPanel>
+                <WrapPanel Margin="0,6,0,0">
+                    <TextBlock Text="Chance %" Margin="0,0,6,0" VerticalAlignment="Center" />
+                    <TextBox x:Name="DropChance" Width="45" MaxLength="3" Margin="0,0,8,0" TextChanged="Draft_Changed" AutomationProperties.Name="Drop chance" />
+                    <TextBlock Text="Attempts" Margin="0,0,6,0" VerticalAlignment="Center" />
+                    <TextBox x:Name="DropRepeats" Width="45" MaxLength="2" Margin="0,0,8,0" TextChanged="Draft_Changed" AutomationProperties.Name="Drop attempts" />
+                    <TextBlock Text="QL variance %" Margin="0,0,6,0" VerticalAlignment="Center" />
+                    <TextBox x:Name="DropVariance" Width="45" MaxLength="3" TextChanged="Draft_Changed" AutomationProperties.Name="Loot QL variance" />
+                </WrapPanel>
+            </StackPanel>
+            <WrapPanel x:Name="RespawnFields" Margin="0,6,0,0">
+                <TextBlock Text="Delay seconds" Margin="0,0,6,0" VerticalAlignment="Center" />
+                <TextBox x:Name="RespawnDelay" Width="80" MaxLength="10" Margin="0,0,8,0" TextChanged="Draft_Changed" AutomationProperties.Name="Respawn delay" />
+                <TextBlock Text="Chance %" Margin="0,0,6,0" VerticalAlignment="Center" />
+                <TextBox x:Name="RespawnChance" Width="45" MaxLength="3" TextChanged="Draft_Changed" AutomationProperties.Name="Respawn chance" />
+            </WrapPanel>
+        </StackPanel>
+        <DataGrid Grid.Row="2" x:Name="Rows" SelectionChanged="Row_SelectionChanged">
+            <DataGrid.Columns>
+                <DataGridTextColumn Header="NPC" Binding="{Binding Name}" Width="*" />
+                <DataGridTextColumn Header="Definition" Binding="{Binding Definition}" Width="*" />
+                <DataGridTextColumn Header="Before" Binding="{Binding Before}" Width="*" />
+                <DataGridTextColumn Header="After" Binding="{Binding After}" Width="*" />
+                <DataGridTextColumn Header="Result" Binding="{Binding Result}" Width="*" />
+            </DataGrid.Columns>
+        </DataGrid>
+        <TextBox x:Name="RowDetails" Grid.Row="3" IsReadOnly="True" Height="88" Margin="0,6,0,0" TextWrapping="Wrap"
+                 VerticalScrollBarVisibility="Auto" AutomationProperties.Name="Selected batch row details" />
+        <StackPanel Grid.Row="4" Margin="0,8,0,0">
+            <TextBlock x:Name="BatchStatus" Style="{StaticResource Caption}" Margin="0,0,0,6" />
+            <DockPanel LastChildFill="False">
+                <Button x:Name="CloseBatch" DockPanel.Dock="Right" Content="Close" IsCancel="True" Margin="0" />
+                <Button x:Name="PreviewBatch" Content="Preview Changes" Click="PreviewBatch_Click" />
+                <Button x:Name="ApplyBatch" Content="Apply reviewed batch" Click="ApplyBatch_Click" />
+                <Button x:Name="UndoBatch" Content="Undo applied batch" Click="UndoBatch_Click" />
+            </DockPanel>
+        </StackPanel>
+    </Grid>
+</Window>
