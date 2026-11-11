@@ -785,6 +785,9 @@ namespace SmokeLounge.AOtomation.Messaging.GameData
 
         CritialResistance = 0x00000187, 
 
+        /// <summary>Primary item template identifier, as stored by the existing Stats registry.</summary>
+        PrimaryTemplateId = 0x0000018B,
+
         SelectedTargetType = 0x0000018D, 
 
         Corpse_Hash = 0x0000018E, 

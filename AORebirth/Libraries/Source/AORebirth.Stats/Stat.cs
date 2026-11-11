@@ -111,7 +111,8 @@ namespace AORebirth.Stats
 
         /// <summary>
         /// </summary>
-        private uint baseValue = 1234567890;
+        internal const uint UninitializedValue = 1234567890;
+        private uint baseValue = UninitializedValue;
 
         /// <summary>
         /// </summary>

@@ -2931,8 +2931,8 @@ namespace AORebirth.Stats
             this.acgItemCategoryId = new Stat(this, 704, 1234567890, false, false, false);
             this.acgItemLevel = new Stat(this, 701, 1234567890, false, false, false);
             this.acgItemSeed = new Stat(this, 700, 1234567890, false, false, false);
-            this.acgItemTemplateId = new Stat(this, 702, 1234567890, false, false, false);
-            this.acgItemTemplateId2 = new Stat(this, 703, 1234567890, false, false, false);
+            this.acgItemTemplateId = new Stat(this, (int)CharacterStat.ACGItemTemplateID, Stat.UninitializedValue, false, false, false);
+            this.acgItemTemplateId2 = new Stat(this, (int)CharacterStat.ACGItemTemplateID2, Stat.UninitializedValue, false, false, false);
             this.actionCategory = new Stat(this, 588, 1234567890, false, false, false);
             this.advantageHash1 = new Stat(this, 651, 1234567890, false, false, false);
             this.advantageHash2 = new Stat(this, 652, 1234567890, false, false, false);
@@ -3383,7 +3383,7 @@ namespace AORebirth.Stats
             this.price = new Stat(this, 74, 1234567890, false, false, false);
             this.primaryItemInstance = new Stat(this, 81, 1234567890, false, false, false);
             this.primaryItemType = new Stat(this, 80, 1234567890, false, false, false);
-            this.primaryTemplateId = new Stat(this, 395, 1234567890, false, false, false);
+            this.primaryTemplateId = new Stat(this, (int)CharacterStat.PrimaryTemplateId, Stat.UninitializedValue, false, false, false);
             this.procChance1 = new Stat(this, 556, 1234567890, false, false, false);
             this.procChance2 = new Stat(this, 557, 1234567890, false, false, false);
             this.procChance3 = new Stat(this, 558, 1234567890, false, false, false);
@@ -3483,7 +3483,7 @@ namespace AORebirth.Stats
             this.savedXP = new Stat(this, 334, 0, true, false, false);
             this.school = new Stat(this, 405, 1234567890, false, false, false);
             this.secondaryItemInstance = new Stat(this, 83, 1234567890, false, false, false);
-            this.secondaryItemTemplate = new Stat(this, 273, 1234567890, false, false, false);
+            this.secondaryItemTemplate = new Stat(this, (int)CharacterStat.SecondaryItemTemplate, Stat.UninitializedValue, false, false, false);
             this.secondaryItemType = new Stat(this, 82, 1234567890, false, false, false);
             this.selectedTarget = new Stat(this, 431, 1234567890, false, false, false);
             this.selectedTargetType = new Stat(this, 397, 1234567890, false, false, false);
@@ -3570,7 +3570,7 @@ namespace AORebirth.Stats
             this.totalDamage = new Stat(this, 629, 1234567890, false, false, false);
             this.totalMass = new Stat(this, 71, 1234567890, false, false, false);
             this.towerInstance = new Stat(this, 515, 1234567890, false, false, false);
-            this.towerNpcHash = new Stat(this, 511, 1234567890, false, false, false);
+            this.towerNpcHash = new Stat(this, (int)CharacterStat.Tower_NPCHash, Stat.UninitializedValue, false, false, false);
             this.towerType = new Stat(this, 388, 1234567890, false, false, false);
             this.tracerEffectType = new Stat(this, 419, 1234567890, false, false, false);
             this.trackChemicalDamage = new Stat(this, 633, 1234567890, false, false, false);
