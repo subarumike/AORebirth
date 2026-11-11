@@ -762,7 +762,7 @@ internal sealed partial class AuthoredMissionTestDao : ICharacterQuestCompletion
         var row = RequireObjectiveRequest(request);
         if (row.Progress >= row.RequiredCount)
             return ObjectiveResult(CharacterQuestCompletionStatus.AlreadyEarned);
-        ApplyInventoryMutation(request.Grants, request.Removals);
+        ApplyInventoryMutationCore(request.Grants, request.Removals);
         row.Progress = row.RequiredCount;
         row.UpdatedAtUtcTicks = request.NowUtcTicks;
         var key = new MissionRewardKeyData(new MissionKeyData(CharacterId, row.QuestId),
@@ -784,7 +784,7 @@ internal sealed partial class AuthoredMissionTestDao : ICharacterQuestCompletion
             return ObjectiveResult(CharacterQuestCompletionStatus.AlreadyCollected);
         if (row.Progress != 0)
             throw new InvalidOperationException("Collection progress is not current.");
-        ApplyInventoryMutation(request.Grants, request.Removals);
+        ApplyInventoryMutationCore(request.Grants, request.Removals);
         row.Progress = 1;
         row.UpdatedAtUtcTicks = request.NowUtcTicks;
         return ObjectiveResult(CharacterQuestCompletionStatus.Collected);
@@ -821,7 +821,7 @@ internal sealed partial class AuthoredMissionTestDao : ICharacterQuestCompletion
         {
             Assert.AreEqual(expected.Value, Stats.GetValueOrDefault(expected.StatId));
         }
-        ApplyInventoryMutation(request.Grants, []);
+        ApplyInventoryMutationCore(request.Grants, []);
         foreach (var mutation in request.StatMutations)
         {
             Assert.AreEqual(MissionStatMutationKind.Set, mutation.Kind);

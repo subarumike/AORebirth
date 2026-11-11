@@ -5,6 +5,7 @@ namespace AORebirth.Database.Domain.Missions
     using System.Linq;
     using AORebirth.Interfaces.Persistence.Missions;
     using Dapper;
+    using SmokeLounge.AOtomation.Messaging.GameData;
 
     public sealed partial class MySqlMissionDao
     {
@@ -17,7 +18,7 @@ namespace AORebirth.Database.Domain.Missions
                 this.EnsureActive();
                 try
                 {
-                    this.ApplyInventoryMutationCore(grants, consumed);
+                    this.ApplyInventoryMutationCore(grants, consumed, allowOverflowGrants: true);
                 }
                 catch
                 {
@@ -28,14 +29,18 @@ namespace AORebirth.Database.Domain.Missions
 
             private void ApplyInventoryMutationCore(
                 IReadOnlyList<MissionItemInstanceData> grants,
-                IReadOnlyList<MissionItemInstanceData> consumed)
+                IReadOnlyList<MissionItemInstanceData> consumed,
+                bool allowOverflowGrants = false)
             {
                 if (grants == null || consumed == null) throw new ArgumentNullException("inventoryPlan");
                 if (grants.Concat(consumed).Any(item => item == null || item.InstanceId <= 0
-                    || item.ContainerType != 104 || item.ContainerInstance != this.CharacterId
+                    || item.ContainerInstance != this.CharacterId
                     || item.ContainerPlacement < 0 || item.StackCount <= 0)
+                    || consumed.Any(item => item.ContainerType != (int)IdentityType.Inventory)
+                    || grants.Any(item => item.ContainerType != (int)IdentityType.Inventory
+                        && !(allowOverflowGrants && item.ContainerType == (int)IdentityType.OverflowWindow))
                     || grants.Concat(consumed).Select(item => item.InstanceId).Distinct().Count() != grants.Count + consumed.Count)
-                    throw new ArgumentException("Authored inventory mutation requires distinct exact owned main-inventory rows.");
+                    throw new ArgumentException("Authored inventory mutation requires distinct exact owned rows in the permitted pages.");
 
                 // Runtime rejects bag use, and the durable boundary also rejects any surviving
                 // child row (including unhydrated content). 0xC749 is IdentityType.Container.

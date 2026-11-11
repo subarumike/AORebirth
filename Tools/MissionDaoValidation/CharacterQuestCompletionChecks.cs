@@ -16,6 +16,70 @@ namespace AORebirth.Tools.MissionDaoValidation
         private const string CompletionDefinition = "{\"Action\":\"FindItem\",\"Reward\":{\"Credits\":17,\"Xp\":23}}";
         private const string CompletionBinding = "{\"EntranceInstance\":-1073741319,\"ObjectiveInstance\":910099}";
 
+        private static void ValidateAuthoredOverflowGrants(MySqlMissionDao dao, string connectionString)
+        {
+            var consumed = CompletionItem(920310, 89);
+            var overflow = CompletionItem(920311, 111);
+            overflow.ContainerType = (int)IdentityType.OverflowWindow;
+            var empty = Array.Empty<MissionItemInstanceData>();
+            dao.Execute(CompletionOwner, tx =>
+            {
+                ((IMissionInventoryMutationTransaction)tx).ApplyInventoryMutation(new[] { consumed }, empty);
+                return true;
+            });
+
+            Expect<ExpectedRollbackException>(() => dao.Execute<int>(CompletionOwner, tx =>
+            {
+                ((IMissionInventoryMutationTransaction)tx).ApplyInventoryMutation(new[] { overflow }, new[] { consumed });
+                throw new ExpectedRollbackException();
+            }), "authored-overflow-rollback-injected-after-mutation");
+            Require(Scalar(connectionString, "SELECT ContainerType FROM item_instances WHERE InstanceId=920310") == (int)IdentityType.Inventory
+                && Scalar(connectionString, "SELECT COUNT(*) FROM item_instances WHERE InstanceId=920311") == 0,
+                "authored-overflow-rollback-keeps-hand-in-and-removes-grant");
+
+            dao.Execute(CompletionOwner, tx =>
+            {
+                ((IMissionInventoryMutationTransaction)tx).ApplyInventoryMutation(new[] { overflow }, new[] { consumed });
+                return true;
+            });
+            Require(Scalar(connectionString, "SELECT ContainerType FROM item_instances WHERE InstanceId=920310") == 0,
+                "authored-overflow-commit-retires-exact-main-inventory-hand-in");
+            Require(Scalar(connectionString, "SELECT COUNT(*) FROM item_instances WHERE InstanceId=920311 AND ContainerType=" + (int)IdentityType.OverflowWindow
+                + " AND ContainerInstance=" + CompletionOwner + " AND ContainerPlacement=111") == 1, "authored-overflow-commit-grants-exact-owned-overflow-row");
+
+            var wrongOwner = CompletionItem(920312, 112);
+            wrongOwner.ContainerType = (int)IdentityType.OverflowWindow;
+            wrongOwner.ContainerInstance = CompletionOwner + 1;
+            Expect<ArgumentException>(() => dao.Execute(CompletionOwner, tx =>
+            {
+                ((IMissionInventoryMutationTransaction)tx).ApplyInventoryMutation(new[] { wrongOwner }, empty);
+                return true;
+            }), "authored-overflow-rejects-foreign-owner-grant");
+            Expect<ArgumentException>(() => dao.Execute(CompletionOwner, tx =>
+            {
+                ((IMissionInventoryMutationTransaction)tx).ApplyInventoryMutation(empty, new[] { overflow });
+                return true;
+            }), "authored-overflow-rejects-consuming-overflow");
+            Require(Scalar(connectionString, "SELECT COUNT(*) FROM item_instances WHERE InstanceId=920312") == 0
+                && Scalar(connectionString, "SELECT ContainerType FROM item_instances WHERE InstanceId=920311") == (int)IdentityType.OverflowWindow,
+                "authored-overflow-rejections-preserve-owned-items");
+
+            const string questId = "completion.overflow-disabled";
+            var quests = new MySqlCharacterQuestDao(() => new MySqlConnection(connectionString));
+            quests.SaveCharacterQuest(CompletionRow(questId, source: 0));
+            ResetCompletionStats(connectionString);
+            Require(dao.Execute(CompletionOwner, tx => ((ICharacterQuestCompletionTransaction)tx)
+                .TryEarnCharacterQuest(EarnRequest(questId))).Status == CharacterQuestCompletionStatus.Earned,
+                "authored-overflow-default-path-has-valid-earned-quest");
+            var forbidden = CompletionItem(920313, 112);
+            forbidden.ContainerType = (int)IdentityType.OverflowWindow;
+            Expect<ArgumentException>(() => dao.Execute(CompletionOwner, tx => ((ICharacterQuestCompletionTransaction)tx)
+                .TryCompleteCharacterQuest(CompleteRequest(questId, forbidden))), "authored-overflow-default-completion-rejects-overflow");
+            Require(quests.LoadForCharacter(CompletionOwner).Single(row => row.QuestId == questId).State == 1
+                && Scalar(connectionString, "SELECT COUNT(*) FROM item_instances WHERE InstanceId=920313") == 0,
+                "authored-overflow-default-rejection-preserves-earned-state");
+        }
+
         private static void ValidateCharacterQuestCompletion(MySqlMissionDao dao, string connectionString)
         {
             var quests = new MySqlCharacterQuestDao(() => new MySqlConnection(connectionString));

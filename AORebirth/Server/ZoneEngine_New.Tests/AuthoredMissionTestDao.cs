@@ -86,7 +86,20 @@ internal sealed partial class AuthoredMissionTestDao : IMissionDao, IMissionDaoT
     }
 
     public void ApplyInventoryMutation(IReadOnlyList<MissionItemInstanceData> grants, IReadOnlyList<MissionItemInstanceData> consumed)
+        => ApplyInventoryMutationCore(grants, consumed, allowOverflowGrants: true);
+
+    void ApplyInventoryMutationCore(IReadOnlyList<MissionItemInstanceData> grants, IReadOnlyList<MissionItemInstanceData> consumed,
+        bool allowOverflowGrants = false)
     {
+        if (grants == null || consumed == null) throw new ArgumentNullException("inventoryPlan");
+        if (grants.Concat(consumed).Any(row => row == null || row.InstanceId <= 0 || row.ContainerInstance != CharacterId
+            || row.ContainerPlacement < 0 || row.StackCount <= 0)
+            || consumed.Any(row => row.ContainerType != (int)IdentityType.Inventory)
+            || grants.Any(row => row.ContainerType != (int)IdentityType.Inventory
+                && !(allowOverflowGrants && row.ContainerType == (int)IdentityType.OverflowWindow))
+            || grants.Concat(consumed).Select(row => row.InstanceId).Distinct().Count() != grants.Count + consumed.Count)
+            throw new ArgumentException("Authored inventory mutation requires distinct exact owned rows in the permitted pages.");
+
         foreach (var row in consumed)
         {
             if (!Items.TryGetValue(row.InstanceId, out var actual) || !Same(actual, row)) throw new InvalidOperationException("Stale item plan.");
@@ -95,7 +108,7 @@ internal sealed partial class AuthoredMissionTestDao : IMissionDao, IMissionDaoT
         }
         foreach (var row in grants)
         {
-            if (row.ContainerType != 104 || row.ContainerInstance != CharacterId || Items.Values.Any(value => value.ContainerType == row.ContainerType
+            if (Items.Values.Any(value => value.ContainerType == row.ContainerType
                 && value.ContainerInstance == row.ContainerInstance && value.ContainerPlacement == row.ContainerPlacement)) throw new InvalidOperationException("Grant slot conflict.");
             Items.Add(row.InstanceId, Copy(row));
         }

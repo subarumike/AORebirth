@@ -1140,10 +1140,12 @@ class ReleaseContractTests(unittest.TestCase):
         prefix = [os.environ.get("ComSpec", r"C:\Windows\System32\cmd.exe"), "/d", "/c"]
         dao = [*prefix, str(self.root / paths[0]), "--chests-only"]
         self.assertEqual(gate.feature_command(self.root, dao), self.root / paths[2])
+        overflow = [*prefix, str(self.root / paths[0]), "--authored-overflow-only"]
+        self.assertEqual(gate.feature_command(self.root, overflow), self.root / paths[2])
         connected = [*prefix, str(self.root / paths[1]), "--engine", str(self.root / paths[4]),
                      "--login-engine", str(self.root / paths[5]), "--chests-only", "--world-engine", str(self.root / paths[6])]
         self.assertEqual(gate.feature_command(self.root, connected), self.root / paths[3])
-        for child in ([*dao, "extra"], [*prefix, str(self.root / paths[0]), "--isolated-sources"],
+        for child in ([*dao, "extra"], [*overflow, "extra"], [*prefix, str(self.root / paths[0]), "--isolated-sources"],
                       [*connected[:5], str(self.root / paths[5]), *connected[6:]], [*connected, "extra"]):
             with self.assertRaises(ValueError):
                 gate.feature_command(self.root, child)
