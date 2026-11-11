@@ -4,6 +4,8 @@ namespace ZoneEngine_New.Core.Pets
     using System.Collections.Generic;
     using System.Globalization;
 
+    using AORebirth.World.Pathfinding;
+
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
@@ -12,10 +14,12 @@ namespace ZoneEngine_New.Core.Pets
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
+    using ZoneEngine_New.Core.Movement;
     using ZoneEngine_New.Core.Mobs;
     using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
+    using ZoneEngine_New.Core.WorldSimulation;
 
     using Vector3 = AORebirth.Core.Vector.Vector3;
 
@@ -30,6 +34,11 @@ namespace ZoneEngine_New.Core.Pets
     {
         /// <summary>A player's pet farther than this from its owner rejoins the owner at once.</summary>
         public const double MaxPlayerPetDistance = 50.0;
+
+        /// <summary>Starts a clearance ray just above the supporting floor, avoiding a hit on the floor itself.</summary>
+        const float SpawnFloorClearance = 0.05f;
+
+        static readonly NavMeshBuildSettings DefaultCollisionAgent = NavMeshBuildSettings.CreateDefault();
 
         readonly Playfield _playfield;
         readonly IGameData _gameData;
@@ -74,15 +83,17 @@ namespace ZoneEngine_New.Core.Pets
                 return null;
             }
 
-            if (replaceSameSlot && owner.OwnedPets.InSlotOf(type) is NpcCharacter previous)
+            NpcCharacter? previous = replaceSameSlot ? owner.OwnedPets.InSlotOf(type) : null;
+            if (!TryFindSpawnPosition(owner, previous, out Vector3 at, out int formationIndex))
+                return null;
+
+            if (previous != null)
                 Dismiss(previous, "replaced");
 
             var controller = new PetController(owner, type, hash, level, expires, summonRequirements);
             if (owner is Player)
                 controller.Order(DefaultMode(type));
 
-            int index = owner.OwnedPets.Count;
-            Vector3 at = _playfield.SnapNpcSpawn(PetFormation.PointFor(owner, index));
             NpcCharacter pet = _playfield.GetRequiredService<SpawnService>().SpawnMob(
                 template,
                 at,
@@ -104,7 +115,7 @@ namespace ZoneEngine_New.Core.Pets
                 attachDefaultBrain: false);
             NpcBrain.CreatePet(pet, controller);
 
-            owner.OwnedPets.Add(pet);
+            owner.OwnedPets.Add(pet, formationIndex);
             PublishPetsStat(owner);
             if (owner is Player player)
             {
@@ -119,6 +130,92 @@ namespace ZoneEngine_New.Core.Pets
                 pet.Identity.Instance, hash, type, pet.Stats.GetOrZero(CharacterStat.Level), owner.Identity.Instance,
                 expires?.ToString("o", CultureInfo.InvariantCulture) ?? "never"));
             return pet;
+        }
+
+        internal bool TryFindSpawnPosition(Character owner, NpcCharacter? previous, out Vector3 at, out int formationIndex)
+        {
+            at = owner.Position;
+            formationIndex = 0;
+            var finder = _playfield.Pathfinder;
+            var world = _playfield.WorldAccess.Instance;
+            if (world == null)
+                return false;
+
+            NavMeshBuildSettings agent = finder?.Settings ?? DefaultCollisionAgent;
+            if (finder != null && TryFindSpawnPosition(owner, previous, world, finder, agent, out at, out formationIndex))
+                return true;
+
+            // Valid collision can extend beyond a baked polygon, and some shop interiors have no mesh at all.
+            return TryFindSpawnPosition(owner, previous, world, null, agent, out at, out formationIndex);
+        }
+
+        bool TryFindSpawnPosition(Character owner, NpcCharacter? previous, PlayfieldWorldSimulation world,
+            NavMeshPathfinder? finder, NavMeshBuildSettings agent, out Vector3 at, out int formationIndex)
+        {
+            at = owner.Position;
+            formationIndex = 0;
+            float radius = agent.AgentRadius;
+            float height = agent.AgentHeight;
+            int candidates = PetFormation.SlotCount + owner.OwnedPets.Count;
+            for (int index = 0; index < candidates; index++)
+            {
+                if (owner.OwnedPets.IsFormationIndexOccupied(index, previous))
+                    continue;
+
+                Vector3 wanted = PetFormation.PointFor(owner, index);
+                Vector3 candidate = wanted;
+                if (finder != null)
+                {
+                    var point = new System.Numerics.Vector3(wanted.xf, wanted.yf, wanted.zf);
+                    if (!finder.TrySnap(point, PetAi.FollowSnapMeters, out System.Numerics.Vector3 snapped))
+                        continue;
+
+                    double dx = snapped.X - wanted.x;
+                    double dz = snapped.Z - wanted.z;
+                    if ((dx * dx) + (dz * dz) > PetAi.FollowSnapMeters * PetAi.FollowSnapMeters
+                        || Math.Abs(snapped.Y - wanted.y) > MovementConfig.GroundSnapTolerance)
+                        continue;
+                    candidate = new Vector3(snapped.X, snapped.Y, snapped.Z);
+                }
+
+                float maxDrop = finder == null ? MovementConfig.GroundSnapTolerance : MovementConfig.GroundProbeLift;
+                if (!world.TrySnapToFloor(candidate, out Vector3 floor)
+                    || floor.y - candidate.y > MovementConfig.GroundProbeLift || candidate.y - floor.y > maxDrop)
+                    continue;
+
+                var feet = new Vector3(floor.x, floor.y + SpawnFloorClearance, floor.z);
+                var head = new Vector3(floor.x, floor.y + height, floor.z);
+                Vector3 ownerAt = owner.Position;
+                if (!world.HasLineOfSight(feet, head)
+                    || (finder == null && (world.TrySphereCast(feet, head, radius, out _, out _)
+                        || world.TrySphereCast(head, feet, radius, out _, out _)))
+                    || !world.HasLineOfSight(ownerAt.xf, ownerAt.yf + MovementConfig.LineOfSightEyeHeight, ownerAt.zf,
+                        floor.xf, floor.yf + MovementConfig.LineOfSightEyeHeight, floor.zf))
+                    continue;
+
+                bool occupied = false;
+                foreach (NpcCharacter other in owner.OwnedPets.All)
+                {
+                    if (ReferenceEquals(other, previous) || other.IsDead || !ReferenceEquals(other.Playfield, _playfield))
+                        continue;
+
+                    double ox = other.Position.x - floor.x;
+                    double oz = other.Position.z - floor.z;
+                    if ((ox * ox) + (oz * oz) < 4 * radius * radius && Math.Abs(other.Position.y - floor.y) < height)
+                    {
+                        occupied = true;
+                        break;
+                    }
+                }
+                if (occupied)
+                    continue;
+
+                at = floor;
+                formationIndex = index;
+                return true;
+            }
+
+            return false;
         }
 
         /// <summary>

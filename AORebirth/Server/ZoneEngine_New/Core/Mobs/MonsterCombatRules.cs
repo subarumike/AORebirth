@@ -95,7 +95,25 @@ namespace ZoneEngine_New.Core.Mobs
             foreach (KeyValuePair<string, MonsterCombatRules> entry in file ?? new())
             {
                 if (!string.IsNullOrWhiteSpace(entry.Key) && entry.Value != null)
+                {
+                    if (entry.Value.Pets?.MaxPetsPerType is < 1)
+                        throw new JsonException($"{path}: {entry.Key}.Pets.MaxPetsPerType must be positive or null.");
+                    if (entry.Value.TriggeredSelfNanos is { } triggers)
+                    {
+                        for (int i = 0; i < triggers.Count; i++)
+                        {
+                            MonsterTriggeredSelfNano? trigger = triggers[i];
+                            if (trigger == null || trigger.NanoId <= 0
+                                || trigger.HealthBelowPercent is < 1 or > 100
+                                || trigger.ChancePercent is < 0 or > 100
+                                || trigger.MaxCastsPerFight is < 1 || trigger.CooldownSeconds < 0)
+                                throw new JsonException($"{path}: {entry.Key}.TriggeredSelfNanos[{i}] needs a positive NanoId, "
+                                    + "HealthBelowPercent 1..100, ChancePercent 0..100, MaxCastsPerFight positive or null, "
+                                    + "and CooldownSeconds >= 0.");
+                        }
+                    }
                     rules[entry.Key.Trim()] = entry.Value;
+                }
             }
 
             return new MonsterCombatRulesCatalog(rules);
@@ -121,6 +139,9 @@ namespace ZoneEngine_New.Core.Mobs
 
         public MonsterPetRule? Pets { get; set; }
 
+        /// <summary>Health-triggered self casts with per-fight limits; excluded from ordinary casting.</summary>
+        public List<MonsterTriggeredSelfNano>? TriggeredSelfNanos { get; set; }
+
         /// <summary>Behaviour switches: NoCombat, NoMove, Wander, Guard, Boss (<see cref="NpcFeature"/>).</summary>
         public List<NpcFeature>? Features { get; set; }
 
@@ -136,6 +157,22 @@ namespace ZoneEngine_New.Core.Mobs
             => Hates is not { Length: > 0 } ? null : _hatedFamilies ??= new HashSet<int>(Hates);
     }
 
+    /// <summary>A health threshold rolls once per fight; selected casts use their own count and cooldown.</summary>
+    public sealed class MonsterTriggeredSelfNano
+    {
+        public required int NanoId { get; set; }
+
+        public required int HealthBelowPercent { get; set; }
+
+        public required int ChancePercent { get; set; }
+
+        /// <summary>Successful executions allowed after the roll; null means unlimited. Reset restores the allowance.</summary>
+        public required int? MaxCastsPerFight { get; set; }
+
+        /// <summary>Additional delay after successful execution; normal casting cadence and recharge still apply.</summary>
+        public required int CooldownSeconds { get; set; }
+    }
+
     /// <summary>
     /// Pets the NPC raises while it fights with the "NPC Pet Creation Item" in its equipment (the first, by slot); the
     /// item's OnUse names the pet's mob hash and level. Every NPC with that item uses these defaults unless its hash
@@ -145,6 +182,9 @@ namespace ZoneEngine_New.Core.Mobs
     {
         /// <summary>Most pets alive at once.</summary>
         public int MaxPets { get; set; } = 1;
+
+        /// <summary>Most living pets of each creation-item mob hash; null leaves the per-type count unlimited.</summary>
+        public int? MaxPetsPerType { get; set; }
 
         /// <summary>Seconds from combat start to the first pet, and between each pet after it.</summary>
         public double SummonIntervalSeconds { get; set; } = 1;

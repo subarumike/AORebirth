@@ -187,25 +187,47 @@ namespace ZoneEngine_New.Core.Pets
     public sealed record PetCharm(int NanoId, Ai.NpcBrain OriginalBrain, int OriginalSide);
 
     /// <summary>
-    /// The pets a character owns, one per pet slot, in summon order (which is also their formation order). A pet
+    /// The pets a character owns, in summon order, with stable formation places. A pet
     /// stays owned while it zones with its owner; between leaving one playfield and arriving on the next it has
     /// no <see cref="Dynel.Playfield"/>.
     /// </summary>
     public sealed class OwnedPets
     {
         readonly List<NpcCharacter> _pets = new();
+        readonly Dictionary<NpcCharacter, int> _formationIndices = new();
 
         public IReadOnlyList<NpcCharacter> All => _pets;
 
         public int Count => _pets.Count;
 
-        internal void Add(NpcCharacter pet)
+        internal void Add(NpcCharacter pet, int? formationIndex = null)
         {
-            if (!_pets.Contains(pet))
-                _pets.Add(pet);
+            if (_pets.Contains(pet))
+                return;
+
+            int index = formationIndex ?? 0;
+            while (IsFormationIndexOccupied(index))
+                index++;
+            _pets.Add(pet);
+            _formationIndices.Add(pet, index);
         }
 
-        internal bool Remove(NpcCharacter pet) => _pets.Remove(pet);
+        internal bool Remove(NpcCharacter pet)
+        {
+            _formationIndices.Remove(pet);
+            return _pets.Remove(pet);
+        }
+
+        internal bool IsFormationIndexOccupied(int index, NpcCharacter? except = null)
+        {
+            foreach (KeyValuePair<NpcCharacter, int> place in _formationIndices)
+            {
+                if (place.Value == index && !ReferenceEquals(place.Key, except))
+                    return true;
+            }
+
+            return false;
+        }
 
         /// <summary>The owned pet in <paramref name="petType"/>'s slot, if any.</summary>
         public NpcCharacter? InSlotOf(int petType)
@@ -233,8 +255,8 @@ namespace ZoneEngine_New.Core.Pets
             return flags;
         }
 
-        /// <summary>This pet's place in the formation (its index among the owner's living pets).</summary>
-        public int FormationIndex(NpcCharacter pet) => Math.Max(0, _pets.IndexOf(pet));
+        /// <summary>This pet's reserved place; removing another pet does not move it.</summary>
+        public int FormationIndex(NpcCharacter pet) => _formationIndices.TryGetValue(pet, out int index) ? index : 0;
 
         /// <summary>The owner must move this far before the formation turns with it.</summary>
         public const double FormationTurnAfterMeters = 0.5;
@@ -329,6 +351,8 @@ namespace ZoneEngine_New.Core.Pets
             (-1.6, 4.6),
             (1.6, 4.6)
         ];
+
+        internal static int SlotCount => Slots.Length;
 
         /// <summary>The follow point of formation slot <paramref name="index"/> around <paramref name="owner"/>.</summary>
         public static Vector3 PointFor(Character owner, int index)

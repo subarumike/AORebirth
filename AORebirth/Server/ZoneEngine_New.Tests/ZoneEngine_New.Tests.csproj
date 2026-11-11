@@ -114,6 +114,11 @@
     <Compile Include="InventoryActionTests.cs" />
     <Compile Include="CastNanoTests.cs" />
   </ItemGroup>
+  <ItemGroup Condition="'$(PetPlacementFocusedTests)' == 'true'">
+    <Compile Remove="@(Compile)" />
+    <Compile Include="TestDoubles.cs" />
+    <Compile Include="PetPlacementTests.cs" />
+  </ItemGroup>
   <ItemGroup Condition="'$(TeamRosterFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />
     <Compile Include="TestDoubles.cs" />

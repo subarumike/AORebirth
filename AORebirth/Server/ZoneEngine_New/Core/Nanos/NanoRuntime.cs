@@ -895,6 +895,8 @@ namespace ZoneEngine_New.Core.Nanos
         static void CastResolved(Character caster, PendingNanoCast cast, PlayerActionOutcome outcome,
             ActionRefusal refusal = ActionRefusal.None, CooldownKey? cooldown = null, TimeSpan readyIn = default, string detail = "")
         {
+            if (outcome == PlayerActionOutcome.Executed && caster is NpcCharacter npc && cast.Target == caster.Identity)
+                npc.Brain?.OnSelfNanoExecuted(cast.Spell.Id);
             if (caster is Player player)
                 ModuleHooks.ActionResolved(player, PlayerActionKind.NanoCast, cast.Spell.Id, outcome, refusal, target: cast.Target,
                     cooldown: cooldown, readyIn: readyIn, detail: detail, requestTimestamp: cast.RequestTimestamp);
