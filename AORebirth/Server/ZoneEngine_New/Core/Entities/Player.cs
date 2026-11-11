@@ -1948,6 +1948,12 @@ namespace ZoneEngine_New.Core.Entities
             return destination;
         }
 
+        internal void ClearReturnDoor()
+        {
+            Stats.Set(CharacterStat.ExternalPlayfieldInstance, 0, StatDetail.Base, dirty: true);
+            Stats.Set(CharacterStat.ExternalDoorInstance, 0, StatDetail.Base, dirty: true);
+        }
+
         /// <summary>
         /// Where a death brings this character back: the stuck location after a failed resolution, else the last save
         /// point, else the new-character start (Arete Landing), else Respawn.json. Throws when none is configured.

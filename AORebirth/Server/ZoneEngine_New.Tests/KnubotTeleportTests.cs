@@ -4,9 +4,12 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Sockets;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 
+using AORebirth.Core.GameData;
+using Google.Protobuf;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -17,6 +20,13 @@ using ZoneEngine_New.Core.GameData;
 using ZoneEngine_New.Core.Knubot;
 using ZoneEngine_New.Core.Network;
 using ZoneEngine_New.Core.Playfield;
+using ZoneEngine_New.Core.Quests;
+using ZoneEngine_New.Core.World;
+using ZoneEngine_New.Core.WorldSimulation;
+
+using ArrivalKind = AORebirth.World.Contracts.V1.ArrivalKind;
+using TransferEnvelope = AORebirth.World.Contracts.V1.TransferEnvelope;
+using Vector3 = AORebirth.Core.Vector.Vector3;
 
 [TestClass]
 public sealed class KnubotTeleportTests
@@ -62,52 +72,123 @@ public sealed class KnubotTeleportTests
     }
 
     [TestMethod]
-    public void EffectRequiresTheAuthoredSourceAndAvailableDestination()
+    [DataRow(false, true)]
+    [DataRow(true, false)]
+    [DataRow(true, true)]
+    public void CatalogRequiresKnownPlayfieldReferences(bool hasSource, bool hasDestination)
     {
-        string root = Path.Combine(Path.GetTempPath(), "aorebirth-knubot-transport-" + Guid.NewGuid().ToString("N"));
-        Directory.CreateDirectory(root);
+        DirectoryInfo root = Directory.CreateTempSubdirectory("aorebirth-knubot-transport-");
         try
         {
-            using ServiceProvider services = new ServiceCollection()
-                .AddSingleton<IGameData>(new StubGameData(HashItemCatalog.Parse("{}"), rootPath: root))
-                .BuildServiceProvider();
-            Playfield source = TestPlayfield(800, services);
-            Player player = TestWorld.CreatePlayer(1);
-            player.Playfield = source;
-            player.EnterOnline(new RecordingZoneSession { State = SessionState.InPlay });
-            var npc = new NpcCharacter(new Identity { Type = IdentityType.CanbeAffected, Instance = 99 }, new StubItemBuilder())
-            {
-                Playfield = source,
-                Position = player.Position
-            };
-            npc.Stats.Set(CharacterStat.Health, 100);
-            npc.Stats.Set(CharacterStat.MaxHealth, 100);
-            var context = new KnubotContext(player, npc, null!, false, null!);
-            var errors = new List<string>();
-            var effect = (KnubotTeleport)KnubotParser.Parse(Directive, false, null!, errors).Effects.Single();
-            Assert.IsFalse(effect.Check(context, new KnubotPlan(), null!), "A missing destination remains unavailable.");
-            Directory.CreateDirectory(Path.Combine(root, "Playfields", "901"));
-            Assert.IsTrue(effect.Check(context, new KnubotPlan(), null!));
-            Assert.IsFalse((effect with { SourceId = 801 }).Check(context, new KnubotPlan(), null!));
-            player.Session!.State = SessionState.Loading;
-            Assert.IsFalse(effect.Check(context, new KnubotPlan(), null!), "An existing transfer must retain ownership.");
-            player.Session.State = SessionState.InPlay;
-            player.Session.UnbindPlayer();
-            Assert.IsFalse(effect.Check(context, new KnubotPlan(), null!), "A stale session cannot apply a route.");
-            player.Session.BindPlayer(player);
-            player.Playfield = TestPlayfield(801, services);
-            Assert.IsFalse(effect.Check(context, new KnubotPlan(), null!), "A player who left the NPC cannot use the route.");
-            player.Playfield = source;
-            player.QuarantinePersistence();
-            Assert.IsFalse(effect.Check(context, new KnubotPlan(), null!), "Quarantined characters cannot transfer.");
+            var metadata = new Dictionary<int, PlayfieldMetaData>();
+            if (hasSource)
+                metadata.Add(800, new PlayfieldMetaData { PlayfieldId = 800 });
+            if (hasDestination)
+                metadata.Add(901, new PlayfieldMetaData { PlayfieldId = 901 });
+            var data = new StubGameData(HashItemCatalog.Parse("{}"), rootPath: root.FullName) { PlayfieldMetadata = metadata };
+            var logger = new StubLogger();
+            var catalog = new KnubotCatalog(data, new QuestCatalog(data, logger), new StubCatalog(), logger);
+            string script = $$"""
+                {
+                  "Npcs": ["TEST"],
+                  "Openers": [{ "Say": "go" }],
+                  "Lines": {
+                    "go": { "Text": "{{Directive}}" }
+                  }
+                }
+                """;
+            IReadOnlyList<string> errors = catalog.Check("route", script);
+            Assert.AreEqual(hasSource, !errors.Any(error => error.Contains("line 'go': teleport source playfield 800")));
+            Assert.AreEqual(hasDestination, !errors.Any(error => error.Contains("line 'go': teleport destination playfield 901")));
+            if (hasSource && hasDestination)
+                Assert.AreEqual(0, errors.Count);
         }
         finally
         {
-            Directory.Delete(root, recursive: true);
+            root.Delete();
         }
     }
 
-    // This check needs the playfield identity and GameData only. No world thread or zone handoff is started.
+    [TestMethod]
+    public void EffectRequiresTheAuthoredSourceAndCurrentSession()
+    {
+        using ServiceProvider services = new ServiceCollection().BuildServiceProvider();
+        Playfield source = TestPlayfield(800, services);
+        Player player = TestWorld.CreatePlayer(1);
+        player.Playfield = source;
+        player.EnterOnline(new RecordingZoneSession { State = SessionState.InPlay });
+        var npc = new NpcCharacter(new Identity { Type = IdentityType.CanbeAffected, Instance = 99 }, new StubItemBuilder())
+        {
+            Playfield = source,
+            Position = player.Position
+        };
+        npc.Stats.Set(CharacterStat.Health, 100);
+        npc.Stats.Set(CharacterStat.MaxHealth, 100);
+        var context = new KnubotContext(player, npc, null!, false, null!);
+        var errors = new List<string>();
+        var effect = (KnubotTeleport)KnubotParser.Parse(Directive, false, null!, errors).Effects.Single();
+        Assert.IsTrue(effect.Check(context, new KnubotPlan(), null!));
+        Assert.IsFalse((effect with { SourceId = 801 }).Check(context, new KnubotPlan(), null!));
+        player.Session!.State = SessionState.Loading;
+        Assert.IsFalse(effect.Check(context, new KnubotPlan(), null!), "An existing transfer must retain ownership.");
+        player.Session.State = SessionState.InPlay;
+        player.Session.UnbindPlayer();
+        Assert.IsFalse(effect.Check(context, new KnubotPlan(), null!), "A stale session cannot apply a route.");
+        player.Session.BindPlayer(player);
+        player.Playfield = TestPlayfield(801, services);
+        Assert.IsFalse(effect.Check(context, new KnubotPlan(), null!), "A player who left the NPC cannot use the route.");
+        player.Playfield = source;
+        player.QuarantinePersistence();
+        Assert.IsFalse(effect.Check(context, new KnubotPlan(), null!), "Quarantined characters cannot transfer.");
+    }
+
+    [TestMethod]
+    public void RefusedLocalTransferKeepsTheReturnDoor()
+    {
+        using ServiceProvider services = new ServiceCollection().AddSingleton<WorldSimulationAccess>().BuildServiceProvider();
+        Playfield source = TestPlayfield(800, services);
+        Playfield destination = TestPlayfield(901, services);
+        Player player = TestWorld.CreatePlayer(1);
+        player.Playfield = source;
+        player.Stats.Set(CharacterStat.ExternalPlayfieldInstance, 800);
+        player.Stats.Set(CharacterStat.ExternalDoorInstance, 99);
+        using var socket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        var dispatcher = (ZoneMessageDispatcher)RuntimeHelpers.GetUninitializedObject(typeof(ZoneMessageDispatcher));
+        var session = new ZoneSession(Guid.NewGuid(), socket, new ZoneMessageCodec(), dispatcher, new StubLogger());
+        try
+        {
+            player.EnterOnline(session);
+            session.State = SessionState.InPlay;
+            Assert.IsFalse(session.TransferToPlayfield(destination, new Vector3(1, 2, 3), player.Rotation,
+                stillAuthorized: null, clearReturnDoor: true));
+            Assert.AreSame(source, player.Playfield);
+            Assert.AreEqual(SessionState.InPlay, session.State);
+            Assert.AreEqual(800, player.Stats.GetOrZero(CharacterStat.ExternalPlayfieldInstance));
+            Assert.AreEqual(99, player.Stats.GetOrZero(CharacterStat.ExternalDoorInstance));
+        }
+        finally
+        {
+            session.UnbindPlayer();
+            session.Close();
+        }
+    }
+
+    [TestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public void RemoteTransferCarriesReturnDoorPolicyWithoutChangingTheSource(bool clearReturnDoor)
+    {
+        Player player = TestWorld.CreatePlayer(1);
+        player.Stats.Set(CharacterStat.ExternalPlayfieldInstance, 800);
+        player.Stats.Set(CharacterStat.ExternalDoorInstance, 99);
+        TransferEnvelope envelope = CrossInstanceTransfer.BuildEnvelope(player, 901, new Vector3(1, 2, 3), player.Rotation,
+            ArrivalKind.ArrivalTeleport, exitProxyDoor: 0, clearReturnDoor: clearReturnDoor);
+        Assert.AreEqual(clearReturnDoor, TransferEnvelope.Parser.ParseFrom(envelope.ToByteArray()).ClearReturnDoor);
+        Assert.AreEqual(800, player.Stats.GetOrZero(CharacterStat.ExternalPlayfieldInstance));
+        Assert.AreEqual(99, player.Stats.GetOrZero(CharacterStat.ExternalDoorInstance));
+    }
+
+    // The checks use playfield identity and refuse collision-free fixtures before scheduling any handoff.
     static Playfield TestPlayfield(int id, ServiceProvider services)
     {
         const BindingFlags flags = BindingFlags.Instance | BindingFlags.NonPublic;
@@ -115,6 +196,7 @@ public sealed class KnubotTeleportTests
         typeof(Playfield).GetField("<Identity>k__BackingField", flags)!
             .SetValue(playfield, new Identity { Type = IdentityType.Playfield2, Instance = id });
         typeof(Playfield).GetField("_serviceProvider", flags)!.SetValue(playfield, services);
+        typeof(Playfield).GetField("_logger", flags)!.SetValue(playfield, new StubLogger());
         return playfield;
     }
 }

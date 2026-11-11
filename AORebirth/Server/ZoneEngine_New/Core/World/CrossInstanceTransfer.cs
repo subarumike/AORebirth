@@ -50,7 +50,7 @@ namespace ZoneEngine_New.Core.World
 
         /// <summary>Runs on the player's own playfield tick. False when the move could not start.</summary>
         public bool Start(Player player, int destinationPlayfield, Vector3 landing, Quaternion heading,
-            ArrivalKind arrival = ArrivalKind.ArrivalZone, int exitProxyDoor = 0)
+            ArrivalKind arrival = ArrivalKind.ArrivalZone, int exitProxyDoor = 0, bool clearReturnDoor = false)
         {
             ArgumentNullException.ThrowIfNull(player);
             ArgumentNullException.ThrowIfNull(landing);
@@ -70,7 +70,7 @@ namespace ZoneEngine_New.Core.World
             TransferEnvelope envelope;
             try
             {
-                envelope = BuildEnvelope(player, destinationPlayfield, landing, heading, arrival, exitProxyDoor);
+                envelope = BuildEnvelope(player, destinationPlayfield, landing, heading, arrival, exitProxyDoor, clearReturnDoor);
                 if (source.GetRequiredService<PlayfieldManager>().Teams.SnapshotTeamState(player) is { } team)
                     envelope.Team = team;
                 // The logout save, in the same order (SpawnService.DespawnPlayer).
@@ -111,13 +111,14 @@ namespace ZoneEngine_New.Core.World
                     reply = null;
                 }
 
-                source.DispatchPlayerProjection(player, () => Complete(player, session, source, reply, landing, heading, destinationPlayfield));
+                source.DispatchPlayerProjection(player,
+                    () => Complete(player, session, source, reply, landing, heading, destinationPlayfield, clearReturnDoor));
             });
             return true;
         }
 
         void Complete(Player player, ZoneSession session, PlayfieldInstance source, TransferReply? reply,
-            Vector3 landing, Quaternion heading, int destinationPlayfield)
+            Vector3 landing, Quaternion heading, int destinationPlayfield, bool clearReturnDoor)
         {
             int characterId = player.Identity.Instance;
             if (reply == null)
@@ -164,7 +165,11 @@ namespace ZoneEngine_New.Core.World
             }
 
             if (ReferenceEquals(player.Playfield, source))
+            {
+                if (clearReturnDoor)
+                    source.WorldAccess.Instance?.ForgetCharacterTriggers(characterId);
                 source.GetRequiredService<SpawnService>().DepartToInstance(player);
+            }
 
             // The client reconnects to the destination by itself; drop this socket once it has had time to.
             _ = Task.Delay(TimeSpan.FromSeconds(10)).ContinueWith(_ => session.Close(), TaskScheduler.Default);
@@ -189,8 +194,8 @@ namespace ZoneEngine_New.Core.World
             Tell(player, message);
         }
 
-        static TransferEnvelope BuildEnvelope(Player player, int destinationPlayfield, Vector3 landing, Quaternion heading,
-            ArrivalKind arrival, int exitProxyDoor)
+        internal static TransferEnvelope BuildEnvelope(Player player, int destinationPlayfield, Vector3 landing, Quaternion heading,
+            ArrivalKind arrival, int exitProxyDoor, bool clearReturnDoor)
         {
             var envelope = new TransferEnvelope
             {
@@ -204,6 +209,7 @@ namespace ZoneEngine_New.Core.World
                 HeadingW = heading.wf,
                 Arrival = arrival,
                 ExitProxyDoor = exitProxyDoor,
+                ClearReturnDoor = clearReturnDoor,
                 SavedUnixMs = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()
             };
 
