@@ -51,6 +51,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Data.Linq" />
     <Reference Include="System.Numerics" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -165,6 +166,8 @@
     <Compile Include="Functions\Functions.cs" />
     <Compile Include="Functions\IFunctions.cs" />
     <Compile Include="GameData\GameDataPaths.cs" />
+    <Compile Include="GameData\ItemBehaviorBindings.cs" />
+    <Compile Include="GameData\ReverseProxyExitCatalog.cs" />
     <Compile Include="GameData\PlayfieldCharacterAppearanceData.cs" />
     <Compile Include="GameData\DynelCollisionData.cs" />
     <Compile Include="GameData\PlayfieldExitProxyDoorsData.cs" />
@@ -201,7 +204,7 @@
     <Compile Include="Items\IItem.cs" />
     <Compile Include="Items\IItemNanoActions.cs" />
     <Compile Include="Items\IItemNanoEvents.cs" />
-    <Compile Include="Items\AwakenedBurdenOfCompetenceAppearance.cs" />
+    <Compile Include="Items\ItemAppearanceOverrides.cs" />
     <Compile Include="Items\Item.cs" />
     <Compile Include="Items\ItemLoader.cs" />
     <Compile Include="Items\ItemTemplate.cs" />

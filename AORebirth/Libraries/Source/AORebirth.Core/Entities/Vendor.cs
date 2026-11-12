@@ -37,6 +37,7 @@ namespace AORebirth.Core.Entities
     using System.Linq;
 
     using AORebirth.Core.Events;
+    using AORebirth.Core.GameData;
     using AORebirth.Core.Inventory;
     using AORebirth.Core.Items;
     using AORebirth.Database.Dao;
@@ -52,13 +53,6 @@ namespace AORebirth.Core.Entities
 
     public class Vendor : Dynel, IEventHolder, IItemContainer
     {
-        private static readonly Dictionary<int, int> LiveVendorMeshOverrides =
-            new Dictionary<int, int>
-            {
-                { 155599, 85976 }, // Basic Bookstore, live Rome Blue capture 20260607-005753
-                { 155603, 85976 }  // Omni Basic Devices, live Rome Blue capture 20260607-005753
-            };
-
         public Identity OriginalIdentity = Identity.None;
 
         public Identity NpcIdentity = Identity.None;
@@ -76,8 +70,8 @@ namespace AORebirth.Core.Entities
             }
 
             this.Stats = new SimpleStatList();
-            // Fallback on Advy adv. crystals shop
-            this.Template = ItemLoader.ItemList[vendorTemplate != null ? vendorTemplate.ItemTemplate : 46522];
+            int templateId = vendorTemplate?.ItemTemplate ?? ItemBehaviorBindings.Current.VendorFallbackTemplateId;
+            this.Template = ItemLoader.ItemList[templateId];
             foreach (KeyValuePair<int, int> s in this.Template.Stats)
             {
                 this.Stats[s.Key].Value = s.Value;
@@ -124,8 +118,7 @@ namespace AORebirth.Core.Entities
 
         private void ApplyLiveVendorVisualOverrides(int templateId)
         {
-            int meshId;
-            if (LiveVendorMeshOverrides.TryGetValue(templateId, out meshId))
+            if (ItemBehaviorBindings.Current.TryResolveVendorMesh(templateId, out int meshId))
             {
                 this.Stats[(int)StatIds.mesh].Value = meshId;
             }

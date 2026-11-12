@@ -10,11 +10,6 @@ namespace WorldEngine
 
     public sealed class WorldOptions
     {
-        /// <summary>NPC instance ids: slot 0 keeps the single-engine range, each further slot gets its own block.</summary>
-        public const int NpcIdBase = 1_000_000;
-
-        public const int NpcIdStride = 0x00800000;
-
         public required IPAddress ListenAddress { get; init; }
 
         public required int Port { get; init; }

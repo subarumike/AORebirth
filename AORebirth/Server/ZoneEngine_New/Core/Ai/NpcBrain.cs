@@ -82,8 +82,8 @@ namespace ZoneEngine_New.Core.Ai
             _nanos = new NpcNanoCaster(this);
             _isEngageable = IsEngageable;
             _thinkElapsed = ThinkPhase(npc);
-            if (npc.Playfield?.GetService<GameData.IGameData>()?.RootPath is string root && root.Length > 0)
-                _petSummons = NpcPetSummons.TryCreate(npc, root);
+            if (npc.Playfield?.GetService<GameData.IGameData>() is { RootPath.Length: > 0 } gameData)
+                _petSummons = NpcPetSummons.TryCreate(npc, gameData);
         }
 
         /// <summary>Combat pets from GameData MonsterCombatRules.json; null for NPCs without a pet rule.</summary>

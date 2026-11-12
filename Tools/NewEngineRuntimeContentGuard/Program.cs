@@ -16,6 +16,7 @@ if (mode == "--doa-self-test") return DoaMutationTests.Run(root);
 if (mode is not ("--write" or "--check" or "--baseline" or "--self-test")) return 64;
 if (mode == "--self-test") return GuardMutationTests.Run(root);
 bool doaInventory = args.Contains("--doa-inventory", StringComparer.Ordinal);
+bool evaluateGraph = doaInventory && args.Contains("--evaluated-graph", StringComparer.Ordinal);
 string? revision = mode == "--baseline" ? (args.Length > 2 ? args[2] : "HEAD") : null;
 string Normalize(string value) => value.Replace('\\', '/');
 string Rel(string value) => Normalize(Path.GetRelativePath(root, value));
@@ -145,15 +146,32 @@ void AddProject(string project)
         }
     }
 }
-AddProject("AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj");
-if (doaInventory)
+EvaluatedRuntimeGraph.Project[] evaluated = [];
+NativeRuntimeGraph.Report? nativeGraph = null;
+string? proposedRevision = null;
+if (evaluateGraph)
 {
-    foreach (string project in new[]
+    if (revision != null) return 64;
+    proposedRevision = Git("rev-parse", "HEAD").Trim();
+    evaluated = EvaluatedRuntimeGraph.Read(root, EvaluatedRuntimeGraph.EntryProjects, message => unresolved.Add(message), tracked);
+    foreach (EvaluatedRuntimeGraph.Project project in evaluated)
     {
-        "AORebirth/Server/WorldEngine/WorldEngine.csproj",
-        "WindowsBuildNet10/Projects/ChatEngine.WinNet10.csproj",
-        "WindowsBuildNet10/Projects/LoginEngine.WinNet10.csproj"
-    })
+        projects.Add(project.Path);
+        foreach (string reference in project.ProjectReferences.Where(DoaRules.IsForbiddenRuntimeProjectReference))
+            dependencyFindings.Add(DoaRules.DataFinding(project.Path, reference, "DOA_MODULE_DEPENDENCY",
+                "Runtime project graph references an executable sibling engine, offline tool or test project.", reference));
+        sourceFiles.UnionWith(project.Inputs.Where(input => input.Kind == "Compile" && Exists(input.Path)).Select(input => input.Path));
+    }
+    EvaluatedRuntimeGraph.ValidateConfiguration(root, evaluated.SelectMany(project => project.Inputs), message => unresolved.Add(message));
+    int nativeArgument = Array.IndexOf(args, "--native-graph");
+    if (nativeArgument < 0 || nativeArgument + 1 >= args.Length)
+        unresolved.Add("Missing measured native package graph (--native-graph).");
+    else
+        nativeGraph = NativeRuntimeGraph.Read(root, args[nativeArgument + 1], proposedRevision, message => unresolved.Add(message));
+}
+else
+{
+    foreach (string project in EvaluatedRuntimeGraph.EntryProjects.Take(doaInventory ? EvaluatedRuntimeGraph.EntryProjects.Length : 1))
     {
         if (Exists(project)) AddProject(project);
         else unresolved.Add("Missing runtime entry project: " + project);
@@ -161,7 +179,6 @@ if (doaInventory)
 }
 
 var contentName = new Regex(@"Scarlett|Buckethead|Accepted(?:Arete|Garden|Social|Subway)|DojaChip|FlintKneecapping|CapturedSubwayTailor|SparrowChild|MongoNano", RegexOptions.CultureInvariant);
-var contentField = new Regex(@"(?:Npc|NPC|Nano|Quest|Vendor|Merchant|Template|Playfield|Mesh|Texture|Weapon|Reward|Item)(?:Id|Ids|Hash|Name|Template|Stock|Pool)|(?:Scarlett|Buckethead|Sarah|Stan|Arete)(?:Id|Instance|Position|Rotation|Name)|^(?:SpawnHash|MobHash|LowId|HighId|HeadMesh|CATMesh|MonsterData|NpcFamily)$", RegexOptions.CultureInvariant);
 var findings = new List<Finding>();
 var files = new List<object>();
 bool IsDatabaseSqlLiteral(string file, string leaf, LiteralExpressionSyntax literal)
@@ -202,7 +219,8 @@ string Category(string text)
     if (Regex.IsMatch(text, "Item", RegexOptions.IgnoreCase)) return "HARDCODED_ITEM_CONTENT";
     return "HARDCODED_OTHER_GAME_CONTENT";
 }
-foreach (string file in sourceFiles.Where(IsSource))
+foreach (string file in sourceFiles.Where(file => evaluateGraph
+             ? file.EndsWith(".cs", StringComparison.OrdinalIgnoreCase) : IsSource(file)))
 {
     string source = Read(file);
     var found = new List<Finding>();
@@ -249,7 +267,7 @@ foreach (string file in sourceFiles.Where(IsSource))
             // An argument to a decoder/reader call is an index, not the assigned content value.
             bool directValue = !literal.Ancestors().TakeWhile(n => n != assignment && n != variable && n != property)
                 .Any(n => n is InvocationExpressionSyntax or ElementAccessExpressionSyntax);
-            if (contentField.IsMatch(leaf) && !infrastructureName && directValue)
+            if (DoaRules.IsLiteralBindingField(leaf) && !infrastructureName && directValue)
                 Add(literal, "CONTENT_LITERAL_BINDING", "Content identity/assignment value is embedded in a runtime declaration or initializer.");
             if (directValue && literal.Ancestors().OfType<ObjectCreationExpressionSyntax>().Any(creation =>
                 Regex.IsMatch(creation.Type.ToString(), @"(?:^|\.)(?:MobTemplate|WorldNpcDefinition|WorldShopDefinition|WorldVendorStock|QuestDefinition|MissionDefinition|DialogueNode|DialogueOption|NpcFamilyStatTemplate)$", RegexOptions.CultureInvariant)))
@@ -259,11 +277,12 @@ foreach (string file in sourceFiles.Where(IsSource))
                 Add(literal, "NAMED_CONTENT_TEXT", "Specific game content text assigned in runtime C#.");
             if (number && literal.Ancestors().OfType<BinaryExpressionSyntax>().FirstOrDefault() is { } binary
                 && binary.Kind() is SyntaxKind.EqualsExpression or SyntaxKind.NotEqualsExpression
-                && (contentField.IsMatch(binary.Left.ToString().Split('.').Last()) || contentField.IsMatch(binary.Right.ToString().Split('.').Last())))
+                && (DoaRules.IsLiteralBindingField(binary.Left.ToString().Split('.').Last())
+                    || DoaRules.IsLiteralBindingField(binary.Right.ToString().Split('.').Last())))
                 Add(literal, "CONTENT_ID_BRANCH", "Runtime branch selects a specific content identity.");
             if (number && literal.Ancestors().OfType<SwitchStatementSyntax>().FirstOrDefault() is { } statement
                 && literal.Ancestors().OfType<CaseSwitchLabelSyntax>().Any()
-                && contentField.IsMatch(statement.Expression.ToString().Split('.').Last()))
+                && DoaRules.IsLiteralBindingField(statement.Expression.ToString().Split('.').Last()))
                 Add(literal, "CONTENT_ID_SWITCH", "Runtime switch selects a specific content identity.");
             if (number && literal.Ancestors().OfType<InvocationExpressionSyntax>().FirstOrDefault() is { } call
                 && call.Expression.ToString().EndsWith(".Stats.Set", StringComparison.Ordinal)
@@ -301,7 +320,11 @@ if (doaInventory)
     findings.AddRange(DoaAdditionalInputs.LftPolicyIssues(publicLftPolicy, Exists(publicLftPolicy) ? Read(publicLftPolicy) : null));
     if (Exists(DoaAdditionalInputs.PackagedInteractions))
         findings.AddRange(DoaAdditionalInputs.PackagedInteractionIssues(Read(DoaAdditionalInputs.PackagedInteractions)));
-    foreach (string file in FilesUnder(DoaAdditionalInputs.NativeSourceRoot, "*").Where(DoaAdditionalInputs.IsNativeSource))
+    IEnumerable<string> nativeFiles = nativeGraph == null
+        ? FilesUnder(DoaAdditionalInputs.NativeSourceRoot, "*").Where(DoaAdditionalInputs.IsNativeSource)
+        : nativeGraph.TranslationUnits.Select(unit => unit.Source).Concat(nativeGraph.TranslationUnits.SelectMany(unit => unit.Includes))
+            .Distinct(StringComparer.OrdinalIgnoreCase);
+    foreach (string file in nativeFiles)
     {
         findings.AddRange(DoaAdditionalInputs.NativeIssues(file, Read(file)));
         nativeFilesAudited++;
@@ -310,14 +333,21 @@ if (doaInventory)
         unresolved.Add("Missing native client source inputs: " + DoaAdditionalInputs.NativeSourceRoot);
 }
 findings = findings.OrderBy(f => f.Path, StringComparer.Ordinal).ThenBy(f => f.Line).ThenBy(f => f.Rule, StringComparer.Ordinal).ToList();
-var report = new { schemaVersion = 2, scope = doaInventory
-        ? "Conservative static Zone, World, Chat and Login project graph, client proxy sources and selected public runtime catalogs."
+var report = new { schemaVersion = evaluateGraph ? 3 : 2, scope = doaInventory
+        ? "Zone, World, Chat and Login project graph, client proxy inputs and selected public runtime catalogs."
         : "Conservative static NewEngine project-reference source graph including SDK default files, explicit imported Compile items and linked shared sources.",
-    sourceRevision = revision, runtimeCSharpFilesAudited = files.Count, nativeFilesAudited, totalRuntimeContentViolations = findings.Count,
-    sourceGraphMethod = "Static project XML expansion, not an evaluated MSBuild compilation manifest. Conditional includes are included conservatively; conditional removals do not hide sources. SDK-generated sources and package binaries are outside this source audit.",
-    sourceGraphLimitations = new[] { "Implicit SDK imports, target-generated Compile items and arbitrary MSBuild property functions are not evaluated.",
+    sourceRevision = revision ?? proposedRevision, runtimeCSharpFilesAudited = files.Count, nativeFilesAudited, totalRuntimeContentViolations = findings.Count,
+    sourceGraphMethod = evaluateGraph
+        ? "MSBuild-evaluated Debug/Release AnyCPU compiler items and SDK defines, with MSVC dependency evidence from the offline x86 package build."
+        : "Static project XML expansion, not an evaluated MSBuild compilation manifest. Conditional includes are included conservatively; conditional removals do not hide sources. SDK-generated sources and package binaries are outside this source audit.",
+    sourceGraphLimitations = new[] { evaluateGraph
+        ? "Repository target-time source mutations and generators require audited coverage. Third-party SDK/NuGet generated C# and analyzer internals are outside this measurement. Evaluated protocol inputs and SDK analyzers are recorded."
+        : "Implicit SDK imports, target-generated Compile items and arbitrary MSBuild property functions are not evaluated.",
         doaInventory ? "The strict scan inspects all satisfiable per-file conditional-symbol combinations up to its fail-closed bound."
-            : "Legacy inventory uses DEBUG, TRACE and AOREBIRTH_WIN_NET10." },
+            : "Legacy inventory uses DEBUG, TRACE and AOREBIRTH_WIN_NET10.",
+        evaluateGraph ? "The Windows build and native x86 package are measured here. The governed private Linux builder is a separate input boundary."
+            : "Historical/static report used for diagnostic comparison." },
+    evaluatedBuildGraph = evaluated, nativeBuildGraph = nativeGraph,
     sourceGraphNotes = graphNotes.ToArray(),
     classificationMethod = "Contextual syntax candidates plus separately recorded domain semantic review. No filename-wide grandfathered violation allowlist.",
     unresolvedProjectInputs = unresolved.ToArray(), projects = projects.ToArray(), files, findings };

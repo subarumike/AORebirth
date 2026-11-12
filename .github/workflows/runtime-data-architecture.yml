@@ -13,8 +13,8 @@ permissions:
 jobs:
   runtime-structure:
     name: dao-runtime-structure
-    runs-on: windows-latest
-    timeout-minutes: 12
+    runs-on: windows-2025-vs2026
+    timeout-minutes: 15
     steps:
       - uses: actions/checkout@v5
         with:
@@ -46,6 +46,11 @@ jobs:
           $guard = 'Tools/NewEngineRuntimeContentGuard/bin/Release/net10.0/NewEngineRuntimeContentGuard.dll'
           dotnet $guard --doa-self-test .
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          dotnet $guard --enforce-structure . $baseline
+          $nativeGraph = Join-Path $env:RUNNER_TEMP 'dao-native-graph'
+          & .\Tools\AOClientRoomSpaceGuard\ProxyDll\Build-Package.cmd --graph-output $nativeGraph
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          git diff --exit-code HEAD
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          dotnet $guard --enforce-structure . $baseline --native-graph $nativeGraph
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           'Public structure passed. Authoritative GameData and runtime validation require dao-canonical-validation.' >> $env:GITHUB_STEP_SUMMARY

@@ -2,10 +2,12 @@ namespace ZoneEngine_New.Core.Ai
 {
     using System;
     using System.Collections.Generic;
+    using System.IO;
 
     using AORebirth.Enums;
 
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Mobs;
 
@@ -18,9 +20,6 @@ namespace ZoneEngine_New.Core.Ai
     /// </summary>
     sealed class NpcPetSummons
     {
-        /// <summary>A summon that could not be placed is tried again this much later.</summary>
-        const double RetrySeconds = 1;
-
         readonly NpcCharacter _npc;
         readonly MonsterPetRule _rule;
         readonly string _hash;
@@ -37,51 +36,56 @@ namespace ZoneEngine_New.Core.Ai
             _level = level;
         }
 
-        /// <summary>Name of the equipment item whose OnUse raises an NPC's combat pets (one template per pet kind).</summary>
-        public const string PetCreationItemName = "NPC Pet Creation Item";
-
         /// <summary>
-        /// Combat pets for an NPC whose equipment holds a <see cref="PetCreationItemName"/> (the first, by slot, when it
-        /// has several) with a pet spawn on use; otherwise null. The NPC's hash may override the
-        /// <see cref="MonsterPetRule"/> defaults in MonsterCombatRules.json.
+        /// Combat pets use the first equipped creation item by slot and the authored policy for the NPC.
         /// </summary>
-        public static NpcPetSummons? TryCreate(NpcCharacter npc, string gameDataRoot)
+        public static NpcPetSummons? TryCreate(NpcCharacter npc, IGameData gameData)
         {
+            MonsterCombatRulesCatalog catalog = MonsterCombatRulesCatalog.For(gameData.RootPath);
             Item? creator = null;
             int creatorSlot = int.MaxValue;
             foreach (KeyValuePair<int, Item> slot in npc.Equipment.Content)
             {
-                if (slot.Key >= creatorSlot
-                    || !string.Equals(slot.Value.Name, PetCreationItemName, StringComparison.OrdinalIgnoreCase))
+                if (slot.Key >= creatorSlot || !catalog.IsPetCreationItem(slot.Value.Definition.Id))
                     continue;
                 creator = slot.Value;
                 creatorSlot = slot.Key;
             }
 
-            if (creator == null || !creator.SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells))
+            if (creator == null)
                 return null;
 
             string? hash = npc.MobTemplate?.Hash ?? npc.SpawnHash;
-            MonsterPetRule rule = MonsterCombatRulesCatalog.For(gameDataRoot).TryGet(hash, out MonsterCombatRules rules)
-                && rules.Pets is MonsterPetRule overridden
-                    ? overridden
-                    : new MonsterPetRule();
+            MonsterPetRule rule = catalog.PetRule(hash);
             if (rule.MaxPets <= 0)
                 return null;
+
+            if (!TryReadSummon(creator.Definition, out string petHash, out int level)
+                || !gameData.HasMobTemplate(petHash))
+                throw new InvalidDataException($"NPC '{hash}' has an invalid pet summon on item {creator.Definition.Id}.");
+
+            return new NpcPetSummons(npc, rule, petHash, level);
+        }
+
+        internal static bool TryReadSummon(ItemTemplate creator, out string petHash, out int level)
+        {
+            petHash = string.Empty;
+            level = 0;
+            if (!creator.SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells))
+                return false;
 
             foreach (ItemSpell spell in spells)
             {
                 if (!spell.Is(FunctionType.SpawnMonster2) && !spell.Is(FunctionType.SummonPet))
                     continue;
-                if (!spell.TryReadString(0, out string petHash) || petHash.Length == 0)
+                if (!spell.TryReadString(0, out string target) || target.Length == 0)
                     continue;
-                if (!spell.TryReadInt(1, out int level))
-                    level = 0;
-
-                return new NpcPetSummons(npc, rule, petHash.Trim(), level);
+                petHash = target.Trim();
+                spell.TryReadInt(1, out level);
+                return petHash.Length > 0;
             }
 
-            return null;
+            return false;
         }
 
         /// <param name="inCombat">The NPC is fighting and not leashing home.</param>
@@ -103,7 +107,7 @@ namespace ZoneEngine_New.Core.Ai
                 for (int i = _pets.Count; i < _rule.MaxPets; i++)
                 {
                     double delay = (i - _pets.Count + 1) * _rule.SummonIntervalSeconds;
-                    _due.Add(nowUtc.AddSeconds(Math.Max(0, delay)));
+                    _due.Add(nowUtc.AddSeconds(delay));
                 }
             }
 
@@ -113,7 +117,7 @@ namespace ZoneEngine_New.Core.Ai
                 if (!IsGone(_pets[i]))
                     continue;
                 _pets.RemoveAt(i);
-                _due.Add(nowUtc.AddSeconds(Math.Max(0, _rule.RespawnDelaySeconds)));
+                _due.Add(nowUtc.AddSeconds(_rule.RespawnDelaySeconds));
             }
 
             for (int i = 0; i < _due.Count; i++)
@@ -125,7 +129,7 @@ namespace ZoneEngine_New.Core.Ai
                     ?.Summon(_npc, _hash, _level, durationSeconds: 0, replaceSameSlot: false);
                 if (pet == null)
                 {
-                    _due[i] = nowUtc.AddSeconds(RetrySeconds);
+                    _due[i] = nowUtc.AddSeconds(_rule.RetryDelaySeconds);
                     continue;
                 }
 

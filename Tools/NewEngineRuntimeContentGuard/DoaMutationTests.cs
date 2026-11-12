@@ -41,6 +41,12 @@ internal static class DoaMutationTests
             ("unchanged and introduced findings", CheckDiff),
             ("strict acceptance and authority boundary", CheckStrictAcceptance),
             ("inactive conditional source", CheckConditionalSource),
+            ("evaluated imports, runtime configuration and generated-source bypass", CheckEvaluatedGraph),
+            ("native graph revision evidence", CheckNativeGraphRevision),
+            ("allocated protocol ranges and authored identities", CheckLiteralBindingFields),
+            ("conditional item-template fallback", () => Block(
+                "class Probe { object Find() => ItemLoader.ItemList[template != null ? template.ItemTemplate : 46522]; }",
+                "DOA_FALLBACK_CONTENT")),
             ("literal and implicit encounter policies", CheckEncounterPolicy),
             ("authored operation privilege bypass", CheckAuthoredPrivilege),
             ("compiled native content", CheckNativePolicy),
@@ -69,6 +75,133 @@ internal static class DoaMutationTests
         }
         Console.WriteLine($"DOA_MUTATION_TESTS={passed}/{cases.Length}");
         return passed == cases.Length ? 0 : 1;
+    }
+
+    private static void CheckLiteralBindingFields()
+    {
+        Require(!DoaRules.IsLiteralBindingField("NpcIdBase"));
+        Require(!DoaRules.IsLiteralBindingField("NpcIdStride"));
+        Require(DoaRules.IsLiteralBindingField("NpcId"));
+        Require(DoaRules.IsLiteralBindingField("NpcIdFallback"));
+        Require(DoaRules.IsLiteralBindingField("TargetPlayfieldId"));
+        Require(DoaRules.IsLiteralBindingField("PetCreationItemName"));
+    }
+
+    private static void CheckEvaluatedGraph()
+    {
+        string root = Directory.CreateTempSubdirectory("dao-msbuild-").FullName;
+        var sources = new Dictionary<string, string>
+        {
+            ["Runtime.csproj"] = """
+                <Project Sdk="Microsoft.NET.Sdk">
+                  <PropertyGroup>
+                    <TargetFramework>net10.0</TargetFramework>
+                    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+                  </PropertyGroup>
+                  <ItemGroup>
+                    <Compile Include="Unconditional.cs" />
+                    <Compile Remove="Unconditional.cs" Condition="'$(Configuration)' == 'Release'" />
+                    <ProjectReference Include="Dependency/Dependency.csproj" />
+                    <None Update="AORebirth/Config/Probe.json" CopyToOutputDirectory="PreserveNewest" />
+                  </ItemGroup>
+                </Project>
+                """,
+            ["Dependency/Dependency.csproj"] = """
+                <Project Sdk="Microsoft.NET.Sdk">
+                  <PropertyGroup><TargetFramework>net10.0</TargetFramework></PropertyGroup>
+                </Project>
+                """,
+            ["Directory.Build.props"] = """
+                <Project>
+                  <PropertyGroup><ConditionalDirectory>Variant</ConditionalDirectory></PropertyGroup>
+                  <PropertyGroup Condition="'$(Configuration)' == 'Release'">
+                    <DefineConstants>$(DefineConstants);PUBLISHED_VARIANT</DefineConstants>
+                  </PropertyGroup>
+                  <ItemGroup Condition="'$(Configuration)' == 'Release' and '$(MSBuildProjectName)' == 'Runtime'">
+                    <Compile Include="$(ConditionalDirectory)/Authored.cs" Link="Linked.cs" />
+                  </ItemGroup>
+                </Project>
+                """,
+            ["Directory.Build.targets"] = "<Project />",
+            ["Unconditional.cs"] = "class GenericMechanic { }",
+            ["Variant/Authored.cs"] = "#if PUBLISHED_VARIANT\nclass Probe { const int QuestLowId = 12345; }\n#endif",
+            ["AORebirth/Config/Probe.json"] = "{"
+        };
+        try
+        {
+            foreach ((string path, string content) in sources)
+            {
+                string destination = Path.Combine(root, path);
+                Directory.CreateDirectory(Path.GetDirectoryName(destination)!);
+                File.WriteAllText(destination, content);
+            }
+            var unresolved = new List<string>();
+            EvaluatedRuntimeGraph.Project[] graph = EvaluatedRuntimeGraph.Read(root, ["Runtime.csproj"], unresolved.Add);
+            if (unresolved.Count != 0)
+                throw new InvalidOperationException(string.Join(Environment.NewLine, unresolved));
+            Require(graph.Length == 4);
+            EvaluatedRuntimeGraph.Project debug = graph.Single(project => project.Path == "Runtime.csproj" && project.Configuration == "Debug");
+            EvaluatedRuntimeGraph.Project release = graph.Single(project => project.Path == "Runtime.csproj" && project.Configuration == "Release");
+            Require(debug.Inputs.Contains(new EvaluatedRuntimeGraph.Input("Compile", "Unconditional.cs")));
+            Require(!release.Inputs.Contains(new EvaluatedRuntimeGraph.Input("Compile", "Unconditional.cs")));
+            Require(!debug.Defines.Contains("PUBLISHED_VARIANT"));
+            Require(release.Defines.Contains("PUBLISHED_VARIANT") && release.Defines.Contains("NET10_0"));
+            string authored = release.Inputs.Single(input => input.Kind == "Compile").Path;
+            Require(authored == "Variant/Authored.cs");
+            Require(DoaRules.SourceVariants(MissionPath, sources[authored], unresolved.Add)
+                .SelectMany(syntax => DoaRules.SourceIssues(MissionPath, syntax)).Any(issue => issue.Rule == "DOA_LITERAL_CONTENT_IDENTITY"));
+            EvaluatedRuntimeGraph.ValidateConfiguration(root, release.Inputs, unresolved.Add);
+            Require(unresolved.Count == 1 && unresolved[0].Contains("Probe.json", StringComparison.Ordinal));
+
+            File.Delete(Path.Combine(root, authored));
+            unresolved.Clear();
+            _ = EvaluatedRuntimeGraph.Read(root, ["Runtime.csproj"], unresolved.Add);
+            Require(unresolved.Count == 1 && unresolved[0].Contains("Missing evaluated Compile input", StringComparison.Ordinal));
+
+            File.WriteAllText(Path.Combine(root, authored), sources[authored]);
+            File.WriteAllText(Path.Combine(root, "Directory.Build.targets"), """
+                <Project>
+                  <Target Name="GenerateHiddenSource" BeforeTargets="CoreCompile">
+                    <ItemGroup><Compile Include="$(IntermediateOutputPath)Hidden.cs" /></ItemGroup>
+                  </Target>
+                </Project>
+                """);
+            unresolved.Clear();
+            _ = EvaluatedRuntimeGraph.Read(root, ["Runtime.csproj"], unresolved.Add);
+            Require(unresolved.Count == 1 && unresolved[0].Contains(
+                "Directory.Build.targets -> GenerateHiddenSource/Compile", StringComparison.Ordinal));
+        }
+        finally
+        {
+            foreach (string path in sources.Keys)
+                File.Delete(Path.Combine(root, path));
+            foreach (string path in new[] { "AORebirth/Config", "AORebirth", "Dependency", "Variant" })
+                Directory.Delete(Path.Combine(root, path));
+            Directory.Delete(root);
+        }
+    }
+
+    private static void CheckNativeGraphRevision()
+    {
+        string root = Directory.CreateTempSubdirectory("dao-native-").FullName;
+        string graph = Directory.CreateDirectory(Path.Combine(root, "graph")).FullName;
+        string revision = Path.Combine(graph, "source-revision.txt");
+        try
+        {
+            File.WriteAllText(revision, new string('a', 40));
+            var unresolved = new List<string>();
+            Require(NativeRuntimeGraph.Read(root, root, new string('b', 40), unresolved.Add) == null);
+            Require(unresolved.Count == 1 && unresolved[0].Contains("different source revision", StringComparison.Ordinal));
+            unresolved.Clear();
+            Require(NativeRuntimeGraph.Read(root, root, new string('a', 40), unresolved.Add) == null);
+            Require(unresolved.Count == 1 && unresolved[0].Contains("toolchain.txt", StringComparison.Ordinal));
+        }
+        finally
+        {
+            File.Delete(revision);
+            Directory.Delete(graph);
+            Directory.Delete(root);
+        }
     }
 
     private static void Block(string source, string rule) => Require(Rules(source).Contains(rule));

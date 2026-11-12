@@ -3,6 +3,14 @@ setlocal EnableExtensions DisableDelayedExpansion
 
 set "ROOT=%~dp0"
 set "SRC=%ROOT%src"
+set "GRAPH_ROOT="
+if not "%~1"=="" (
+  if /I not "%~1"=="--graph-output" exit /b 64
+  if "%~2"=="" exit /b 64
+  if not "%~3"=="" exit /b 64
+  set "GRAPH_ROOT=%~f2"
+  set "AO_REBIRTH_CODESIGN=0"
+)
 set "PATCH_VERSION=2"
 set "SOURCE_SHA=unknown"
 set "GITRESULT=%TEMP%\AORebirthClientPatch-git-%RANDOM%-%RANDOM%.txt"
@@ -41,6 +49,7 @@ if errorlevel 1 (
 )
 
 set "BUILD_ROOT=%TEMP%\AORebirthClientPatch-%RANDOM%-%RANDOM%"
+if defined GRAPH_ROOT set "BUILD_ROOT=%GRAPH_ROOT%"
 if exist "%BUILD_ROOT%" (
   echo [AORebirthClientPatch] ERROR temporary build directory collision: "%BUILD_ROOT%".
   exit /b 1
@@ -51,9 +60,20 @@ if errorlevel 1 (
   exit /b 1
 )
 
+set "PROXY_DEPS="
+set "DEPLOY_DEPS="
+set "SETUP_DEPS="
+if defined GRAPH_ROOT (
+  mkdir "%BUILD_ROOT%\graph\proxy" "%BUILD_ROOT%\graph\deploy" "%BUILD_ROOT%\graph\setup"
+  if errorlevel 1 exit /b 1
+  set PROXY_DEPS=/sourceDependencies "%BUILD_ROOT%\graph\proxy\."
+  set DEPLOY_DEPS=/sourceDependencies "%BUILD_ROOT%\graph\deploy\."
+  set SETUP_DEPS=/sourceDependencies "%BUILD_ROOT%\graph\setup\."
+)
+
 echo [AORebirthClientPatch] Building x86 static-CRT proxy...
 pushd "%BUILD_ROOT%"
-cl /nologo /std:c++17 /O2 /GL /Gy /EHsc /W4 /WX /MT ^
+cl /nologo /std:c++17 /O2 /GL /Gy /EHsc /W4 /WX /MT %PROXY_DEPS% ^
   /DUNICODE /D_UNICODE /DWIN32_LEAN_AND_MEAN /DNOMINMAX ^
   /DAO_REBIRTH_CLIENT_PATCH_VERSION=\"%PATCH_VERSION%\" ^
   /DAO_REBIRTH_CLIENT_PATCH_SOURCE_SHA=\"%SOURCE_SHA%\" ^
@@ -121,7 +141,7 @@ if errorlevel 1 (
 )
 
 echo [AORebirthClientPatch] Building and running deployment helper self-test...
-cl /nologo /std:c++17 /O2 /GL /Gy /EHsc /W4 /WX /MT ^
+cl /nologo /std:c++17 /O2 /GL /Gy /EHsc /W4 /WX /MT %DEPLOY_DEPS% ^
   /DUNICODE /D_UNICODE /DWIN32_LEAN_AND_MEAN /DNOMINMAX ^
   /DAO_REBIRTH_CLIENT_PATCH_VERSION=\"%PATCH_VERSION%\" ^
   /DAO_REBIRTH_CLIENT_PATCH_SOURCE_SHA=\"%SOURCE_SHA%\" ^
@@ -253,6 +273,7 @@ if errorlevel 1 (
 )
 
 set "ARTIFACT_ROOT=%ROOT%artifacts"
+if defined GRAPH_ROOT set "ARTIFACT_ROOT=%BUILD_ROOT%\artifacts"
 if not exist "%ARTIFACT_ROOT%" mkdir "%ARTIFACT_ROOT%"
 if errorlevel 1 (
   echo [AORebirthClientPatch] ERROR could not create artifacts directory.
@@ -318,7 +339,7 @@ if errorlevel 1 (
   exit /b 1
 )
 
-cl /nologo /std:c++17 /O2 /GL /Gy /EHsc /W4 /WX /MT ^
+cl /nologo /std:c++17 /O2 /GL /Gy /EHsc /W4 /WX /MT %SETUP_DEPS% ^
   /DUNICODE /D_UNICODE /DWIN32_LEAN_AND_MEAN /DNOMINMAX /DAO_REBIRTH_CLIENT_PATCH_EMBEDDED ^
   /DAO_REBIRTH_CLIENT_PATCH_VERSION=\"%PATCH_VERSION%\" ^
   /DAO_REBIRTH_CLIENT_PATCH_SOURCE_SHA=\"%SOURCE_SHA%\" ^
@@ -343,6 +364,17 @@ echo [AORebirthClientPatch] PASS package="%ZIP%"
 echo [AORebirthClientPatch] PASS extracted package="%PUBLISHED_DIR%"
 echo [AORebirthClientPatch] PASS setup="%SETUP_EXE%"
 echo [AORebirthClientPatch] AO was not launched and no client directory was changed.
+if defined GRAPH_ROOT (
+  powershell -NoProfile -File "%ROOT%..\..\NewEngineRuntimeContentGuard\Write-NativeGraphHashes.ps1" -Checkout "%ROOT%..\..\.." -BuildRoot "%BUILD_ROOT%"
+  if errorlevel 1 exit /b 1
+  if not exist "%BUILD_ROOT%\graph\source-hashes.json" exit /b 1
+  git -C "%ROOT%..\..\.." rev-parse HEAD > "%BUILD_ROOT%\graph\source-revision.txt"
+  if errorlevel 1 exit /b 1
+  set VCToolsInstallDir > "%BUILD_ROOT%\graph\toolchain.txt"
+  if errorlevel 1 exit /b 1
+  set WindowsSdkDir >> "%BUILD_ROOT%\graph\toolchain.txt"
+  if errorlevel 1 exit /b 1
+)
 exit /b 0
 
 :stage_copy_failed

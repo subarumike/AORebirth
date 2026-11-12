@@ -37,6 +37,7 @@ namespace AORebirth.Core.NPCHandler
     using System.Collections.Generic;
 
     using AORebirth.Core.Entities;
+    using AORebirth.Core.GameData;
     using AORebirth.Core.Playfields;
     using AORebirth.Core.Textures;
     using AORebirth.Core.Vector;
@@ -65,7 +66,7 @@ namespace AORebirth.Core.NPCHandler
         {
             Character mobCharacter = null;
 
-            DBMobTemplate mob = MobTemplateDao.Instance.GetMobTemplateByHash(hash);
+            DBMobTemplate mob = ResolveMobTemplate(hash);
             if (mob != null)
             {
                 int level = desiredLevel;
@@ -113,7 +114,7 @@ namespace AORebirth.Core.NPCHandler
                 return null;
             }
 
-            DBMobTemplate mob = MobTemplateDao.Instance.GetMobTemplateByHash(hash);
+            DBMobTemplate mob = ResolveMobTemplate(hash);
             if (mob == null)
             {
                 return null;
@@ -130,6 +131,14 @@ namespace AORebirth.Core.NPCHandler
                 controller,
                 level,
                 reservedIdentity);
+        }
+
+        private static DBMobTemplate ResolveMobTemplate(string hash)
+        {
+            return MobTemplateDao.Instance.GetMobTemplateByHash(hash)
+                ?? PetSummonMobTemplateCatalog.TryGet(
+                    GameDataPaths.ResolveFile(GameDataPaths.ResolveRuntimeRoot(), PetSummonMobTemplateCatalog.FileName),
+                    hash);
         }
 
         private static Character CreateMob(

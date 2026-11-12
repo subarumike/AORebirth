@@ -31,12 +31,18 @@
   },
   "ASSU": {
     "Pets": {
-      "MaxPets": 2
+      "MaxPets": 2,
+      "SummonIntervalSeconds": 1,
+      "RespawnDelaySeconds": 10,
+      "RetryDelaySeconds": 1
     }
   },
   "LITH": {
     "Pets": {
-      "MaxPets": 4
+      "MaxPets": 4,
+      "SummonIntervalSeconds": 1,
+      "RespawnDelaySeconds": 10,
+      "RetryDelaySeconds": 1
     }
   },
   "BYWH": {

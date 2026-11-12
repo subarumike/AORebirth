@@ -41,6 +41,7 @@ namespace AORebirth.Core.Items
     using AORebirth.Core.Entities;
     using AORebirth.Core.Events;
     using AORebirth.Core.Functions;
+    using AORebirth.Core.GameData;
     using AORebirth.Core.Requirements;
     using AORebirth.Enums;
 
@@ -228,11 +229,10 @@ namespace AORebirth.Core.Items
         /// </returns>
         public int GetAttribute(int attributeId)
         {
-            int awakenedIcon = 0;
             if (attributeId == (int)StatIds.icon
-                && AwakenedBurdenOfCompetenceAppearance.TryResolveIcon(this, out awakenedIcon))
+                && ItemBehaviorBindings.Current.TryResolveIcon(this.LowID, this.HighID, out int iconId))
             {
-                return awakenedIcon;
+                return iconId;
             }
 
             if (this.Attributes.Keys.Contains(attributeId))

@@ -5,6 +5,7 @@ namespace AORebirth.Core.Inventory
 
     using AORebirth.Core.Events;
     using AORebirth.Core.Functions;
+    using AORebirth.Core.GameData;
     using AORebirth.Core.Items;
     using AORebirth.Enums;
 
@@ -12,8 +13,6 @@ namespace AORebirth.Core.Inventory
 
     public static class InventoryItemRules
     {
-        private const int BookOfKnowledgeTemplateId = 99302;
-
         public static bool IsSameTemplate(IItem left, IItem right)
         {
             return left != null
@@ -58,7 +57,7 @@ namespace AORebirth.Core.Inventory
         }
 
         /// <summary>
-        /// True only for real bags (legacy backpack template / Book of Knowledge / Backpack identity).
+        /// True only for real bags (legacy or authored backpack template, or Backpack identity).
         /// Do NOT treat bare <see cref="IdentityType.Container"/> as a bag — armor and jewelry often
         /// carry that identity and would wrongly be blocked from going into backpacks (same trap as
         /// mail/GMI; see <see cref="IsMailForbiddenContainerItem"/>).
@@ -80,7 +79,7 @@ namespace AORebirth.Core.Inventory
 
         /// <summary>
         /// Items live mail Feedback_MailNoChests should block (Item field + send): real backpacks/bags
-        /// ONLY — Backpack identity, legacy backpack template, or Book of Knowledge. Same conservative
+        /// ONLY — Backpack identity, legacy backpack template, or an authored backpack template. Same conservative
         /// set as <see cref="IsGmiForbiddenContainerItem"/>.
         /// Do NOT use bare <see cref="IdentityType.Container"/> or bare ItemClass==2: many yes-drop
         /// items (armor especially) carry a Container identity and ItemClass 2, so either check would
@@ -102,7 +101,7 @@ namespace AORebirth.Core.Inventory
         }
 
         /// <summary>
-        /// GMI deposit: block real backpacks/bags only (legacy backpack template / backpack identity / Book of Knowledge).
+        /// GMI deposit: block real backpacks/bags only (legacy or authored backpack template, or Backpack identity).
         /// Do not treat bare IdentityType.Container as forbidden — many yes-drop items carry that identity wrongly / broadly.
         /// Do not use bare ItemClass==2 — that is also Armor in AO data.
         /// </summary>
@@ -244,16 +243,7 @@ namespace AORebirth.Core.Inventory
         private static bool IsBackpackContainerTemplate(IItem item)
         {
             return IsLegacyBackpackTemplate(item)
-                   || IsBookOfKnowledgeContainerTemplate(item);
-        }
-
-        private static bool IsBookOfKnowledgeContainerTemplate(IItem item)
-        {
-            return IsSameTemplateIdPair(
-                item.LowID,
-                item.HighID,
-                BookOfKnowledgeTemplateId,
-                BookOfKnowledgeTemplateId);
+                   || ItemBehaviorBindings.Current.IsBackpackContainerTemplate(item.LowID, item.HighID);
         }
 
         private static Identity CreateLegacyBackpackContainerIdentity(

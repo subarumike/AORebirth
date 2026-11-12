@@ -116,13 +116,13 @@ namespace ZoneEngine_New.Core.GameData
     internal readonly record struct ItemTemplatesStatus(string? Sha256, string? Path, int Entries);
 
     /// <summary>MonsterCombatRules.json: NPC features (via NpcTemplates' RuleFeatures), hates and pets.</summary>
-    public sealed class MonsterCombatRulesReload(IGameData gameData) : IReloadableGameData
+    public sealed class MonsterCombatRulesReload(IGameData gameData, IItemTemplateCatalog? items = null) : IReloadableGameData
     {
         public string Name => MonsterCombatRulesCatalog.ReloadName;
 
-        public IReadOnlyList<string> Files { get; } = [MonsterCombatRulesCatalog.FileName];
+        public IReadOnlyList<string> Files { get; } = [MonsterCombatRulesCatalog.FileName, MonsterCombatRulesCatalog.PetSummonsFileName];
 
-        public GameDataReloadResult Reload() => MonsterCombatRulesCatalog.Reload(gameData.RootPath);
+        public GameDataReloadResult Reload() => MonsterCombatRulesCatalog.Reload(gameData.RootPath, items, gameData);
     }
 
     /// <summary>NpcTemplates.json, swapped inside <see cref="GameDataStore"/>.</summary>

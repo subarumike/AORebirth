@@ -71,6 +71,26 @@ public sealed class GameDataReloadTests
     }
 
     [TestMethod]
+    public void NpcPetPolicyRequiresAProfileAndEveryAuthoredTiming()
+    {
+        using var content = new Content();
+        content.Rules("{}");
+        var data = new GameDataStore(new StubLogger(), null, content.Root);
+        var items = new StubCatalog();
+        var original = MonsterCombatRulesCatalog.For(content.Root);
+        var missingProfile = Assert.ThrowsExactly<FileNotFoundException>(() => original.ValidatePetSummons(items, data));
+        StringAssert.Contains(missingProfile.Message, MonsterCombatRulesCatalog.PetSummonsFileName);
+
+        content.Rules("""
+            { "RLDT": { "Pets": { "MaxPets": 2, "SummonIntervalSeconds": 1, "RespawnDelaySeconds": 10 } } }
+            """);
+        GameDataReloadResult missingTiming = MonsterCombatRulesCatalog.Reload(content.Root, items, data);
+        Assert.IsFalse(missingTiming.Ok);
+        StringAssert.Contains(missingTiming.Problems.Single(), nameof(MonsterPetRule.RetryDelaySeconds));
+        Assert.AreSame(original, MonsterCombatRulesCatalog.For(content.Root));
+    }
+
+    [TestMethod]
     [DataRow("""{ "Hash": "BAD", "Action": "Assemble" }""", "requires an objective SpecItem")]
     [DataRow("""{ "Hash": "BAD", "Action": "Equip", "Objective": { "SpecItem": "MISSING" } }""",
         "objective SpecItem 'MISSING' does not resolve")]

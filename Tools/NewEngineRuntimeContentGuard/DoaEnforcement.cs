@@ -4,19 +4,19 @@ using System.Text.RegularExpressions;
 
 internal static class DoaEnforcement
 {
-    private const int ProcessTimeoutMilliseconds = 180_000;
+    private const int ProcessTimeoutMilliseconds = 300_000;
 
     internal static int Run(string root, string[] args)
     {
         bool structureOnly = args[0] == "--enforce-structure";
         if (args.Length < 3 || !Regex.IsMatch(args[2], "^[0-9a-fA-F]{40}$"))
         {
-            Console.Error.WriteLine("Usage: --enforce <checkout> <exact-base-sha> --catalog-root <GameData> [--output <report>]");
-            Console.Error.WriteLine("       --enforce-structure <checkout> <exact-base-sha> [--output <report>]");
+            Console.Error.WriteLine("Usage: --enforce <checkout> <exact-base-sha> --catalog-root <GameData> --native-graph <build-dir> [--output <report>]");
+            Console.Error.WriteLine("       --enforce-structure <checkout> <exact-base-sha> --native-graph <build-dir> [--output <report>]");
             return 64;
         }
 
-        string? catalogRoot = null, output = null;
+        string? catalogRoot = null, output = null, nativeGraph = null;
         for (int index = 3; index < args.Length; index += 2)
         {
             if (index + 1 >= args.Length || string.IsNullOrWhiteSpace(args[index + 1])
@@ -28,6 +28,7 @@ internal static class DoaEnforcement
             switch (args[index])
             {
                 case "--catalog-root" when !structureOnly && catalogRoot == null: catalogRoot = Path.GetFullPath(args[index + 1]); break;
+                case "--native-graph" when nativeGraph == null: nativeGraph = Path.GetFullPath(args[index + 1]); break;
                 case "--output" when output == null: output = Path.GetFullPath(args[index + 1]); break;
                 default:
                     Console.Error.WriteLine("DOA_INVALID_VALIDATION_OPTION=" + args[index]);
@@ -48,7 +49,9 @@ internal static class DoaEnforcement
             RunChild(root, "git", ["merge-base", "--is-ancestor", baseline, "HEAD"], [0]);
             string guard = typeof(DoaEnforcement).Assembly.Location;
             RunChild(root, "dotnet", [guard, "--baseline", root, baseline, "--doa-inventory", "--output", baselinePath], [0]);
-            RunChild(root, "dotnet", [guard, "--write", root, "--doa-inventory", "--output", proposedPath], [0, 1]);
+            var proposedArguments = new List<string> { guard, "--write", root, "--doa-inventory", "--evaluated-graph", "--output", proposedPath };
+            if (nativeGraph != null) proposedArguments.AddRange(["--native-graph", nativeGraph]);
+            RunChild(root, "dotnet", proposedArguments.ToArray(), [0, 1]);
 
             using JsonDocument before = JsonDocument.Parse(File.ReadAllText(baselinePath));
             using JsonDocument after = JsonDocument.Parse(File.ReadAllText(proposedPath));
@@ -67,10 +70,13 @@ internal static class DoaEnforcement
                 status,
                 validationScope = structureOnly ? "PUBLIC_STRUCTURE" : "STRUCTURE_AND_AUTHORITATIVE_REFERENCES",
                 baselineRevision = baseline,
+                proposedRevision = after.RootElement.GetProperty("sourceRevision").GetString(),
                 sourceGraph = after.RootElement.GetProperty("sourceGraphMethod").GetString(),
                 runtimeCSharpFilesAudited = after.RootElement.GetProperty("runtimeCSharpFilesAudited").GetInt32(),
                 nativeFilesAudited = after.RootElement.GetProperty("nativeFilesAudited").GetInt32(),
                 sourceGraphLimitations = after.RootElement.GetProperty("sourceGraphLimitations").Clone(),
+                evaluatedBuildGraph = after.RootElement.GetProperty("evaluatedBuildGraph").Clone(),
+                nativeBuildGraph = after.RootElement.GetProperty("nativeBuildGraph").Clone(),
                 authoritativeReferencesEvaluated = catalogRoot != null,
                 inheritedOpenFindings = inherited,
                 introducedFindings = introduced,
@@ -89,6 +95,9 @@ internal static class DoaEnforcement
             Console.WriteLine($"DOA_TOTAL_CURRENT_FINDINGS={proposedFindings.Length}");
             Console.WriteLine($"DOA_UNRESOLVED_PROJECT_INPUTS={unresolved.Length}");
             Console.WriteLine($"DOA_AUTHORITATIVE_REFERENCES={(structureOnly ? "NOT_EVALUATED" : authoritative.Length == 0 ? "PASS" : "FAIL")}");
+            Console.WriteLine($"DAO_EXISTING_VIOLATIONS={inherited.Length}");
+            Console.WriteLine($"DAO_NEW_VIOLATIONS={introduced.Length}");
+            Console.WriteLine($"DAO_PUBLIC_STRUCTURE={(proposedFindings.Length == 0 && unresolved.Length == 0 ? "PASS" : "FAIL")}");
             foreach (Finding finding in inherited.Concat(introduced).Concat(authoritative))
                 Console.Error.WriteLine($"BLOCK {finding.Path}:{finding.Line} {finding.Rule} {finding.Symbol}: {finding.Basis}");
             foreach (string finding in unresolved)

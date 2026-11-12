@@ -45,7 +45,7 @@
     <EmbeddedResource Include="Fixtures/LegacyProductionCharacterStats.json" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Remove="ChatNetworkTests.cs;ClientSendTests.cs" />
+    <Compile Remove="ChatNetworkTests.cs;ClientSendTests.cs;DaoCanonicalRuntimeLoaderTests.cs" />
   </ItemGroup>
   <!-- Explicit focused run: the clean baseline contains unrelated stale test types.
        The default/full suite remains unchanged and continues reporting those failures. -->
@@ -55,6 +55,13 @@
     <Compile Remove="@(Compile)" />
     <Compile Include="ChatNetworkTests.cs" />
     <Compile Include="ClientSendTests.cs" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(DaoCanonicalRuntimeLoaderTests)' == 'true'">
+    <Compile Remove="@(Compile)" />
+    <Compile Include="DaoCanonicalRuntimeLoaderTests.cs" />
+    <Compile Include="DatabaseSchemaReadinessTests.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Core/GameData/ItemBehaviorBindings.cs" Link="ItemBehaviorBindings.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Core/GameData/ReverseProxyExitCatalog.cs" Link="ReverseProxyExitCatalog.cs" />
   </ItemGroup>
   <ItemGroup Condition="'$(StaticDoorFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />

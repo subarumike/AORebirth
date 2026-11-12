@@ -24,6 +24,7 @@ public sealed class ItemBehaviorContent
     /// <summary>Dimach Item template pairs by profession (null = everyone else) and Dimach skill tier.</summary>
     public FistWeaponContent[] DimachWeapons { get; set; } = [];
     public WornMeshOverrideContent[] WornMeshOverrides { get; set; } = [];
+    public int[] BossModifierTemplateIds { get; init; } = [];
     public string[] Provenance { get; set; } = [];
 
     public static ItemBehaviorContent Load(string? gameDataRoot = null)
@@ -64,8 +65,25 @@ public sealed class ItemBehaviorContent
             || result.WornMeshOverrides.SelectMany(value => value.TemplateIds.Select(id => (id, value.MeshId)))
                 .Distinct().Count() != result.WornMeshOverrides.Sum(value => value.TemplateIds.Length))
             throw new InvalidDataException("Invalid or ambiguous worn mesh override content.");
+        if (result.BossModifierTemplateIds == null || result.BossModifierTemplateIds.Any(id => id <= 0)
+            || result.BossModifierTemplateIds.Distinct().Count() != result.BossModifierTemplateIds.Length)
+            throw new InvalidDataException("Invalid or duplicate boss modifier item IDs.");
         return result;
     }
+
+    public void ValidateBossModifierTemplates(IItemTemplateCatalog templates)
+    {
+        if (BossModifierTemplateIds.Length == 0)
+            throw new InvalidDataException("ItemBehavior.json requires BossModifierTemplateIds.");
+
+        foreach (int id in BossModifierTemplateIds)
+        {
+            if (!templates.TryGet(id, out _))
+                throw new InvalidDataException($"ItemBehavior.json refers to unknown boss modifier item {id}.");
+        }
+    }
+
+    public bool IsBossModifier(int templateId) => Array.IndexOf(BossModifierTemplateIds, templateId) >= 0;
 
     public ItemPackageContent? FindPackage(Item item) => Packages.SingleOrDefault(p => p.SourceIds.Contains(item.LowId) || p.SourceIds.Contains(item.HighId));
     public VitalItemContent? FindVitalItem(Item item) => VitalItems.SingleOrDefault(v => v.TemplateIds.Contains(item.LowId) || v.TemplateIds.Contains(item.HighId));

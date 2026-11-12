@@ -42,6 +42,7 @@ namespace AORebirth.Core.GameData
         public const string GoverningFormsFileName = "GoverningForms.json";
 
         public const string ItemTemplatesFileName = "ItemTemplates.json";
+        public const string ItemBehaviorFileName = "ItemBehavior.json";
 
         public const string VendingMachinesFileName = "VendingMachines.json";
 

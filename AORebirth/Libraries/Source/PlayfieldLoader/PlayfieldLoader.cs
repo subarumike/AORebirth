@@ -39,6 +39,7 @@ namespace ZoneEngine.Core.Playfields
 
     using AORebirth.Core.Events;
     using AORebirth.Core.Functions;
+    using AORebirth.Core.GameData;
     using AORebirth.Core.Items;
     using AORebirth.Core.Playfields;
     using AORebirth.Core.Statels;
@@ -64,10 +65,6 @@ namespace ZoneEngine.Core.Playfields
         /// </summary>
         public static Dictionary<int, PlayfieldData> PFData = new Dictionary<int, PlayfieldData>();
 
-        private const int SubwayPlayfieldId = 127;
-
-        private const int SubwayEntranceDestinationDoorInstance = unchecked((int)0xC006007F);
-
         #endregion
 
         #region Public Methods and Operators
@@ -89,9 +86,13 @@ namespace ZoneEngine.Core.Playfields
         /// </returns>
         public static int CacheAllPlayfieldData(string fname)
         {
-            PFData = new Dictionary<int, PlayfieldData>();
-
-            MessagePackZip.UncompressData<PlayfieldData>(fname).ForEach(x => PFData.Add(x.PlayfieldId, x));
+            var reverseProxyExits = ReverseProxyExitCatalog.Load(
+                GameDataPaths.ResolveFile(GameDataPaths.ResolveRuntimeRoot(), GameDataPaths.TeleportRoutesFileName));
+            Dictionary<int, PlayfieldData> playfields = MessagePackZip.UncompressData<PlayfieldData>(fname)
+                .ToDictionary(playfield => playfield.PlayfieldId);
+            reverseProxyExits.ValidateDestinationReferences((playfieldId, door) =>
+                playfields.TryGetValue(playfieldId, out PlayfieldData playfield) && playfield.GetDoor(door) != null);
+            PFData = playfields;
 
             Console.WriteLine("Tweaking in some Statel functions");
 
@@ -181,17 +182,9 @@ namespace ZoneEngine.Core.Playfields
                         }
                     }
 
-                    if (foundproxyteleport && resolvedDestinationPlayfieldId == SubwayPlayfieldId)
+                    if (foundproxyteleport)
                     {
-                        playfieldid = SubwayPlayfieldId;
-                        doorinstance = SubwayEntranceDestinationDoorInstance;
-                    }
-
-                    if (foundproxyteleport
-                        && ShouldSynthesizeReverseProxyExit(
-                            resolvedDestinationPlayfieldId,
-                            doorinstance))
-                    {
+                        reverseProxyExits.ApplyDestinationOverride(resolvedDestinationPlayfieldId, ref playfieldid, ref doorinstance);
                         if (PFData.ContainsKey(playfieldid))
                         {
                             StatelData internalDoor = PFData[playfieldid].GetDoor(doorinstance);
@@ -212,16 +205,6 @@ namespace ZoneEngine.Core.Playfields
             }
 
             return PFData.Count;
-        }
-
-        private static bool ShouldSynthesizeReverseProxyExit(
-            int destinationPlayfieldId,
-            int destinationDoorInstance)
-        {
-            // PF127 contains ordinary interior doors. Only its confirmed entrance door
-            // may receive the synthetic reverse-proxy exit used to leave the Subway.
-            return destinationPlayfieldId != SubwayPlayfieldId
-                   || destinationDoorInstance == SubwayEntranceDestinationDoorInstance;
         }
 
         #endregion

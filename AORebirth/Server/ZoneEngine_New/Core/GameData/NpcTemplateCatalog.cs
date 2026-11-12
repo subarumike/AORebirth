@@ -51,6 +51,21 @@ namespace ZoneEngine_New.Core.GameData
 
         public int LeafCount => _leaves.Count;
 
+        internal IEnumerable<int> EquipmentTemplateIds()
+        {
+            foreach (NpcLeaf leaf in _leaves.Values)
+            foreach (NpcLevelBand band in leaf.Bands)
+            foreach (List<int> pair in band.Equipment)
+            {
+                if (pair == null || pair.Count == 0 || pair[0] <= 0)
+                    continue;
+
+                yield return pair[0];
+                if (pair.Count >= 2 && pair[1] > 0 && pair[1] != pair[0])
+                    yield return pair[1];
+            }
+        }
+
         public static NpcTemplateCatalog Parse(string? json, Random? random = null)
         {
             var families = new Dictionary<string, string[]>(StringComparer.Ordinal);

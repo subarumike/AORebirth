@@ -48,6 +48,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Web.Extensions" />
   </ItemGroup>
   <Choose>
@@ -115,6 +116,9 @@
     <Compile Include="CaptureRuntimeSafetyTests.cs" />
     <Compile Include="NewCharacterStartAreaSelectionContractTests.cs" />
     <Compile Include="GenericCmdUseRouteClassifierTests.cs" />
+    <Compile Include="..\..\..\..\AORebirth.Core\GameData\ReverseProxyExitCatalog.cs">
+      <Link>ReverseProxyExitCatalog.cs</Link>
+    </Compile>
     <Compile Include="LoginSessionHydrationSafetyContractTests.cs" />
     <Compile Include="InfoPacketTests.cs" />
     <Compile Include="InspectMessageContractTests.cs" />

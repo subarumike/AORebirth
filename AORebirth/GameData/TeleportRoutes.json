@@ -1,4 +1,7 @@
 {
+  "ReverseProxyExitDestinations": [
+    {"Playfield": 127, "DoorInstance": "C006007F"}
+  ],
   "Routes": [
     {"Playfield": 605, "Type": "Door", "Instance": "C001025D", "DestinationPlayfield": 1328, "DestinationType": "Door", "DestinationInstance": "C0000530"},
     {"Playfield": 605, "Type": "Door", "Instance": "C015025D", "DestinationPlayfield": 1329, "DestinationType": "Door", "DestinationInstance": "C0000531"},

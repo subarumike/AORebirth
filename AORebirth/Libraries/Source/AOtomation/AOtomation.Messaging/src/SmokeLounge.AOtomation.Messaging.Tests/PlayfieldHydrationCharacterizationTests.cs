@@ -22,8 +22,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
                 loader,
                 "MessagePackZip.UncompressData<PlayfieldData>(fname)",
                 "TeleportDao.Instance.GetWhere(",
-                "resolvedDestinationPlayfieldId == SubwayPlayfieldId",
-                "ShouldSynthesizeReverseProxyExit(");
+                "reverseProxyExits.ApplyDestinationOverride(resolvedDestinationPlayfieldId, ref playfieldid, ref doorinstance)",
+                "PFData[playfieldid].GetDoor(doorinstance)");
         }
 
         [TestMethod]

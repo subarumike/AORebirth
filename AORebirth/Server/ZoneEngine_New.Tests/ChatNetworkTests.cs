@@ -43,6 +43,25 @@ public sealed class ChatNetworkTests
         }
     }
 
+    [TestMethod]
+    [TestCategory("DaoCanonicalChatLoaders")]
+    public void LftLocationLoaderReadsSelectedGameData()
+        => LoadLftLocations(Path.Combine(SelectedGameDataRoot(), "Teams", "LftLocations.json"));
+
+    [TestMethod]
+    [TestCategory("DaoCanonicalChatLoaders")]
+    public void CompatibilitySummonLoaderReadsSelectedGameData()
+        => Assert.IsGreaterThan(0, AORebirth.Database.Dao.PetSummonMobTemplateCatalog.Validate(
+            Path.Combine(SelectedGameDataRoot(), AORebirth.Database.Dao.PetSummonMobTemplateCatalog.FileName)));
+
+    private static string SelectedGameDataRoot()
+    {
+        string? root = Environment.GetEnvironmentVariable("DAO_CANONICAL_GAMEDATA_ROOT");
+        if (string.IsNullOrWhiteSpace(root) || !Path.IsPathFullyQualified(root))
+            Assert.Inconclusive("An explicit absolute GameData root is required for the canonical Chat loader check.");
+        return root!;
+    }
+
     [DataTestMethod]
     [DataRow("""{ "Version": 1, "ShadowlandsPlayfieldIds": [42] }""")]
     [DataRow("""{ "Version": 1, "UnlistedRegion": "RubiKa", "ShadowlandsPlayfieldIds": [42, 42] }""")]

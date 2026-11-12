@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
@@ -11,6 +12,13 @@ internal static class DoaRules
     private const string DataPath = "AORebirth/GameData/";
     private const string DungeonPolicy = "DungeonGeneration.json";
     private const int MaximumConditionalSymbols = 8;
+    // A binding names an identity or authored field. Names that contain one as a prefix can
+    // describe something else, such as the base or stride of a dynamically allocated ID range.
+    private static readonly Regex LiteralBindingField = new(
+        @"(?:Npc|NPC|Nano|Quest|Vendor|Merchant|Template|Playfield|Mesh|Texture|Weapon|Reward|Item)(?:Ids?|Hash|Name|Template|Stock|Pool)(?:Fallback|Default|Override)?$|(?:Scarlett|Buckethead|Sarah|Stan|Arete)(?:Id|Instance|Position|Rotation|Name)$|^(?:SpawnHash|MobHash|LowId|HighId|HeadMesh|CATMesh|MonsterData|NpcFamily)$",
+        RegexOptions.CultureInvariant);
+
+    internal static bool IsLiteralBindingField(string name) => LiteralBindingField.IsMatch(name);
     private static readonly string[] CapturedSymbols =
         ["MissionRollCaptureLibrary", "MissionRollCaptureTemplate", "CapturedRollBodiesHex", "CapturedPacketHex"];
     private static readonly string[] CapturedMembers = ["CapturedBody", "CapturedCount", "DecodeTemplate", "TemplateBody"];
@@ -131,6 +139,12 @@ internal static class DoaRules
                 && fallback.Right == operand && (IsContentIdentity(Name(fallback.Left))
                     || missions && MissionPolicyFields.Contains(Name(fallback.Left), StringComparer.Ordinal)))
                 yield return (literal, "DOA_FALLBACK_CONTENT", "Missing gameplay content silently selects a fixed replacement.");
+            if (operand.Parent is ConditionalExpressionSyntax choice && (choice.WhenTrue == operand || choice.WhenFalse == operand)
+                && UnwrapParent(choice).Parent is ArgumentSyntax index
+                && index.Parent?.Parent is ElementAccessExpressionSyntax lookup
+                && lookup.Expression is MemberAccessExpressionSyntax table
+                && Name(table.Expression) == "ItemLoader" && Name(table.Name) == "ItemList")
+                yield return (literal, "DOA_FALLBACK_CONTENT", "A conditional item-template lookup silently selects a fixed replacement.");
             if (operand.Parent is ConstantPatternSyntax pattern && (pattern.Parent is IsPatternExpressionSyntax condition
                     && IsContentIdentity(Name(condition.Expression)) || pattern.Parent is SwitchExpressionArmSyntax arm
                     && arm.Parent is SwitchExpressionSyntax selection && IsContentIdentity(Name(selection.GoverningExpression))))

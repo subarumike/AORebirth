@@ -67,7 +67,10 @@ On Windows, run `Tools/run_newengine_content_architecture_guard.cmd --doa-self-t
 for deterministic mutation tests. Run the same wrapper with
 `--enforce-structure <base-sha>` for the public source and catalog check and
 `--enforce <base-sha> --catalog-root <GameData>` to include authoritative
-references. Both modes accept `--output <report>`. Supply the exact Git base.
+references. For both checks, use `Build-Package.cmd --graph-output <directory>`
+under `Tools/AOClientRoomSpaceGuard/ProxyDll` and pass its compiler evidence
+directory as `--native-graph <directory>`. Both modes accept `--output <report>`.
+Supply the exact Git base.
 Keep reports containing private content in the owning ignored workspace.
 
 Both checks reject every current architecture finding and unresolved required
@@ -83,6 +86,52 @@ eligibility checks, and serialization and persistence contracts. Publish only
 the status and a reference to restricted evidence. Keep private data and status
 publication credentials outside candidate-controlled jobs. Missing or
 inconclusive private evidence blocks integration.
+
+### Trusted validation and master protection
+
+Use the private validation workflow from its independently reviewed, pinned
+workflow commit. Stage the approved canonical content before executing the
+candidate. Use an isolated validation worker with access limited to the staged
+data and disposable dependencies. Keep network publication credentials and
+private upstream credentials on the trusted controller, outside that worker.
+
+The pinned workflow runs a job named `dao-canonical-validation`. The job must
+complete each named validation step in `tools/dao_canonical_publisher.py` and
+upload `dao-canonical-evidence-<run_attempt>` with the actual canonical
+`manifest.json` and its `receipt.json`. The receipt schema in `verify_receipt`
+binds the measured source, current base, current private revision and tree,
+manifest hash, run attempt, and successful checks. Build the manifest with the
+existing release-contract inventory algorithm. A complete manifest and passing
+runtime evidence are required even when the public structural check passes.
+
+Use the existing focused Zone tests with `-p:DaoCanonicalRuntimeLoaderTests=true`
+and the focused Chat tests with `-p:ChatNetworkFocusedTests=true` and
+`--filter TestCategory=DaoCanonicalChatLoaders`. Set `DAO_CANONICAL_GAMEDATA_ROOT`
+to the absolute path of the measured tree. Require every selected loader test to
+execute and pass. Use the disposable schema validation workflow for the actual
+schema and retain its measured result alongside the schema contract tests.
+
+Use an independently reviewed checkout of the publisher on the trusted
+controller. Bind `DAO_TRUSTED_VALIDATOR` in its ignored profile
+to the private `REPOSITORY`, numeric `WORKFLOW_ID`, pinned `WORKFLOW_SOURCE_SHA`,
+numeric installed `APP_ID` and `MASTER_RULESET_ID`. Set the short-lived App
+installation token in `AO_REBIRTH_DAO_APP_TOKEN` only for the controller process.
+The App needs Checks write access on the public repository. Run
+`Tools/publish_dao_canonical_validation.cmd --profile <ignored-profile> --candidate <exact-sha> --private-run <run-id>`.
+The publisher checks the authenticated run attempt and job steps, verifies the
+archive digest and manifest, checks current source and content authority, and
+publishes success only through the App bound to the active `master` ruleset.
+Only the source and the evidence digest appear in the public check.
+
+Keep the temporary `update` restriction in the active `master` ruleset while
+trusted validation is unavailable or failing. Once all required checks pass on
+the exact proposed commit and current base, read the active ruleset and verify
+that its required status contexts are source-bound, strict status checking is
+enabled, the pull request rule applies, and the bypass actor list is empty.
+Then remove only the temporary `update` rule in a reviewed settings change.
+Re-read the effective rules on `master` and verify that both checks, the pull
+request rule, and the deletion and force-push protections are still active.
+If any verification fails, retain or restore the update restriction.
 
 ## Data Flow
 

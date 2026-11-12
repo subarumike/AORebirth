@@ -485,15 +485,9 @@ namespace ZoneEngine_New.Core.Entities
             return false;
         }
 
-        /// <summary>Equipment items named "Boss Modifier Item (…)" are alternatives: each spawn keeps one at random.</summary>
-        const string BossModifierPrefix = "Boss Modifier Item";
-
-        static bool IsBossModifier(string? name)
-            => name?.StartsWith(BossModifierPrefix, StringComparison.OrdinalIgnoreCase) == true;
-
         /// <summary>
         /// The template equipment entries that are boss modifiers, and the one picked for this spawn (-1 when there
-        /// are none). Names come from the item templates, so no instance is created for the discarded ones.
+        /// are none). No instance is created for the discarded item templates.
         /// </summary>
         (HashSet<int> Modifiers, int Kept) PickBossModifier(List<List<int>> pairs, int quality)
         {
@@ -506,8 +500,8 @@ namespace ZoneEngine_New.Core.Entities
 
                 int lowId = pair[0];
                 int highId = pair.Count >= 2 && pair[1] > 0 ? pair[1] : lowId;
-                string? name = _items.CreateTemplate(lowId, highId, quality).Name;
-                if (IsBossModifier(name))
+                int templateId = _items.CreateTemplate(lowId, highId, quality).Id;
+                if (ItemBehaviorContent.Current.IsBossModifier(templateId))
                     modifiers.Add(i);
             }
 

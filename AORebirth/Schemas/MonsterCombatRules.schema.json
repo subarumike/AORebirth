@@ -14,15 +14,28 @@
         ],
         "properties": {
           "MaxPets": {
-            "type": "integer"
+            "type": "integer",
+            "minimum": 0
           },
           "SummonIntervalSeconds": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0
           },
           "RespawnDelaySeconds": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0
+          },
+          "RetryDelaySeconds": {
+            "type": "number",
+            "exclusiveMinimum": 0
           }
         },
+        "required": [
+          "MaxPets",
+          "SummonIntervalSeconds",
+          "RespawnDelaySeconds",
+          "RetryDelaySeconds"
+        ],
         "additionalProperties": false
       },
       "Features": {

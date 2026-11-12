@@ -97,6 +97,7 @@ namespace WorldEngine.State
                 _sessions[candidate.Session] = candidate;
 
                 bool recovering = Recovering(now);
+                NpcInstanceRange npcRange = NpcInstanceRange.ForSlot(candidate.Slot);
                 var accepted = new RegisterAccepted
                 {
                     Epoch = Epoch,
@@ -105,8 +106,8 @@ namespace WorldEngine.State
                     HeartbeatMs = (int)_options.Heartbeat.TotalMilliseconds,
                     LeaseTtlMs = (int)_options.LeaseTtl.TotalMilliseconds,
                     Recovering = recovering,
-                    NpcIdBase = WorldOptions.NpcIdBase + candidate.Slot * WorldOptions.NpcIdStride,
-                    NpcIdCount = WorldOptions.NpcIdStride,
+                    NpcIdBase = npcRange.FirstInstance,
+                    NpcIdCount = npcRange.Count,
                     GameClockOffsetSeconds = _gameClockOffsetSeconds
                 };
 

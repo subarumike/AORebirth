@@ -1,0 +1,111 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "NpcSummonFallbacks.schema.json",
+  "title": "NPC summon compatibility templates.",
+  "description": "Editable compatibility templates used after a database template lookup misses.",
+  "type": "object",
+  "properties": {
+    "Version": {
+      "type": "integer",
+      "const": 1
+    },
+    "Templates": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "properties": {
+          "Hash": {
+            "type": "string",
+            "minLength": 4,
+            "maxLength": 4
+          },
+          "MinLvl": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "MaxLvl": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "Side": {
+            "type": "integer"
+          },
+          "Fatness": {
+            "type": "integer"
+          },
+          "Breed": {
+            "type": "integer"
+          },
+          "Sex": {
+            "type": "integer"
+          },
+          "Race": {
+            "type": "integer"
+          },
+          "Name": {
+            "type": "string",
+            "minLength": 1
+          },
+          "Flags": {
+            "type": "integer"
+          },
+          "NPCFamily": {
+            "type": "integer"
+          },
+          "Health": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "MonsterData": {
+            "type": "integer"
+          },
+          "MonsterScale": {
+            "type": "integer",
+            "minimum": 1
+          },
+          "TextureHands": {
+            "type": "integer"
+          },
+          "TextureBody": {
+            "type": "integer"
+          },
+          "TextureFeet": {
+            "type": "integer"
+          },
+          "TextureArms": {
+            "type": "integer"
+          },
+          "TextureLegs": {
+            "type": "integer"
+          },
+          "HeadMesh": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "Hash",
+          "MinLvl",
+          "MaxLvl",
+          "Side",
+          "Fatness",
+          "Breed",
+          "Sex",
+          "Race",
+          "Name",
+          "Flags",
+          "NPCFamily",
+          "Health",
+          "MonsterData",
+          "MonsterScale"
+        ],
+        "additionalProperties": false
+      }
+    }
+  },
+  "required": [
+    "Version",
+    "Templates"
+  ],
+  "additionalProperties": false
+}

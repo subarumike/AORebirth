@@ -10,6 +10,8 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
     using System.IO;
     using System.Linq;
 
+    using AORebirth.Core.GameData;
+
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -128,27 +130,19 @@ namespace SmokeLounge.AOtomation.Messaging.Tests
         [TestMethod]
         public void SubwayTeleportProxyOverridesPreserveOfficialEntryAndMainExitLandings()
         {
-            string playfieldLoader =
-                ReadRepositoryFile(@"AORebirth\Libraries\Source\PlayfieldLoader\PlayfieldLoader.cs");
-            AssertContains(playfieldLoader, "private const int SubwayPlayfieldId = 127;");
-            AssertContains(
-                playfieldLoader,
-                "private const int SubwayEntranceDestinationDoorInstance = unchecked((int)0xC006007F);");
-            AssertContains(
-                playfieldLoader,
-                "if (foundproxyteleport && resolvedDestinationPlayfieldId == SubwayPlayfieldId)");
-            AssertContains(playfieldLoader, "playfieldid = SubwayPlayfieldId;");
-            AssertContains(
-                playfieldLoader,
-                "doorinstance = SubwayEntranceDestinationDoorInstance;");
-            AssertContains(playfieldLoader, "ShouldSynthesizeReverseProxyExit(");
-            AssertContains(playfieldLoader, "destinationPlayfieldId != SubwayPlayfieldId");
-            AssertContains(
-                playfieldLoader,
-                "destinationDoorInstance == SubwayEntranceDestinationDoorInstance");
-            Assert.IsFalse(
-                playfieldLoader.Contains("RemoveSubwayNonEntranceDoorStatels"),
-                "PF127 ordinary interior door statels must remain loaded.");
+            var catalog = ReverseProxyExitCatalog.Load(Path.Combine(
+                FindRepositoryRoot(), "AORebirth", "GameData", "TeleportRoutes.json"));
+            int playfield = 127;
+            int door = unchecked((int)0xC005007F);
+            catalog.ApplyDestinationOverride(playfield, ref playfield, ref door);
+            Assert.AreEqual(127, playfield);
+            Assert.AreEqual(unchecked((int)0xC006007F), door);
+
+            playfield = 125;
+            door = unchecked((int)0xC03A007D);
+            catalog.ApplyDestinationOverride(playfield, ref playfield, ref door);
+            Assert.AreEqual(125, playfield);
+            Assert.AreEqual(unchecked((int)0xC03A007D), door);
         }
 
         [TestMethod]

@@ -24,6 +24,8 @@ Type npcHash = typeof(NpcTemplateCatalog).GetNestedType("NpcHashDto", BindingFla
 
 Write("MonsterCombatRules", "Monster combat rules: combat behaviour keyed by mob hash.", nameof(MonsterCombatRules),
     typeof(Dictionary<string, MonsterCombatRules>), LoaderOptions(typeof(MonsterCombatRulesCatalog)));
+Write("NpcPetSummons", "NPC combat pet creation items and their authored policy.", nameof(NpcPetSummonProfile),
+    typeof(NpcPetSummonProfile), LoaderOptions(typeof(MonsterCombatRulesCatalog)));
 Write("NpcTemplates", "NPC templates: mob hashes, their families and level bands.", "NpcTemplateCatalog.NpcHashDto",
     typeof(Dictionary<,>).MakeGenericType(typeof(string), npcHash), LoaderOptions(typeof(NpcTemplateCatalog)));
 // Gameplay.json is written in camelCase; the loader matches names case-insensitively.
@@ -87,6 +89,28 @@ JsonSchemaExporterOptions Exporter()
                 };
             if (context.PropertyInfo is { } questProperty && questProperty.DeclaringType == typeof(QuestTemplate) && node is JsonObject questNode)
                 RefineQuestProperty(questProperty.Name, questNode);
+            if (context.PropertyInfo is { } petProperty && node is JsonObject petNode)
+            {
+                if (petProperty.DeclaringType == typeof(MonsterPetRule))
+                {
+                    if (petProperty.Name == nameof(MonsterPetRule.RetryDelaySeconds))
+                        petNode["exclusiveMinimum"] = 0;
+                    else
+                        petNode["minimum"] = 0;
+                }
+                if (petProperty.DeclaringType == typeof(NpcPetSummonProfile))
+                {
+                    if (petProperty.Name == nameof(NpcPetSummonProfile.Version))
+                        petNode["const"] = 1;
+                    if (petProperty.Name == nameof(NpcPetSummonProfile.CreationItemTemplateIds))
+                    {
+                        petNode["minItems"] = 1;
+                        petNode["uniqueItems"] = true;
+                        if (petNode["items"] is JsonObject itemId)
+                            itemId["minimum"] = 1;
+                    }
+                }
+            }
             // Quests.json reward items live in QuestRewards.json, keyed by Reward.Hash; Records is not read from it.
             if (context.TypeInfo.Type == typeof(QuestReward) && node is JsonObject rewardNode
                 && rewardNode["properties"] is JsonObject rewardProperties)

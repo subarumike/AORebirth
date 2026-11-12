@@ -40,6 +40,18 @@
   "WornMeshOverrides": [
     { "TemplateIds": [302730], "MeshId": 245106, "OnlyWhenOverrideTextureId": 0, "OverrideTextureId": 302715 }
   ],
+  "IconOverrides": [
+    { "TemplateId": 302730, "IconId": 302952 }
+  ],
+  "BackpackContainerTemplates": [
+    { "LowId": 99302, "HighId": 99302 }
+  ],
+  "NpcFallbackWeaponTemplateId": 44008,
+  "VendorFallbackTemplateId": 46522,
+  "VendorMeshOverrides": [
+    { "TemplateId": 155599, "MeshId": 85976 },
+    { "TemplateId": 155603, "MeshId": 85976 }
+  ],
   "Provenance": [
     "Permanent passage-item bindings preserved from the former InventoryActionService compiled bridge.",
     "Package content preserved from capture 20260806-rabbit and existing durable transactional grant behavior.",
