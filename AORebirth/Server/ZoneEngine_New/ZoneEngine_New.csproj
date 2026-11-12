@@ -73,9 +73,11 @@
     <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterPersistenceDao.Inventory.cs" Link="Shared/Characters/MySqlCharacterPersistenceDao.Inventory.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterPersistenceDao.Transactions.cs" Link="Shared/Characters/MySqlCharacterPersistenceDao.Transactions.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterPersistenceDao.DailyLogin.cs" Link="Shared/Characters/MySqlCharacterPersistenceDao.DailyLogin.cs" />
+	<Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Characters/MySqlCharacterPersistenceDao.OrgVote.cs" Link="Shared/Characters/MySqlCharacterPersistenceDao.OrgVote.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Quests/MySqlCharacterQuestDao.cs" Link="Shared/Quests/MySqlCharacterQuestDao.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Characters/ICharacterPersistenceDao.cs" Link="Shared/Characters/ICharacterPersistenceDao.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Characters/CharacterPersistenceData.cs" Link="Shared/Characters/CharacterPersistenceData.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Characters/PersistedOrgVoteData.cs" Link="Shared/Characters/PersistedOrgVoteData.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Characters/DailyLoginPersistenceData.cs" Link="Shared/Characters/DailyLoginPersistenceData.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Characters/CharacterDirectoryData.cs" Link="Shared/Characters/CharacterDirectoryData.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Interfaces/Persistence/Characters/ICharacterDao.cs" Link="Shared/Characters/ICharacterDao.cs" />

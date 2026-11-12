@@ -32,11 +32,12 @@ namespace ZoneEngine_New.Core.MessageHandlers
         readonly OrgLockoutClock _lockouts;
         readonly OrgMembershipService _memberships;
         readonly OrgTaxTickService _tax;
+        readonly OrgVoteService _votes;
 
         // Lazy: PlayfieldManager depends on the message router, which depends on the handlers.
         public OrgClientMessageHandler(IGameData gameData, Lazy<PlayfieldManager> playfieldManager,
             IOrganizationRepository organizations, IZoneLogger logger, IChatEngineLink chat,
-            OrgLockoutClock lockouts, OrgMembershipService memberships, OrgTaxTickService tax)
+            OrgLockoutClock lockouts, OrgMembershipService memberships, OrgTaxTickService tax, OrgVoteService votes)
         {
             _gameData = gameData;
             _playfieldManager = playfieldManager;
@@ -46,6 +47,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
             _lockouts = lockouts;
             _memberships = memberships;
             _tax = tax;
+            _votes = votes;
         }
 
         public Type MessageBodyType => typeof(OrgClientMessage);
@@ -112,6 +114,18 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 case OrgClientCommand.Unknown2:
                 case OrgClientCommand.Kick:
                     HandleKick(message, session, player);
+                    return;
+                case OrgClientCommand.StartVote:
+                    HandleStartVote(message, session, player);
+                    return;
+                case OrgClientCommand.Vote:
+                    HandleVote(message, session, player);
+                    return;
+                case OrgClientCommand.VoteInfo:
+                    HandleVoteInfo(message, session, player);
+                    return;
+                case OrgClientCommand.StopVote:
+                    HandleStopVote(message, session, player);
                     return;
                 default:
                     // Commands not implemented yet stay silent for members; non-members get the captured refusal
