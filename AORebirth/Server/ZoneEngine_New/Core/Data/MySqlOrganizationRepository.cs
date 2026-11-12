@@ -81,6 +81,27 @@ namespace ZoneEngine_New.Core.Data
         public int GetOrganizationIdOf(int characterId)
             => Run(() => _persistence.LoadOrganizationId(characterId));
 
+        public PersistedOrgVoteStartResult StartVote(int organizationId, int starterId, string description, int durationMinutes,
+            System.Collections.Generic.IList<string> choices, System.Collections.Generic.IList<int> electorateIds,
+            long startedUnix, long endsUnix, long cooldownSeconds)
+            => Run(() => _persistence.StartOrganizationVote(organizationId, starterId, description, durationMinutes, choices,
+                electorateIds, startedUnix, endsUnix, cooldownSeconds));
+
+        public PersistedOrgVoteData? GetShownVote(int organizationId)
+            => Run(() => _persistence.LoadShownOrganizationVote(organizationId));
+
+        public PersistedOrgVoteData? GetVote(int voteId)
+            => Run(() => _persistence.LoadOrganizationVote(voteId));
+
+        public System.Collections.Generic.IList<int> GetDueVoteIds(long nowUnix)
+            => Run(() => _persistence.LoadDueActiveVoteIds(nowUnix));
+
+        public OrgVoteCastOutcome CastVote(int voteId, int characterId, int choiceNo, long nowUnix)
+            => Run(() => _persistence.CastOrganizationVote(voteId, characterId, choiceNo, nowUnix));
+
+        public bool CloseVote(int voteId, string status, string? stopReason, long nowUnix)
+            => Run(() => _persistence.CloseOrganizationVote(voteId, status, stopReason, nowUnix));
+
         static int ReadStoredRank(System.Collections.Generic.IList<CharacterStatData> stats)
         {
             foreach (CharacterStatData stat in stats)

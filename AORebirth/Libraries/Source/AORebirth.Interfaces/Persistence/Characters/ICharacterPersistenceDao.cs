@@ -49,6 +49,23 @@ namespace AORebirth.Interfaces.Persistence.Characters
         PersistedAnarchistKickResult RecordAnarchistKick(int organizationId, int kickedId, string kickedName, int kickerId, string kickerName, int memberQuorum, int leaderQuorum);
         /// <summary>Moves credits between one character's Cash and the organization Bank under the organization lock.</summary>
         PersistedOrganizationBankResult TransferOrganizationBank(int organizationId, int characterId, bool deposit, long amount, long bankCap, long cashCap);
+        /// <summary>
+        /// Starts an organization vote under the organization lock. Refused while a vote is Active or while the last
+        /// Finished/Stopped vote closed less than <paramref name="cooldownSeconds"/> before <paramref name="startedUnix"/>.
+        /// The electorate snapshot is stored with the vote.
+        /// </summary>
+        PersistedOrgVoteStartResult StartOrganizationVote(int organizationId, int starterId, string description, int durationMinutes,
+            IList<string> choices, IList<int> electorateIds, long startedUnix, long endsUnix, long cooldownSeconds);
+        /// <summary>The Active vote of the organization, or else its latest Finished vote; null when none. Stopped votes are never returned.</summary>
+        PersistedOrgVoteData? LoadShownOrganizationVote(int organizationId);
+        /// <summary>Full vote with choices and electorate, or null when no row exists.</summary>
+        PersistedOrgVoteData? LoadOrganizationVote(int voteId);
+        /// <summary>Ids of Active votes whose deadline has passed.</summary>
+        IList<int> LoadDueActiveVoteIds(long nowUnix);
+        /// <summary>Records one vote of an eligible member that has not voted yet, while the vote is Active and open.</summary>
+        OrgVoteCastOutcome CastOrganizationVote(int voteId, int characterId, int choiceNo, long nowUnix);
+        /// <summary>Moves an Active vote to Finished or Stopped. Returns false when it was no longer Active.</summary>
+        bool CloseOrganizationVote(int voteId, string status, string? stopReason, long nowUnix);
         /// <summary>Clears Clan and ClanLevel, sets SocialStatus to the orgless value and deletes the tax row of one character.</summary>
         void ClearOrganizationMembership(int characterId);
         /// <summary>Character ids whose Clan stat equals the organization id.</summary>

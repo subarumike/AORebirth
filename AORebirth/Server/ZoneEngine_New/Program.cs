@@ -285,6 +285,7 @@ namespace ZoneEngine_New
             services.AddSingleton<OrgLockoutClock>();
             services.AddSingleton<OrgTaxTickService>();
             services.AddSingleton<OrgMembershipService>();
+            services.AddSingleton<OrgVoteService>();
             services.AddSingleton<ICharacterPlayedBornRepository, MySqlCharacterPlayedBornRepository>();
             services.AddSingleton<CharacterPlayedClock>();
             services.AddSingleton<ICharacterCoalesceCommit, MySqlCharacterCoalesceCommit>();

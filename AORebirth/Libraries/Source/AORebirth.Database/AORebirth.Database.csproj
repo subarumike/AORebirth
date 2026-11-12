@@ -117,6 +117,7 @@
     <Compile Include="Domain\Characters\MySqlCharacterPersistenceDao.Inventory.cs" />
     <Compile Include="Domain\Characters\MySqlCharacterPersistenceDao.Transactions.cs" />
     <Compile Include="Domain\Characters\MySqlCharacterPersistenceDao.DailyLogin.cs" />
+	<Compile Include="Domain\Characters\MySqlCharacterPersistenceDao.OrgVote.cs" />
     <Compile Include="Domain\Characters\MySqlCharacterPersistenceDao.Legacy.cs" />
     <Compile Include="Domain\Characters\MySqlCharacterDao.Legacy.cs" />
     <Compile Include="Domain\Missions\MySqlMissionDao.cs" />
@@ -240,6 +241,9 @@
     <Content Include="SqlTables\org_anar_pend_kick.sql" />
     <Content Include="SqlTables\org_lockout.sql" />
     <Content Include="SqlTables\org_member_tax.sql" />
+    <Content Include="SqlTables\org_vote.sql" />
+    <Content Include="SqlTables\org_vote_choice.sql" />
+    <Content Include="SqlTables\org_vote_member.sql" />
     <Content Include="SqlTables\questdungeonkeys.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
