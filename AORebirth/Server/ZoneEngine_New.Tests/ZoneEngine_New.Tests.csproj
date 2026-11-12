@@ -172,5 +172,9 @@
     <Compile Remove="@(Compile)" />
     <Compile Include="TestDoubles.cs" />
     <Compile Include="NpcEditor*Tests.cs" />
+    <Compile Include="../../../Tools/AORebirth.NpcEditor.Official/*.cs" Link="OfficialResearch/%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(NpcEditorFocusedTests)' != 'true'">
+    <Compile Remove="NpcEditorOfficial*Tests.cs" />
   </ItemGroup>
 </Project>

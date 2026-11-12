@@ -1,0 +1,22 @@
+<Window x:Class="AORebirth.NpcEditor.ConnectionModeWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="AORebirth NPC Editor" Width="560" Height="330" MinWidth="470" MinHeight="315"
+        ResizeMode="CanMinimize" WindowStartupLocation="CenterScreen" Style="{StaticResource EditorWindowStyle}">
+    <StackPanel Margin="22">
+        <TextBlock Text="AORebirth NPC Editor" FontSize="27" FontWeight="SemiBold" />
+        <TextBlock Text="Choose a connection mode" Style="{StaticResource Caption}" Margin="0,4,0,16" />
+        <Border Background="{StaticResource Panel}" CornerRadius="6" Padding="12" Margin="0,0,0,8">
+            <StackPanel>
+                <Button Content="AORebirth server" Click="OpenAORebirth_Click" HorizontalAlignment="Left" />
+                <TextBlock Text="Sign in to ZoneEngine for NPC inspection and editing." Style="{StaticResource Caption}" Margin="0,5,0,0" />
+            </StackPanel>
+        </Border>
+        <Border Background="{StaticResource Panel}" CornerRadius="6" Padding="12">
+            <StackPanel>
+                <Button Content="Official AO — Read Only" Click="OpenOfficial_Click" HorizontalAlignment="Left" />
+                <TextBlock Text="Inspect NPC snapshots published locally by AOSharp." Style="{StaticResource Caption}" Margin="0,5,0,0" />
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</Window>

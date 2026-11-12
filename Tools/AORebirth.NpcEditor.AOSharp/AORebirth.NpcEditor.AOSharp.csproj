@@ -7,6 +7,8 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="..\AORebirth.NpcEditor.Official\OfficialSnapshot.cs" Link="OfficialSnapshot.cs" />
+    <Reference Include="System.Runtime.Serialization" />
     <Reference Include="AOSharp.Core">
       <HintPath>$(AOSharpPath)\AOSharp.Core.dll</HintPath>
       <Private>false</Private>

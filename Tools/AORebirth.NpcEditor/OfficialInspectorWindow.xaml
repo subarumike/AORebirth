@@ -1,0 +1,124 @@
+<Window x:Class="AORebirth.NpcEditor.OfficialInspectorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="AORebirth NPC Editor — Official AO Read Only" Width="1190" Height="745" MinWidth="825" MinHeight="525"
+        WindowStartupLocation="CenterScreen" Style="{StaticResource EditorWindowStyle}">
+    <Window.Resources>
+        <DataTemplate x:Key="OfficialTextOption">
+            <TextBlock Text="{Binding}" Foreground="{DynamicResource {x:Static SystemColors.ControlTextBrushKey}}" />
+        </DataTemplate>
+    </Window.Resources>
+    <Grid Margin="18,14">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <StackPanel Margin="0,0,0,10">
+            <TextBlock Text="Official AO — Read Only" FontSize="28" FontWeight="SemiBold" />
+            <TextBlock Text="Local NPC snapshots from the AOSharp observation bridge" Style="{StaticResource Caption}" Margin="0,4,0,0" />
+        </StackPanel>
+        <Border Grid.Row="1" Background="{StaticResource Panel}" CornerRadius="6" Padding="10" Margin="0,0,0,8">
+            <WrapPanel>
+                <TextBlock Text="AOSharp session" VerticalAlignment="Center" Margin="0,0,7,0" />
+                <ComboBox x:Name="SessionSelector" Width="270" Margin="0,0,8,0" ItemTemplate="{StaticResource EditorOptionLabel}"
+                          AutomationProperties.Name="AOSharp session" SelectionChanged="Session_SelectionChanged" />
+                <Button x:Name="ReadSelected" Content="Read selected target" Click="ReadSelected_Click" />
+                <CheckBox x:Name="LockTarget" Content="Lock target" IsEnabled="False"
+                          Checked="LockTarget_Changed" Unchecked="LockTarget_Changed" />
+            </WrapPanel>
+        </Border>
+        <StackPanel Grid.Row="2" Margin="0,0,0,8">
+            <TextBlock x:Name="TargetHeading" Text="Waiting for a selected NPC" FontSize="21" FontWeight="SemiBold" />
+            <TextBlock x:Name="TargetInfo" Style="{StaticResource Caption}" Margin="0,4,0,0" />
+        </StackPanel>
+        <TabControl x:Name="ObservationViews" Grid.Row="3" SelectionChanged="ObservationView_Changed">
+            <TabItem Header="NPC observations">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <DockPanel Margin="0,0,0,8">
+                        <ComboBox x:Name="PropertyCategory" DockPanel.Dock="Left" Width="180" Margin="0,0,8,0"
+                                  ItemTemplate="{StaticResource OfficialTextOption}"
+                                  AutomationProperties.Name="NPC property category" SelectionChanged="PropertyFilter_Changed" />
+                        <TextBox x:Name="PropertySearch" MaxLength="128" AutomationProperties.Name="Search observed properties"
+                                 TextChanged="PropertyFilter_Changed" />
+                    </DockPanel>
+                    <DataGrid Grid.Row="1" x:Name="Properties">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="Category" Binding="{Binding Category}" Width="125" />
+                            <DataGridTextColumn Header="Property" Binding="{Binding Name}" Width="*" />
+                            <DataGridTextColumn Header="Value" Binding="{Binding Value}" Width="2*" />
+                            <DataGridTextColumn Header="Evidence" Binding="{Binding Classification}" Width="155" />
+                            <DataGridTextColumn Header="Source" Binding="{Binding Source}" Width="*" />
+                            <DataGridTextColumn Header="Confidence" Binding="{Binding Confidence}" Width="90" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Observed events">
+                <DataGrid x:Name="Events" Margin="8">
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="UTC" Binding="{Binding CapturedUtc, StringFormat=u}" Width="165" />
+                        <DataGridTextColumn Header="Kind" Binding="{Binding Kind}" Width="120" />
+                        <DataGridTextColumn Header="Detail" Binding="{Binding Detail}" Width="2*" />
+                        <DataGridTextColumn Header="Evidence" Binding="{Binding Classification}" Width="150" />
+                        <DataGridTextColumn Header="Source" Binding="{Binding Source}" Width="*" />
+                        <DataGridTextColumn Header="Confidence" Binding="{Binding Confidence}" Width="90" />
+                    </DataGrid.Columns>
+                </DataGrid>
+            </TabItem>
+            <TabItem x:Name="LootView" Header="Opened-corpse observations">
+                <Grid Margin="8">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <StackPanel Margin="0,0,0,8">
+                        <DockPanel>
+                            <TextBlock DockPanel.Dock="Left" Text="Observation set" VerticalAlignment="Center" Margin="0,0,8,0" />
+                            <ComboBox x:Name="LootSets" ItemTemplate="{StaticResource EditorOptionLabel}" AutomationProperties.Name="Local loot observation set"
+                                      SelectionChanged="LootSet_Changed" />
+                        </DockPanel>
+                        <TextBlock x:Name="LootContext" Style="{StaticResource Caption}" Margin="0,4,0,0" />
+                    </StackPanel>
+                    <DataGrid Grid.Row="1" x:Name="LootObservations" SelectionChanged="LootSelection_Changed">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="UTC" Binding="{Binding CapturedUtc, StringFormat=u}" Width="162" />
+                            <DataGridTextColumn Header="Observation" Binding="{Binding Status}" Width="145" />
+                            <DataGridTextColumn Header="Corpse" Binding="{Binding CorpseIdentity}" Width="100" />
+                            <DataGridTextColumn Header="Item" Binding="{Binding ItemName}" Width="*" />
+                            <DataGridTextColumn Header="AOIDs" Binding="{Binding ItemIds}" Width="90" />
+                            <DataGridTextColumn Header="QL" Binding="{Binding Quality}" Width="55" />
+                            <DataGridTextColumn Header="Qty" Binding="{Binding Quantity}" Width="50" />
+                            <DataGridTextColumn Header="Credits" Binding="{Binding Credits}" Width="70" />
+                            <DataGridTextColumn Header="Notes" Binding="{Binding Notes}" Width="*" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                    <WrapPanel Grid.Row="2" Margin="0,8,0,0">
+                        <Button x:Name="RecordLoot" Content="Record opened-corpse loot…" Click="RecordLoot_Click" />
+                        <Button x:Name="RemoveLoot" Content="Remove draft observation" Click="RemoveLoot_Click" />
+                    </WrapPanel>
+                </Grid>
+            </TabItem>
+        </TabControl>
+        <Border Grid.Row="4" Background="{StaticResource Panel}" CornerRadius="4" Padding="8" Margin="0,8,0,0">
+            <DockPanel>
+                <WrapPanel DockPanel.Dock="Right">
+                    <Button x:Name="CompareNpc" Content="Compare with AORebirth…" Click="CompareNpc_Click" />
+                    <Button x:Name="ExportNpc" Content="Export JSON and CSV" Click="ExportNpc_Click" />
+                </WrapPanel>
+                <StackPanel>
+                    <TextBlock x:Name="StatusText" Text="Waiting for the local AOSharp bridge." Style="{StaticResource Caption}" />
+                    <TextBox x:Name="ExportStatus" IsReadOnly="True" Visibility="Collapsed" Margin="0,5,8,0" TextWrapping="Wrap"
+                             AutomationProperties.Name="Local export status and paths" />
+                </StackPanel>
+            </DockPanel>
+        </Border>
+    </Grid>
+</Window>

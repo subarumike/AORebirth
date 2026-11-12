@@ -7,4 +7,8 @@
     <Nullable>enable</Nullable>
     <AssemblyName>AORebirth.NpcEditor</AssemblyName>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="..\AORebirth.NpcEditor.Official\*.cs" Link="Official\%(Filename)%(Extension)" />
+    <Compile Include="..\..\AORebirth\Libraries\Source\AOtomation\AOtomation.Messaging\src\SmokeLounge.AOtomation.Messaging\GameData\CharacterStat.cs" Link="Official\CharacterStat.cs" />
+  </ItemGroup>
 </Project>

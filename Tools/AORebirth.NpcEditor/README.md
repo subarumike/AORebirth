@@ -1,9 +1,10 @@
 # AORebirth NPC Editor
 
-The standalone WPF editor connects to a local `ZoneEngine_New` built from this
-branch. It works with manual NPC selection. Named loot and coverage can be
-managed with the local server running and no AO client open. The optional [AOSharp target bridge](../AORebirth.NpcEditor.AOSharp/README.md)
-adds selection following for an AO client connected to the same local server.
+The standalone WPF editor opens a mode chooser. **AORebirth server** connects to
+a local `ZoneEngine_New` built from this branch and supports manual selection,
+editing, named loot and coverage. The optional [AOSharp target bridge](../AORebirth.NpcEditor.AOSharp/README.md)
+adds target following for an AO client connected to that same server.
+**Official AO — Read Only** opens a separate local snapshot inspector.
 
 ## Build and launch on Windows
 
@@ -195,6 +196,30 @@ points, named assignments and staged observations. Placement results use
 representative levels for the applicable bands. Use the filters and export up
 to 10,000 matching rows to CSV or JSON. A missing observation or unconfigured
 row is a review finding. The report does not estimate retail completeness.
+
+## Official AO read-only research
+
+Build and load the updated [AOSharp target bridge](../AORebirth.NpcEditor.AOSharp/README.md)
+using the existing AOSharp loader. Start the editor and choose **Official AO —
+Read Only**. Select an NPC yourself in the AO client. The editor reads the
+local snapshot and offers an explicit session choice when several clients
+are reporting. **Read selected target** refreshes the local publication.
+**Lock target** holds the exact observed selection generation. A changed or
+unavailable locked target must be unlocked before following another selection.
+To change editor modes, close and reopen the app.
+
+To record loot from a corpse you opened during normal gameplay, lock the NPC
+while it is selected and use **Opened-corpse observations**. An unavailable
+lock may retain the last snapshot as a historical reference for manual
+recording. Enter the corpse or item identifiers only when you know them.
+The export retains the manual association and observation status.
+
+**Export JSON and CSV** creates a new file pair in
+`%LOCALAPPDATA%\AORebirth\NpcEditor\Exports`. **Compare with AORebirth** opens
+a local `NpcTemplates.json` for a read-only comparison of candidate template
+bands. The comparison keeps client observations separate from authored
+values. See the [capability discovery report](CAPABILITY_DISCOVERY.md) for
+field-level sources and a manual acceptance checklist.
 
 ## Focused validation
 
