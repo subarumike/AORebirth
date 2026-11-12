@@ -54,7 +54,7 @@ namespace ZoneEngine_New.Core.Entities
                 && MobTemplate?.Has(NpcFeature.Boss) == true
                 && Playfield?.MetaData is { IsIndoor: false } metadata
                 && PlayfieldEntryFlags.ExpansionPlayfield(metadata) == 0
-                && Equipment.Content.Values.Any(item => IsBossModifier(item.Name));
+                && Equipment.Content.Values.Any(item => ItemBehaviorContent.Current.IsBossModifier(item.Definition.Id));
 
         /// <summary>
         /// False for NoCombat NPCs: vendors and other non-combat NPCs. A NoCombat NPC cannot be attacked, attack, cast or
