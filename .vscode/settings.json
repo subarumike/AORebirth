@@ -12,6 +12,8 @@
   },
   "json.schemas": [
     { "fileMatch": ["**/GameData/MonsterCombatRules.json"], "url": "./AORebirth/Schemas/MonsterCombatRules.schema.json" },
+    { "fileMatch": ["**/GameData/NpcPetSummons.json"], "url": "./AORebirth/Schemas/NpcPetSummons.schema.json" },
+    { "fileMatch": ["**/GameData/NpcSummonFallbacks.json"], "url": "./AORebirth/Schemas/NpcSummonFallbacks.schema.json" },
     { "fileMatch": ["**/GameData/NpcTemplates.json"], "url": "./AORebirth/Schemas/NpcTemplates.schema.json" },
     { "fileMatch": ["**/Config/Gameplay.json"], "url": "./AORebirth/Schemas/Gameplay.schema.json" },
     { "fileMatch": ["**/GameData/QuestRewards.json"], "url": "./AORebirth/Schemas/QuestRewards.schema.json" },

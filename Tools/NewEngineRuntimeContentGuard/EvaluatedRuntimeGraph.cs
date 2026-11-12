@@ -170,7 +170,8 @@ internal static class EvaluatedRuntimeGraph
 
     private static bool AuditBuildInput(string root, string path, Action<string> unresolved)
     {
-        XDocument document = XDocument.Load(Path.Combine(root, path));
+        // Preserve MSBuild's checkout-text handling even when a legacy declaration names a different encoding.
+        XDocument document = XDocument.Parse(File.ReadAllText(Path.Combine(root, path)));
         foreach (XElement task in document.Descendants().Where(element => element.Name.LocalName == "UsingTask"))
             unresolved($"Repository build task requires audited source-generation coverage: {path} -> {(string?)task.Attribute("TaskName")}");
 

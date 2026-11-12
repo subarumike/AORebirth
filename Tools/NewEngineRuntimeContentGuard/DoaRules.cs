@@ -15,7 +15,7 @@ internal static class DoaRules
     // A binding names an identity or authored field. Names that contain one as a prefix can
     // describe something else, such as the base or stride of a dynamically allocated ID range.
     private static readonly Regex LiteralBindingField = new(
-        @"(?:Npc|NPC|Nano|Quest|Vendor|Merchant|Template|Playfield|Mesh|Texture|Weapon|Reward|Item)(?:Ids?|Hash|Name|Template|Stock|Pool)(?:Fallback|Default|Override)?$|(?:Scarlett|Buckethead|Sarah|Stan|Arete)(?:Id|Instance|Position|Rotation|Name)$|^(?:SpawnHash|MobHash|LowId|HighId|HeadMesh|CATMesh|MonsterData|NpcFamily)$",
+        @"(?:Npc|NPC|Nano|Quest|Vendor|Merchant|Template|Playfield|Mesh|Texture|Weapon|Reward|Item)(?:Ids?|Hash|Name(?:Prefix|Suffix)?|Template|Stock|Pool)(?:Fallback|Default|Override)?$|BossModifierPrefix$|(?:Scarlett|Buckethead|Sarah|Stan|Arete)(?:Id|Instance|Position|Rotation|Name)$|^(?:SpawnHash|MobHash|LowId|HighId|HeadMesh|CATMesh|MonsterData|NpcFamily)$",
         RegexOptions.CultureInvariant);
 
     internal static bool IsLiteralBindingField(string name) => LiteralBindingField.IsMatch(name);

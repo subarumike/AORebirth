@@ -81,10 +81,13 @@ internal static class DoaMutationTests
     {
         Require(!DoaRules.IsLiteralBindingField("NpcIdBase"));
         Require(!DoaRules.IsLiteralBindingField("NpcIdStride"));
+        Require(!DoaRules.IsLiteralBindingField("ProtocolNamePrefix"));
         Require(DoaRules.IsLiteralBindingField("NpcId"));
         Require(DoaRules.IsLiteralBindingField("NpcIdFallback"));
         Require(DoaRules.IsLiteralBindingField("TargetPlayfieldId"));
         Require(DoaRules.IsLiteralBindingField("PetCreationItemName"));
+        Require(DoaRules.IsLiteralBindingField("PetCreationItemNamePrefix"));
+        Require(DoaRules.IsLiteralBindingField("BossModifierPrefix"));
     }
 
     private static void CheckEvaluatedGraph()
