@@ -10,7 +10,7 @@ Rules are **declared**, confirmed where indicated by captures. Packet evidence a
 - Out of scope: Notum Wars (contracts, controlled fields), Alien Invasion (cities, `/org city`) and Towers.
 - Org system messages go to the "Org Msg" channel (existing org chat).
 - Durations, rank tables and texts are data-driven (GameData JSON). Governing forms come from `GoverningForms.json` (default form = index 0, Feudalism; ranks listed from highest left to lowest right; Anarchism has a single rank).
-- Any schema change for locks, votes or debt needs explicit approval first. Debt persistence for [4B] uses the single approved table `org_member_tax` (replaces the earlier `org_debt` and `org_tax_tick` plan); locks and votes remain unapproved.
+- Any schema change for locks, votes or debt needs explicit approval first. Debt persistence for [4B] uses the single approved table `org_member_tax` (replaces the earlier `org_debt` and `org_tax_tick` plan). Votes use the approved tables `org_vote`, `org_vote_choice` and `org_vote_member`, linked to `organizations.Id` (migration `20261112_org_vote.sql`).
 - Text commands must not depend on the target identity; the first letter of a name argument is upper-cased (kick by name).
 
 ## 2. Create
@@ -47,9 +47,12 @@ Kicked characters get a 6 h lock (anarchist leader 12 h).
 
 ## 6. Votes
 
-- Leader starts: `/org startvote "<text>" <minutes> 1:<a> 2:<b> ...`; 2 to 10 entries; 2 to 10080 minutes; 30 minutes minimum between votes.
-- EVERY member, including the lowest rank, can `/org vote info` and `/org vote <id>`. One vote per member, cannot be changed; the id must exist.
-- At the end all members receive the results message. The leader may `stopvote [reason]`.
+- Leader starts: `/org startvote "<text>" <minutes> 1:<a> 2:<b> ...`; 2 to 10 entries; 2 to 10080 minutes.
+- Cooldown between votes: 30 minutes by default, configurable as `org.voteCooldownSeconds` in `AORebirth\Config\Gameplay.json` (AOR testing option; retail value 1800 is the default). Other vote constants stay retail hardcoded.
+- EVERY member, including the lowest rank, can `/org vote info` and `/org vote <id>`. One vote per member, cannot be changed; the id must exist. Members who have not voted may vote even if offline at start; leavers and kicked members keep their vote.
+- Invalid entry (non-numeric or out of range): AOR uses Text.json 179467989 (usage) with the typed number, instead of the retail "exceeds the maximum" text (AOR choice, captured text differs).
+- Results: choices sorted by vote count descending, then choice number ascending. Places use the captured ordinals (Text.json category 508, index 0 = First place to 9 = Tenth place). Choices with the same count share a place; a tie line (54457652) is shown when more than one choice shares a place. Zero votes: 88959635. Zero-vote choices are ranked too.
+- At the end all members receive the results message. The leader may `stopvote [reason]`. Stopped votes are hidden from `/org vote info`.
 
 ## 7. Declared texts
 

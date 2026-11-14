@@ -41,6 +41,8 @@
     <Content Include="../../AORebirth/Libraries/Source/AORebirth.Database/Migrations/20261111_character_played_born.sql" Link="Migrations/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     <EmbeddedResource Include="../../AORebirth/Libraries/Source/AORebirth.Database/Migrations/20261112_org_member_tax.sql" Link="Migrations/%(Filename)%(Extension)" />
     <Content Include="../../AORebirth/Libraries/Source/AORebirth.Database/Migrations/20261112_org_member_tax.sql" Link="Migrations/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+    <EmbeddedResource Include="../../AORebirth/Libraries/Source/AORebirth.Database/Migrations/20261112_org_vote.sql" Link="Migrations/%(Filename)%(Extension)" />
+    <Content Include="../../AORebirth/Libraries/Source/AORebirth.Database/Migrations/20261112_org_vote.sql" Link="Migrations/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="../../AORebirth/Libraries/Source/AORebirth.Database/SqlTables/*.sql" Link="SqlTables/%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

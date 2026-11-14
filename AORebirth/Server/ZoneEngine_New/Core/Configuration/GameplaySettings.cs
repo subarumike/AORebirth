@@ -208,6 +208,8 @@ namespace ZoneEngine_New.Core.Configuration
                     throw new InvalidDataException(path + ": org lockout seconds must be 0 or more.");
                 if (Org.TaxTickSeconds <= 0 || Org.TaxPeriodSeconds <= 0)
                     throw new InvalidDataException(path + ": org taxTickSeconds and taxPeriodSeconds must be above 0.");
+                if (Org.VoteCooldownSeconds < 0)
+                    throw new InvalidDataException(path + ": org voteCooldownSeconds must be 0 or more.");
             if (WorldClock == null || !WorldClock.TryGetEpoch(out _) || WorldClock.DayAtEpoch < 0
                 || WorldClock.TimeOfDayAtEpochSeconds < 0 || WorldClock.TimeOfDayAtEpochSeconds >= Network.GameClock.SecondsPerDay)
                 throw new InvalidDataException(path + ": worldClock needs an ISO 8601 epochUtc, dayAtEpoch 0 or more, and "
@@ -396,6 +398,9 @@ namespace ZoneEngine_New.Core.Configuration
 
         /// <summary>Real-time seconds of a tax warning or suspension period before the next check.</summary>
         public long TaxPeriodSeconds { get; init; } = 1800;
+
+        /// <summary>Real-time seconds an organization must wait after a vote ends or is stopped before starting another (retail 30 min).</summary>
+        public int VoteCooldownSeconds { get; init; } = 1800;
     }
 
     /// <summary>

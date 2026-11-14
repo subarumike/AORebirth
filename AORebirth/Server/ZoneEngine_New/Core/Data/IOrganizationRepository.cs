@@ -63,5 +63,25 @@ namespace ZoneEngine_New.Core.Data
 
         /// <summary>Organization id (stored Clan stat) of one character, 0 when orgless.</summary>
         int GetOrganizationIdOf(int characterId);
+
+        /// <summary>Starts a vote under the organization lock, enforcing the single-active and cooldown rules.</summary>
+        AORebirth.Interfaces.Persistence.Characters.PersistedOrgVoteStartResult StartVote(int organizationId, int starterId,
+            string description, int durationMinutes, System.Collections.Generic.IList<string> choices,
+            System.Collections.Generic.IList<int> electorateIds, long startedUnix, long endsUnix, long cooldownSeconds);
+
+        /// <summary>The Active vote of the organization, else its latest Finished vote; null when none.</summary>
+        AORebirth.Interfaces.Persistence.Characters.PersistedOrgVoteData? GetShownVote(int organizationId);
+
+        /// <summary>Full vote by id, or null.</summary>
+        AORebirth.Interfaces.Persistence.Characters.PersistedOrgVoteData? GetVote(int voteId);
+
+        /// <summary>Ids of Active votes whose deadline has passed.</summary>
+        System.Collections.Generic.IList<int> GetDueVoteIds(long nowUnix);
+
+        /// <summary>Records one cast vote of an eligible member.</summary>
+        AORebirth.Interfaces.Persistence.Characters.OrgVoteCastOutcome CastVote(int voteId, int characterId, int choiceNo, long nowUnix);
+
+        /// <summary>Moves an Active vote to Finished or Stopped; false when it was no longer Active.</summary>
+        bool CloseVote(int voteId, string status, string? stopReason, long nowUnix);
     }
 }
