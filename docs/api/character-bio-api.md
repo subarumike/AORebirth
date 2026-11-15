@@ -111,13 +111,43 @@ Verified examples:
 | `basic_stats/profession_title` | `PROFNAME` | derived 5.1 | may be empty |
 | `basic_stats/defender_rank_id` | `ALIENLEVEL` | stat 169 | integer 0–30 |
 | `basic_stats/defender_rank` | `RANK_name` | derived 5.1 | GameData name |
-| n/a | `PVPRATING` | stat 333 | integer, JSON only |
-| n/a | `PVPTITLE` | none | always empty string |
+| n/a | `PVPRATING` | stat 333 (`PvP_Rating`) | integer, JSON only; see 5.2a |
+| n/a | `PVPTITLE` | derived from stat 333 | Legacy title band; empty below 1400; see 5.2a |
 | n/a | `HEADID` | none | `0` |
 | n/a | `CHAR_DIMENSION` | constant | `11` |
 | n/a | `CHAR_INSTANCE` | `characters.Id` | integer |
 | `pictureurl` | n/a | none | empty element |
 | `smallpictureurl` | n/a | none | empty element |
+
+#### 5.2a PvP fields
+
+- `PVPRATING` is the stat 333 value from the database. `NewCharacter.json` sets it to 1300 at creation.
+- `PVPTITLE` is the Legacy title for the rating band. Band names come from `Text.json` category 2010, and their IDs overlap the Duel IDs (2002–2010). Band thresholds are not verified yet (wiki.aodb.us, marked outdated). Provisional: 1400 Freshman, 1500 Rookie, 1600 Apprentice, 1700 Novice, 1800 Neophyte, 1900 Experienced, 2000 Expert, 2100 Master, 2300 Champion, 2500+ Grand Master. Grand Master has ID 158737026; Master has no confirmed ID.
+- AOR status: the in-game Legacy title is implemented (see 5.2b). `PVPTITLE` for the Bio API must use the same bands as the game (`PvpLegacyTitles.json`).
+
+#### 5.2b PvP titles in game (validated)
+
+Retail is the reference. Retail captures show the following behaviour, and AOR reproduces it.
+
+- **Display mode**: stat 673 (`VisualFlags`) bits `0x180` select the mode: 0 Legacy, 1 Duel, 2 Solo, 3 Team. Toggling it (`CharacterAction 0xA6`) makes the server answer with the stat 673 update only. There is no appearance update. AOR does the same (`Player.TryApplyVisualFlags`).
+- **Solo, Duel, Team titles**: the server sends only the scores in the character info packet (fields 35-42). The client builds the title text and the overhead prefix itself, so no title text is on the wire.
+
+  | Info packet field | Stat |
+  |---|---|
+  | `PvpDuelWins` | 674 |
+  | `PvpDuelLoses` | 675 |
+  | `PvpProfessionDuelLoses` | 676 (hypothesis) |
+  | `PvpSoloKills` | 678 |
+  | `PvpTeamKills` | 680 |
+  | `PvpSoloScore` | 682 |
+  | `PvpTeamScore` | 683 |
+  | `PvpDuelScore` | 684 |
+
+- **Legacy title**: no retail capture contains a non-empty Legacy title (the retail character used has rating 1350, below the first band). The server computes it from stat 333 with `GameData/PvpLegacyTitles.json`, and sends it in the info packet `LegacyTitle` (playercard). The retail client does not receive stat 333.
+- **Legacy overhead (editorial decision, not captured)**: when the mode is Legacy, the name sent in the entity update is prefixed with the title (for example `Grand Master Technykk`). It was validated in game for self and others, with no side effects (friend list included). Other modes keep the plain name.
+- **Refresh**: overhead and playercard update on toggle without relog, for self and others. The overhead refreshes when the character is clicked or targeted (F1 self, Shift-Tab other).
+- **`PvpLegacyTitles.json`**: `TextCategory` (2010) and `Bands` with `MinRating`, `TextId`, `Fallback`, `Note`. The name comes from `Text.json`. If `TextId` is null or has no text, `Fallback` is used, so `Text.json` stays untouched. Master (2100) uses `Fallback` "Master". Only the 1400 threshold is confirmed. The others are provisional.
+- **Known gap**: the cross-instance `PlayerCard` (`world.proto`) has no PvP fields. Inspecting a character on another ZoneEngine instance shows zeros and an empty `LegacyTitle`. Fixing it needs additive proto fields, which are not approved yet.
 
 ### 5.3 Organization fields
 
@@ -195,7 +225,7 @@ The example above is the retail Glitch record (dimension 5). The AOR output must
 
 ```json
 [
-  {"SEX":"Male","BREED":"Opifex","PVPRATING":1701,"NAME":"Glitch","FIRSTNAME":"Thomas","PVPTITLE":"","LASTNAME":"Hitandrun","CHAR_DIMENSION":11,"ALIENLEVEL":22,"RANK_name":"Challenger","HEADID":0,"PROFNAME":"Kingpin","LEVELX":220,"PROF":"Fixer","CHAR_INSTANCE":649213,"SIDE":"Omni"},
+  {"SEX":"Male","BREED":"Opifex","PVPRATING":1701,"NAME":"Glitch","FIRSTNAME":"Thomas","PVPTITLE":"NOVICE","LASTNAME":"Hitandrun","CHAR_DIMENSION":11,"ALIENLEVEL":22,"RANK_name":"Challenger","HEADID":0,"PROFNAME":"Kingpin","LEVELX":220,"PROF":"Fixer","CHAR_INSTANCE":649213,"SIDE":"Omni"},
   {"ORG_DIMENSION":11,"RANK_TITLE":"President","ORG_INSTANCE":6814,"NAME":"A Better Tomorrow","RANK":0},
   "2026/11/13 05:58:14"
 ]
