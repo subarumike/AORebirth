@@ -168,7 +168,7 @@ namespace AORebirth.Database.Domain.Missions
                         return QuestCompletionResult(CharacterQuestCompletionStatus.Rejected, quest, "The durable character stats changed before completion.");
                 }
 
-                this.ApplyInventoryMutationCore(request.Grants, new MissionItemInstanceData[0], allowOverflowGrants: successor != null);
+                this.ApplyInventoryMutationCore(request.Grants, Array.Empty<MissionItemInstanceData>(), allowOverflowGrants: true);
                 // Only this private path can authorize the shared ledger/stat primitive from characterquests.
                 MissionAtomicStatRewardResultData reward = this.ApplyCharacterStatReward(key, CharacterQuestRewardType,
                     request.StatMutations, "characterquest:" + quest.QuestId + ":" + quest.AssignedAtUtcTicks.ToString(CultureInfo.InvariantCulture),

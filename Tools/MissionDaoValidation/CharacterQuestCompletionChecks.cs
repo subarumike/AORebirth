@@ -79,6 +79,117 @@ namespace AORebirth.Tools.MissionDaoValidation
             }
         }
 
+        private static void ValidateCharacterQuestOverflowAndRestart(DisposableMySql disposable)
+        {
+            const string standalone = "successor.overflow.standalone";
+            const string protectedBefore = "successor.overflow.protected";
+            const string protectedAfter = "successor.protected.active";
+            const string newBefore = "successor.reconnect.before";
+            const string newAfter = "successor.reconnect.after";
+            int template = (int)CharacterQuestSourceCode.Template;
+            int active = (int)CharacterQuestStateCode.Active;
+            int completed = (int)CharacterQuestStateCode.Completed;
+            int overflow = (int)IdentityType.OverflowWindow;
+            string connectionString = new MySqlConnectionStringBuilder(disposable.ApplicationConnectionString)
+                { Pooling = false }.ConnectionString;
+            var quests = new MySqlCharacterQuestDao(() => new MySqlConnection(connectionString));
+            var dao = new MySqlMissionDao(() => new MySqlConnection(connectionString));
+            var protectedRow = CompletionRow(protectedAfter, state: active, source: template, assigned: CompletionAssigned - 1);
+            protectedRow.Progress = 1;
+            protectedRow.RequiredCount = 3;
+            quests.SaveCharacterQuest(protectedRow);
+
+            var standaloneItem = CompletionItem(920302, 113);
+            standaloneItem.ContainerType = overflow;
+            var protectedItem = CompletionItem(920303, 114);
+            protectedItem.ContainerType = overflow;
+            var startItem = CompletionItem(920304, 115);
+            startItem.ContainerType = overflow;
+            var predecessorReward = CompletionItem(920305, 116);
+
+            var ordinary = CompleteRequest(standalone, standaloneItem);
+            var protectedCompletion = CompleteRequest(protectedBefore, protectedItem);
+            var withSuccessor = CompleteRequest(newBefore, predecessorReward, startItem);
+            withSuccessor.Successor = new CharacterQuestSuccessorRequest { QuestId = newAfter, RequiredCount = 2 };
+            foreach (CharacterQuestCompletionRequest request in new[] { ordinary, protectedCompletion, withSuccessor })
+            {
+                quests.SaveCharacterQuest(CompletionRow(request.QuestId, state: active, source: template));
+                ResetCompletionStats(connectionString);
+                Require(dao.Execute(CompletionOwner, tx => ((ICharacterQuestCompletionTransaction)tx)
+                    .TryEarnCharacterQuest(EarnRequest(request.QuestId))).Status == CharacterQuestCompletionStatus.Earned,
+                    request.QuestId + "-earned");
+
+                if (request == protectedCompletion)
+                {
+                    request.Successor = new CharacterQuestSuccessorRequest { QuestId = protectedAfter, RequiredCount = 2 };
+                    Require(dao.Execute(CompletionOwner, tx => ((ICharacterQuestCompletionTransaction)tx)
+                        .TryCompleteCharacterQuest(request)).Status == CharacterQuestCompletionStatus.Rejected,
+                        "successor-protected-assignment-rejects-explicit-replacement");
+                    Require(Scalar(connectionString, "SELECT COUNT(*) FROM item_instances WHERE InstanceId=" + protectedItem.InstanceId) == 0,
+                        "successor-protected-assignment-rejection-leaves-no-overflow-grant");
+                    request.Successor = null;
+                }
+
+                if (request == withSuccessor)
+                {
+                    var connection = new FaultConnection(connectionString) { FailurePoint = "commit-after" };
+                    var uncertain = new MySqlMissionDao(() => connection);
+                    Expect<MissionCommitOutcomeUnknownException>(() => uncertain.Execute(CompletionOwner, tx =>
+                        ((ICharacterQuestCompletionTransaction)tx).TryCompleteCharacterQuest(request)),
+                        "successor-overflow-commit-acknowledgement-lost");
+                }
+                else
+                {
+                    Require(dao.Execute(CompletionOwner, tx => ((ICharacterQuestCompletionTransaction)tx)
+                        .TryCompleteCharacterQuest(request)).Status == CharacterQuestCompletionStatus.Applied,
+                        request.QuestId + "-ordinary-overflow-committed");
+                }
+            }
+
+            disposable.Restart();
+            var reconnectedQuests = new MySqlCharacterQuestDao(() => new MySqlConnection(connectionString));
+            var reconnectedDao = new MySqlMissionDao(() => new MySqlConnection(connectionString));
+            var rows = reconnectedQuests.LoadForCharacter(CompletionOwner);
+            CharacterQuestRow original = rows.Single(row => row.QuestId == protectedAfter);
+            CharacterQuestRow next = rows.Single(row => row.QuestId == newAfter);
+            Require(original.State == active && original.Source == template && original.Progress == 1
+                && original.RequiredCount == 3 && original.AssignedAtUtcTicks == protectedRow.AssignedAtUtcTicks,
+                "successor-restart-protected-row-exactly-preserved");
+            Require(next.State == active && next.Source == template && next.Progress == 0
+                && next.RequiredCount == 2 && next.AssignedAtUtcTicks == withSuccessor.NowUtcTicks,
+                "successor-restart-committed-assignment-exactly-restored");
+
+            int replayId = 920310;
+            foreach (CharacterQuestCompletionRequest request in new[] { ordinary, protectedCompletion, withSuccessor })
+            {
+                Require(rows.Single(row => row.QuestId == request.QuestId).State == completed,
+                    request.QuestId + "-completed-after-restart");
+                foreach (MissionItemInstanceData originalItem in request.Grants)
+                {
+                    Require(Scalar(connectionString, "SELECT COUNT(*) FROM item_instances WHERE InstanceId=" + originalItem.InstanceId
+                        + " AND ContainerType=" + originalItem.ContainerType + " AND ContainerInstance=" + CompletionOwner
+                        + " AND ContainerPlacement=" + originalItem.ContainerPlacement + " AND StackCount=1") == 1,
+                        request.QuestId + "-exact-item-row-after-restart");
+                }
+                request.Grants = request.Grants.Select(originalItem =>
+                {
+                    MissionItemInstanceData replayItem = CompletionItem(replayId++, originalItem.ContainerPlacement + 4);
+                    replayItem.ContainerType = originalItem.ContainerType;
+                    return replayItem;
+                }).ToArray();
+                Require(reconnectedDao.Execute(CompletionOwner, tx => ((ICharacterQuestCompletionTransaction)tx)
+                    .TryCompleteCharacterQuest(request)).Status == CharacterQuestCompletionStatus.AlreadyApplied,
+                    request.QuestId + "-reconnect-replay-idempotent");
+                Require(request.Grants.All(replayItem =>
+                        Scalar(connectionString, "SELECT COUNT(*) FROM item_instances WHERE InstanceId=" + replayItem.InstanceId) == 0)
+                    && Scalar(connectionString, "SELECT COUNT(*) FROM missionrewardledger WHERE QuestId='" + request.QuestId
+                        + "' AND Status=" + (int)MissionRewardStatus.Applied) == 1,
+                    request.QuestId + "-reconnect-replay-grants-no-extra-rewards");
+            }
+            Require(ReadCompletionStat(connectionString, CharacterStat.Cash) == 117
+                && ReadCompletionStat(connectionString, CharacterStat.XP) == 223, "successor-reconnect-replay-preserves-stats");
+        }
+
         private static void ValidateCharacterQuestCompletion(MySqlMissionDao dao, string connectionString)
         {
             var quests = new MySqlCharacterQuestDao(() => new MySqlConnection(connectionString));

@@ -5,11 +5,13 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text.Json;
 using System.Threading;
 using AORebirth.Database.Domain.Quests;
 using AORebirth.Enums;
 using AORebirth.Interfaces.Persistence.Missions;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SmokeLounge.AOtomation.Messaging.GameData;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
@@ -399,12 +401,9 @@ public sealed class FindItemRewardTests
                 """);
             var data = new StubGameData(new HashItemCatalog([], []), rootPath: directory.FullName);
             var catalog = new QuestCatalog(data, new StubLogger());
-            var dao = new CompletionDao();
-            using var snapshots = new CharacterSnapshotService(dao, dao, new StubLogger());
             DateTime now = new(2026, 1, 1, 0, 0, 0, DateTimeKind.Utc);
-            using var f = new Fixture(dao, now: () => now, snapshots: snapshots, questCatalog: catalog);
-            dao.Fixture = f;
-            f.Player.Playfield = f.CreateWorld(25);
+            using var f = new AuthoredChainFixture(catalog, new StubCatalog().Add(startItem, 1), () => now);
+            CompletionDao dao = f.Dao;
             Assert.IsTrue(f.Quests.TryAssignTemplate(f.Player, first, out _));
             long firstAssigned = now.Ticks;
             long existingAssigned = now.AddMinutes(olderRun ? -1 : 1).Ticks;
@@ -467,6 +466,50 @@ public sealed class FindItemRewardTests
             }
             Assert.AreEqual(1, dao.Completed);
             Assert.AreEqual(assignSuccessor ? 1 : 0, dao.Grants.Count(item => item.LowId == startItem));
+        }
+        finally
+        {
+            File.Delete(catalogPath);
+            directory.Delete();
+        }
+    }
+
+    [DataTestMethod]
+    [DataRow("MISS", 987653, 987653)]
+    [DataRow("T001", 987653, 987653)]
+    [DataRow("T002", 987654, 987654)]
+    [DataRow("T002", 987653, 987654)]
+    public void AuthoredChainKeepsCompletionPendingWhenSuccessorReferencesAreInvalid(string nextStep, int lowId, int highId)
+    {
+        var directory = Directory.CreateTempSubdirectory("ao-quest-invalid-successor-");
+        string catalogPath = Path.Combine(directory.FullName, QuestCatalog.FileName);
+        try
+        {
+            File.WriteAllText(catalogPath, $$"""
+                [{"Hash":"T001","Name":"First","Action":"TalkTo","NextStep":"{{nextStep}}"},
+                 {"Hash":"T002","Name":"Next","Action":"TalkTo","StartItems":[{"Id":{{lowId}},"HighId":{{highId}},"Quality":1}]}]
+                """);
+            var data = new StubGameData(new HashItemCatalog([], []), rootPath: directory.FullName);
+            var catalog = new QuestCatalog(data, new StubLogger());
+            var templates = new StubCatalog().Add(987653, 1);
+            using var f = new AuthoredChainFixture(catalog, templates, () => DateTime.UnixEpoch);
+            Assert.IsTrue(f.Quests.TryAssignTemplate(f.Player, "T001", out _));
+
+            Assert.IsFalse(f.Quests.TryComplete(f.Player, "T001", out _));
+            Assert.IsTrue(f.Quests.GetLog(f.Player).Quests["T001"].IsRewardPending);
+            Assert.AreEqual((int)QuestState.Active, f.Store.Character!.State);
+            Assert.AreEqual(0, f.Dao.Completed);
+            Assert.AreEqual(0, f.Dao.Grants.Count);
+            Assert.IsFalse(f.Store.AdditionalQuests.ContainsKey("T002"));
+
+            if (nextStep == "T002")
+            {
+                templates.Add(987654, 1);
+                f.Quests.RetryPendingRewards(f.Player, force: true);
+                Assert.AreEqual(1, f.Dao.Completed);
+                Assert.AreEqual(1, f.Dao.Grants.Count);
+                Assert.AreEqual((int)QuestState.Active, f.Store.AdditionalQuests["T002"].State);
+            }
         }
         finally
         {
@@ -637,32 +680,75 @@ public sealed class FindItemRewardTests
         public bool TryFromInstanceRecord(ItemInstanceRecord row, out Item item) => _inner.TryFromInstanceRecord(row, out item);
     }
 
+    sealed class AuthoredChainFixture : IDisposable
+    {
+        internal readonly Player Player = TestWorld.CreatePlayer(77);
+        internal readonly QuestDungeonDestinationTests.QuestStore Store = new();
+        internal readonly CompletionDao Dao = new();
+        internal QuestService Quests { get; }
+        readonly ServiceProvider _services;
+        readonly CharacterSnapshotService _snapshots;
+        readonly InventoryFlushService _flush;
+
+        internal AuthoredChainFixture(QuestCatalog catalog, IItemTemplateCatalog templates, Func<DateTime> now)
+        {
+            Dao.Attach(Player, Store);
+            var session = new QuestDungeonDestinationTests.Session();
+            session.BindPlayer(Player);
+            Player.Session = session;
+            Player.Playfield = (Playfield)RuntimeHelpers.GetUninitializedObject(typeof(Playfield));
+            _services = new ServiceCollection().AddSingleton(templates).BuildServiceProvider();
+            typeof(Playfield).GetField("_serviceProvider", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .SetValue(Player.Playfield, _services);
+            var logger = new StubLogger();
+            _flush = new InventoryFlushService(new Lazy<PlayfieldManager>(() => throw new AssertFailedException("No coalesced flush expected.")),
+                new QuestDungeonDestinationTests.Persistence(), logger);
+            _snapshots = new CharacterSnapshotService(Dao, Dao, logger);
+            Quests = new QuestService(catalog, Store, new StubItemBuilder(), _flush, logger, now, Dao, _snapshots);
+        }
+
+        public void Dispose()
+        {
+            _snapshots.Dispose();
+            _flush.Dispose();
+            _services.Dispose();
+        }
+    }
+
     sealed class CompletionDao : IMissionDao, IMissionDaoTransaction, ICharacterQuestCompletionTransaction,
         ICharacterRepository, IStatRepository
     {
-        internal Fixture Fixture = null!;
+        Player _player = null!;
+        QuestDungeonDestinationTests.QuestStore _store = null!;
+        internal Fixture Fixture { set => Attach(value.Player, value.Store); }
+
+        internal void Attach(Player player, QuestDungeonDestinationTests.QuestStore store)
+        {
+            _player = player;
+            _store = store;
+        }
         internal readonly List<MissionItemInstanceData> Grants = [];
         internal readonly Dictionary<int, int> Stats = [];
         internal int Completed;
         internal int Checkpoints;
         internal bool? UnknownCompletionCommit;
         internal Action? BeforeEarn;
-        public int CharacterId => Fixture.Player.Identity.Instance;
+        public int CharacterId => _player.Identity.Instance;
         public string AccountKey => string.Empty;
         public T Execute<T>(int characterId, Func<IMissionDaoTransaction, T> operation) => Execute(characterId, string.Empty, operation);
         public T Execute<T>(int characterId, string accountKey, Func<IMissionDaoTransaction, T> operation)
         {
             Assert.AreEqual(CharacterId, characterId);
-            Assert.IsTrue(Monitor.IsEntered(Fixture.Player.PersistenceGate));
+            Assert.IsTrue(Monitor.IsEntered(_player.PersistenceGate));
             return operation(this);
         }
         public CharacterQuestCompletionSnapshotData ReadCharacterQuest(string questId)
         {
-            var row = Fixture.Store.Character?.QuestId == questId ? Fixture.Store.Character
-                : Fixture.Store.AdditionalQuests.GetValueOrDefault(questId);
+            var row = _store.Character?.QuestId == questId ? _store.Character
+                : _store.AdditionalQuests.GetValueOrDefault(questId);
             if (row == null)
                 return null!;
-            var generated = row.Source == (int)QuestSource.Generated ? Fixture.Store.Generated : null;
+            var generated = row.Source == (int)QuestSource.Generated ? _store.Generated : null;
             return new()
             {
                 CharacterId = row.CharacterId, QuestId = row.QuestId, Source = row.Source, State = row.State,
@@ -674,10 +760,10 @@ public sealed class FindItemRewardTests
         }
         public CharacterQuestCompletionResult TryEarnCharacterQuest(CharacterQuestEarnRequest request)
         {
-            var row = Fixture.Store.Character!;
+            var row = _store.Character!;
             if (Completed > 0) return Result(CharacterQuestCompletionStatus.AlreadyApplied);
             if (row.State != (int)QuestState.Active || (row.Source == (int)QuestSource.Generated
-                && row.Progress < row.RequiredCount && Fixture.Store.Generated!.ExpiresAtUtcTicks <= request.NowUtcTicks))
+                && row.Progress < row.RequiredCount && _store.Generated!.ExpiresAtUtcTicks <= request.NowUtcTicks))
                 return Result(CharacterQuestCompletionStatus.Rejected);
             if (row.Progress >= row.RequiredCount) return Result(CharacterQuestCompletionStatus.AlreadyEarned);
             BeforeEarn?.Invoke();
@@ -689,7 +775,7 @@ public sealed class FindItemRewardTests
         {
             if (Completed > 0) return Result(CharacterQuestCompletionStatus.AlreadyApplied);
             if (UnknownCompletionCommit == false) throw new MissionCommitOutcomeUnknownException(new Exception("Injected before commit."));
-            Assert.AreEqual(Fixture.Store.Character!.RequiredCount, Fixture.Store.Character.Progress);
+            Assert.AreEqual(_store.Character!.RequiredCount, _store.Character.Progress);
             foreach (var expected in request.ExpectedStatValues)
                 Assert.AreEqual(expected.Value, (long)Stats.GetValueOrDefault(expected.StatId), "Durable baseline must match the live reward plan.");
             foreach (var mutation in request.StatMutations)
@@ -701,11 +787,11 @@ public sealed class FindItemRewardTests
             }
             Grants.AddRange(request.Grants);
             foreach (var mutation in request.StatMutations) Stats[mutation.StatId] = checked((int)mutation.Value);
-            Fixture.Store.Character.State = (int)QuestState.Completed;
+            _store.Character.State = (int)QuestState.Completed;
             if (request.Successor is { } successor)
             {
                 Assert.IsTrue(CharacterQuestSuccessorRequest.CanAssign(ReadCharacterQuest(successor.QuestId), request.AssignedAtUtcTicks));
-                Fixture.Store.Save(new CharacterQuestRow
+                _store.Save(new CharacterQuestRow
                 {
                     CharacterId = CharacterId, QuestId = successor.QuestId, Source = (int)QuestSource.Template,
                     State = (int)QuestState.Active, RequiredCount = successor.RequiredCount,
@@ -719,11 +805,11 @@ public sealed class FindItemRewardTests
                     { StatIdentityType = m.StatIdentityType, StatId = m.StatId, Value = m.Value }).ToArray() };
         }
         CharacterQuestCompletionResult Result(CharacterQuestCompletionStatus status) => new()
-            { Status = status, Quest = ReadCharacterQuest(Fixture.Store.Character!.QuestId) };
+            { Status = status, Quest = ReadCharacterQuest(_store.Character!.QuestId) };
         public bool SaveOnlineCheckpoint(int characterId, CharacterRecord? location, IReadOnlyList<StatRecord> stats)
         {
             Assert.AreEqual(CharacterId, characterId);
-            Assert.IsTrue(Monitor.IsEntered(Fixture.Player.PersistenceGate));
+            Assert.IsTrue(Monitor.IsEntered(_player.PersistenceGate));
             foreach (var stat in stats) Stats[stat.StatId] = stat.StatValue;
             Checkpoints++;
             return true;

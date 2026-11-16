@@ -79,6 +79,7 @@ namespace AORebirth.Tools.MissionDaoValidation
                 if (questSuccessorOnly)
                 {
                     ValidateCharacterQuestSuccessors(dao, disposable.ApplicationConnectionString);
+                    ValidateCharacterQuestOverflowAndRestart(disposable);
                     Console.WriteLine("MISSION_DAO_TEST_MODE=ISOLATED_PRODUCTION_SOURCES");
                     Console.WriteLine("MISSION_QUEST_SUCCESSOR_MYSQL=PASS");
                     Console.WriteLine("MISSION_QUEST_SUCCESSOR_CHECKS=" + checks.ToString(CultureInfo.InvariantCulture));
@@ -509,6 +510,7 @@ namespace AORebirth.Tools.MissionDaoValidation
         private sealed class DisposableMySql : IDisposable
         {
             private string environmentFile;
+            private string containerId;
             private bool containerCreated;
             private bool networkCreated;
             private bool volumeCreated;
@@ -547,7 +549,7 @@ namespace AORebirth.Tools.MissionDaoValidation
                     result.networkCreated = true;
                     Docker("volume", "create", "--label", LabelKey + "=" + LabelValue, VolumeName);
                     result.volumeCreated = true;
-                    Docker(
+                    result.containerId = Docker(
                         "run",
                         "--detach",
                         "--name",
@@ -564,7 +566,7 @@ namespace AORebirth.Tools.MissionDaoValidation
                         result.environmentFile,
                         "--volume",
                         VolumeName + ":/var/lib/mysql",
-                        Image);
+                        Image).Trim();
                     result.containerCreated = true;
 
                     result.RootConnectionString = ConnectionString("root", rootPassword);
@@ -576,6 +578,22 @@ namespace AORebirth.Tools.MissionDaoValidation
                     result.Dispose();
                     throw;
                 }
+            }
+
+            internal void Restart()
+            {
+                if (!this.containerCreated || this.containerId == null || this.containerId.Length != 64
+                    || !HasExpectedLabel("container", this.containerId))
+                    throw new InvalidOperationException("disposable-mysql-restart-ownership-mismatch");
+
+                string before = Docker("container", "inspect", "--format", "{{.State.StartedAt}}", this.containerId).Trim();
+                Docker("restart", this.containerId);
+                string after = Docker("container", "inspect", "--format", "{{.State.StartedAt}}", this.containerId).Trim();
+                Require(before.Length != 0 && after.Length != 0 && before != after, "disposable-mysql-owned-process-restarted");
+
+                var settings = new MySqlConnectionStringBuilder(this.ApplicationConnectionString) { Pooling = false };
+                using (MySqlConnection ready = WaitForMySql(settings.ConnectionString))
+                    Require(ready.State == ConnectionState.Open, "disposable-mysql-reconnected-after-restart");
             }
 
             public void Dispose()
@@ -663,13 +681,14 @@ namespace AORebirth.Tools.MissionDaoValidation
                    && string.Equals(result.Output.Trim(), LabelValue, StringComparison.Ordinal);
         }
 
-        private static void Docker(params string[] arguments)
+        private static string Docker(params string[] arguments)
         {
             ProcessResult result = DockerResult(arguments);
             if (result.ExitCode != 0)
             {
                 throw new InvalidOperationException("docker-command-failed");
             }
+            return result.Output;
         }
 
         private static ProcessResult DockerResult(params string[] arguments)

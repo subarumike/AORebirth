@@ -80,6 +80,8 @@ namespace AORebirth.Interfaces.Persistence.Missions
         public string ExpectedAcgBuildingGeneratorJson { get; set; }
         public long NowUtcTicks { get; set; }
         public CharacterQuestSuccessorRequest Successor { get; set; }
+
+        /// <summary>Planned grants for the quest owner in main inventory or overflow, including any successor start items.</summary>
         public IReadOnlyList<MissionItemInstanceData> Grants { get; set; } = new MissionItemInstanceData[0];
         public IList<MissionStatMutationData> StatMutations { get; set; } = new MissionStatMutationData[0];
         public IList<MissionStatValueData> ExpectedStatValues { get; set; } = new MissionStatValueData[0];

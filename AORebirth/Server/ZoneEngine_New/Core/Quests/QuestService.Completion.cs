@@ -3,6 +3,7 @@ namespace ZoneEngine_New.Core.Quests;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -371,9 +372,7 @@ public sealed partial class QuestService
                 if (skippedUnique.Count > 0)
                     _logger.Info("Quest reward unique items already held, left out char=" + player.Identity.Instance
                         + " quest=" + quest.QuestId + " items=" + string.Join(", ", skippedUnique));
-                QuestTemplate? successorTemplate = !string.IsNullOrEmpty(rewardTemplate.NextStep)
-                    && _catalog.TryGet(rewardTemplate.NextStep, out QuestTemplate next)
-                    && !string.Equals(next.Hash, quest.QuestId, StringComparison.OrdinalIgnoreCase) ? next : null;
+                QuestTemplate? successorTemplate = ResolveSuccessor(quest, rewardTemplate.NextStep);
                 QuestLog? successorLog = successorTemplate == null ? null : GetLog(player);
                 var xp = DirectXpRewardPlan.CreateQuestReward(player, Math.Max(0, reward?.Xp ?? 0));
                 // Runtime vitals are published by the full XP plan; only durable stats belong in the reward transaction.
@@ -403,6 +402,7 @@ public sealed partial class QuestService
                             completion.ReadCharacterQuest(successorTemplate.Hash), earned.Quest.AssignedAtUtcTicks))
                     {
                         successor = NewAssignment(successorTemplate.Hash, QuestSource.Template, successorTemplate, now);
+                        ValidateSuccessorStartItems(player, successorTemplate);
                         foreach (Item item in MintStartItems(player, successor))
                         {
                             if (UniqueItems.WouldDuplicate(player, item, out string name))
@@ -498,6 +498,31 @@ public sealed partial class QuestService
                 if (quest.IsRewardPending && !player.IsPersistenceQuarantined)
                     NotifyPending(player, quest);
             }
+        }
+    }
+
+    QuestTemplate? ResolveSuccessor(PlayerQuest predecessor, string? nextStep)
+    {
+        if (string.IsNullOrEmpty(nextStep))
+            return null;
+        if (string.Equals(nextStep, predecessor.QuestId, StringComparison.OrdinalIgnoreCase)
+            || !_catalog.TryGet(nextStep, out QuestTemplate successor) || successor.RequiredCount <= 0)
+            throw new InvalidDataException($"Quest {predecessor.QuestId} has an invalid successor '{nextStep}'. Completion remains pending.");
+        return successor;
+    }
+
+    static void ValidateSuccessorStartItems(Player player, QuestTemplate successor)
+    {
+        if (successor.StartItems is not { Count: > 0 } startItems)
+            return;
+
+        IItemTemplateCatalog templates = player.Playfield!.GetRequiredService<IItemTemplateCatalog>();
+        foreach (QuestRewardItem definition in startItems)
+        {
+            int highId = definition.HighId ?? definition.Id;
+            if (definition.Id <= 0 || highId <= 0 || definition.Quality <= 0
+                || !templates.TryGet(definition.Id, out _) || !templates.TryGet(highId, out _))
+                throw new InvalidDataException($"Quest {successor.Hash} has an unresolved start item '{definition.Hash ?? definition.Id.ToString(CultureInfo.InvariantCulture)}'. Completion remains pending.");
         }
     }
 
