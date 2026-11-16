@@ -213,6 +213,7 @@
     <Compile Include="Messages\N3Messages\DoorFullUpdateMessage.cs" />
     <Compile Include="Messages\N3Messages\DoorStatusUpdateMessage.cs" />
     <Compile Include="Messages\N3Messages\OrgServerMessages\OrgLeadershipTransferMessage.cs" />
+    <Compile Include="Messages\N3Messages\OrgServerMessages\OrgTaxIncreaseMessage.cs" />
     <Compile Include="Messages\N3Messages\SetNameMessage.cs" />
     <Compile Include="Messages\N3Messages\FightModeUpdateMessage.cs" />
     <Compile Include="Messages\N3Messages\FullAutoMessage.cs" />

@@ -42,6 +42,9 @@ namespace ZoneEngine_New.Core.Data
         public void SaveLeader(int organizationId, int leaderId)
             => Run(() => _persistence.SaveOrganizationLeader(organizationId, leaderId));
 
+        public void SaveTax(int organizationId, int tax)
+            => Run(() => _persistence.SaveOrganizationTax(organizationId, tax));
+
         public AORebirth.Interfaces.Persistence.Characters.PersistedOrgLockoutData GetLockout(int characterId)
             => Run(() => _persistence.LoadOrgLockout(characterId));
 
@@ -52,6 +55,16 @@ namespace ZoneEngine_New.Core.Data
                 int kickedId, string kickedName, int kickerId, string kickerName, int memberQuorum, int leaderQuorum)
                 => Run(() => _persistence.RecordAnarchistKick(organizationId, kickedId, kickedName, kickerId, kickerName,
                     memberQuorum, leaderQuorum));
+
+        public AORebirth.Interfaces.Persistence.Characters.PersistedOrganizationBankResult TransferBank(int organizationId, int characterId,
+            bool deposit, long amount, long bankCap, long cashCap)
+            => Run(() => _persistence.TransferOrganizationBank(organizationId, characterId, deposit, amount, bankCap, cashCap));
+
+        public PersistedOrgMemberTaxData GetMemberTax(int characterId)
+            => Run(() => _persistence.LoadOrgMemberTax(characterId));
+
+        public void SaveMemberTax(int characterId, PersistedOrgMemberTaxData data)
+            => Run(() => _persistence.SaveOrgMemberTax(characterId, data));
 
         public void ClearMembership(int characterId)
             => Run(() => _persistence.ClearOrganizationMembership(characterId));
@@ -67,6 +80,27 @@ namespace ZoneEngine_New.Core.Data
 
         public int GetOrganizationIdOf(int characterId)
             => Run(() => _persistence.LoadOrganizationId(characterId));
+
+        public PersistedOrgVoteStartResult StartVote(int organizationId, int starterId, string description, int durationMinutes,
+            System.Collections.Generic.IList<string> choices, System.Collections.Generic.IList<int> electorateIds,
+            long startedUnix, long endsUnix, long cooldownSeconds)
+            => Run(() => _persistence.StartOrganizationVote(organizationId, starterId, description, durationMinutes, choices,
+                electorateIds, startedUnix, endsUnix, cooldownSeconds));
+
+        public PersistedOrgVoteData? GetShownVote(int organizationId)
+            => Run(() => _persistence.LoadShownOrganizationVote(organizationId));
+
+        public PersistedOrgVoteData? GetVote(int voteId)
+            => Run(() => _persistence.LoadOrganizationVote(voteId));
+
+        public System.Collections.Generic.IList<int> GetDueVoteIds(long nowUnix)
+            => Run(() => _persistence.LoadDueActiveVoteIds(nowUnix));
+
+        public OrgVoteCastOutcome CastVote(int voteId, int characterId, int choiceNo, long nowUnix)
+            => Run(() => _persistence.CastOrganizationVote(voteId, characterId, choiceNo, nowUnix));
+
+        public bool CloseVote(int voteId, string status, string? stopReason, long nowUnix)
+            => Run(() => _persistence.CloseOrganizationVote(voteId, status, stopReason, nowUnix));
 
         static int ReadStoredRank(System.Collections.Generic.IList<CharacterStatData> stats)
         {

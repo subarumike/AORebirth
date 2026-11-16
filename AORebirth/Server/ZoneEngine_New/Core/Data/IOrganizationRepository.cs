@@ -26,6 +26,9 @@ namespace ZoneEngine_New.Core.Data
         /// <summary>Stores the new leader (presidency transfer).</summary>
         void SaveLeader(int organizationId, int leaderId);
 
+        /// <summary>Stores the organization tax (whole credits, zero or positive).</summary>
+        void SaveTax(int organizationId, int tax);
+
         /// <summary>Organization invite lockout for this character, or null when none exists.</summary>
         AORebirth.Interfaces.Persistence.Characters.PersistedOrgLockoutData GetLockout(int characterId);
 
@@ -36,7 +39,17 @@ namespace ZoneEngine_New.Core.Data
         AORebirth.Interfaces.Persistence.Characters.PersistedAnarchistKickResult RecordAnarchistKick(int organizationId,
             int kickedId, string kickedName, int kickerId, string kickerName, int memberQuorum, int leaderQuorum);
 
-        /// <summary>Removes the membership of one character (leave, kick, side change).</summary>
+        /// <summary>Moves credits between one character's Cash and the Bank under the organization lock; caps are enforced there.</summary>
+        AORebirth.Interfaces.Persistence.Characters.PersistedOrganizationBankResult TransferBank(int organizationId, int characterId,
+            bool deposit, long amount, long bankCap, long cashCap);
+
+        /// <summary>Tax schedule of one member (org_member_tax), or null when none is stored.</summary>
+        AORebirth.Interfaces.Persistence.Characters.PersistedOrgMemberTaxData GetMemberTax(int characterId);
+
+        /// <summary>Inserts or updates the tax schedule of one member.</summary>
+        void SaveMemberTax(int characterId, AORebirth.Interfaces.Persistence.Characters.PersistedOrgMemberTaxData data);
+
+        /// <summary>Removes the membership of one character (leave, kick, side change); also deletes its tax row.</summary>
         void ClearMembership(int characterId);
 
         /// <summary>Character ids that are members of the organization (stored Clan stat).</summary>
@@ -50,5 +63,25 @@ namespace ZoneEngine_New.Core.Data
 
         /// <summary>Organization id (stored Clan stat) of one character, 0 when orgless.</summary>
         int GetOrganizationIdOf(int characterId);
+
+        /// <summary>Starts a vote under the organization lock, enforcing the single-active and cooldown rules.</summary>
+        AORebirth.Interfaces.Persistence.Characters.PersistedOrgVoteStartResult StartVote(int organizationId, int starterId,
+            string description, int durationMinutes, System.Collections.Generic.IList<string> choices,
+            System.Collections.Generic.IList<int> electorateIds, long startedUnix, long endsUnix, long cooldownSeconds);
+
+        /// <summary>The Active vote of the organization, else its latest Finished vote; null when none.</summary>
+        AORebirth.Interfaces.Persistence.Characters.PersistedOrgVoteData? GetShownVote(int organizationId);
+
+        /// <summary>Full vote by id, or null.</summary>
+        AORebirth.Interfaces.Persistence.Characters.PersistedOrgVoteData? GetVote(int voteId);
+
+        /// <summary>Ids of Active votes whose deadline has passed.</summary>
+        System.Collections.Generic.IList<int> GetDueVoteIds(long nowUnix);
+
+        /// <summary>Records one cast vote of an eligible member.</summary>
+        AORebirth.Interfaces.Persistence.Characters.OrgVoteCastOutcome CastVote(int voteId, int characterId, int choiceNo, long nowUnix);
+
+        /// <summary>Moves an Active vote to Finished or Stopped; false when it was no longer Active.</summary>
+        bool CloseVote(int voteId, string status, string? stopReason, long nowUnix);
     }
 }

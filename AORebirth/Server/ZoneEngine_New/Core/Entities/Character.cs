@@ -4596,20 +4596,23 @@ namespace ZoneEngine_New.Core.Entities
                     BreedHostility = 0,
                     FirstName = firstName ?? string.Empty,
                     LastName = lastName ?? string.Empty,
-                    LegacyTitle = string.Empty,
+                    LegacyTitle = IsPlayer
+                        ? Playfield?.GetService<GameData.PvpLegacyTitleCatalog>()?.TitleFor(Stats.GetOrZero(CharacterStat.PvP_Rating)) ?? string.Empty
+                        : string.Empty,
                     PvpTitle = string.Empty,
                     CityPlayfieldId = 0,
                     InvadersKilled = Stats.GetOrZero(CharacterStat.InvadersKilled),
                     KilledByInvaders = Stats.GetOrZero(CharacterStat.KilledByInvaders),
                     AiLevel = Stats.GetOrZero(CharacterStat.AlienLevel),
-                    PvpDuelWins = 0,
-                    PvpDuelLoses = 0,
-                    PvpProfessionDuelLoses = 0,
-                    PvpSoloKills = 0,
-                    PvpTeamKills = 0,
-                    PvpSoloScore = 0,
-                    PvpTeamScore = 0,
-                    PvpDuelScore = 0
+                    // Retail InfoPacket carries the PvP stats (674..684); the client composes the overhead title from them.
+                    PvpDuelWins = Stats.GetOrZero(CharacterStat.PVPDuelKills),
+                    PvpDuelLoses = Stats.GetOrZero(CharacterStat.PVPDuelDeaths),
+                    PvpProfessionDuelLoses = Stats.GetOrZero(CharacterStat.PVPProfessionDuelKills),
+                    PvpSoloKills = Stats.GetOrZero(CharacterStat.PVPRankedSoloKills),
+                    PvpTeamKills = Stats.GetOrZero(CharacterStat.PVPRankedTeamKills),
+                    PvpSoloScore = Stats.GetOrZero(CharacterStat.PVPSoloScore),
+                    PvpTeamScore = Stats.GetOrZero(CharacterStat.PVPTeamScore),
+                    PvpDuelScore = Stats.GetOrZero(CharacterStat.PVPDuelScore)
                 }
             };
         }
@@ -4711,7 +4714,12 @@ namespace ZoneEngine_New.Core.Entities
                     // Unset race defaults to 1 (not 0) for a valid Appearance.
                     Race = (uint)(StatCollection.IsUnset(race) ? 1 : race)
                 },
-                Name = name,
+                // Legacy display mode: the legacy title prefixes the wire name (validated in game; no retail capture has a non-empty legacy title).
+                Name = IsPlayer && !StatCollection.IsUnset(visualFlags) && (visualFlags & 0x180) == 0
+                    ? (Playfield?.GetService<GameData.PvpLegacyTitleCatalog>()?.TitleFor(Stats.GetOrZero(CharacterStat.PvP_Rating)) is { Length: > 0 } legacyTitle
+                        ? legacyTitle + " " + name
+                        : name)
+                    : name,
                 CharacterFlags = (CharacterFlags)characterFlags,
                 AccountFlags = (short)Stats.GetOrZero(CharacterStat.AccountFlags),
                 Expansions = StatCollection.IsUnset(expansions)

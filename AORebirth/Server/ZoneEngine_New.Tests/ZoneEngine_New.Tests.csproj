@@ -138,6 +138,11 @@
     <Compile Include="TestDoubles.cs" />
     <Compile Include="ExpansionEntitlementHydrationTests.cs" />
   </ItemGroup>
+  <ItemGroup Condition="'$(CharacterSpawnFocusedTests)' == 'true'">
+    <Compile Remove="@(Compile)" />
+    <Compile Include="TestDoubles.cs" />
+    <Compile Include="LoginMovementHydrationTests.cs" />
+  </ItemGroup>
   <ItemGroup Condition="'$(LoginCharacterCreationFocusedTests)' == 'true'">
     <!-- Login uses the existing full engine libraries; the normal Zone suite keeps its trimmed references. -->
     <ProjectReference Remove="@(ProjectReference)" />

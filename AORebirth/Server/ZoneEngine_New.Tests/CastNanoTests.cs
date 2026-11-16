@@ -67,6 +67,49 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        [DataRow(3.0, true)]
+        [DataRow(60.0, false)]
+        public void HealPetKeepsInRangeOrderWhileNanoRecovers(double distance, bool inRange)
+        {
+            NanoSpell heal = TestNanos.Create(InstantId, durationCentiseconds: 0, nanoPointCost: 5,
+                modifiers:
+                [
+                    new ItemSpell
+                    {
+                        FunctionType = (int)FunctionType.Hit,
+                        Arguments = [(int)CharacterStat.Health, 12, 12]
+                    }
+                ]);
+            heal.Stats[CharacterStat.AttackRange] = 20;
+            using var world = new FanoutWorld(new StubItemBuilder().Add(heal));
+            Player owner = world.Player(1, 0, 0, 0);
+            Player teammate = world.Player(2, distance, 0, 0);
+            world.Join(owner, teammate);
+            teammate.Stats.Set(CharacterStat.MaxHealth, 100);
+            teammate.Stats.Set(CharacterStat.Health, 40);
+            NpcCharacter pet = world.Npc(3, 0, 0, 0, attackable: true);
+            pet.Stats.Set(CharacterStat.CurrentNano, 0);
+            pet.TryAddUploadedNano(heal.Id);
+            var controller = new PetController(owner, PetTypes.Heal, "TEST", 1, null);
+            pet.BindPet(controller);
+            controller.Heal(teammate.Identity);
+            var tend = new PetTendNode(NpcBrain.CreatePet(pet, controller));
+
+            tend.Evaluate(0.1f);
+
+            Assert.AreEqual(40, teammate.Stats.GetOrZero(CharacterStat.Health));
+            Assert.AreEqual(inRange ? teammate.Identity : Identity.None, controller.HealTarget,
+                "Low nano may postpone an in-range heal; an out-of-range order still ends.");
+            if (inRange)
+            {
+                pet.Stats.Set(CharacterStat.CurrentNano, 5);
+                tend.Evaluate(0.1f);
+                Assert.AreEqual(52, teammate.Stats.GetOrZero(CharacterStat.Health));
+                Assert.AreEqual(0, pet.Stats.GetOrZero(CharacterStat.CurrentNano));
+            }
+        }
+
+        [TestMethod]
         public void CastNanoLeavesAnExistingPendingCastUntouched()
         {
             var items = new StubItemBuilder().Add(Timed(BuffId));
@@ -686,6 +729,98 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        public void TeamCastNanoAppliesHostileFlaggedExperienceBonusToTeammates()
+        {
+            const int leadership = 225573;
+            NanoFlags leadershipFlags = NanoFlags.IsBuff | NanoFlags.IsHostile | NanoFlags.NotRemovable
+                | NanoFlags.NoResistCannotFumble | NanoFlags.NoTimerNotify;
+            var bonus = new ItemSpell
+            {
+                FunctionType = (int)FunctionType.Modify,
+                Target = (int)ItemTarget.Wearer,
+                Arguments = [(int)CharacterStat.XPModifier, 50]
+            };
+            var debuff = new ItemSpell
+            {
+                FunctionType = (int)FunctionType.Modify,
+                Target = (int)ItemTarget.Wearer,
+                Arguments = [(int)CharacterStat.XPModifier, -50]
+            };
+            var items = new StubItemBuilder()
+                .Add(TestNanos.Create(leadership, durationCentiseconds: 4500, ncuCost: 999, strain: 611,
+                    can: 0, flags: leadershipFlags, modifiers: [bonus]))
+                .Add(TestNanos.Create(HostileId, can: 0, flags: leadershipFlags, modifiers: [debuff]));
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            Player mate = world.Player(2, 10, 0, 0);
+            Player bystander = world.Player(3, 5, 0, 0);
+            world.Join(caster, mate);
+            world.MakeVisible(caster, mate, bystander);
+
+            TeamSnapshot? team = world.Playfield.GetRequiredService<TeamService>().GetImmediateTeam(caster);
+            Assert.IsNotNull(team);
+            CollectionAssert.AreEquivalent(new[] { 1, 2 }, team.MemberIds.ToArray());
+            Assert.IsTrue(world.Playfield.GetRequiredService<PlayfieldLocality>().IsVisibleTo(mate, caster));
+            mate.Stats.Set(CharacterStat.XPModifier, 0);
+            Assert.IsFalse(NanoRuntime.TryApplyImmediate(
+                caster, mate, leadership, items, new SilentInventory(), DateTime.UtcNow));
+            Assert.IsTrue(UseCast(caster, items, FunctionType.TeamCastNano, HostileId));
+            Assert.IsFalse(mate.TryGetBuff(HostileId, out _), "An actual debuff must still be rejected on a teammate.");
+            Assert.IsTrue(UseCast(caster, items, FunctionType.TeamCastNano, leadership));
+            Assert.IsTrue(caster.TryGetBuff(leadership, out _));
+            Assert.IsFalse(bystander.TryGetBuff(leadership, out _));
+            Assert.IsTrue(mate.TryGetBuff(leadership, out Buff? applied), "Leadership must reach a visible teammate.");
+            Assert.IsNotNull(applied);
+            Assert.AreEqual(4500, applied.DurationCentiseconds);
+            Assert.AreEqual(0, mate.UsedNcu);
+            Assert.IsFalse(applied.CanCancel);
+            mate.RebaseStats();
+            Assert.AreEqual(50, mate.Stats.GetOrZero(CharacterStat.XPModifier));
+        }
+
+        [TestMethod]
+        public void TeamCastNanoChecksChildLevelPerRecipient()
+        {
+            NanoSpell restricted = Timed(BuffId);
+            restricted.Actions.Add(new ItemAction
+            {
+                ActionType = (int)ActionType.ToUse,
+                Requirements =
+                [
+                    new ItemRequirement
+                    {
+                        Target = (int)ItemTarget.Self,
+                        Operator = (int)Operator.GreaterThan,
+                        StatNumber = (int)CharacterStat.Level,
+                        Value = 24
+                    }
+                ]
+            });
+            var items = new StubItemBuilder().Add(restricted).Add(Timed(ChildId));
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            Player ineligible = world.Player(2, 10, 0, 0);
+            Player eligible = world.Player(3, 5, 0, 0);
+            caster.Stats.Set(CharacterStat.Level, 25);
+            ineligible.Stats.Set(CharacterStat.Level, 24);
+            eligible.Stats.Set(CharacterStat.Level, 25);
+            world.Join(caster, ineligible);
+            world.Join(caster, eligible);
+            world.MakeVisible(caster, ineligible, eligible);
+
+            TeamSnapshot? team = world.Playfield.GetRequiredService<TeamService>().GetImmediateTeam(caster);
+            Assert.IsNotNull(team);
+            CollectionAssert.AreEquivalent(new[] { 1, 2, 3 }, team.MemberIds.ToArray());
+            Assert.IsTrue(world.Playfield.GetRequiredService<PlayfieldLocality>().IsVisibleTo(ineligible, caster));
+            Assert.IsTrue(UseCast(caster, items, FunctionType.TeamCastNano, ChildId));
+            Assert.IsTrue(ineligible.TryGetBuff(ChildId, out _), "An unrestricted child must reach the lower-level teammate.");
+            Assert.IsTrue(UseCast(caster, items, FunctionType.TeamCastNano, BuffId));
+            Assert.IsTrue(caster.TryGetBuff(BuffId, out _));
+            Assert.IsTrue(eligible.TryGetBuff(BuffId, out _));
+            Assert.IsFalse(ineligible.TryGetBuff(BuffId, out _), "Level 24 must not receive a child that requires level 25.");
+        }
+
+        [TestMethod]
         public void PeriodicTeamCastNanoRefreshesTheCasterAndTeamAtTheConfiguredIntervalAndCount()
         {
             var refresh = new ItemSpell
@@ -1053,10 +1188,13 @@ namespace ZoneEngine_New.Tests
                     .SetValue(_manager, new Dictionary<int, Player>());
 
                 Playfield = (Playfield)RuntimeHelpers.GetUninitializedObject(typeof(Playfield));
+                typeof(Playfield).GetField("<FightModes>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
+                    .SetValue(Playfield, DistrictFightModes.None);
                 _services = new ServiceCollection()
                     .AddSingleton(_registry)
                     .AddSingleton(_teams)
                     .AddSingleton(_manager)
+                    .AddSingleton(new PlayfieldLocality(1, metaData: null))
                     .AddSingleton<WorldSimulationAccess>()
                     .AddSingleton<IItemBuilder>(items)
                     .AddSingleton<IInventoryRepository>(new SilentInventory())
@@ -1113,6 +1251,15 @@ namespace ZoneEngine_New.Tests
                     Target = inviter.Identity,
                     Parameter2 = 1
                 });
+            }
+
+            public void MakeVisible(params Player[] players)
+            {
+                PlayfieldLocality locality = _services.GetRequiredService<PlayfieldLocality>();
+                foreach (Player player in players)
+                    locality.RegisterDynel(player);
+                foreach (Player player in players)
+                    locality.ActivatePlayerVisibility(player);
             }
 
             public void Dispose() => _services.Dispose();

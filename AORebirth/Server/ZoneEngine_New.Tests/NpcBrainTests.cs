@@ -3,6 +3,8 @@ namespace ZoneEngine_New.Tests
     using System.Reflection;
     using System.Runtime.CompilerServices;
 
+    using AORebirth.Enums;
+
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
 
@@ -10,6 +12,8 @@ namespace ZoneEngine_New.Tests
 
     using ZoneEngine_New.Core.Ai;
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.Inventory;
+    using ZoneEngine_New.Core.Pets;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.WorldSimulation;
 
@@ -18,6 +22,60 @@ namespace ZoneEngine_New.Tests
     [TestClass]
     public sealed class NpcBrainTests
     {
+        [TestMethod]
+        public void NpcOnTerminateRequirementReadsHateWithoutAnIncomingAttacker()
+        {
+            using ServiceProvider services = CombatServices();
+            Playfield playfield = Playfield(services);
+            Player player = TestWorld.CreatePlayer(18);
+            NpcCharacter npc = CreateNpc();
+            Place(playfield, services, player, npc);
+            NpcBrain brain = NpcBrain.Create(npc);
+            npc.SetFightingTarget(player.Identity);
+            npc.Stats.Set(CharacterStat.MaxHealth, 100);
+            npc.Stats.Set(CharacterStat.Health, 40);
+
+            var template = new ItemTemplate();
+            template.SpellList[EventType.OnTerminate] =
+            [
+                new ItemSpell
+                {
+                    FunctionType = (int)FunctionType.Hit,
+                    Target = (int)ItemTarget.Self,
+                    Arguments = [(int)CharacterStat.Health, 5, 5],
+                    Requirements =
+                    [
+                        new ItemRequirement
+                        {
+                            StatNumber = (int)CharacterStat.NumberOfFightingOpponents,
+                            Operator = (int)Operator.GreaterThan,
+                            Value = 0
+                        },
+                        new ItemRequirement
+                        {
+                            StatNumber = (int)CharacterStat.NPCHatelistSize,
+                            Operator = (int)Operator.GreaterThan,
+                            Value = 0
+                        },
+                        new ItemRequirement { Operator = (int)Operator.Or }
+                    ]
+                }
+            ];
+            var inventory = new StubInventoryRepository();
+            var items = new StubItemBuilder();
+
+            Assert.AreEqual(0, npc.Stats.Get(CharacterStat.NumberOfFightingOpponents));
+            Assert.AreEqual(1, player.Stats.Get(CharacterStat.NumberOfFightingOpponents));
+            Assert.IsFalse(template.ExecuteTerminateSpells(npc, inventory, items));
+
+            brain.AddThreatFrom(player, 1f);
+            Assert.IsTrue(template.ExecuteTerminateSpells(npc, inventory, items));
+            Assert.AreEqual(45, npc.Stats.GetOrZero(CharacterStat.Health));
+
+            brain.ClearHate();
+            Assert.IsFalse(template.ExecuteTerminateSpells(npc, inventory, items));
+        }
+
         [TestMethod]
         public void ProximityAggroAddsOneHateWhenBreedHostilityIsPositive()
         {
@@ -216,6 +274,46 @@ namespace ZoneEngine_New.Tests
             Assert.IsTrue(brain.IsInAttackRange(player));
             Assert.IsFalse(npc.HasLineOfSightTo(player));
             Assert.IsFalse(brain.CanAttackNow(player));
+        }
+
+        [TestMethod]
+        [DataRow(3.0, 3.0)]
+        [DataRow(5.0, 3.4)]
+        public void AttackPetUsesDirectRouteOnlyWhenFormationCannotStart(double enemyX, double expectedDestinationX)
+        {
+            using ServiceProvider services = CombatServices();
+            Playfield playfield = Playfield(services);
+            typeof(Playfield).GetField("<FightModes>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .SetValue(playfield, DistrictFightModes.None);
+            Player owner = TestWorld.CreatePlayer(41);
+            NpcCharacter pet = CreateNpc();
+            pet.Position = new Vector3(0, 0, 0);
+            var enemy = new NpcCharacter(
+                new Identity { Type = IdentityType.CanbeAffected, Instance = 1002 }, new StubItemBuilder());
+            enemy.Position = new Vector3(enemyX, 0, 0);
+            pet.Stats.Set(CharacterStat.CharRadius, 1);
+            pet.Stats.Set(CharacterStat.Scale, 25);
+            pet.Stats.Set(CharacterStat.RunSpeed, 1000);
+            pet.Motor.RefreshFromStats();
+            enemy.Stats.Set(CharacterStat.CharRadius, 1);
+            enemy.Stats.Set(CharacterStat.Scale, 25);
+            var weapon = TestWorld.CreateItem();
+            weapon.Definition.Stats[CharacterStat.AttackRange] = 2;
+            pet.SetWeapon(WeaponSlot.MainHand, new CharacterWeapon { Item = weapon });
+            Place(playfield, services, owner, pet, enemy);
+            var controller = new PetController(owner, PetTypes.Attack, "TEST", 1, null);
+            pet.BindPet(controller);
+            NpcBrain brain = NpcBrain.CreatePet(pet, controller);
+            brain.SetCurrentTarget(enemy.Identity);
+
+            Assert.IsFalse(brain.IsInAttackRange(enemy));
+            new PetFightNode(brain).Evaluate(0.1f);
+
+            Assert.AreEqual(enemy.Identity, pet.FightingTarget);
+            Assert.IsTrue(pet.Motor.HasPath, "An out-of-range pet must begin closing on a reachable target.");
+            var destination = (Vector3)typeof(NpcBrain).GetField("_segmentDestination", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .GetValue(brain)!;
+            Assert.AreEqual(expectedDestinationX, destination.x, 1e-3);
         }
 
         [TestMethod]

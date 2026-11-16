@@ -10,7 +10,7 @@ Rules are **declared**, confirmed where indicated by captures. Packet evidence a
 - Out of scope: Notum Wars (contracts, controlled fields), Alien Invasion (cities, `/org city`) and Towers.
 - Org system messages go to the "Org Msg" channel (existing org chat).
 - Durations, rank tables and texts are data-driven (GameData JSON). Governing forms come from `GoverningForms.json` (default form = index 0, Feudalism; ranks listed from highest left to lowest right; Anarchism has a single rank).
-- Any schema change for locks, votes or debt needs explicit approval first.
+- Any schema change for locks, votes or debt needs explicit approval first. Debt persistence for [4B] uses the single approved table `org_member_tax` (replaces the earlier `org_debt` and `org_tax_tick` plan). Votes use the approved tables `org_vote`, `org_vote_choice` and `org_vote_member`, linked to `organizations.Id` (migration `20261112_org_vote.sql`).
 - Text commands must not depend on the target identity; the first letter of a name argument is upper-cased (kick by name).
 
 ## 2. Create
@@ -25,8 +25,8 @@ Rules are **declared**, confirmed where indicated by captures. Packet evidence a
 
 A GM may also disband the organization of a targeted leader (Org Msg 119220807, client notice 508/28601677 to online members, disband lockout not applied to the GM) / start a vote.
 - Governing form change resets everybody except the president to the lowest rank. Re-applying the SAME form is accepted and also resets the ranks (a way to rebuild the hierarchy).
-- Tax: shows the value; non-leaders cannot change it. The "leave the org?" dialog (OrgServer 0x0008) is sent ONLY when the new tax is greater than the old one; a lower or equal tax is applied silently. Collected every 2 hours of played time from connected members; a member without enough credits drops to 0 and the shortfall becomes debt (`/org debt`); credits given with `bank add` reduce the debt.
-- Bank: view refused to the lowest rank (except anarchism); `bank add` by anyone who owns the amount; org bank capped at 4,000,000,000 (excess is lost); `bank remove` limited by the org balance and by the toon limit of 1,000,000,000. Tested with 1 credit.
+credits given with `bank add` reduce the debt first (step [4B]; AOR choice, not captured).
+- Bank: view refused to the lowest rank (except anarchism, message 237299844; others get 78644776 with the Bank value). `bank add` by anyone who owns the amount, no success message; org bank capped at 3999999999 and the giver keeps the difference (decided, not captured). `bank remove` leader only (non-leader gets 222804051), limited by the org balance (210489620 with %i) and by the leader's 999999999 limit (5429092). Tested with 1 credit.
 - Disband needs a client dialog; every member gets a 12 h lock (`disbandLockoutSeconds` 43200 in Gameplay.json).
 
 ## 4. Promote / demote / ranks
@@ -47,9 +47,12 @@ Kicked characters get a 6 h lock (anarchist leader 12 h).
 
 ## 6. Votes
 
-- Leader starts: `/org startvote "<text>" <minutes> 1:<a> 2:<b> ...`; 2 to 10 entries; 2 to 10080 minutes; 30 minutes minimum between votes.
-- EVERY member, including the lowest rank, can `/org vote info` and `/org vote <id>`. One vote per member, cannot be changed; the id must exist.
-- At the end all members receive the results message. The leader may `stopvote [reason]`.
+- Leader starts: `/org startvote "<text>" <minutes> 1:<a> 2:<b> ...`; 2 to 10 entries; 2 to 10080 minutes.
+- Cooldown between votes: 30 minutes by default, configurable as `org.voteCooldownSeconds` in `AORebirth\Config\Gameplay.json` (AOR testing option; retail value 1800 is the default). Other vote constants stay retail hardcoded.
+- EVERY member, including the lowest rank, can `/org vote info` and `/org vote <id>`. One vote per member, cannot be changed; the id must exist. Members who have not voted may vote even if offline at start; leavers and kicked members keep their vote.
+- Invalid entry (non-numeric or out of range): AOR uses Text.json 179467989 (usage) with the typed number, instead of the retail "exceeds the maximum" text (AOR choice, captured text differs).
+- Results: choices sorted by vote count descending, then choice number ascending. Places use the captured ordinals (Text.json category 508, index 0 = First place to 9 = Tenth place). Choices with the same count share a place; a tie line (54457652) is shown when more than one choice shares a place. Zero votes: 88959635. Zero-vote choices are ranked too.
+- At the end all members receive the results message. The leader may `stopvote [reason]`. Stopped votes are hidden from `/org vote info`.
 
 ## 7. Declared texts
 
@@ -60,5 +63,16 @@ All sentences are consolidated in the catalog of the scenario document (sections
 1. Data: ref/sentence catalog JSON, lock durations (base 6 h, disband 12 h, anarchist leader kick 12 h), vote limits, tax/bank caps.
 2. Read-only commands: ranks, tax, bank, debt, vote info.
 3. Create (GM-locked), invite/join, leave, kick, promote/demote.
-4. Leader commands, bank, tax, then votes and disband.
-5. Locks and debt persistence only after explicit schema approval.
+4. Leader commands, bank, then tax [4A] (per-member tick, no debt write).
+5. Debt and upkeep state [4B] with the approved table `org_member_tax`; then votes [5] and disband.
+
+## 9. Organization tax (step [4A])
+
+- `/org tax` (any member) shows the current tax (147882695, %i). A non-leader trying to change it gets 192685736; the leader gets 198384040 for a negative or non-integer value.
+- A valid change (int32, >= 0) sets `Organizations.Tax` and sends an Org Msg to all members, then the feedback 165930356 to the leader.
+- Org Msg 89226052 is ref `"]9V7` + text arg (leader name, `s` + length + 1 + name) + `i` + new tax + `u` + old tax (base-85 ints). Captured 0 -> 1: `"]9V7Nykorgtest i!!!!" u!!!!!` (new first, then old).
+- Feedback 165930356 is ref `$01,h` + `u` (old) + `i` (new). Captured 0 -> 1: `$01,hu!!!!!i!!!!"` (old first, then new, matching the text "changed from %u to %u").
+- If the new tax is strictly higher than the old one, online members get the client dialog 220373365 (OrgServer 0x0008); Yes runs the existing `/org leave` path without a second dialog, No does nothing.
+- Tax tick: each member is charged individually every `taxTick` (Gameplay.json > org > taxTick, default 7200) of his personal /played time, only while online. Only applied when the tax is > 0. The leader is not charged in the retail capture.
+- Retail upkeep sequence (captured, debt\...-195354): unpaid tick gives warning 84220094 (30 min real time); still unpaid gives debt 125% of tax and 30 min suspension (168308756); suspended members are refused with 153045876 except debt, info and leave; paying at period end moves the debt to the org bank (236096388). Full details in rules.txt [4B].
+- Bank cap 3 999 999 999 remains an AOR choice. The earlier 108633128 deduction ref and 78644776 bank-full alert at tick are no longer part of the retail behaviour.

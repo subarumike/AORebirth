@@ -250,5 +250,17 @@ namespace SmokeLounge.AOtomation.Messaging.Messages.N3Messages
         /// echoes the same action (FUN_10049fd6 → FUN_1002a40e adds the merged count to Target).
         /// </summary>
         JoinItems = 0x00000035,
+
+        /// <summary>
+        /// Client-to-server /played. Retail answers with a FormatFeedback carrying the character name and its played
+        /// time as four integers (days, hours, minutes, seconds). Capture played-born 2026-11-10.
+        /// </summary>
+        PlayedTime = 0x00000085,
+
+        /// <summary>
+        /// Client-to-server /born. Retail answers with a FormatFeedback carrying the character name and the creation
+        /// date text. Capture played-born 2026-11-10.
+        /// </summary>
+        BornDate = 0x00000086,
     }
 }

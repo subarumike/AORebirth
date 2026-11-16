@@ -61,7 +61,7 @@ Org system messages arrive as chat-server `GroupMessage`, `ChannelId=1`, `Sender
 | disband | `%.Neo` | `#`QX`s<leader>` | `Clan=0` online members |
 | promote to president (dialog 0x0009) | - | `%UKqGs<newPresident>`; new president `&!!!":"lW;as<old>` | - |
 | tax (no arg) | `#ge1Du!!!!<n>` | - | - |
-| tax <n> (leader) | `$01,hu` (from X to Y); if increased: OrgServer 0x0008 | `"]9V7s<leader>...` (new / old tax) | - |
+| tax <n> (leader) | `$01,hu` + old + `i` + new (from X to Y); if increased: OrgServer 0x0008 | `"]9V7` + `s` + leader name + `i` + new + `u` + old (captured 0 -> 1: `"]9V7Nykorgtesti!!!!"u!!!!!`) | - |
 | bank | `"L&(Yu!!!!<n>` | - | - |
 | bank add <n> | none; credits move toon -> org | - | credits |
 | bank remove <n> (leader) | none; credits move org -> toon | - | credits |
@@ -103,12 +103,14 @@ Create refusals are Feedback 501 (see 5.2). Governing form: applying the CURRENT
 | `";`_V` | startvote with a duration out of range (1 min tested) | The legal vote time is between 2 and 10080 minutes. ( 10080 minutes is 1 week ). |
 | `"l9r3` | startvote with 0, 1 or 11 entries | Voting should have a minimum of 2 and a maximum of 10 choices. |
 | `#0k,>u!!!!?...` | startvote within 30 min of the previous vote | There is a minumum period of 30 minutes between voting. Voting may be started in N minutes from now. |
-| `"mLTEs` | vote on an entry that does not exist | The number [] exceeds the maximum number of options on vote. Please do a '/org vote info' for details. |
+| `"mLTEs` | vote on an entry that does not exist | The number [] exceeds the maximum number of options on vote. Please do a '/org vote info' for details. (Retail text. AOR uses 179467989 by decision, see rules doc section 6.) |
 | `%rgLG` | vote twice, or try to change a vote | You have already cast your vote. You cannot vote more than once on this matter. |
 | `%7dp,` | bank remove by a non-leader | Only leaders can take credits out of the organization. |
 | `%#`LIu` | bank remove above the balance (parameter = balance) | You cannot withdraw more credits from the organizational bank account than is currently in it. The account holds N credits right now. |
-| `"]LeU` | bank add above own credits (to confirm in a capture) | You cannot add more credits than you own. |
-| - | bank remove reaching the 1B toon limit | You cannot receive that many credits or you'd reach your limit. (declared, no capture) |
+| `"]LeU` | bank add above own credits (to confirm in a capture) | You cannot add more credits than you own. (Text.json 89364632) |
+| - | bank add invalid, zero or negative amount (declared, no capture) | The specified amount of credits is not allowed. (Text.json 5429092) |
+| - | bank add when the Bank is already at 3999999999 (AOR only, declared) | The specified amount of credits is not allowed. (Text.json 5429092) |
+| - | bank remove by the leader when the toon would exceed 999999999 (declared, no capture; the 'reach your limit' sentence is not in Text.json) | The specified amount of credits is not allowed. (Text.json 5429092) |
 | - | kick by name refused for a non-leader, "offline" case | Only the leader can kick this character. (declared in missing.ods; NO ref captured; the captured by-name rank refusal uses `$3*4s`) |
 | client-side | invited character under lock | Unable to perform action, able in HH:MM:SS (evaluated by the client, see section 7) |
 
@@ -122,8 +124,8 @@ Create refusals (Feedback CategoryId 501, MessageId -> sentence):
 ### 5.2 Info sentences (declared)
 
 - `$c[u1s<Form>~<ranks>`: "Governing form: Feudalism / Ranks: Lord, Knight, Vassal, Peasant".
-- `$01,hu`: "Organizational tax changed from X to Y credits."
-- `"]9V7s...`: "Your leader, <name>, just changed the organizational tax. The new tax is Y credits (the old value was X)."
+- `$01,hu` + old + `i` + new: "Organizational tax changed from X to Y credits." (leader only)
+- `"]9V7` + leader name + `i` + new + `u` + old: "Your leader, <name>, just changed the organizational tax. The new tax is Y credits (the old value was X)." (Org Msg, all members)
 - `#ge1Du!!!!<n>`: "The current level of organizational tax is N."
 - `$JG@@i`: "Your debt to the organization is N credits."
 - `"L&(Yu!!!!<n>`: "Organization bank account: N credits."
@@ -134,11 +136,11 @@ Create refusals (Feedback CategoryId 501, MessageId -> sentence):
 - `%UKqGs`: "Leadership has been given to <name>."; `&!!!":"lW;as`: "Leadership was given to you by <old>."
 - `%.Neo`: "Organization disbanded."; `#`QX`s`: "Your leader, <name> has disbanded your organization."
 - `#?k4$~"7-$k`: "Organization members have been informed. Voting can begin in a few seconds. Use '/org vote info' to show the voting status."
-- `$qG9%s...`: Org Msg "Voting notice for "<text>"... Duration, Candidates, Voting can begin in a few seconds. Use '/org vote <voteentry id>' to cast your vote."
+- `$qG9%s...` (ref 206008469, confirmed in `votes\Lower Scheol` events.log 16:21:13): Org Msg "Voting notice for "<text>"... Duration, Candidates, Voting can begin in a few seconds. Use '/org vote <voteentry id>' to cast your vote." AOR sends it as ref 206008469 on `/org startvote`, followed by the leader replies 123361268 and 65798404 (ChatText, captured in Lower Scheol and Freelancers).
 - `"].9%s...`: "Voting information for ... Candidates ... Status: N minutes remaining. You have not voted yet / your choice."
 - `%).'*s...`: "Your vote has been cast. You voted for 1:Simpson".
-- `!;Ys!s...`: "Results for ... Status: N member voted. First place ( N vote ): ..."
-- `$F1!D`: "No voting in progress."; `#MjDG`: "Voting stopped."; `$1c8ms<reason>`: "Organization leader has stopped the voting with message : "<reason>""
+- `!;Ys!s...`: "Results for ... Status: N member voted. First place ( N vote ): ..." (decoded layout: header ref 16378820, then two spaces literal, count ref 112284196 when votes exist; ordinal ref = R + 508 + place index; tie ref 54457652; single ref 5931833; no trailing line feed).
+- `$F1!D`: "No voting in progress."; `#MjDG` (ref 131953188): "Voting stopped.", sent to the leader only; `$1c8ms<reason>` (ref 166906756): "Organization leader has stopped the voting with message : "<reason>"", sent to the whole organization. The reason is always passed as `%s`, so a stop without reason shows `""` (Bitnykk's chat paste, not in the packet captures). Members only see the organization notice. 131953188 confirmed in `votes\Shuttle to ICC (dng) [PF 7101] - 20261112-190630`.
 - `%).'*s` and the other vote texts take the entries as `n:text` separated by spaces.
 - Fragments `#g:]I`, `"fdKu`, `"9U8%`, `"k2UU`, `$J*Dq` and the demote summary `$KHl9~~...~~#-CF8` were seen but are not mapped to a sentence with certainty (probably parts of the vote info / ranks summaries). They are not needed for the first implementation.
 
@@ -160,7 +162,7 @@ anarchist leader kicked 12 h, disbanded org 12 h for everyone (`disbandLockoutSe
 
 ## 8. Amounts
 
-Tax, BankAdd and BankRemove were tested with 1 credit; in the capture the bank held 1 credit, so `%#`LIu` parameter = balance (the "0 credits" example in missing.ods was made off-capture). Limits (bank cap 4 billion, toon limit 1 billion) are declared in rules.txt, not captured.
+The bank cap 3999999999 is supported by captured views (3999999999 at 11:24 and 11:26, 3000000001 at 11:26:38 on Old Athen). The toon limit 999999999 and the overflow rule (giver keeps the difference) are declared in rules.txt, not captured.
 
 ## 9. Still open
 
