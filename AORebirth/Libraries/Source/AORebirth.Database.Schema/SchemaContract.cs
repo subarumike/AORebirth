@@ -41,7 +41,8 @@ public static class SchemaContract
         "20261109_org_anar_pend_kick.sql",
         "20261111_character_played_born.sql",
         "20261112_org_member_tax.sql",
-        "20261112_org_vote.sql"
+        "20261112_org_vote.sql",
+        "20261116_pork_meta.sql"
     });
 
     // Other governed components may legitimately record these unrelated migrations.
@@ -63,7 +64,8 @@ public static class SchemaContract
         "characterskilllocks", "characterquests", "generatedquests", "questdungeonkeys",
         "characterperklocks", "characterresearch", "characternanolinelocks", "characterpetnames", "dailyloginclaims",
         "account_sanctions", "org_lockout", "org_anar_pend_kick", "characterplayedborn", "org_member_tax",
-                "org_vote", "org_vote_choice", "org_vote_member"
+                "org_vote", "org_vote_choice", "org_vote_member",
+        "character_bio_meta", "org_stats_meta", "org_online_meta"
     });
 
     public static readonly IReadOnlyList<(string Table, string Columns)> UniqueKeys = Array.AsReadOnly(new[]
@@ -91,7 +93,8 @@ public static class SchemaContract
         ("org_anar_pend_kick", "org_id,kicked_id,kicker_id"),
         ("characterplayedborn", "char_id"),
         ("org_member_tax", "char_id"),
-        ("org_vote", "vote_id"), ("org_vote_choice", "vote_id,choice_no"), ("org_vote_member", "vote_id,char_id")
+        ("org_vote", "vote_id"), ("org_vote_choice", "vote_id,choice_no"), ("org_vote_member", "vote_id,char_id"),
+        ("character_bio_meta", "id_char"), ("org_stats_meta", "id_org"), ("org_online_meta", "id_org")
     });
 
     private static IReadOnlyList<ColumnRequirement> BuildColumns()
@@ -218,6 +221,12 @@ public static class SchemaContract
         Add("org_vote_member", "varchar", "char_name");
         Add("org_vote_member", "tinyint", "choice_no", true);
         Add("org_vote_member", "bigint", "cast_at");
+        Add("character_bio_meta", "int", "id_char", true);
+        Add("org_stats_meta", "int", "id_org", true);
+        Add("org_online_meta", "int", "id_org", true);
+        Add("character_bio_meta", "datetime", "last_updated");
+        Add("org_stats_meta", "datetime", "last_updated");
+        Add("org_online_meta", "datetime", "last_updated");
         Add("login", "int", "Id Flags");
         Add("login", "varchar", "Username");
         return result.AsReadOnly();

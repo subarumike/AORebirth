@@ -1,0 +1,20 @@
+# Local test configuration for Apache (copy to <PORK_EXPORT_PATH>\.htaccess).
+# Needs mod_rewrite and AllowOverride All on the export folder. The production web server is configured by the server owner.
+
+DirectoryIndex index.html
+
+# ?data_type=json on a retail XML name serves the matching static JSON file (specification section 3.1).
+RewriteEngine On
+RewriteCond %{QUERY_STRING} (^|&)data_type=json(&|$)
+RewriteRule ^(.*/)(bio|basicstats|online)\.xml$ $1$2.json [L]
+
+AddType "text/xml; charset=utf-8" .xml
+AddType "application/json; charset=utf-8" .json
+
+# Online lists: Last-Modified is the only validator (specification section 12.4).
+<FilesMatch "^online\.(xml|json)$">
+	FileETag None
+	<IfModule mod_headers.c>
+		Header unset ETag
+	</IfModule>
+</FilesMatch>

@@ -440,6 +440,18 @@ namespace LoginEngine.Packets
 
                     stage = "initial stats";
                     StatDao.Instance.BulkReplace(stats, connection, transaction);
+                    stage = "bio change tracking";
+                    using (IDbCommand touch = connection.CreateCommand())
+                    {
+                        touch.Transaction = transaction;
+                        touch.CommandText = "INSERT INTO character_bio_meta (id_char,last_updated) VALUES (@Id,UTC_TIMESTAMP(6)) "
+                            + "ON DUPLICATE KEY UPDATE last_updated=VALUES(last_updated)";
+                        IDbDataParameter idParameter = touch.CreateParameter();
+                        idParameter.ParameterName = "@Id";
+                        idParameter.Value = charID;
+                        touch.Parameters.Add(idParameter);
+                        touch.ExecuteNonQuery();
+                    }
                     stage = "starting inventory and uploaded nanos";
                     CharacterStartPackageApplier.Apply(charID, startPackage, connection, transaction);
                     stage = "starting health and nano";
