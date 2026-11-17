@@ -187,8 +187,8 @@ namespace ZoneEngine_New.Core.Pets
                 var head = new Vector3(floor.x, floor.y + height, floor.z);
                 Vector3 ownerAt = owner.Position;
                 if (!world.HasLineOfSight(feet, head)
-                    || (finder == null && (world.TrySphereCast(feet, head, radius, out _, out _)
-                        || world.TrySphereCast(head, feet, radius, out _, out _)))
+                    || world.TrySphereCast(feet, head, radius, out _, out _)
+                    || world.TrySphereCast(head, feet, radius, out _, out _)
                     || !world.HasLineOfSight(ownerAt.xf, ownerAt.yf + MovementConfig.LineOfSightEyeHeight, ownerAt.zf,
                         floor.xf, floor.yf + MovementConfig.LineOfSightEyeHeight, floor.zf))
                     continue;

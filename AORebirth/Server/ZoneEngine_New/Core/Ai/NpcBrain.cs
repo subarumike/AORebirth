@@ -82,8 +82,8 @@ namespace ZoneEngine_New.Core.Ai
             _nanos = new NpcNanoCaster(this);
             _isEngageable = IsEngageable;
             _thinkElapsed = ThinkPhase(npc);
-            if (npc.Playfield?.GetService<GameData.IGameData>()?.RootPath is string root && root.Length > 0)
-                _petSummons = NpcPetSummons.TryCreate(npc, root);
+            if (npc.Playfield?.GetService<GameData.IGameData>() is { RootPath.Length: > 0 } gameData)
+                _petSummons = NpcPetSummons.TryCreate(npc, gameData);
         }
 
         /// <summary>Combat pets from GameData MonsterCombatRules.json; null for NPCs without a pet rule.</summary>
@@ -1851,9 +1851,13 @@ namespace ZoneEngine_New.Core.Ai
 
         internal void ObserveNanoHealth() => _nanos.ObserveHealth();
 
-        internal void ResetNanoTriggers() => _nanos.ResetFight();
+        internal void ResetEncounterAbilities()
+        {
+            _nanos.ResetFight();
+            _petSummons?.Reset();
+        }
 
-        internal void OnSelfNanoExecuted(int nanoId) => _nanos.OnSelfNanoExecuted(nanoId);
+        internal void OnSelfNanoExecuted(int nanoId, DateTime nowUtc) => _nanos.OnSelfNanoExecuted(nanoId, nowUtc);
 
         /// <summary>Makes <paramref name="target"/> the one the chase and attack work on (a pet's chosen enemy).</summary>
         internal void SetCurrentTarget(Identity target) => _currentTarget = target;

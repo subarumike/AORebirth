@@ -113,11 +113,13 @@
     <Compile Include="TestDoubles.cs" />
     <Compile Include="InventoryActionTests.cs" />
     <Compile Include="CastNanoTests.cs" />
+    <Compile Include="CastNanoTests.EncounterTriggers.cs" />
   </ItemGroup>
   <ItemGroup Condition="'$(PetPlacementFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />
     <Compile Include="TestDoubles.cs" />
     <Compile Include="PetPlacementTests.cs" />
+    <Compile Include="NpcPetSummonsTests.cs" />
   </ItemGroup>
   <ItemGroup Condition="'$(TeamRosterFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />

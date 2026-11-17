@@ -754,7 +754,7 @@ namespace ZoneEngine_New.Core.Nanos
             {
                 ClientFeedback.Send(caster, ClientFeedback.NanoExecutedSuccessfully);
                 ExecuteOnUseEffects(caster, recipient!, spell, skipPassiveModifiers: false);
-                CastResolved(caster, cast, PlayerActionOutcome.Executed);
+                CastExecuted(caster, cast, nowUtc);
                 return;
             }
 
@@ -797,7 +797,7 @@ namespace ZoneEngine_New.Core.Nanos
             ExecuteOnUseEffects(caster, recipient, spell, skipPassiveModifiers: true);
             if (spell.IsHostile)
                 OnDebuffLanded(caster, recipient, applied, addThreat: false);
-            CastResolved(caster, cast, PlayerActionOutcome.Executed);
+            CastExecuted(caster, cast, nowUtc);
             LogUtil.Debug(
                 DebugInfoDetail.Engine,
                 string.Format(
@@ -891,12 +891,17 @@ namespace ZoneEngine_New.Core.Nanos
             return null;
         }
 
+        static void CastExecuted(Character caster, PendingNanoCast cast, DateTime nowUtc)
+        {
+            if (caster is NpcCharacter npc && cast.Target == caster.Identity)
+                npc.Brain?.OnSelfNanoExecuted(cast.Spell.Id, nowUtc);
+            CastResolved(caster, cast, PlayerActionOutcome.Executed);
+        }
+
         /// <summary>A started cast ended: <paramref name="outcome"/> with the request it came from.</summary>
         static void CastResolved(Character caster, PendingNanoCast cast, PlayerActionOutcome outcome,
             ActionRefusal refusal = ActionRefusal.None, CooldownKey? cooldown = null, TimeSpan readyIn = default, string detail = "")
         {
-            if (outcome == PlayerActionOutcome.Executed && caster is NpcCharacter npc && cast.Target == caster.Identity)
-                npc.Brain?.OnSelfNanoExecuted(cast.Spell.Id);
             if (caster is Player player)
                 ModuleHooks.ActionResolved(player, PlayerActionKind.NanoCast, cast.Spell.Id, outcome, refusal, target: cast.Target,
                     cooldown: cooldown, readyIn: readyIn, detail: detail, requestTimestamp: cast.RequestTimestamp);

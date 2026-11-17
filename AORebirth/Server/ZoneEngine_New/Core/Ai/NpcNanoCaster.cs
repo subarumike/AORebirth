@@ -153,6 +153,10 @@ namespace ZoneEngine_New.Core.Ai
 
         public void ResetFight()
         {
+            if (_triggerInFlight is { } inFlight && Npc.PendingCast is { } cast
+                && cast.Spell.Id == inFlight.Spell.Id && cast.Target == Npc.Identity)
+                NanoRuntime.InterruptCast(Npc);
+
             foreach (TriggeredSelfNano trigger in _triggeredSelfNanos)
             {
                 trigger.State = TriggerState.Unrolled;
@@ -162,14 +166,14 @@ namespace ZoneEngine_New.Core.Ai
             _triggerInFlight = null;
         }
 
-        public void OnSelfNanoExecuted(int nanoId)
+        public void OnSelfNanoExecuted(int nanoId, DateTime nowUtc)
         {
             if (_triggerInFlight == null || _triggerInFlight.Spell.Id != nanoId)
                 return;
 
             TriggeredSelfNano trigger = _triggerInFlight;
             trigger.CastsThisFight++;
-            trigger.ReadyAtUtc = DateTime.UtcNow.AddSeconds(trigger.Rule.CooldownSeconds);
+            trigger.ReadyAtUtc = nowUtc.AddSeconds(trigger.Rule.CooldownSeconds);
             trigger.State = trigger.Rule.MaxCastsPerFight is int limit && trigger.CastsThisFight >= limit
                 ? TriggerState.Finished
                 : TriggerState.Pending;

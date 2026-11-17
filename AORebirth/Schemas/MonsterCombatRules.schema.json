@@ -14,21 +14,36 @@
         ],
         "properties": {
           "MaxPets": {
-            "type": "integer"
+            "type": "integer",
+            "minimum": 0
           },
           "MaxPetsPerType": {
             "type": [
               "integer",
               "null"
-            ]
+            ],
+            "minimum": 1
           },
           "SummonIntervalSeconds": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0
           },
           "RespawnDelaySeconds": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0
+          },
+          "RetryDelaySeconds": {
+            "type": "number",
+            "exclusiveMinimum": 0
           }
         },
+        "required": [
+          "MaxPets",
+          "MaxPetsPerType",
+          "SummonIntervalSeconds",
+          "RespawnDelaySeconds",
+          "RetryDelaySeconds"
+        ],
         "additionalProperties": false
       },
       "TriggeredSelfNanos": {
