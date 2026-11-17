@@ -244,6 +244,9 @@
     <Content Include="SqlTables\org_vote.sql" />
     <Content Include="SqlTables\org_vote_choice.sql" />
     <Content Include="SqlTables\org_vote_member.sql" />
+    <Content Include="SqlTables\character_bio_meta.sql" />
+    <Content Include="SqlTables\org_stats_meta.sql" />
+    <Content Include="SqlTables\org_online_meta.sql" />
     <Content Include="SqlTables\questdungeonkeys.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
