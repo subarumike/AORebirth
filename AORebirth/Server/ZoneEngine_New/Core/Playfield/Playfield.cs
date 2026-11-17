@@ -853,6 +853,17 @@ namespace ZoneEngine_New.Core.Playfield
                     _characterSnapshot.CheckpointIfDue(player);
                 }
 
+                ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("org.tax");
+                if (_playfieldManager.OrgTax is { } orgTax)
+                {
+                    DateTime utcNow = DateTime.UtcNow;
+                    foreach (Player player in _tickPlayers)
+                    {
+                        if (ReferenceEquals(player.Playfield, this))
+                            orgTax.Tick(player, utcNow);
+                    }
+                }
+
                 if (_playfieldManager.ModuleWorld is { } moduleWorld)
                 {
                     ZoneEngine_New.Core.Metrics.TickStallWatch.Stage("modules.world");
@@ -930,6 +941,8 @@ namespace ZoneEngine_New.Core.Playfield
                 services.AddSingleton(_playfieldManager.NpcScripts);
             if (_playfieldManager.OrgMembership != null)
                 services.AddSingleton(_playfieldManager.OrgMembership);
+            if (_playfieldManager.PlayedClock != null)
+                services.AddSingleton(_playfieldManager.PlayedClock);
             if (_playfieldManager.Gameplay != null)
                 services.AddSingleton(_playfieldManager.Gameplay);
             if (_playfieldManager.ModuleEvents != null)
@@ -937,6 +950,7 @@ namespace ZoneEngine_New.Core.Playfield
             services.AddSingleton(_playfieldManager.ItemTemplates);
             services.AddSingleton(_playerHydrator);
             services.AddSingleton(_gameData);
+            services.AddSingleton<ZoneEngine_New.Core.GameData.PvpLegacyTitleCatalog>();
             services.AddSingleton(_items);
             services.AddSingleton(_hashItems);
             services.AddSingleton(_inventoryRepository);

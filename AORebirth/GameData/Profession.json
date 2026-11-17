@@ -1,0 +1,18 @@
+{
+  "Professions": {
+    "1": { "Name": "Soldier"},
+    "2": { "Name": "Martial Artist"},
+    "3": { "Name": "Engineer"},
+    "4": { "Name": "Fixer"},
+    "5": { "Name": "Agent"},
+    "6": { "Name": "Adventurer"},
+    "7": { "Name": "Trader"},
+    "8": { "Name": "Bureaucrat"},
+    "9": { "Name": "Enforcer"},
+    "10": { "Name": "Doctor"},
+    "11": { "Name": "Nano-Technician"},
+    "12": { "Name": "Meta-Physicist"},
+    "13": { "Name": "Keeper"},
+    "14": { "Name": "Shade"}
+  }
+}

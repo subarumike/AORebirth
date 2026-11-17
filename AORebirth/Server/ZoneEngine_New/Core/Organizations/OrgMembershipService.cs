@@ -36,6 +36,7 @@ namespace ZoneEngine_New.Core.Organizations
         const int KickedByMember = 169766805;
         const int QuorumLeaderKickedLeader = 230985621;
         const int CannotKickLeader = 211;
+        const int CannotKickSelf = 186172214;
         const int KickRankRefused = 167722847;
         const int NoActiveCharacter = 53724837;
         const int MemberQuorum = 2;
@@ -52,10 +53,12 @@ namespace ZoneEngine_New.Core.Organizations
         readonly Lazy<PlayfieldManager> _playfields;
         readonly IGameData _gameData;
         readonly GameplaySettings _settings;
+        readonly OrgTaxTickService _tax;
 
         // Lazy: PlayfieldManager holds this service, so eager resolution would be a cycle.
         public OrgMembershipService(IOrganizationRepository organizations, OrgLockoutClock lockouts, IChatEngineLink chat,
-            ICharacterDao characters, Lazy<PlayfieldManager> playfields, IGameData gameData, GameplaySettings settings)
+            ICharacterDao characters, Lazy<PlayfieldManager> playfields, IGameData gameData, GameplaySettings settings,
+            OrgTaxTickService tax)
         {
             _organizations = organizations;
             _lockouts = lockouts;
@@ -64,6 +67,7 @@ namespace ZoneEngine_New.Core.Organizations
             _playfields = playfields;
             _gameData = gameData;
             _settings = settings;
+            _tax = tax;
         }
 
         public static bool IsLeader(Player player, OrganizationRecord org) => org.LeaderId == player.Identity.Instance;
@@ -91,6 +95,7 @@ namespace ZoneEngine_New.Core.Organizations
 
             _lockouts.Add(player.Identity.Instance, player.Name ?? string.Empty, _settings.Org.LeaveLockoutSeconds);
             _organizations.ClearMembership(player.Identity.Instance);
+            _tax.Forget(player.Identity.Instance);
             ClientFeedback.SendFormattedInCategory(player, MemberCategory, LeaveNotice);
             ClearOnline(player, org.Id);
         }
@@ -147,6 +152,7 @@ namespace ZoneEngine_New.Core.Organizations
 
             foreach (MemberRef member in members)
             {
+                _tax.Forget(member.Id);
                 if (member.Id != lockoutExemptId)
                     _lockouts.Add(member.Id, member.Name, _settings.Org.DisbandLockoutSeconds);
 
@@ -161,7 +167,10 @@ namespace ZoneEngine_New.Core.Organizations
         void Kick(Player actor, MemberRef target)
         {
             if (target.Id == actor.Identity.Instance)
+            {
+                ClientFeedback.SendFormattedInCategory(actor, MemberCategory, CannotKickSelf);
                 return;
+            }
 
             OrganizationRecord? org = OrganizationOf(target);
             if (org is null)
@@ -278,6 +287,7 @@ namespace ZoneEngine_New.Core.Organizations
         {
             _lockouts.Add(target.Id, target.Name, lockoutSeconds);
             _organizations.ClearMembership(target.Id);
+            _tax.Forget(target.Id);
 
             if (target.Online is not { } online)
                 return;

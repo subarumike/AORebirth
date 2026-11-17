@@ -28,22 +28,51 @@ namespace AORebirth.Interfaces.Persistence.Characters
         /// <summary>Stores the organization membership (Clan stat) of one character, inserting the stat row when missing.</summary>
         void SaveOrganizationMembership(int characterId, int organizationId);
         void SaveOrganizationLeader(int organizationId, int leaderId);
+        /// <summary>Stores the organization tax (whole credits, zero or positive).</summary>
+        void SaveOrganizationTax(int organizationId, int tax);
         /// <summary>Organization invite lockout for this character, or null when none exists.</summary>
         PersistedOrgLockoutData LoadOrgLockout(int characterId);
         /// <summary>Inserts or updates the organization lockout row of this character.</summary>
         void SaveOrgLockout(int characterId, string characterName, long secondsRemaining);
+        /// <summary>Played time and creation time of this character, or null when no row exists.</summary>
+        PersistedCharacterPlayedBornData LoadCharacterPlayedBorn(int characterId);
+        /// <summary>Inserts or updates the played time; the creation time is kept once recorded.</summary>
+        void SaveCharacterPlayedBorn(int characterId, string characterName, long playedSeconds, long? createdAtUnix);
+        /// <summary>Tax schedule of this member (org_member_tax row), or null when none is stored.</summary>
+        PersistedOrgMemberTaxData LoadOrgMemberTax(int characterId);
+        /// <summary>Inserts or updates the tax schedule row of this member.</summary>
+        void SaveOrgMemberTax(int characterId, PersistedOrgMemberTaxData data);
         /// <summary>
         /// Stores one Anarchism kick request under the organizations row lock. Quorum is memberQuorum for a member
         /// target and leaderQuorum for the leader; when reached, the stored requests of that target are deleted.
         /// </summary>
         PersistedAnarchistKickResult RecordAnarchistKick(int organizationId, int kickedId, string kickedName, int kickerId, string kickerName, int memberQuorum, int leaderQuorum);
-        /// <summary>Clears Clan and ClanLevel and sets SocialStatus to the orgless value for one character.</summary>
+        /// <summary>Moves credits between one character's Cash and the organization Bank under the organization lock.</summary>
+        PersistedOrganizationBankResult TransferOrganizationBank(int organizationId, int characterId, bool deposit, long amount, long bankCap, long cashCap);
+        /// <summary>
+        /// Starts an organization vote under the organization lock. Refused while a vote is Active or while the last
+        /// Finished/Stopped vote closed less than <paramref name="cooldownSeconds"/> before <paramref name="startedUnix"/>.
+        /// The electorate snapshot is stored with the vote.
+        /// </summary>
+        PersistedOrgVoteStartResult StartOrganizationVote(int organizationId, int starterId, string description, int durationMinutes,
+            IList<string> choices, IList<int> electorateIds, long startedUnix, long endsUnix, long cooldownSeconds);
+        /// <summary>The Active vote of the organization, or else its latest Finished vote; null when none. Stopped votes are never returned.</summary>
+        PersistedOrgVoteData? LoadShownOrganizationVote(int organizationId);
+        /// <summary>Full vote with choices and electorate, or null when no row exists.</summary>
+        PersistedOrgVoteData? LoadOrganizationVote(int voteId);
+        /// <summary>Ids of Active votes whose deadline has passed.</summary>
+        IList<int> LoadDueActiveVoteIds(long nowUnix);
+        /// <summary>Records one vote of an eligible member that has not voted yet, while the vote is Active and open.</summary>
+        OrgVoteCastOutcome CastOrganizationVote(int voteId, int characterId, int choiceNo, long nowUnix);
+        /// <summary>Moves an Active vote to Finished or Stopped. Returns false when it was no longer Active.</summary>
+        bool CloseOrganizationVote(int voteId, string status, string? stopReason, long nowUnix);
+        /// <summary>Clears Clan and ClanLevel, sets SocialStatus to the orgless value and deletes the tax row of one character.</summary>
         void ClearOrganizationMembership(int characterId);
         /// <summary>Character ids whose Clan stat equals the organization id.</summary>
         IList<int> LoadOrganizationMemberIds(int organizationId);
         /// <summary>Organization id of one character (stored Clan stat), 0 when orgless.</summary>
         int LoadOrganizationId(int characterId);
-        /// <summary>Clears the membership of every member and deletes the organizations row in one transaction.</summary>
+        /// <summary>Clears the membership of every member, deletes their tax rows and the organizations row in one transaction.</summary>
         void DisbandOrganization(int organizationId);
         IList<PersistedItemData> LoadCarriedItems(int characterId);
         IList<PersistedItemData> LoadBankItems(int characterId);

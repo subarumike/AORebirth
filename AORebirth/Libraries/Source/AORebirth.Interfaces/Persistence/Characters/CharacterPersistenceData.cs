@@ -171,10 +171,36 @@ namespace AORebirth.Interfaces.Persistence.Characters
         public int RemainingXp { get; set; }
     }
 
+    /// <summary>Played seconds and creation time (Unix seconds UTC, null when never recorded) of one character.</summary>
+    public sealed class PersistedCharacterPlayedBornData
+    {
+        public long PlayedSeconds { get; set; }
+        public long? CreatedAtUnix { get; set; }
+    }
+
     /// <summary>Organization invite lockout: remaining seconds, decremented only while the character is online.</summary>
     public sealed class PersistedOrgLockoutData
     {
         public long SecondsRemaining { get; set; }
+    }
+
+    /// <summary>Organization tax stage of one member: None when paid, Warned after a failed tax, Suspended during the suspension.</summary>
+    public enum OrgTaxStage
+    {
+        None = 0,
+        Warned = 1,
+        Suspended = 2
+    }
+
+    /// <summary>Tax schedule of one organization member: next personal /played tick, unpaid debt and warning or suspension stage.</summary>
+    public sealed class PersistedOrgMemberTaxData
+    {
+        public int OrganizationId { get; set; }
+        public string CharacterName { get; set; }
+        public long NextTaxPlayed { get; set; }
+        public long Debt { get; set; }
+        public OrgTaxStage Stage { get; set; }
+        public long StageEndsUtc { get; set; }
     }
 
     /// <summary>Result of one Anarchism kick request stored in org_anar_pend_kick.</summary>
@@ -200,6 +226,29 @@ namespace AORebirth.Interfaces.Persistence.Characters
         public bool TargetIsLeader { get; set; }
         /// <summary>Requests consumed by a reached quorum, oldest first.</summary>
         public IList<PersistedAnarchistKickerData> Requesters { get; set; } = new List<PersistedAnarchistKickerData>();
+    }
+
+    public enum OrganizationBankOutcome
+    {
+        /// <summary>The organization no longer exists; nothing was stored.</summary>
+        Missing,
+        /// <summary>The transfer is stored; <see cref="PersistedOrganizationBankResult.Bank"/> and Cash hold the new values.</summary>
+        Done,
+        /// <summary>A deposit exceeds the depositor's credits.</summary>
+        InsufficientCash,
+        /// <summary>A deposit into a bank already at its cap.</summary>
+        BankFull,
+        /// <summary>A withdrawal exceeds the bank balance.</summary>
+        InsufficientBank,
+        /// <summary>A withdrawal would take the character past the cash cap.</summary>
+        CashFull
+    }
+
+    public sealed class PersistedOrganizationBankResult
+    {
+        public OrganizationBankOutcome Outcome { get; set; }
+        public long Bank { get; set; }
+        public long Cash { get; set; }
     }
 
     public sealed class CharacterActiveNanoData

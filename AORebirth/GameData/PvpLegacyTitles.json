@@ -1,0 +1,15 @@
+{
+  "TextCategory": 2010,
+  "Bands": [
+    { "MinRating": 1400, "TextId": 2002, "Fallback": "", "Note": "Freshman" },
+    { "MinRating": 1500, "TextId": 2003, "Fallback": "", "Note": "Rookie" },
+    { "MinRating": 1600, "TextId": 2004, "Fallback": "", "Note": "Apprentice" },
+    { "MinRating": 1700, "TextId": 2005, "Fallback": "", "Note": "Novice" },
+    { "MinRating": 1800, "TextId": 2006, "Fallback": "", "Note": "Neophyte" },
+    { "MinRating": 1900, "TextId": 2008, "Fallback": "", "Note": "Experienced" },
+    { "MinRating": 2000, "TextId": 2009, "Fallback": "", "Note": "Expert" },
+    { "MinRating": 2100, "TextId": null, "Fallback": "Master", "Note": "Master: Text.json id not yet confirmed; Fallback text used" },
+    { "MinRating": 2300, "TextId": 2010, "Fallback": "", "Note": "Champion" },
+    { "MinRating": 2500, "TextId": 158737026, "Fallback": "", "Note": "Grand Master" }
+  ]
+}

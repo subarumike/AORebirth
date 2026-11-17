@@ -39,6 +39,7 @@ namespace ZoneEngine_New.Core.Organizations
         public const string InviteAlreadyInOrganization = "\"Y^0o";
         public const string InviteOtherSide = "%`cZp";
         public const string OrganizationDisbanded = "%.Neo";
+        public const string TaxChangedOrg = "\"]9V7";
 
     }
 
@@ -48,6 +49,7 @@ namespace ZoneEngine_New.Core.Organizations
         // Captured retail framing of every ref text: Unknown1 0x10, Unknown2 0, Unknown3 1.
         const byte RefFlags = 0x10;
         const int RefTrailer = 1;
+        const int OrdinalCategory = 508;
 
         /// <summary>Integer parameter: five base-85 digits, each offset by '!' (0 = "!!!!!", 1 = "!!!!\"").</summary>
         public static string EncodeInt(uint value)
@@ -85,6 +87,15 @@ namespace ZoneEngine_New.Core.Organizations
         /// <summary>String parameter: 's', then the length plus one, then the text.</summary>
         public static string TextArg(string value) => "s" + (char)(value.Length + 1) + value;
 
+        /// <summary>Catalog ref identified by its Text.json id, without parameters.</summary>
+        public static string RefId(int textId) => EncodeInt((uint)textId);
+
+        /// <summary>
+        /// Ordinal parameter ("First place" .. "Tenth place"): marker 'R', then category 508 and the place index 0..9.
+        /// Captured in the Adonis City, Lower Scheol and Freelancers vote traces.
+        /// </summary>
+        public static string NestedOrdinal(int index) => "R" + RefId(OrdinalCategory) + RefId(index);
+
         /// <summary>Feedback (promote/demote recipient line): FormatFeedback carrying the same text envelope as the refs.</summary>
         public static FormatFeedbackMessage Feedback(Identity recipient, string refAndParameters) => new()
         {
@@ -93,6 +104,16 @@ namespace ZoneEngine_New.Core.Organizations
             Unknown1 = 0,
             Unknown2 = 0,
             FormattedMessage = Wrap(refAndParameters)
+        };
+
+        /// <summary>Vote cast confirmation: captured as FormatFeedback, and its envelope has no closing '~'.</summary>
+        public static FormatFeedbackMessage VoteCastConfirmation(Identity recipient, string refAndParameters) => new()
+        {
+            Identity = recipient,
+            Unknown = 1,
+            Unknown1 = 0,
+            Unknown2 = 0,
+            FormattedMessage = "~&!!!&t" + refAndParameters
         };
 
         public static string GoverningFormNotice(string leaderName, string formName)
@@ -109,6 +130,11 @@ namespace ZoneEngine_New.Core.Organizations
         /// <summary>Org Msg after a rank kick (Text.json 37093479, rules.txt "was kicked by"). Plain text: no ref captured.</summary>
         public static string RankKickedOrgMessage(string kicker, string kicked)
             => kicker + " kicked " + kicked + " from your organization.";
+
+        /// <summary>Org Msg after the leader changes the tax (Text.json 89226052): leader name, then new tax, then old tax.</summary>
+        public static string TaxChangedOrgMessage(string leaderName, int newTax, int oldTax)
+            => Wrap(OrgChatRefs.TaxChangedOrg + TextArg(leaderName)
+                + "i" + EncodeInt((uint)newTax) + "u" + EncodeInt((uint)oldTax));
 
         /// <summary>Org Msg after a side-change kick (Text.json 181448347). Plain text: no ref captured.</summary>
         public static string SideChangeKickedOrgMessage(string kicked)

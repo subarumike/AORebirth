@@ -19,12 +19,67 @@ namespace ZoneEngine_New.Tests
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
+    using ZoneEngine_New.Core.Trade;
     using Vector3 = AORebirth.Core.Vector.Vector3;
 
     [TestClass]
     public sealed class InventoryActionTests
     {
         static Identity Slot(int placement = 64) => new() { Type = IdentityType.Inventory, Instance = placement };
+
+        [TestMethod]
+        public void DetachedQuarantinedShopperDoesNotPinStockOrCloseAnotherShopper()
+        {
+            using var world = new World();
+            Playfield playfield = world.Player.Playfield!;
+            world.Player.Stats.Set(CharacterStat.Health, 100);
+            var other = TestWorld.CreatePlayer(222);
+            other.Playfield = playfield;
+            var otherSession = new Session();
+            other.Session = otherSession;
+            otherSession.BindPlayer(other);
+            other.Stats.Set(CharacterStat.Health, 100);
+
+            var data = new StubGameData(HashItemCatalog.Parse("""{"TOOL":{"Templates":[1000]}}"""));
+            var catalog = new StubCatalog().Add(1000, 1);
+            var minter = new HashItemMinter(data, catalog, new StubItemBuilder());
+            var trades = new TradeService(new StubLogger(), data, catalog, minter,
+                world.Ids, world.Flush, new RejectingTradePersistence());
+            var machine = new VendingMachine(new Identity { Type = IdentityType.VendingMachine, Instance = 7 },
+                new ItemTemplate
+                {
+                    Id = 2000,
+                    Quality = 1,
+                    ShopInventory = [new ShopInventoryEntry { Hash = "TOOL", MinQl = 1, MaxQl = 1, Amount = 1, Chance = 100 }]
+                }) { Playfield = playfield };
+            Assert.IsTrue(trades.TryOpenShop(world.Player, machine));
+            Assert.IsTrue(trades.TryGetSession(world.Player, out TradeSession detachedTrade));
+            Assert.IsTrue(trades.TryOpenShop(other, machine));
+            Assert.IsTrue(trades.TryGetSession(other, out TradeSession otherTrade));
+            Assert.AreEqual(2, machine.Stock.OpenTrades);
+            Assert.AreEqual(1000, machine.Stock.Slots.Single().LowId);
+
+            // Logout intentionally skips normal cancellation for quarantined state.
+            world.Player.QuarantinePersistence();
+            world.Player.Session = null;
+            world.Player.Playfield = null;
+            var unrelated = (Playfield)RuntimeHelpers.GetUninitializedObject(typeof(Playfield));
+            trades.Tick(unrelated, 0);
+            Assert.AreEqual(2, machine.Stock.OpenTrades);
+
+            trades.Tick(playfield, 0);
+            Assert.IsFalse(trades.TryGetSession(world.Player, out _));
+            Assert.IsTrue(trades.TryGetSession(other, out TradeSession active));
+            Assert.AreSame(otherTrade, active);
+            Assert.AreEqual(1, machine.Stock.OpenTrades);
+            trades.Tick(playfield, 0);
+            trades.Decline(world.Player, detachedTrade);
+            Assert.AreEqual(1, machine.Stock.OpenTrades);
+            Assert.AreEqual(1000, machine.Stock.Slots.Single().LowId);
+
+            trades.Cancel(other, "fixture complete");
+            Assert.AreEqual(0, machine.Stock.OpenTrades);
+        }
 
         [TestMethod]
         public void SplitPreservesQuantityAndOriginalInstanceAndPublishesOnlyAfterCommit()
@@ -370,6 +425,68 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(0, w.Session.Messages.Count);
         }
 
+        [TestMethod]
+        public void ResearchCompletionDuringFlushCannotDropProgressBeforePerkIsStored()
+        {
+            const int researchId = 101;
+            var research = new RecordingResearch();
+            Player player = TestWorld.CreatePlayer(111);
+            using var flush = new InventoryFlushService(new Lazy<PlayfieldManager>(() => throw new InvalidOperationException()),
+                research, new StubLogger(), trainedPerks: research, research: research);
+            player.TrainedPerks.Add(100);
+            player.Research.Set(researchId, 10);
+            var item = TestWorld.CreateItem(instanceId: 37, persisted: false);
+            player.Inventory.MarkDirty(item, player.Inventory.Inventory, 64);
+
+            // Hold the progress lock to pause the writer at the precise snapshot boundary.
+            object progressGate = typeof(ResearchProgress).GetField("_gate", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .GetValue(player.Research)!;
+            Exception? flushFailure = null;
+            var writer = new Thread(() =>
+            {
+                try { flush.HardFlush(player); }
+                catch (Exception error) { flushFailure = error; }
+            }) { IsBackground = true };
+            try
+            {
+                lock (progressGate)
+                {
+                    writer.Start();
+                    Assert.IsTrue(SpinWait.SpinUntil(
+                        () => (writer.ThreadState & ThreadState.WaitSleepJoin) != 0, TimeSpan.FromSeconds(5)));
+                    player.TrainedPerks.Add(researchId);
+                    player.Research.Set(researchId, 0);
+                }
+            }
+            finally
+            {
+                Assert.IsTrue(writer.Join(TimeSpan.FromSeconds(5)));
+            }
+
+            Assert.IsNull(flushFailure);
+            Assert.IsNotNull(research.SavedRows);
+            Assert.AreEqual(0, research.SavedRows.Count);
+            Assert.IsTrue(research.PerksWhenRowsSaved.Contains(researchId),
+                "The completed tier must be stored before its research progress row is removed.");
+        }
+
+        sealed class RecordingResearch : ITrainedPerkRepository, IResearchRepository, ICharacterCoalesceCommit
+        {
+            int[] _storedPerks = [];
+            public int[] PerksWhenRowsSaved { get; private set; } = [];
+            public IReadOnlyList<ResearchProgressRecord>? SavedRows { get; private set; }
+            IReadOnlyList<int> ITrainedPerkRepository.GetForCharacter(int characterId) => _storedPerks;
+            IReadOnlyList<ResearchProgressRecord> IResearchRepository.GetForCharacter(int characterId) => [];
+            public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates,
+                int characterId, IReadOnlyList<int> uploadedNanoIds, IReadOnlyList<ActiveNanoRecord>? activeNanos,
+                IReadOnlyList<SkillLockRecord>? skillLocks) { }
+            public void Save(int characterId, IReadOnlyList<int> perkIds) => _storedPerks = perkIds.ToArray();
+            public void Save(int characterId, IReadOnlyList<ResearchProgressRecord> research)
+            {
+                PerksWhenRowsSaved = _storedPerks;
+                SavedRows = research;
+            }
+        }
         internal sealed class World : IDisposable
         {
             public readonly Player Player = TestWorld.CreatePlayer(111);
@@ -388,6 +505,7 @@ namespace ZoneEngine_New.Tests
                 typeof(PlayfieldManager).GetField("_playersByCharacterId", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(manager, new Dictionary<int, Player>());
                 Flush = new InventoryFlushService(new Lazy<PlayfieldManager>(() => manager), new Coalesce(), new StubLogger());
                 _services = new ServiceCollection()
+                    .AddSingleton(new DynelRegistry())
                     .AddSingleton(new PlayfieldLocality(4582, null))
                     .AddSingleton(Flush)
                     .BuildServiceProvider();
@@ -411,6 +529,10 @@ namespace ZoneEngine_New.Tests
         sealed class Coalesce : ICharacterCoalesceCommit
         {
             public void Persist(IReadOnlyList<ItemInstanceRecord> inserts, IReadOnlyList<ItemLocationUpdate> updates, int characterId, IReadOnlyList<int> uploadedNanoIds, IReadOnlyList<ActiveNanoRecord>? activeNanos, IReadOnlyList<SkillLockRecord>? skillLocks) => throw new InvalidOperationException("No unexpected independent flush.");
+        }
+        sealed class RejectingTradePersistence : ITradePersistence
+        {
+            public void Persist(TradePersistenceBatch batch) => throw new InvalidOperationException("No shop transaction is expected.");
         }
         internal sealed class Persistence : IInventoryMutationPersistence
         {

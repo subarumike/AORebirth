@@ -5,6 +5,7 @@ using System.Reflection;
 using System.Text.Json.Nodes;
 using AORebirth.Core.GameData;
 using AORebirth.Database.Dao;
+using AORebirth.Database.Domain.CharacterCreation;
 using AORebirth.Enums;
 using AORebirth.Interfaces.Persistence.CharacterCreation;
 using LoginEngine.CharacterCreation;
@@ -67,6 +68,34 @@ public sealed class CharacterCreationTests
         BreedAbilities abilities = starter.AbilitiesFor(breed);
         CollectionAssert.AreEqual(new[] { "Strength", "Psychic", "Sense", "Intelligence", "Stamina", "Agility" }
             .Select(name => authored[name]!.GetValue<int>()).ToArray(), abilities.ToLegacyOrder());
+    }
+
+    [DataTestMethod]
+    [DataRow(1, 297667)]
+    [DataRow(2, 297666)]
+    [DataRow(3, 297665)]
+    public void NanoTechnicianStarterDeckMatchesThePersistedGender(int gender, int expectedTemplate)
+    {
+        File.WriteAllText(Path.Combine(directory, JsonCharacterStartPackageDao.FileName), """
+            { "packages": [{ "professionId": 11, "items": [
+              { "placement": 71, "lowId": 121567, "highId": 121567, "quality": 1, "count": 1 },
+              { "placement": 72, "lowId": 297665, "highId": 297665, "quality": 1, "count": 1,
+                "genderTemplates": [
+                  { "gender": 1, "templateId": 297667 },
+                  { "gender": 2, "templateId": 297666 },
+                  { "gender": 3, "templateId": 297665 }
+                ] }
+            ] }] }
+            """);
+        CharacterStartProfessionPackage template = new JsonCharacterStartPackageDao(directory).TryGetPackage(11);
+        CharacterStartProfessionPackage selected = template.ResolveForGender(gender);
+        CharacterStartPackageItem deck = selected.Items.Single(item => item.Placement == 72);
+        Assert.AreEqual(expectedTemplate, deck.LowId);
+        Assert.AreEqual(expectedTemplate, deck.HighId);
+        Assert.AreEqual(1, deck.Quality);
+        Assert.AreEqual(1, deck.Count);
+        Assert.AreEqual(297665, template.Items.Single(item => item.Placement == 72).LowId);
+        Assert.AreSame(template.Items[0], selected.Items[0]);
     }
 
     [DataTestMethod]

@@ -245,9 +245,64 @@ namespace AORebirth.Database.Domain.Characters
         {
             if (organizationId <= 0) throw new ArgumentOutOfRangeException(nameof(organizationId));
             if (leaderId <= 0) throw new ArgumentOutOfRangeException(nameof(leaderId));
-            Transaction((c, t) => Execute(c, t, "UPDATE organizations SET LeaderId=@Leader WHERE Id=@Id",
-                "@Leader", leaderId, "@Id", organizationId));
+                Transaction((c, t) => Execute(c, t, "UPDATE organizations SET LeaderId=@Leader WHERE Id=@Id",
+                    "@Leader", leaderId, "@Id", organizationId));
+            }
+
+            public void SaveOrganizationTax(int organizationId, int tax)
+            {
+                if (organizationId <= 0) throw new ArgumentOutOfRangeException(nameof(organizationId));
+                if (tax < 0) throw new ArgumentOutOfRangeException(nameof(tax));
+                Transaction((c, t) => Execute(c, t, "UPDATE organizations SET Tax=@Tax WHERE Id=@Id",
+                    "@Tax", tax, "@Id", organizationId));
+            }
+
+        public PersistedOrganizationBankResult TransferOrganizationBank(int organizationId, int characterId, bool deposit,
+            long amount, long bankCap, long cashCap)
+        {
+            if (organizationId <= 0) throw new ArgumentOutOfRangeException(nameof(organizationId));
+            if (characterId <= 0) throw new ArgumentOutOfRangeException(nameof(characterId));
+            if (amount <= 0) throw new ArgumentOutOfRangeException(nameof(amount));
+            return Transaction((c, t) =>
+            {
+                // The organizations row lock serialises bank transfers of one organization, as RecordAnarchistKick does.
+                IList<long> banks = QueryWithin(c, t, "SELECT Bank FROM organizations WHERE Id=@Id FOR UPDATE",
+                    r => r.GetInt64(0), "@Id", organizationId);
+                if (banks.Count == 0) return new PersistedOrganizationBankResult { Outcome = OrganizationBankOutcome.Missing };
+
+                IList<long> cashes = QueryWithin(c, t,
+                    "SELECT StatValue FROM stats WHERE Type=@Type AND Instance=@Id AND StatId=@Cash FOR UPDATE",
+                    r => r.GetInt64(0), "@Type", (int)IdentityType.CanbeAffected, "@Id", characterId, "@Cash", (int)CharacterStat.Cash);
+                long bank = banks[0];
+                long cash = cashes.Count > 0 ? cashes[0] : 0;
+
+                if (deposit)
+                {
+                    if (cash < amount) return BankResult(OrganizationBankOutcome.InsufficientCash, bank, cash);
+                    if (bank >= bankCap) return BankResult(OrganizationBankOutcome.BankFull, bank, cash);
+                    // The bank keeps what fits under its cap; the giver keeps the rest.
+                    long moved = Math.Min(amount, bankCap - bank);
+                    bank += moved;
+                    cash -= moved;
+                }
+                else
+                {
+                    if (amount > bank) return BankResult(OrganizationBankOutcome.InsufficientBank, bank, cash);
+                    if (cash + amount > cashCap) return BankResult(OrganizationBankOutcome.CashFull, bank, cash);
+                    bank -= amount;
+                    cash += amount;
+                }
+
+                Execute(c, t, "UPDATE organizations SET Bank=@Bank WHERE Id=@Id", "@Bank", bank, "@Id", organizationId);
+                Execute(c, t, "INSERT INTO stats (Type,Instance,StatId,StatValue) VALUES (@Type,@Id,@Cash,@Value) "
+                    + "ON DUPLICATE KEY UPDATE StatValue=VALUES(StatValue)",
+                    "@Value", cash, "@Type", (int)IdentityType.CanbeAffected, "@Id", characterId, "@Cash", (int)CharacterStat.Cash);
+                return BankResult(OrganizationBankOutcome.Done, bank, cash);
+            });
         }
+
+        static PersistedOrganizationBankResult BankResult(OrganizationBankOutcome outcome, long bank, long cash)
+            => new PersistedOrganizationBankResult { Outcome = outcome, Bank = bank, Cash = cash };
 
         public PersistedOrgLockoutData LoadOrgLockout(int characterId)
         {
@@ -267,6 +322,63 @@ namespace AORebirth.Database.Domain.Characters
                 + "VALUES (@CharId,@Name,@Seconds,@Now) ON DUPLICATE KEY UPDATE char_name=VALUES(char_name), "
                 + "seconds_remaining=VALUES(seconds_remaining), last_updated=VALUES(last_updated)",
                 "@CharId", characterId, "@Name", characterName ?? string.Empty, "@Seconds", secondsRemaining, "@Now", now));
+        }
+
+        public PersistedCharacterPlayedBornData LoadCharacterPlayedBorn(int characterId)
+        {
+            if (characterId <= 0) return null;
+            var rows = Query("SELECT played_sec, created_at FROM characterplayedborn WHERE char_id=@CharId LIMIT 1",
+                r => new PersistedCharacterPlayedBornData
+                {
+                    PlayedSeconds = r.GetInt64(0),
+                    CreatedAtUnix = r.IsDBNull(1) ? (long?)null : r.GetInt64(1),
+                },
+                "@CharId", characterId);
+            return rows.Count == 0 ? null : rows[0];
+        }
+
+        // The creation time is written only while it is still NULL, so the first recorded value is kept.
+        public void SaveCharacterPlayedBorn(int characterId, string characterName, long playedSeconds, long? createdAtUnix)
+        {
+            if (characterId <= 0) throw new ArgumentOutOfRangeException(nameof(characterId));
+            if (playedSeconds < 0) throw new ArgumentOutOfRangeException(nameof(playedSeconds));
+            Transaction((c, t) => Execute(c, t, "INSERT INTO characterplayedborn (char_id,char_name,played_sec,created_at) "
+                + "VALUES (@CharId,@Name,@Played,@Created) ON DUPLICATE KEY UPDATE char_name=VALUES(char_name), "
+                + "played_sec=VALUES(played_sec), created_at=COALESCE(created_at, VALUES(created_at))",
+                "@CharId", characterId, "@Name", characterName ?? string.Empty, "@Played", playedSeconds,
+                "@Created", createdAtUnix));
+        }
+
+        public PersistedOrgMemberTaxData LoadOrgMemberTax(int characterId)
+        {
+            if (characterId <= 0) return null;
+            var rows = Query("SELECT org_id, char_name, next_tax_played, debt, stage, stage_ends_utc FROM org_member_tax WHERE char_id=@CharId LIMIT 1",
+                r => new PersistedOrgMemberTaxData
+                {
+                    OrganizationId = r.GetInt32(0),
+                    CharacterName = r.IsDBNull(1) ? string.Empty : r.GetString(1),
+                    NextTaxPlayed = r.GetInt64(2),
+                    Debt = r.GetInt64(3),
+                    Stage = (OrgTaxStage)Enum.Parse(typeof(OrgTaxStage), r.GetString(4)),
+                    StageEndsUtc = r.GetInt64(5),
+                },
+                "@CharId", characterId);
+            return rows.Count == 0 ? null : rows[0];
+        }
+
+        public void SaveOrgMemberTax(int characterId, PersistedOrgMemberTaxData data)
+        {
+            if (characterId <= 0) throw new ArgumentOutOfRangeException(nameof(characterId));
+            if (data == null) throw new ArgumentNullException(nameof(data));
+            if (data.OrganizationId <= 0) throw new ArgumentOutOfRangeException(nameof(data));
+            if (data.NextTaxPlayed < 0 || data.Debt < 0) throw new ArgumentOutOfRangeException(nameof(data));
+            long now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+            Transaction((c, t) => Execute(c, t, "INSERT INTO org_member_tax (char_id,org_id,char_name,next_tax_played,debt,stage,stage_ends_utc,last_updated) "
+                + "VALUES (@CharId,@Org,@Name,@Next,@Debt,@Stage,@Ends,@Now) ON DUPLICATE KEY UPDATE org_id=VALUES(org_id), "
+                + "char_name=VALUES(char_name), next_tax_played=VALUES(next_tax_played), debt=VALUES(debt), "
+                + "stage=VALUES(stage), stage_ends_utc=VALUES(stage_ends_utc), last_updated=VALUES(last_updated)",
+                "@CharId", characterId, "@Org", data.OrganizationId, "@Name", data.CharacterName ?? string.Empty,
+                "@Next", data.NextTaxPlayed, "@Debt", data.Debt, "@Stage", data.Stage.ToString(), "@Ends", data.StageEndsUtc, "@Now", now));
         }
 
         public PersistedAnarchistKickResult RecordAnarchistKick(int organizationId, int kickedId, string kickedName,
@@ -336,6 +448,8 @@ namespace AORebirth.Database.Domain.Characters
                     "@Type", (int)IdentityType.CanbeAffected, "@Id", characterId,
                     "@Clan", (int)CharacterStat.Clan, "@Level", (int)CharacterStat.ClanLevel);
                 Execute(c, t, "DELETE FROM org_anar_pend_kick WHERE kicked_id=@Id OR kicker_id=@Id", "@Id", characterId);
+                // Leave, kick and side change end the tax schedule; its unpaid debt is dropped with the row.
+                Execute(c, t, "DELETE FROM org_member_tax WHERE char_id=@Id", "@Id", characterId);
                 return 0;
             });
         }
@@ -370,6 +484,7 @@ namespace AORebirth.Database.Domain.Characters
                 Execute(c, t, "DELETE FROM stats WHERE Type=@Type AND StatId=@Clan AND StatValue=@Id",
                     "@Type", (int)IdentityType.CanbeAffected, "@Clan", (int)CharacterStat.Clan, "@Id", organizationId);
                 Execute(c, t, "DELETE FROM org_anar_pend_kick WHERE org_id=@Id", "@Id", organizationId);
+                Execute(c, t, "DELETE FROM org_member_tax WHERE org_id=@Id", "@Id", organizationId);
                 Execute(c, t, "DELETE FROM organizations WHERE Id=@Id", "@Id", organizationId);
                 return 0;
             });

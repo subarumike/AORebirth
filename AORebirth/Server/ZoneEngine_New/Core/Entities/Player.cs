@@ -2512,6 +2512,9 @@ namespace ZoneEngine_New.Core.Entities
             }
         }
 
+        /// <summary>VisualFlags bits 7-8: PvP title display mode (0 legacy, 1 duel, 2 solo, 3 team).</summary>
+        const int PvpDisplayModeVisualFlagMask = 0x180;
+
         /// <summary>
         /// Client pad/social toggle from CharacterAction ChangeVisualFlag. The social bits choose
         /// the wear pages, so the look is rebuilt before the flags go back out on the wire.
@@ -2521,10 +2524,19 @@ namespace ZoneEngine_New.Core.Entities
             if (visualFlags < 0 || visualFlags > short.MaxValue)
                 return false;
 
-            if (Stats.Get(CharacterStat.VisualFlags) == visualFlags)
+            int previous = Stats.Get(CharacterStat.VisualFlags);
+            if (previous == visualFlags)
                 return true;
 
             Stats.Set(CharacterStat.VisualFlags, visualFlags, StatDetail.Base, dirty: true);
+            if (((previous ^ visualFlags) & ~PvpDisplayModeVisualFlagMask) == 0)
+            {
+                // PvP title display switch: retail sends only the VisualFlags stat, no AppearanceUpdate
+                // (capture api\spec_smarket_clan_sup 20261115-124731/124733).
+                FlushDirtyStats();
+                return true;
+            }
+
             RebaseWearAppearance();
             // Live answers a toggle with the VisualFlags stat, then AppearanceUpdate (capture 2026-10-06T19:22:51Z).
             FlushDirtyStats();
@@ -2975,6 +2987,7 @@ namespace ZoneEngine_New.Core.Entities
             CharacterStat.PVPSoloScore,
             CharacterStat.PVPTeamScore,
             CharacterStat.PVPDuelScore,
+            CharacterStat.PvP_Rating,
             CharacterStat.Commendations,
             CharacterStat.DailyMissionResets,
             CharacterStat.UnreadMailCount,
@@ -3246,7 +3259,7 @@ namespace ZoneEngine_New.Core.Entities
             Logger.Info(
                 string.Format(
                     CultureInfo.InvariantCulture,
-                    "InfoPacket player={0} name={1} first='{2}' last='{3}' level={4} prof={5} hp={6}/{7}",
+                    "InfoPacket player={0} name={1} first='{2}' last='{3}' level={4} prof={5} hp={6}/{7} legacy='{8}'",
                     Identity.Instance,
                     Name ?? string.Empty,
                     info.FirstName,
@@ -3254,7 +3267,8 @@ namespace ZoneEngine_New.Core.Entities
                     info.Level,
                     (int)info.Profession,
                     info.Health,
-                    info.MaxHealth));
+                    info.MaxHealth,
+                    info.LegacyTitle));
             return message;
         }
 

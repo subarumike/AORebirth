@@ -12,6 +12,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Chat;
     using ZoneEngine_New.Core.GameData;
+    using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Organizations;
     using ZoneEngine_New.Core.Playfield;
@@ -30,11 +31,13 @@ namespace ZoneEngine_New.Core.MessageHandlers
         readonly IChatEngineLink _chat;
         readonly OrgLockoutClock _lockouts;
         readonly OrgMembershipService _memberships;
+        readonly OrgTaxTickService _tax;
+        readonly OrgVoteService _votes;
 
         // Lazy: PlayfieldManager depends on the message router, which depends on the handlers.
         public OrgClientMessageHandler(IGameData gameData, Lazy<PlayfieldManager> playfieldManager,
             IOrganizationRepository organizations, IZoneLogger logger, IChatEngineLink chat,
-            OrgLockoutClock lockouts, OrgMembershipService memberships)
+            OrgLockoutClock lockouts, OrgMembershipService memberships, OrgTaxTickService tax, OrgVoteService votes)
         {
             _gameData = gameData;
             _playfieldManager = playfieldManager;
@@ -43,6 +46,8 @@ namespace ZoneEngine_New.Core.MessageHandlers
             _chat = chat;
             _lockouts = lockouts;
             _memberships = memberships;
+            _tax = tax;
+            _votes = votes;
         }
 
         public Type MessageBodyType => typeof(OrgClientMessage);
@@ -58,10 +63,19 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 || !ReferenceEquals(player.Session, session) || player.IsPersistenceQuarantined)
                 return;
 
+            if (player.Organization is not null && RefuseWhileSuspended(message, player))
+                return;
+
             switch (message.Command)
             {
+                case OrgClientCommand.Debt when player.Organization is not null:
+                    HandleDebt(player);
+                    return;
                 case OrgClientCommand.Info:
                     HandleInfo(message, session, player);
+                    return;
+                case OrgClientCommand.Tax when !string.IsNullOrEmpty(message.CommandArgs):
+                    HandleTaxChange(message, session, player);
                     return;
                 case OrgClientCommand.Ranks:
                 case OrgClientCommand.Tax:
@@ -91,9 +105,27 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 case OrgClientCommand.Disband:
                     HandleDisband(message, session, player);
                     return;
+                case OrgClientCommand.BankAdd:
+                    HandleBankTransfer(message, session, player, deposit: true);
+                    return;
+                case OrgClientCommand.BankRemove:
+                    HandleBankTransfer(message, session, player, deposit: false);
+                    return;
                 case OrgClientCommand.Unknown2:
                 case OrgClientCommand.Kick:
                     HandleKick(message, session, player);
+                    return;
+                case OrgClientCommand.StartVote:
+                    HandleStartVote(message, session, player);
+                    return;
+                case OrgClientCommand.Vote:
+                    HandleVote(message, session, player);
+                    return;
+                case OrgClientCommand.VoteInfo:
+                    HandleVoteInfo(message, session, player);
+                    return;
+                case OrgClientCommand.StopVote:
+                    HandleStopVote(message, session, player);
                     return;
                 default:
                     // Commands not implemented yet stay silent for members; non-members get the captured refusal
@@ -107,7 +139,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
         static bool AnswersNotInOrganization(OrgClientCommand command) => command is
             OrgClientCommand.Debt or OrgClientCommand.VoteInfo or OrgClientCommand.Vote or OrgClientCommand.StartVote
             or OrgClientCommand.StopVote
-            or OrgClientCommand.BankAdd or OrgClientCommand.BankRemove or OrgClientCommand.Name
+            or OrgClientCommand.Name
             or OrgClientCommand.Description or OrgClientCommand.Objective or OrgClientCommand.History
             or OrgClientCommand.GoverningForm or OrgClientCommand.Invite;
 
@@ -135,12 +167,13 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     SendRef(session, player, OrgChatText.WithInt(OrgChatRefs.TaxValue, org.Tax));
                     return;
                 case OrgClientCommand.Bank:
-                    // Viewing is refused to the lowest rank except in single-rank forms (anarchism); that refusal's ref was
-                    // not captured, so such a request gets no reply rather than a guessed one.
+                    // Viewing is refused to the lowest rank except in single-rank forms (anarchism).
                     int lowest = forms.Forms.TryGetValue(org.GovernmentForm, out GoverningForm? f) ? f.Ranks.Length - 1 : 0;
                     int rank = player.Stats.GetOrZero(CharacterStat.ClanLevel, StatDetail.Base);
                     if (lowest == 0 || rank < lowest)
                         SendRef(session, player, OrgChatText.WithInt(OrgChatRefs.BankBalance, org.Bank));
+                    else
+                        ClientFeedback.SendFormattedInCategory(player, MemberCategory, BankViewTooLow);
                     return;
             }
         }
