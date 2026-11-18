@@ -67,6 +67,20 @@ namespace ZoneEngine_New.Core.Inventory
 
         public Dictionary<EventType, List<ItemSpell>> SpellList { get; init; } = new();
 
+        internal IEnumerable<int> UploadedNanoIds()
+        {
+            foreach (List<ItemSpell> spells in SpellList.Values)
+            {
+                if (spells == null)
+                    continue;
+                foreach (ItemSpell spell in spells)
+                {
+                    if (spell.Is(FunctionType.UploadNano) && spell.TryReadInt(0, out int nanoId))
+                        yield return nanoId;
+                }
+            }
+        }
+
         public List<ItemAction> Actions { get; init; } = new();
 
         /// <summary>

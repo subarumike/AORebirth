@@ -108,7 +108,7 @@ namespace ZoneEngine_New
                         gameData.HashInstanceCount,
                         gameData.MonsterDataCount));
                 IItemTemplateCatalog itemTemplates = rootServices.GetRequiredService<IItemTemplateCatalog>();
-                NpcPetSummonProfile.LoadOptional(gameData.RootPath)?.ValidateReferences(itemTemplates, gameData);
+                MonsterCombatRulesCatalog.For(gameData.RootPath).ValidateEncounterReferences(itemTemplates, gameData);
                 // NPC scripts compile now, so a bad program is reported at startup rather than at the first spawn.
                 rootServices.GetRequiredService<ZoneEngine_New.Core.NpcScripts.NpcScriptCatalog>();
                 var missionOffers = rootServices.GetRequiredService<GeneratedMissionRollService>().OfferCatalog;

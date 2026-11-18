@@ -13,7 +13,8 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
         /// <summary>First dungeon Playfield2 id: above every RDB playfield and the legacy mission lease range.</summary>
         public const int FirstPlayfield = 0x00200000;
 
-        public const string QuestIdPrefix = "D";
+        // Discriminator already stored in generatedquests. Its value is part of the persisted identifier format.
+        const char PersistedDungeonDiscriminator = 'D';
 
         /// <summary>Dungeon ids run from <see cref="FirstPlayfield"/> up to the proxy playfield block (<see cref="ZoneEngine_New.Core.Playfield.ProxyPlayfieldIds.First"/>).</summary>
         public static bool IsDungeonPlayfield(int playfieldId)
@@ -26,7 +27,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
             if (number <= 0 || number > int.MaxValue - FirstPlayfield)
                 return false;
 
-            questId = QuestIdPrefix + number.ToString(CultureInfo.InvariantCulture);
+            questId = FormatQuestId(number);
             playfieldId = FirstPlayfield + number;
             return true;
         }
@@ -37,18 +38,21 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
             if (!IsDungeonPlayfield(playfieldId))
                 return false;
 
-            questId = QuestIdPrefix + (playfieldId - FirstPlayfield).ToString(CultureInfo.InvariantCulture);
+            questId = FormatQuestId(playfieldId - FirstPlayfield);
             return true;
         }
 
         public static bool TryGetPlayfield(string questId, out int playfieldId)
         {
             playfieldId = 0;
-            if (string.IsNullOrEmpty(questId) || !questId.StartsWith(QuestIdPrefix, System.StringComparison.Ordinal)
-                || !int.TryParse(questId.AsSpan(QuestIdPrefix.Length), NumberStyles.None, CultureInfo.InvariantCulture, out int number))
+            if (string.IsNullOrEmpty(questId) || questId[0] != PersistedDungeonDiscriminator
+                || !int.TryParse(questId.AsSpan(1), NumberStyles.None, CultureInfo.InvariantCulture, out int number))
                 return false;
 
             return TryCreate(number, out _, out playfieldId);
         }
+
+        static string FormatQuestId(int number)
+            => PersistedDungeonDiscriminator + number.ToString(CultureInfo.InvariantCulture);
     }
 }

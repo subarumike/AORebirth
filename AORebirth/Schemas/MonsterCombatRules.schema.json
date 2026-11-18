@@ -14,16 +14,74 @@
         ],
         "properties": {
           "MaxPets": {
-            "type": "integer"
+            "type": "integer",
+            "minimum": 0
+          },
+          "MaxPetsPerType": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "minimum": 1
           },
           "SummonIntervalSeconds": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0
           },
           "RespawnDelaySeconds": {
-            "type": "number"
+            "type": "number",
+            "minimum": 0
+          },
+          "RetryDelaySeconds": {
+            "type": "number",
+            "exclusiveMinimum": 0
           }
         },
+        "required": [
+          "MaxPets",
+          "MaxPetsPerType",
+          "SummonIntervalSeconds",
+          "RespawnDelaySeconds",
+          "RetryDelaySeconds"
+        ],
         "additionalProperties": false
+      },
+      "TriggeredSelfNanos": {
+        "type": [
+          "array",
+          "null"
+        ],
+        "items": {
+          "type": "object",
+          "properties": {
+            "NanoId": {
+              "type": "integer"
+            },
+            "HealthBelowPercent": {
+              "type": "integer"
+            },
+            "ChancePercent": {
+              "type": "integer"
+            },
+            "MaxCastsPerFight": {
+              "type": [
+                "integer",
+                "null"
+              ]
+            },
+            "CooldownSeconds": {
+              "type": "integer"
+            }
+          },
+          "required": [
+            "NanoId",
+            "HealthBelowPercent",
+            "ChancePercent",
+            "MaxCastsPerFight",
+            "CooldownSeconds"
+          ],
+          "additionalProperties": false
+        }
       },
       "Features": {
         "type": [
@@ -36,7 +94,8 @@
             "NoMove",
             "Wander",
             "Guard",
-            "Boss"
+            "Boss",
+            "Social"
           ]
         }
       },
