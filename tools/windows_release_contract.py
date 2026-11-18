@@ -1482,8 +1482,8 @@ def reconcile_plan(root, profile, bundle, public_sha, dump_sha, baseline, before
     prior, prior_link = None, None
     if baseline.get("APPLIED_RECONCILIATION_BUNDLE"):
         state_root = Path(profile["STATE_ROOT"]).resolve()
-        previous = Path(baseline["APPLIED_RECONCILIATION_BUNDLE"])
-        if not previous.resolve().is_relative_to(state_root):
+        previous = Path(baseline["APPLIED_RECONCILIATION_BUNDLE"]).resolve(strict=True)
+        if not previous.is_relative_to(state_root):
             raise ValueError("Prior reconciliation escaped local release state")
         prior_file = previous / "reconciliation.json"
         prior_bytes = prior_file.read_bytes()
