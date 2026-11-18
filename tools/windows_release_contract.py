@@ -9,6 +9,7 @@ import argparse
 import base64
 import ctypes
 import hashlib
+import importlib.util
 import json
 import ntpath
 import os
@@ -34,7 +35,8 @@ OUTPUTS = (
 )
 PRODUCT_PATHS = ("AORebirth/Server", "AORebirth/Libraries", "AORebirth/Config", "WindowsBuildNet10",
                  "NewZoneEngineBuild", "Tools/DatabaseMigrationTool", "Directory.Build.targets", "tools/windows_release_contract.py",
-                 "tools/windows_release_contract.cmd", "tools/build_aorebirth_debug.cmd", "start-engines.cmd", "start-engines.ps1")
+                 "tools/windows_release_contract.cmd", "Tools/runtime_catalog_contract.py", "Tools/PorkForAor/src/GameData.php",
+                 "tools/build_aorebirth_debug.cmd", "start-engines.cmd", "start-engines.ps1")
 CONFIG_OVERRIDES = {"AORebirth/Config/Config.xml", "AORebirth/Config/ChatEngine.Config.xml"}
 PATCH_TOOL = "tools/windows_release_contract.py"
 PATCH_ENTRYPOINT = "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj"
@@ -47,12 +49,12 @@ PATCH_OUTPUTS = tuple(path for path in OUTPUTS if "/ZoneEngine_New/" in path)
 PRIVATE_CHEST_CATALOGS = {"Loot/MissionChestRKAllowlist.json", "Loot/MissionChestSeasonalExclusions.json", "Loot/MissionChestSpecialExclusions.json"}
 INDEPENDENT_PRIVATE_CATALOGS = {"QuestRewards.json", "ObjectStateMachines.json"}
 # Named catalog loaders and GameDataPaths; no extension-only root admission.
-RUNTIME_ROOT_CATALOGS = frozenset("""AbilityCosts.json AlienXp.json ChatChannels.json ComboNames.json
+RUNTIME_ROOT_CATALOGS = frozenset("""AbilityCosts.json AlienXp.json Breed.json ChatChannels.json ComboNames.json
 DungeonDoorStyles.json DungeonEntrances.json DungeonGeneration.json DynelCollision.json GoverningForms.json
 ItemBehavior.json items.dat ItemTemplates.json MonsterCombatRules.json MonsterData.json NpcPetSummons.json
 MonsterWeapons.json nanos.dat NewCharacter.json NpcTemplates.json ObjectStateMachines.json PerkActions.json
-Perks.json PetReplies.json PetTypes.json Quests.json QuestRewards.json Research.json Respawn.json
-SkillCosts.json SkillTrickle.json SpawnExclusions.json StartPackages.json TeleportRoutes.json Tradeskills.json VendingMachines.json
+Perks.json PetReplies.json PetTypes.json Profession.json PvpLegacyTitles.json Quests.json QuestRewards.json Research.json Respawn.json
+Sex.json Side.json SkillCosts.json SkillTrickle.json SpawnExclusions.json StartPackages.json TeleportRoutes.json Text.json Tradeskills.json VendingMachines.json
 WaterExits.json Xp.json""".split())
 RUNTIME_MISSION_FILES = frozenset("""Locations.json Text.json RollPolicy.json RollMixes.json
 MissionOffers.json Keys.json RewardObservations.json RareLoot.json RareLootChancePercent.json
@@ -120,6 +122,40 @@ def write_json(path, value, exclusive=False):
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("xb" if exclusive else "wb") as stream:
         stream.write(encoded(value))
+
+
+def release_catalog_contract():
+    # Portable consumers may load this file by path without the tools directory on sys.path.
+    path = Path(__file__).resolve().parents[1] / "Tools/runtime_catalog_contract.py"
+    if not path.is_file():
+        raise ValueError("Current source is missing the runtime catalog validator")
+    spec = importlib.util.spec_from_file_location("runtime_catalog_contract", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def source_declares_runtime_catalog_validation(public_sha):
+    # A retained release can predate this guard and may be read outside its source checkout.
+    source_root = Path(__file__).resolve().parents[1]
+    try:
+        probe = subprocess.run(["git", "--no-replace-objects", "cat-file", "-e", public_sha + ":Tools/runtime_catalog_contract.py"],
+                               cwd=source_root, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
+    except FileNotFoundError:
+        return False
+    return probe.returncode == 0
+
+
+def catalog_manifest_validation(required, rows, reconciliation):
+    installed = {row["path"]: row for row in rows}
+    available = {path for snapshot in reconciliation["SOURCE_SNAPSHOTS"].values() for path in snapshot["AFTER"]}
+    missing_files = sorted(set(required) - installed.keys())
+    missing_authority = sorted(set(required) - available)
+    if missing_files or missing_authority:
+        raise ValueError("Required runtime catalogs are incomplete: missing from canonical manifest="
+                         + (", ".join(missing_files) or "none") + "; missing from current authority="
+                         + (", ".join(missing_authority) or "none"))
+    return [installed[path] for path in required]
 
 
 def relative(value):
@@ -2191,6 +2227,13 @@ def run_build(root, profile, child, patch=None, reuse=None):
         bundle, attempt, plan, projected, states = intake(root, profile, patch=patch, reused_context=prior)
     if plan["CANONICAL_BEFORE_MANIFEST"] != plan["WINDOWS_GAMEDATA_MANIFEST"]:
         raise ValueError("Approved content A/M/D must be reconciled before Windows build; inspect latest-plan.json")
+    contract = release_catalog_contract()
+    required_catalogs = contract.required_catalog_paths(root)
+    catalog_rows = read_json(load_descriptor(bundle, attempt["CANONICAL_MANIFEST"]))
+    catalog_validation = catalog_manifest_validation(required_catalogs, catalog_rows, plan)
+    if contract.verify_runtime_catalogs(root, Path(profile["CANONICAL_GAMEDATA_ROOT"]), runtime_content_path) != required_catalogs:
+        raise ValueError("Required runtime catalog validation scope changed")
+    attempt["WINDOWS_RUNTIME_CATALOG_VALIDATION"] = catalog_validation
     current_states, directories = content_states(profile["CANONICAL_GAMEDATA_ROOT"])
     if current_states != states:
         raise ValueError("Canonical file set/state changed before compilation")
@@ -2544,6 +2587,14 @@ def require_successful_attempt(bundle, attempt, *, selected_checkpoint=False):
         validate_windows_reuse(bundle, attempt, selection)
     reconciliation = read_json(load_descriptor(bundle, attempt["RECONCILIATION"]))
     rows = validate_reconciliation_summary(bundle, reconciliation, selected_patch=selection is not None or selected_checkpoint)
+    if "WINDOWS_RUNTIME_CATALOG_VALIDATION" in attempt:
+        catalog_validation = attempt["WINDOWS_RUNTIME_CATALOG_VALIDATION"]
+        validate_manifest(catalog_validation)
+        measured_catalogs = tuple(row["path"] for row in catalog_validation)
+        if catalog_validation != catalog_manifest_validation(measured_catalogs, rows, reconciliation):
+            raise ValueError("Windows runtime catalog validation differs from the authoritative accepted manifest")
+    elif source_declares_runtime_catalog_validation(attempt["PUBLIC_MASTER_SHA"]):
+        raise ValueError("Windows runtime catalog validation is required by the accepted source")
     validation = attempt.get("WINDOWS_CONTENT_VALIDATION", {})
     if (set(validation) != {"METHOD", "SUMMARY_SHA256", "LOCAL_REPLAY_SHA256", "CANONICAL_MANIFEST", "VALIDATED_AT_UTC"}
             or validation["METHOD"] != "LOCAL_GUARDED_REPLAY_AND_WHOLE_TREE_MEASUREMENT"
@@ -2566,6 +2617,8 @@ def require_successful_attempt(bundle, attempt, *, selected_checkpoint=False):
 
 def current_matches(root, profile, bundle, attempt):
     require_successful_attempt(bundle, attempt)
+    if "WINDOWS_RUNTIME_CATALOG_VALIDATION" not in attempt:
+        raise ValueError("Current Windows startup requires runtime catalog validation")
     selection = attempt.get("WINDOWS_PATCH_SELECTION")
     if selection is None:
         source_exact(root, attempt["PUBLIC_MASTER_SHA"], profile.get("LOCAL_CONFIG_OVERRIDES", ()))
@@ -2573,6 +2626,10 @@ def current_matches(root, profile, bundle, attempt):
         authority = fresh_public(root, profile)
         verify_patch_source(root, profile, authority, load_descriptor(bundle, selection), selection["SHA256"],
                             attempt["WINDOWS_PATCH_TOOL_SOURCE_SHA"])
+    required_catalogs = release_catalog_contract().required_catalog_paths(root)
+    measured_catalogs = tuple(row["path"] for row in attempt["WINDOWS_RUNTIME_CATALOG_VALIDATION"])
+    if measured_catalogs != required_catalogs:
+        raise ValueError("Windows runtime catalog validation scope differs from the current source")
     rows, _ = inventory(profile["CANONICAL_GAMEDATA_ROOT"])
     if validate_manifest(rows) != attempt["WINDOWS_GAMEDATA_MANIFEST"]:
         raise ValueError("Current Windows GameData differs from the build handed to Mike")
@@ -2878,6 +2935,9 @@ def main(argv=None):
                                                 patch=patch, reused_context=prior)
             print("CONTENT_PLAN_SHA256=" + digest(encoded(plan)))
             print("BUILD_ATTEMPT_RECEIPT=" + (bundle / "prepared.json").relative_to(root).as_posix())
+            catalog_rows = read_json(load_descriptor(bundle, attempt["CANONICAL_MANIFEST"]))
+            required_catalogs = release_catalog_contract().required_catalog_paths(root)
+            catalog_manifest_validation(required_catalogs, catalog_rows, plan)
             if plan["CANONICAL_BEFORE_MANIFEST"] != plan["WINDOWS_GAMEDATA_MANIFEST"]:
                 raise ValueError("Canonical content must be reconciled before build")
         elif args.mode == "record-startup":

@@ -85,6 +85,30 @@ definitions and typed protocol fields. The Roslyn checks cover documented source
 patterns and the existing project graph inventory. Semantic review remains
 required for new APIs and indirect flows outside those patterns.
 
+The existing `content-boundary` job also runs the runtime catalog contract.
+The contract checks explicit admission for fixed paths used by Zone and Chat
+readers and checks the required declarations in the PORK reader. The public
+fixture executes the production Legacy PvP loader using synthetic content.
+For a change to the catalog contract, `master` must require the strict
+`dao-canonical-validation` status from the trusted validation App. The public
+job checks this binding through GitHub's effective branch rules. GitHub then
+requires the separate check on the candidate commit.
+
+The trusted worker uses the staged canonical GameData selected for that exact
+source and measured manifest. Its focused runtime checks include these commands.
+
+```text
+python -B Tools/runtime_catalog_contract.py --catalog-root <selected-GameData>
+php Tools/PorkForAor/verify-catalogs.php <selected-GameData>
+dotnet test AORebirth/Server/ZoneEngine_New.Tests/ZoneEngine_New.Tests.csproj -p:RuntimeCatalogFocusedTests=true --filter FullyQualifiedName~RuntimeCatalogTests.StagedLegacyPvpCatalogLoadsEveryAuthoredBand
+```
+
+Set `AO_REBIRTH_RUNTIME_CATALOG_VALIDATION_ROOT` to that absolute GameData
+path for the C# check and clear the GameData override. The worker must verify
+the focused check executed before attesting to it. Keep private inputs and
+evidence on the trusted worker and keep publisher credentials on its separate
+controller. Missing trusted validation blocks the catalog change.
+
 ## Data Flow
 
 Typical login/playfield flow:

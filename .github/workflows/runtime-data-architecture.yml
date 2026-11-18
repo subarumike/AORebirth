@@ -22,7 +22,11 @@ jobs:
       - uses: actions/setup-dotnet@v5
         with:
           dotnet-version: '10.0.x'
+      - uses: actions/setup-python@v6
+        with:
+          python-version: '3.13'
       - name: Verify proposed runtime and catalog changes
+        id: proposed
         shell: pwsh
         env:
           PR_BASE: ${{ github.event.pull_request.base.sha }}
@@ -46,4 +50,27 @@ jobs:
           dotnet $guard --doa-self-test .
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           dotnet $guard --enforce . $baseline
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B -m unittest discover -s Tools/tests -p test_runtime_catalog_contract.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B -m unittest discover -s Tools/tests -p test_windows_release_contract.py -k test_pvp_and_pork_catalog_admission -k test_authoritative_catalog_validation -k test_hash_bound_prior_checkpoint
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          python -B Tools/runtime_catalog_contract.py
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          $results = Join-Path $env:RUNNER_TEMP catalog-fixture-results
+          dotnet test AORebirth/Server/ZoneEngine_New.Tests/ZoneEngine_New.Tests.csproj -m:1 -p:RuntimeCatalogFocusedTests=true --nologo --filter 'FullyQualifiedName~RuntimeCatalogTests.LegacyPvpTitlesResolveTheirTextCategoryAndAuthoredFallback' --results-directory $results --logger 'trx;LogFileName=catalog-fixture.trx'
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          [xml]$fixture = Get-Content -Raw (Join-Path $results catalog-fixture.trx)
+          $counters = $fixture.TestRun.ResultSummary.Counters
+          if ([int]$counters.executed -lt 1 -or [int]$counters.passed -ne [int]$counters.executed) {
+            throw 'The production PvP reader fixture must execute and pass.'
+          }
+          "base-sha=$baseline" >> $env:GITHUB_OUTPUT
+      - name: Require trusted canonical validation for catalog changes
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          CATALOG_BASE: ${{ steps.proposed.outputs.base-sha }}
+        run: |
+          python -B Tools/runtime_catalog_contract.py --require-trusted-premerge-base $env:CATALOG_BASE
           exit $LASTEXITCODE

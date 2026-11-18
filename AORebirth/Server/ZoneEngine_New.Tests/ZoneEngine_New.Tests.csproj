@@ -121,6 +121,11 @@
     <Compile Include="PetPlacementTests.cs" />
     <Compile Include="NpcPetSummonsTests.cs" />
   </ItemGroup>
+  <ItemGroup Condition="'$(RuntimeCatalogFocusedTests)' == 'true'">
+    <Compile Remove="@(Compile)" />
+    <Compile Include="TestDoubles.cs" />
+    <Compile Include="RuntimeCatalogTests.cs" />
+  </ItemGroup>
   <ItemGroup Condition="'$(TeamRosterFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />
     <Compile Include="TestDoubles.cs" />
