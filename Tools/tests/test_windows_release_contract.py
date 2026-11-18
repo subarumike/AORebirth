@@ -1318,6 +1318,16 @@ class ReleaseContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "not a production build"):
             gate.require_successful_attempt(receipt_path.parent, attempt)
 
+    def test_authority_fetch_never_follows_a_fork_parent(self):
+        profile = {"PRIVATE_CONTENT_REPOSITORY": "owner/configured-fork", "PRIVATE_CONTENT_BRANCH": "main"}
+        expected = ["gh", "api", "-H", "Cache-Control: no-cache", "repos/owner/configured-fork/commits/main"]
+        with mock.patch.object(gate, "fresh_public", return_value=PUBLIC), \
+                mock.patch.object(gate, "source_exact"), \
+                mock.patch.object(gate, "command", side_effect=ValueError("private authority unavailable")) as request:
+            with self.assertRaisesRegex(ValueError, "private authority unavailable"):
+                gate.fresh_sources(self.root, profile)
+        request.assert_called_once_with(expected, role="Private content authority fetch")
+
     def test_fresh_authority_fetch_failures_do_not_fall_back_to_cached_state(self):
         profile = {"PUBLIC_PRODUCT_REMOTE": "origin", "PRIVATE_CONTENT_BRANCH": "main"}
         def public_git(root, *args):
