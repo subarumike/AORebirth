@@ -7,7 +7,6 @@ namespace ZoneEngine_New.Core.Mobs
     using System.Linq;
     using System.Text.Json;
 
-    using ZoneEngine_New.Core.Ai;
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Nanos;
@@ -21,7 +20,7 @@ namespace ZoneEngine_New.Core.Mobs
     public sealed class MonsterCombatRulesCatalog
     {
         public const string FileName = "MonsterCombatRules.json";
-        public const string PetSummonsFileName = "NpcPetSummons.json";
+        public const string PetSummonsFileName = NpcPetSummonProfile.FileName;
 
         /// <summary>The name <see cref="Reload"/> is registered under.</summary>
         public const string ReloadName = "MonsterCombatRules";
@@ -98,14 +97,14 @@ namespace ZoneEngine_New.Core.Mobs
 
         internal bool IsPetCreationItem(int templateId) => _creationItemIds.Contains(templateId);
 
-        MonsterPetRule? PetOverride(string? spawnHash, string? templateHash)
+        NpcPetSummonPolicy? PetOverride(string? spawnHash, string? templateHash)
         {
             if (TryGet(spawnHash, out MonsterCombatRules spawnRule) && spawnRule.Pets != null)
                 return spawnRule.Pets;
             return TryGet(templateHash, out MonsterCombatRules templateRule) ? templateRule.Pets : null;
         }
 
-        internal MonsterPetRule? PetRule(string? spawnHash, string? templateHash)
+        internal NpcPetSummonPolicy? PetRule(string? spawnHash, string? templateHash)
             => PetOverride(spawnHash, templateHash) ?? _petSummons?.Policy;
 
         internal bool RequiresPetCreator(string? spawnHash, string? templateHash)
@@ -118,15 +117,9 @@ namespace ZoneEngine_New.Core.Mobs
             if (!File.Exists(AORebirth.Core.GameData.GameDataPaths.ResolveFile(gameData.RootPath, FileName)))
                 throw new FileNotFoundException($"Mandatory NPC combat catalog {FileName} is missing.");
 
-            GameDataStore? store = gameData as GameDataStore;
-            HashSet<int> equippedIds = store == null ? [] : new HashSet<int>(store.NpcEquipmentTemplateIds());
-            foreach (int id in _petSummons.CreationItemTemplateIds)
-            {
-                if (!items.TryGet(id, out ItemTemplate item))
-                    throw new InvalidDataException($"{PetSummonsFileName}: missing creation item template {id}.");
-                NpcPetSummons.ReadSummons(item, store == null || equippedIds.Contains(id) ? gameData : null);
-            }
+            _petSummons.ValidateReferences(items, gameData);
 
+            GameDataStore? store = gameData as GameDataStore;
             foreach ((string hash, MonsterCombatRules rule) in _rules)
             {
                 if (rule.Pets == null && rule.TriggeredSelfNanos is not { Count: > 0 })
@@ -186,20 +179,7 @@ namespace ZoneEngine_New.Core.Mobs
                 }
             }
 
-            NpcPetSummonProfile? petSummons = null;
-            string petPath = AORebirth.Core.GameData.GameDataPaths.ResolveFile(root, PetSummonsFileName);
-            if (File.Exists(petPath))
-            {
-                petSummons = JsonSerializer.Deserialize<NpcPetSummonProfile>(File.ReadAllText(petPath), JsonOptions);
-                if (petSummons?.Version != 1 || petSummons.Policy == null || petSummons.CreationItemTemplateIds == null
-                    || petSummons.CreationItemTemplateIds.Length == 0
-                    || Array.Exists(petSummons.CreationItemTemplateIds, id => id <= 0)
-                    || new HashSet<int>(petSummons.CreationItemTemplateIds).Count != petSummons.CreationItemTemplateIds.Length)
-                    throw new InvalidDataException($"{PetSummonsFileName}: expected version 1, unique positive item IDs and a pet policy.");
-                petSummons.Policy.Validate(PetSummonsFileName);
-            }
-
-            return new MonsterCombatRulesCatalog(rules, petSummons);
+            return new MonsterCombatRulesCatalog(rules, NpcPetSummonProfile.LoadOptional(root));
         }
 
         /// <summary>One root's current rules; the reference is swapped whole.</summary>
@@ -220,7 +200,7 @@ namespace ZoneEngine_New.Core.Mobs
     {
         HashSet<int>? _hatedFamilies;
 
-        public MonsterPetRule? Pets { get; set; }
+        public NpcPetSummonPolicy? Pets { get; set; }
 
         /// <summary>Health-triggered self casts with per-fight limits; excluded from ordinary casting.</summary>
         public List<MonsterTriggeredSelfNano>? TriggeredSelfNanos { get; set; }
@@ -254,42 +234,5 @@ namespace ZoneEngine_New.Core.Mobs
 
         /// <summary>Additional delay after successful execution; normal casting cadence and recharge still apply.</summary>
         public required int CooldownSeconds { get; set; }
-    }
-
-    /// <summary>
-    /// Explicit policy for an equipped pet creation template. Pets leave when the NPC resets, dies or despawns.
-    /// </summary>
-    public sealed class MonsterPetRule
-    {
-        /// <summary>Most pets alive at once.</summary>
-        public required int MaxPets { get; init; }
-
-        /// <summary>Most living pets of each creation-item mob hash; null leaves the per-type count unlimited.</summary>
-        public required int? MaxPetsPerType { get; init; }
-
-        /// <summary>Seconds from combat start to the first pet, and between each pet after it.</summary>
-        public required double SummonIntervalSeconds { get; init; }
-
-        /// <summary>Seconds after a pet dies before its replacement, while the fight goes on.</summary>
-        public required double RespawnDelaySeconds { get; init; }
-
-        /// <summary>Seconds before retrying unavailable placement or an immediate selection opportunity.</summary>
-        public required double RetryDelaySeconds { get; init; }
-
-        internal void Validate(string context)
-        {
-            if (MaxPets < 0 || MaxPetsPerType is < 1
-                || !double.IsFinite(SummonIntervalSeconds) || SummonIntervalSeconds < 0
-                || !double.IsFinite(RespawnDelaySeconds) || RespawnDelaySeconds < 0
-                || !double.IsFinite(RetryDelaySeconds) || RetryDelaySeconds <= 0)
-                throw new InvalidDataException($"{context}: invalid pet cap or timing.");
-        }
-    }
-
-    public sealed class NpcPetSummonProfile
-    {
-        public required int Version { get; init; }
-        public required int[] CreationItemTemplateIds { get; init; }
-        public required MonsterPetRule Policy { get; init; }
     }
 }

@@ -512,7 +512,7 @@ def value_hash(value):
     return "MISSING" if value is MISSING else digest(encoded(value))
 
 
-def merge_value(base, incoming, private, resolutions, pointer=""):
+def merge_value(base, incoming, private, resolutions, pointer="", *, recorded=MISSING):
     """Three-way merge; independently owned keys survive and conflicts fail closed."""
     if value_hash(private) == value_hash(base):
         return incoming
@@ -524,36 +524,59 @@ def merge_value(base, incoming, private, resolutions, pointer=""):
         if (not isinstance(resolution, dict) or resolution.get("INPUT_HASHES") != expected
                 or not resolution.get("APPROVAL") or resolution.get("ACTION") not in ("PRESERVE_PRIVATE", "RESOLVED_VALUE")):
             raise ContentConflict(pointer, expected)
-        return private if resolution["ACTION"] == "PRESERVE_PRIVATE" else resolution["VALUE"]
+        if resolution["ACTION"] == "PRESERVE_PRIVATE":
+            return private
+        approved = resolution["VALUE"]
+        if recorded is not MISSING and value_hash(recorded) == value_hash(approved):
+            return recorded
+        # The receipt recursively sorts keys. Materialize the approved value in that same order.
+        return json.loads(encoded(approved), object_pairs_hook=pairs)
     if isinstance(base, dict) and isinstance(private, dict) and (isinstance(incoming, dict) or incoming is MISSING):
         incoming_missing = incoming is MISSING
         incoming = {} if incoming is MISSING else incoming
         result = {}
         for key in dict.fromkeys([*private, *incoming, *base]):
             child = pointer + "/" + key.replace("~", "~0").replace("/", "~1")
-            value = merge_value(base.get(key, MISSING), incoming.get(key, MISSING), private.get(key, MISSING), resolutions, child)
+            recorded_child = recorded.get(key, MISSING) if isinstance(recorded, dict) else MISSING
+            value = merge_value(base.get(key, MISSING), incoming.get(key, MISSING), private.get(key, MISSING),
+                                resolutions, child, recorded=recorded_child)
             if value is not MISSING:
                 result[key] = value
         return MISSING if incoming_missing and not result else result
     if base is MISSING and isinstance(incoming, dict) and isinstance(private, dict):
-        return merge_value({}, incoming, private, resolutions, pointer)
+        return merge_value({}, incoming, private, resolutions, pointer, recorded=recorded)
     raise ContentConflict(pointer, expected)
 
 
-def merge_bytes(base, incoming, private, resolutions):
+def merge_bytes(base, incoming, private, resolutions, *, recorded_resolution_order=None):
     if private == base:
         return incoming
     if incoming == base or incoming == private:
         return private
     def parse(value):
         return MISSING if value is None else json.loads(value.decode("utf-8-sig"), object_pairs_hook=pairs)
-    result = merge_value(parse(base), parse(incoming), parse(private), resolutions)
+    result = merge_value(parse(base), parse(incoming), parse(private), resolutions,
+                         recorded=parse(recorded_resolution_order))
     if result is MISSING:
         return None
     for raw in (private, incoming):
         if raw is not None and value_hash(parse(raw)) == value_hash(result):
             return raw
     return (json.dumps(result, ensure_ascii=False, indent=2) + "\n").encode()
+
+
+def verify_merge_bytes(base, incoming, private, resolutions, result, *, historical_checkpoint=False):
+    if merge_bytes(base, incoming, private, resolutions) == result:
+        return
+    if historical_checkpoint and result is not None and any(
+            isinstance(resolution, dict) and resolution.get("ACTION") == "RESOLVED_VALUE"
+            for resolution in resolutions.values()):
+        # The old writer lost approved key order in the receipt. Only a matching resolved
+        # value can recover that order from the hash-bound payload. The complete replay must
+        # still reproduce the original bytes, including data outside those approved values.
+        if merge_bytes(base, incoming, private, resolutions, recorded_resolution_order=result) == result:
+            return
+    raise ValueError("Content result is not the guarded three-way reconciliation")
 
 
 def changes(before, after):
@@ -1305,7 +1328,9 @@ def validate_runtime_exclusions(bundle, value, actual, portable=False, *, histor
             raise ValueError("Runtime exclusion schema differs")
         path = row["PATH"]
         relative(path)
-        if admitted(path) or path in seen or row["REASON"] != "DENIED_ADMISSION":
+        # An applied checkpoint records its own exclusion; current admission still applies
+        # to every new plan and its portable summary.
+        if (admitted(path) and not historical_checkpoint) or path in seen or row["REASON"] != "DENIED_ADMISSION":
             raise ValueError("Runtime exclusion does not identify a denied path")
         seen.append(path)
         identities = {}
@@ -1687,8 +1712,8 @@ def validate_reconciliation(bundle, reconciliation, *, historical_checkpoint=Fal
         if ((private is None) != (old is None) or (private is not None and
                 (digest(private) != old["sha256"] or blob(private) != old["blob"] or len(private) != old["size"]))):
             raise ValueError("Canonical before-payload differs from the complete manifest")
-        if merge_bytes(base, incoming, private, change["RESOLUTIONS"]) != result:
-            raise ValueError("Content result is not the guarded three-way reconciliation")
+        verify_merge_bytes(base, incoming, private, change["RESOLUTIONS"], result,
+                           historical_checkpoint=historical_checkpoint)
         if path in reconciliation["PROTECTED_GENERATED_FILES"] and private != result:
             raise ValueError("Required generated/private content was overwritten")
         if result is None:

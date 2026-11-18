@@ -4,30 +4,28 @@ namespace ZoneEngine_New.Core.Ai
     using System.Collections.Generic;
     using System.IO;
 
-    using AORebirth.Enums;
-
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Mobs;
 
     /// <summary>
-    /// An NPC's <see cref="MonsterPetRule"/>: once it starts fighting it raises pets from its pet-creation item, one every
-    /// <see cref="MonsterPetRule.SummonIntervalSeconds"/> (the first one interval in), up to
-    /// <see cref="MonsterPetRule.MaxPets"/>; a pet that dies is replaced
-    /// <see cref="MonsterPetRule.RespawnDelaySeconds"/> later while the fight goes on. The pets are ordinary NPC pets
+    /// An NPC's <see cref="NpcPetSummonPolicy"/>: once it starts fighting it raises pets from its pet-creation item, one every
+    /// <see cref="NpcPetSummonPolicy.SummonIntervalSeconds"/> (the first one interval in), up to
+    /// <see cref="NpcPetSummonPolicy.MaxPets"/>; a pet that dies is replaced
+    /// <see cref="NpcPetSummonPolicy.RespawnDelaySeconds"/> later while the fight goes on. The pets are ordinary NPC pets
     /// (<see cref="Pets.PetService"/>), so the owner's reset, death or despawn dismisses them.
     /// </summary>
     sealed class NpcPetSummons
     {
         readonly NpcCharacter _npc;
-        readonly MonsterPetRule _rule;
-        readonly SummonOperation[] _summons;
+        readonly NpcPetSummonPolicy _rule;
+        readonly NpcPetSummonOperation[] _summons;
         readonly List<NpcCharacter> _pets = new();
         readonly List<DateTime> _due = new();
         bool _inCombat;
 
-        NpcPetSummons(NpcCharacter npc, MonsterPetRule rule, SummonOperation[] summons)
+        NpcPetSummons(NpcCharacter npc, NpcPetSummonPolicy rule, NpcPetSummonOperation[] summons)
         {
             _npc = npc;
             _rule = rule;
@@ -42,7 +40,7 @@ namespace ZoneEngine_New.Core.Ai
         {
             MonsterCombatRulesCatalog catalog = MonsterCombatRulesCatalog.For(gameData.RootPath);
             string? hash = npc.SpawnHash ?? npc.MobTemplate?.Hash;
-            MonsterPetRule? rule = catalog.PetRule(hash, npc.MobTemplate?.Hash);
+            NpcPetSummonPolicy? rule = catalog.PetRule(hash, npc.MobTemplate?.Hash);
             Item? creator = null;
             foreach (Item item in npc.Equipment.Content.Values)
             {
@@ -63,41 +61,7 @@ namespace ZoneEngine_New.Core.Ai
             if (rule is not { MaxPets: > 0 })
                 return null;
 
-            return new NpcPetSummons(npc, rule, ReadSummons(creator.Definition, gameData));
-        }
-
-        internal static SummonOperation[] ReadSummons(ItemTemplate creator, IGameData? gameData)
-        {
-            if (!creator.SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells))
-                throw new InvalidDataException($"NPC pet creation item {creator.Id} has no OnUse event.");
-
-            var summons = new List<SummonOperation>();
-            foreach (ItemSpell spell in spells)
-            {
-                bool spawnsMonster = spell.Is(FunctionType.SpawnMonster2);
-                if (!spawnsMonster && !spell.Is(FunctionType.SummonPet))
-                    continue;
-                if (!spell.TryReadString(0, out string petHash) || string.IsNullOrWhiteSpace(petHash))
-                    throw new InvalidDataException($"NPC pet creation item {creator.Id} has a summon with no target hash.");
-
-                petHash = petHash.Trim();
-                bool hasLevel = spell.TryReadInt(1, out int level);
-                bool hasDuration = spell.TryReadInt(2, out int duration);
-                if ((spawnsMonster && level <= 0) || (!hasLevel && spell.ArgumentCount > 1)
-                    || (!hasDuration && spell.ArgumentCount > 2))
-                    throw new InvalidDataException($"NPC pet creation item {creator.Id} has invalid summon arguments for '{petHash}'.");
-                if (gameData != null && (!gameData.HasMobTemplate(petHash)
-                    || !gameData.TryResolveMobTemplate(petHash, level > 0 ? level : null, out MobTemplate template)
-                    || !NpcTemplateValidation.CanSpawn(template)))
-                    throw new InvalidDataException($"NPC pet creation item {creator.Id} refers to unspawnable pet '{petHash}'.");
-
-                // SpawnMonster2 does not apply a time-to-live in the normal item function.
-                summons.Add(new SummonOperation(spell, petHash, level, spawnsMonster ? 0 : duration));
-            }
-
-            if (summons.Count == 0)
-                throw new InvalidDataException($"NPC pet creation item {creator.Id} has no OnUse summon operation.");
-            return summons.ToArray();
+            return new NpcPetSummons(npc, rule, NpcPetSummonProfile.ReadSummons(creator.Definition, gameData));
         }
 
         /// <param name="inCombat">The NPC is fighting and not leashing home.</param>
@@ -137,7 +101,7 @@ namespace ZoneEngine_New.Core.Ai
                 if (_due[i] > nowUtc || _pets.Count >= _rule.MaxPets)
                     continue;
 
-                if (!TryChoosePet(out SummonOperation summon))
+                if (!TryChoosePet(out NpcPetSummonOperation summon))
                 {
                     // Zero means an immediate initial attempt, not another random roll every world tick.
                     double delay = _rule.SummonIntervalSeconds > 0 ? _rule.SummonIntervalSeconds : _rule.RetryDelaySeconds;
@@ -166,7 +130,7 @@ namespace ZoneEngine_New.Core.Ai
             _pets.Clear();
         }
 
-        bool TryChoosePet(out SummonOperation selected)
+        bool TryChoosePet(out NpcPetSummonOperation selected)
         {
             selected = default;
 
@@ -176,7 +140,7 @@ namespace ZoneEngine_New.Core.Ai
             var self = new RequirementSubject(
                 stat => criteria.Resolve(stat, id => _npc.Stats.Get(id)), _npc.ResolveRequirement);
             var owner = new RequirementSubject(stat => _npc.Stats.Get(stat), _npc.ResolveRequirement);
-            foreach (SummonOperation summon in _summons)
+            foreach (NpcPetSummonOperation summon in _summons)
             {
                 if (!ItemTemplate.MeetsRequirements(summon.Spell.Requirements, self, owner, owner))
                     continue;
@@ -202,7 +166,5 @@ namespace ZoneEngine_New.Core.Ai
 
         bool IsGone(NpcCharacter pet)
             => pet.IsDead || pet.Playfield == null || !ReferenceEquals(pet.Pet?.Owner, _npc);
-
-        internal readonly record struct SummonOperation(ItemSpell Spell, string Hash, int Level, int Duration);
     }
 }

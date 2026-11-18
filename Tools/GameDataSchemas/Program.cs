@@ -25,7 +25,7 @@ Type npcHash = typeof(NpcTemplateCatalog).GetNestedType("NpcHashDto", BindingFla
 Write("MonsterCombatRules", "Monster combat rules: combat behaviour keyed by mob hash.", nameof(MonsterCombatRules),
     typeof(Dictionary<string, MonsterCombatRules>), LoaderOptions(typeof(MonsterCombatRulesCatalog)));
 Write("NpcPetSummons", "NPC combat pet creation items and their authored policy.", nameof(NpcPetSummonProfile),
-    typeof(NpcPetSummonProfile), LoaderOptions(typeof(MonsterCombatRulesCatalog)));
+    typeof(NpcPetSummonProfile), LoaderOptions(typeof(NpcPetSummonProfile)));
 Write("NpcTemplates", "NPC templates: mob hashes, their families and level bands.", "NpcTemplateCatalog.NpcHashDto",
     typeof(Dictionary<,>).MakeGenericType(typeof(string), npcHash), LoaderOptions(typeof(NpcTemplateCatalog)));
 // Gameplay.json is written in camelCase; the loader matches names case-insensitively.
@@ -91,17 +91,17 @@ JsonSchemaExporterOptions Exporter()
                 RefineQuestProperty(questProperty.Name, questNode);
             if (context.PropertyInfo is { } petProperty && node is JsonObject petNode)
             {
-                if (petProperty.DeclaringType == typeof(MonsterPetRule))
+                if (petProperty.DeclaringType == typeof(NpcPetSummonPolicy))
                 {
-                    if (petProperty.Name == nameof(MonsterPetRule.RetryDelaySeconds))
+                    if (petProperty.Name == nameof(NpcPetSummonPolicy.RetryDelaySeconds))
                         petNode["exclusiveMinimum"] = 0;
                     else
-                        petNode["minimum"] = petProperty.Name == nameof(MonsterPetRule.MaxPetsPerType) ? 1 : 0;
+                        petNode["minimum"] = petProperty.Name == nameof(NpcPetSummonPolicy.MaxPetsPerType) ? 1 : 0;
                 }
                 if (petProperty.DeclaringType == typeof(NpcPetSummonProfile))
                 {
                     if (petProperty.Name == nameof(NpcPetSummonProfile.Version))
-                        petNode["const"] = 1;
+                        petNode["const"] = NpcPetSummonProfile.SupportedVersion;
                     if (petProperty.Name == nameof(NpcPetSummonProfile.CreationItemTemplateIds))
                     {
                         petNode["minItems"] = 1;

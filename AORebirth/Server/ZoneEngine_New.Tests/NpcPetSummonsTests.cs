@@ -239,7 +239,7 @@ public sealed class NpcPetSummonsTests
 
         void WriteGameData(int equippedTemplateId, int maxPets)
         {
-            var policy = new MonsterPetRule
+            var policy = new NpcPetSummonPolicy
             {
                 MaxPets = maxPets, MaxPetsPerType = 1, SummonIntervalSeconds = 2, RespawnDelaySeconds = 7, RetryDelaySeconds = 3
             };
