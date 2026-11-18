@@ -1,5 +1,16 @@
 # Current Task
 
+ACTIVE (2026-11-17): PORK-compatible bio API for AOR on `api-pork-doc`. The
+specification is [character-bio-api.md](../api/character-bio-api.md). Done and
+uncommitted: migration `20261116_pork_meta.sql` (applied locally), the engine
+hooks of section 6.1 (compiled), and the PHP exporter `Tools/PorkForAor` with the
+character, organization stats and online exporters, the sweep, `web/apache.htaccess`
+and `web/org.php`. The exporters are checked on localhost by the owner; the sweep,
+and the heartbeat cost remain open (section 11).
+No test suite was run and no engine or client was started by the agent.
+
+## Retained previous task
+
 IMPLEMENTED AND FEATURE VALIDATED (2026-11-07) on
 `codex/retail-mission-doa-repair`, based on freshly fetched public master
 `cda38284540f45573424fb399a60c9ab7627a6f7`. Typed offers replace runtime

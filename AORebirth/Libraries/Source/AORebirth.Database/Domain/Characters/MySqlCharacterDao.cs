@@ -120,6 +120,14 @@ namespace AORebirth.Database.Domain.Characters
                             throw new InvalidDataException("Stale-online recovery did not update exactly the captured rows.");
                         }
 
+                        // PORK: every organization that had an online member changed its online list.
+                        connection.Execute(
+                            "INSERT INTO org_online_meta (id_org,last_updated) "
+                            + "SELECT DISTINCT StatValue, UTC_TIMESTAMP(6) FROM stats "
+                            + "WHERE Type=50000 AND StatId=5 AND StatValue<>0 AND Instance IN @CharacterIds "
+                            + "ON DUPLICATE KEY UPDATE last_updated=VALUES(last_updated)",
+                            new { CharacterIds = captured.Select(row => row.Id).ToArray() }, transaction);
+
                         long remaining = connection.Query<long>(
                             "SELECT COUNT(*) FROM characters WHERE Online IS NOT NULL AND Online<>0",
                             transaction: transaction).Single();
@@ -142,9 +150,19 @@ namespace AORebirth.Database.Domain.Characters
         {
             // Preserve the default-isolation transaction previously owned by generic Save.
             return this.WithConnection(connection => InTransaction(
-                connection, null, transaction => new TransactionOutcome<int>(
-                    connection.Execute("UPDATE characters SET Online=@Online WHERE Id=@CharacterId",
-                        new { CharacterId = characterId, Online = online }, transaction), true)));
+                connection, null, transaction =>
+                {
+                    int updated = connection.Execute("UPDATE characters SET Online=@Online WHERE Id=@CharacterId",
+                        new { CharacterId = characterId, Online = online }, transaction);
+                    // PORK: the organization online list changes with the character's online flag.
+                    connection.Execute(
+                        "INSERT INTO org_online_meta (id_org,last_updated) "
+                        + "SELECT StatValue, UTC_TIMESTAMP(6) FROM stats "
+                        + "WHERE Type=50000 AND Instance=@CharacterId AND StatId=5 AND StatValue<>0 "
+                        + "ON DUPLICATE KEY UPDATE last_updated=VALUES(last_updated)",
+                        new { CharacterId = characterId }, transaction);
+                    return new TransactionOutcome<int>(updated, true);
+                }));
         }
 
         private static T InTransaction<T>(

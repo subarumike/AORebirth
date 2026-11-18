@@ -204,8 +204,39 @@ namespace AORebirth.Database.Dao
                 new { LeaderId = id },
                 connection,
                 transaction).FirstOrDefault();
+            // PORK change tracking: the organization pages and its members' bios change with this deletion.
+            // This must run before the organization and Clan stat rows are deleted below.
+            connection.Execute(
+                "INSERT INTO org_stats_meta (id_org,last_updated) "
+                + "SELECT StatValue, UTC_TIMESTAMP(6) FROM stats WHERE Type=50000 AND Instance=@CharacterId AND StatId=5 AND StatValue<>0 "
+                + "ON DUPLICATE KEY UPDATE last_updated=VALUES(last_updated)",
+                new { CharacterId = id },
+                transaction);
+            connection.Execute(
+                "INSERT INTO org_online_meta (id_org,last_updated) "
+                + "SELECT StatValue, UTC_TIMESTAMP(6) FROM stats WHERE Type=50000 AND Instance=@CharacterId AND StatId=5 AND StatValue<>0 "
+                + "ON DUPLICATE KEY UPDATE last_updated=VALUES(last_updated)",
+                new { CharacterId = id },
+                transaction);
             if (org != null)
             {
+                connection.Execute(
+                    "INSERT INTO character_bio_meta (id_char,last_updated) "
+                    + "SELECT Instance, UTC_TIMESTAMP(6) FROM stats WHERE Type=50000 AND StatId=5 AND StatValue=@OrgId "
+                    + "ON DUPLICATE KEY UPDATE last_updated=VALUES(last_updated)",
+                    new { OrgId = org.Id },
+                    transaction);
+                connection.Execute(
+                    "INSERT INTO org_stats_meta (id_org,last_updated) VALUES (@OrgId,UTC_TIMESTAMP(6)) "
+                    + "ON DUPLICATE KEY UPDATE last_updated=VALUES(last_updated)",
+                    new { OrgId = org.Id },
+                    transaction);
+                connection.Execute(
+                    "INSERT INTO org_online_meta (id_org,last_updated) VALUES (@OrgId,UTC_TIMESTAMP(6)) "
+                    + "ON DUPLICATE KEY UPDATE last_updated=VALUES(last_updated)",
+                    new { OrgId = org.Id },
+                    transaction);
+
                 // What to do if the leader deletes himself?
                 // Lets remove the org for now, later on should it switch to secondhighest char in org?
                 OrganizationDao.Instance.Delete(org.Id, connection, transaction);
