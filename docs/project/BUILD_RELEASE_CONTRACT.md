@@ -130,6 +130,27 @@ build artifacts and release receipts remain private. Public documentation uses
 the role names above instead of publishing those private details. Existing
 deployment-tooling access and publication rules remain in force.
 
+## Admitting a new runtime catalog
+
+Land the production reader, its content validation and schema, and the exact
+path in the release contract's runtime admission table through source review.
+Check that the reader owns the path and rejects invalid content. Test the
+complete Windows manifest and its portable reconciliation summary. The Linux
+package verifier uses the release contract from the Windows-accepted source.
+Keep unclassified paths denied.
+
+Review protected content in the configured private upstream. Publish approved
+data only after the authoritative intake can admit the path. If the upstream
+already contains the file from a previously denied projection, the existing
+`REQUIRED_CURRENT_CATALOGS` mapping can restore an absent canonical file from
+that exact source snapshot. Apply the measured, approved reconciliation and
+validate the installed file through its production reader.
+
+For NPC pet summons, the exact path is `NpcPetSummons.json`. ZoneEngine's
+`NpcPetSummonProfile` owns loading and reference validation. A source change
+that uses this optional catalog for an encounter must require and validate it
+before enabling the authored policy.
+
 ## Windows preparation and acceptance
 
 1. Fetch public master and record its exact tip. Use that tip as
