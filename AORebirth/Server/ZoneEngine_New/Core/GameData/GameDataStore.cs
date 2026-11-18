@@ -164,6 +164,9 @@ namespace ZoneEngine_New.Core.GameData
         public bool HasMobTemplate(string hash)
             => _npcTemplates.HasTemplate(hash);
 
+        internal IEnumerable<int> NpcEquipmentTemplateIds(string? hash = null)
+            => _npcTemplates.EquipmentTemplateIds(hash);
+
         public bool TryGetMobTemplate(string hash, out MobTemplate template)
         {
             template = null!;

@@ -132,6 +132,7 @@
     <Compile Include="TestDoubles.cs" />
     <Compile Include="NpcBrainTests.cs" />
     <Compile Include="NpcPatrolTests.cs" />
+    <Compile Include="NpcPetSummonProfileTests.cs" />
   </ItemGroup>
   <ItemGroup Condition="'$(ExpansionHydrationFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />

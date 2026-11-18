@@ -2,6 +2,7 @@ namespace ZoneEngine_New.Core.GameData
 {
     using System;
     using System.Collections.Generic;
+    using System.Linq;
     using System.Text.Json;
     using System.Text.Json.Serialization;
 
@@ -50,6 +51,25 @@ namespace ZoneEngine_New.Core.GameData
         public int FamilyCount => _families.Count;
 
         public int LeafCount => _leaves.Count;
+
+        internal IEnumerable<int> EquipmentTemplateIds(string? hash = null)
+            => EquipmentBands(hash).SelectMany(band => EquipmentTemplateIds(band.Equipment));
+
+        internal IEnumerable<NpcLevelBand> EquipmentBands(string? hash)
+            => hash == null ? _leaves.Values.SelectMany(leaf => leaf.Bands)
+                : _leaves.TryGetValue(hash, out NpcLeaf? leaf) ? leaf.Bands : [];
+
+        static IEnumerable<int> EquipmentTemplateIds(IEnumerable<List<int>> equipment)
+        {
+            foreach (List<int> pair in equipment)
+            {
+                if (pair == null || pair.Count == 0 || pair[0] <= 0)
+                    continue;
+                yield return pair[0];
+                if (pair.Count >= 2 && pair[1] > 0 && pair[1] != pair[0])
+                    yield return pair[1];
+            }
+        }
 
         public static NpcTemplateCatalog Parse(string? json, Random? random = null)
         {
