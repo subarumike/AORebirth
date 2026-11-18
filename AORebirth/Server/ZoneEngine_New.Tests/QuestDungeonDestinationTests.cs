@@ -51,6 +51,48 @@ public sealed class QuestDungeonDestinationTests
         new ItemTemplateCatalog(RuntimeData.Value, new StubLogger())));
 
     [TestMethod]
+    public void InvalidQuestItemBindingsDoNotRemoveUnrelatedQuestsOrGrantFallbackItems()
+    {
+        DirectoryInfo root = Directory.CreateTempSubdirectory("quest-item-bindings-");
+        string? previousOverride = Environment.GetEnvironmentVariable(GameDataPaths.OverrideEnvironmentVariableName);
+        try
+        {
+            Environment.SetEnvironmentVariable(GameDataPaths.OverrideEnvironmentVariableName, null);
+            File.WriteAllText(Path.Combine(root.FullName, QuestCatalog.FileName), """
+                [
+                    {"Hash":"START","StartItems":[
+                        {"Hash":"MISSINGFIRST","Id":101,"HighId":102,"Quality":1},
+                        {"Hash":"MISSINGSECOND","Id":103,"HighId":104,"Quality":1}]},
+                    {"Hash":"ASSEMBLE","Action":"Assemble"},
+                    {"Hash":"EQUIP","Action":"Equip","Objective":{"SpecItem":"MISSINGOBJECTIVE"}},
+                    {"Hash":"UNRELATED"}
+                ]
+                """);
+            var catalog = new QuestCatalog(new StubGameData(HashItemCatalog.Parse("{}"), rootPath: root.FullName), new StubLogger());
+
+            Assert.AreEqual(4, catalog.Count, "One invalid quest binding must not empty the catalog on startup.");
+            Assert.IsTrue(catalog.TryGet("UNRELATED", out QuestTemplate unrelated));
+            Assert.IsNull(unrelated.LoadProblem);
+            Assert.IsTrue(catalog.TryGet("START", out QuestTemplate start));
+            StringAssert.Contains(start.LoadProblem!, "MISSINGFIRST");
+            Assert.IsTrue(start.StartItems!.All(item => item.Id == 0 && item.HighId == null));
+            Assert.IsTrue(catalog.TryGet("ASSEMBLE", out QuestTemplate assemble));
+            StringAssert.Contains(assemble.LoadProblem!, "Objective SpecItem is required");
+            Assert.IsTrue(catalog.TryGet("EQUIP", out QuestTemplate equip));
+            StringAssert.Contains(equip.LoadProblem!, "MISSINGOBJECTIVE");
+
+            var result = catalog.Reload();
+            Assert.IsTrue(result.Ok);
+            Assert.AreEqual(3, result.Problems.Count);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(GameDataPaths.OverrideEnvironmentVariableName, previousOverride);
+            root.Delete(recursive: true);
+        }
+    }
+
+    [TestMethod]
     public void AcceptancePersistsSelectedIdentityAndPublishesLinkedKeyOnlyAfterCommit()
     {
         using var f = new Fixture();

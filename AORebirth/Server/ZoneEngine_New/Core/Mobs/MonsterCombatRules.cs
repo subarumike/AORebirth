@@ -32,6 +32,7 @@ namespace ZoneEngine_New.Core.Mobs
             PropertyNameCaseInsensitive = true,
             ReadCommentHandling = JsonCommentHandling.Skip,
             AllowTrailingCommas = true,
+            AllowDuplicateProperties = false,
             Converters = { new System.Text.Json.Serialization.JsonStringEnumConverter() }
         };
 
@@ -111,22 +112,24 @@ namespace ZoneEngine_New.Core.Mobs
             => PetOverride(spawnHash, templateHash) is { MaxPets: > 0 };
 
         public void ValidateEncounterReferences(IItemTemplateCatalog items, IGameData gameData)
+            => ValidateEncounterReferences(items, gameData, (gameData as GameDataStore)?.LoadedNpcTemplates);
+
+        internal void ValidateEncounterReferences(IItemTemplateCatalog items, IGameData gameData, NpcTemplateCatalog? templates)
         {
             if (_petSummons == null)
                 throw new FileNotFoundException($"Mandatory NPC pet policy {PetSummonsFileName} is missing.");
             if (!File.Exists(AORebirth.Core.GameData.GameDataPaths.ResolveFile(gameData.RootPath, FileName)))
                 throw new FileNotFoundException($"Mandatory NPC combat catalog {FileName} is missing.");
 
-            _petSummons.ValidateReferences(items, gameData);
+            _petSummons.ValidateReferences(items, gameData, templates);
 
-            GameDataStore? store = gameData as GameDataStore;
             foreach ((string hash, MonsterCombatRules rule) in _rules)
             {
                 if (rule.Pets == null && rule.TriggeredSelfNanos is not { Count: > 0 })
                     continue;
-                if (!gameData.HasMobTemplate(hash))
+                if (!(templates?.HasTemplate(hash) ?? gameData.HasMobTemplate(hash)))
                     throw new InvalidDataException($"{FileName}: encounter rule refers to unknown NPC template '{hash}'.");
-                NpcLevelBand[]? bands = store?.NpcEquipmentBands(hash).ToArray();
+                NpcLevelBand[]? bands = templates?.EquipmentBands(hash).ToArray();
                 if (bands is { Length: 0 })
                     throw new InvalidDataException($"{FileName}: encounter rule requires an NPC leaf template for '{hash}'.");
                 if (rule.Pets is { MaxPets: > 0 } && bands != null

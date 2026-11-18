@@ -64,6 +64,38 @@ public sealed class NpcPetSummonsTests
     }
 
     [TestMethod]
+    public void CombatRulesReloadRejectsDuplicateRulesAndKeepsTheActiveCatalog()
+    {
+        using var scene = new Scene();
+        MonsterCombatRulesCatalog active = MonsterCombatRulesCatalog.For(scene.Data.RootPath);
+        File.WriteAllText(Path.Combine(scene.Data.RootPath, MonsterCombatRulesCatalog.FileName),
+            $$"""{ "{{OwnerHash}}": {}, "{{OwnerHash}}": {} }""");
+
+        var result = MonsterCombatRulesCatalog.Reload(scene.Data.RootPath, scene.Catalog, scene.Data);
+
+        Assert.IsFalse(result.Ok);
+        Assert.AreSame(active, MonsterCombatRulesCatalog.For(scene.Data.RootPath));
+    }
+
+    [TestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public void NpcTemplateReloadPreservesTheActiveCatalogWhenAnEncounterBindingWouldBreak(bool removePet)
+    {
+        using var scene = new Scene();
+        var reload = new NpcTemplatesReload(scene.Data, scene.Catalog);
+        Assert.IsTrue(reload.Reload().Ok, "The installed encounter remains valid.");
+        NpcTemplateCatalog active = scene.Data.LoadedNpcTemplates;
+        scene.WriteNpcTemplates(removePet ? CreationTemplateId : CreationTemplateId + 1, removePet ? PetHashes[0] : null);
+
+        var result = reload.Reload();
+
+        Assert.IsFalse(result.Ok);
+        StringAssert.Contains(result.Problems.Single(), removePet ? PetHashes[0] : "bound pet creation item");
+        Assert.AreSame(active, scene.Data.LoadedNpcTemplates);
+    }
+
+    [TestMethod]
     public void ConditionalSelectionRespectsOneOfEachTypeAndFourLivingPets()
     {
         using var scene = new Scene();
@@ -247,7 +279,12 @@ public sealed class NpcPetSummonsTests
                 JsonSerializer.Serialize(new NpcPetSummonProfile { Version = 1, CreationItemTemplateIds = [CreationTemplateId], Policy = policy }));
             File.WriteAllText(Path.Combine(_root.FullName, MonsterCombatRulesCatalog.FileName),
                 JsonSerializer.Serialize(new Dictionary<string, MonsterCombatRules> { [OwnerHash] = new() { Pets = policy } }));
-            var templates = PetHashes.ToDictionary(hash => hash, hash => new
+            WriteNpcTemplates(equippedTemplateId);
+        }
+
+        public void WriteNpcTemplates(int equippedTemplateId, string? omittedPet = null)
+        {
+            var templates = PetHashes.Where(hash => hash != omittedPet).ToDictionary(hash => hash, hash => new
             {
                 Templates = new[] { new { Name = hash, Level = 1, Stats = FixtureStats(), Equipment = Array.Empty<int[]>() } }
             });

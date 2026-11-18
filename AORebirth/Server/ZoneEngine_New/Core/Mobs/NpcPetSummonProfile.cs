@@ -56,21 +56,21 @@ namespace ZoneEngine_New.Core.Mobs
             return profile;
         }
 
-        internal void ValidateReferences(IItemTemplateCatalog items, IGameData gameData)
+        internal void ValidateReferences(IItemTemplateCatalog items, IGameData gameData, NpcTemplateCatalog? templates = null)
         {
-            GameDataStore? store = gameData as GameDataStore;
-            HashSet<int> equippedIds = store == null ? [] : new HashSet<int>(store.NpcEquipmentTemplateIds());
+            templates ??= (gameData as GameDataStore)?.LoadedNpcTemplates;
+            HashSet<int> equippedIds = templates == null ? [] : new HashSet<int>(templates.EquipmentTemplateIds());
             foreach (int id in CreationItemTemplateIds)
             {
                 if (!items.TryGet(id, out ItemTemplate item))
                     throw new InvalidDataException($"{FileName}: missing creation item template {id}.");
 
                 // Validate the authored operation for every item and require spawnable targets for equipped items.
-                ReadSummons(item, store == null || equippedIds.Contains(id) ? gameData : null);
+                ReadSummons(item, templates == null || equippedIds.Contains(id) ? gameData : null, templates);
             }
         }
 
-        internal static NpcPetSummonOperation[] ReadSummons(ItemTemplate creator, IGameData? gameData)
+        internal static NpcPetSummonOperation[] ReadSummons(ItemTemplate creator, IGameData? gameData, NpcTemplateCatalog? templates = null)
         {
             if (!creator.SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? spells))
                 throw new InvalidDataException($"NPC pet creation item {creator.Id} has no OnUse event.");
@@ -90,9 +90,7 @@ namespace ZoneEngine_New.Core.Mobs
                 if ((spawnsMonster && level <= 0) || (!hasLevel && spell.ArgumentCount > 1)
                     || (!hasDuration && spell.ArgumentCount > 2))
                     throw new InvalidDataException($"NPC pet creation item {creator.Id} has invalid summon arguments for '{petHash}'.");
-                if (gameData != null && (!gameData.HasMobTemplate(petHash)
-                    || !gameData.TryResolveMobTemplate(petHash, level > 0 ? level : null, out MobTemplate template)
-                    || !NpcTemplateValidation.CanSpawn(template)))
+                if (gameData != null && !CanSpawnPet(gameData, templates, petHash, level > 0 ? level : null))
                     throw new InvalidDataException($"NPC pet creation item {creator.Id} refers to unspawnable pet '{petHash}'.");
 
                 // SpawnMonster2 does not apply a time-to-live in the normal item function.
@@ -102,6 +100,18 @@ namespace ZoneEngine_New.Core.Mobs
             if (summons.Count == 0)
                 throw new InvalidDataException($"NPC pet creation item {creator.Id} has no OnUse summon operation.");
             return summons.ToArray();
+        }
+
+        static bool CanSpawnPet(IGameData gameData, NpcTemplateCatalog? templates, string hash, int? level)
+        {
+            if (!(templates?.HasTemplate(hash) ?? gameData.HasMobTemplate(hash)))
+                return false;
+
+            MobTemplate template;
+            bool found = templates == null
+                ? gameData.TryResolveMobTemplate(hash, level, out template)
+                : templates.TryResolve(hash, level, out template);
+            return found && NpcTemplateValidation.CanSpawn(template);
         }
     }
 

@@ -45,6 +45,30 @@ public sealed class PetPlacementTests
     }
 
     [TestMethod]
+    public void CollisionOnlyPlacementUsesAnOppositeFormationPointWhenRearSlotsHaveNoFloor()
+    {
+        using var scene = new Scene([Floor(0, minZ: 15.9f)]);
+        Assert.IsNull(scene.Owner.Playfield!.Pathfinder);
+        Assert.IsTrue(scene.Service.TryFindSpawnPosition(scene.Owner, null, out Vector3 at, out int index));
+        Assert.IsTrue(at.z > scene.Owner.Position.z);
+
+        Vector3 followPoint = PetFormation.PointFor(scene.Owner, index);
+        Assert.AreEqual(followPoint.x, at.x, 0.001);
+        Assert.AreEqual(followPoint.z, at.z, 0.001);
+    }
+
+    [TestMethod]
+    public void OppositeFormationSlotsUseDistinctAttackOffsets()
+    {
+        using var scene = new Scene([Floor(0)]);
+        NpcCharacter pet = scene.AddPet(physicalSlot: 0, reservedSlot: 0);
+        Vector3 rear = PetFormation.AttackPoint(pet, scene.Owner, 0, 1);
+        Vector3 opposite = PetFormation.AttackPoint(pet, scene.Owner, PetFormation.OppositeSlot(0), 1);
+
+        Assert.IsTrue(Vector3.Abs(rear - opposite) > 0.001);
+    }
+
+    [TestMethod]
     public void CollisionOnlyPlacementRejectsInsufficientHeadroom()
     {
         using var scene = new Scene([Floor(0), Floor(0.75f)]);

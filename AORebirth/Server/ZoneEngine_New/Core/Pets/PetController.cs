@@ -335,8 +335,8 @@ namespace ZoneEngine_New.Core.Pets
     }
 
     /// <summary>
-    /// Where each pet walks when it follows its owner: fixed slots behind and to either side, turned with the
-    /// owner's heading, so several pets spread out instead of piling onto one spot.
+    /// The pet follow positions rotate with the owner. Rear slots are preferred, with separately reserved
+    /// opposite positions available when collision blocks the rear.
     /// </summary>
     public static class PetFormation
     {
@@ -354,13 +354,26 @@ namespace ZoneEngine_New.Core.Pets
 
         internal static int SlotCount => Slots.Length;
 
+        // A nonnegative rear index maps to a negative opposite index and vice versa.
+        internal static int OppositeSlot(int index) => ~index;
+
         /// <summary>The follow point of formation slot <paramref name="index"/> around <paramref name="owner"/>.</summary>
         public static Vector3 PointFor(Character owner, int index)
         {
             ArgumentNullException.ThrowIfNull(owner);
-            (double side, double back) = Slots[Math.Clamp(index, 0, Slots.Length - 1)];
+            bool opposite = index < 0;
+            if (opposite)
+                index = OppositeSlot(index);
+
+            (double side, double back) = Slots[Math.Min(index, Slots.Length - 1)];
             if (index >= Slots.Length)
                 back += 1.5 * (index - Slots.Length + 1);
+
+            if (opposite)
+            {
+                side = -side;
+                back = -back;
+            }
 
             double yaw = owner.OwnedPets.FormationYaw(owner);
             double forwardX = Math.Sin(yaw);
@@ -380,10 +393,19 @@ namespace ZoneEngine_New.Core.Pets
         /// </summary>
         public static Vector3 AttackPoint(Character pet, Character target, int index, double reach)
         {
+            bool opposite = index < 0;
+            if (opposite)
+                index = OppositeSlot(index);
+
             double dx = pet.Position.x - target.Position.x;
             double dz = pet.Position.z - target.Position.z;
             double baseAngle = Math.Atan2(dx, dz);
-            double spread = (index % 2 == 0 ? 1 : -1) * ((index + 1) / 2) * (Math.PI / 5);
+            double spreadStep = Math.PI / 5;
+            double spread = (index % 2 == 0 ? 1 : -1) * ((index + 1) / 2) * spreadStep;
+            // Offset the opposite slots by half a step so they do not share a rear slot's attack angle.
+            if (opposite)
+                spread += spreadStep / 2;
+
             double angle = baseAngle + spread;
             return new Vector3(
                 target.Position.x + (Math.Sin(angle) * reach),

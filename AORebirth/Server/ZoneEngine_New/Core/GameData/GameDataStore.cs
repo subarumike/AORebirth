@@ -16,6 +16,7 @@ namespace ZoneEngine_New.Core.GameData
 
     using Utility;
 
+    using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Mobs;
     using ZoneEngine_New.Core.WorldSimulation;
@@ -167,7 +168,7 @@ namespace ZoneEngine_New.Core.GameData
         internal IEnumerable<int> NpcEquipmentTemplateIds(string? hash = null)
             => _npcTemplates.EquipmentTemplateIds(hash);
 
-        internal IEnumerable<NpcLevelBand> NpcEquipmentBands(string hash) => _npcTemplates.EquipmentBands(hash);
+        internal NpcTemplateCatalog LoadedNpcTemplates => _npcTemplates;
 
         public bool TryGetMobTemplate(string hash, out MobTemplate template)
         {
@@ -526,7 +527,7 @@ namespace ZoneEngine_New.Core.GameData
         /// Reads NpcTemplates.json (through the GameData override folder) and swaps it in. On a missing file or a parse
         /// failure the current templates stay. Startup and module reloads; never on a playfield tick.
         /// </summary>
-        internal AORebirth.Modules.Content.GameDataReloadResult ReloadNpcTemplates()
+        internal AORebirth.Modules.Content.GameDataReloadResult ReloadNpcTemplates(IItemTemplateCatalog? items = null)
         {
             const string name = "NpcTemplates";
             string path = GameDataPaths.ResolveFile(RootPath, GameDataPaths.NpcTemplatesFileName);
@@ -548,6 +549,8 @@ namespace ZoneEngine_New.Core.GameData
                 string rulesRoot = RootPath;
                 loaded.RuleFeatures = hash =>
                     Mobs.MonsterCombatRulesCatalog.For(rulesRoot).TryGet(hash, out Mobs.MonsterCombatRules rules) ? rules.Features : null;
+                if (items != null)
+                    MonsterCombatRulesCatalog.For(rulesRoot).ValidateEncounterReferences(items, this, loaded);
                 _npcTemplates = loaded;
                 _logger.Info(
                     string.Format(

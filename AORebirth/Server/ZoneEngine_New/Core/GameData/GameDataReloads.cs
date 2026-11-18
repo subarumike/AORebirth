@@ -126,7 +126,7 @@ namespace ZoneEngine_New.Core.GameData
     }
 
     /// <summary>NpcTemplates.json, swapped inside <see cref="GameDataStore"/>.</summary>
-    public sealed class NpcTemplatesReload(IGameData gameData) : IReloadableGameData
+    public sealed class NpcTemplatesReload(IGameData gameData, IItemTemplateCatalog? items = null) : IReloadableGameData
     {
         public string Name => "NpcTemplates";
 
@@ -134,7 +134,7 @@ namespace ZoneEngine_New.Core.GameData
 
         public GameDataReloadResult Reload()
             => gameData is GameDataStore store
-                ? store.ReloadNpcTemplates()
+                ? store.ReloadNpcTemplates(items)
                 : new GameDataReloadResult(Name, false, 0, ["this zone's GameData does not reload NpcTemplates"]);
     }
 

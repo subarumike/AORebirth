@@ -142,23 +142,31 @@ namespace ZoneEngine_New.Core.Pets
                 return false;
 
             NavMeshBuildSettings agent = finder?.Settings ?? DefaultCollisionAgent;
-            if (finder != null && TryFindSpawnPosition(owner, previous, world, finder, agent, out at, out formationIndex))
+            if (finder != null
+                && TryFindSpawnPosition(owner, previous, world, finder, agent, opposite: false, out at, out formationIndex))
                 return true;
 
             // Valid collision can extend beyond a baked polygon, and some shop interiors have no mesh at all.
-            return TryFindSpawnPosition(owner, previous, world, null, agent, out at, out formationIndex);
+            if (TryFindSpawnPosition(owner, previous, world, null, agent, opposite: false, out at, out formationIndex))
+                return true;
+
+            // Keep the usual follow spots when usable. If the rear is blocked, reserve a spot opposite it.
+            return (finder != null
+                    && TryFindSpawnPosition(owner, previous, world, finder, agent, opposite: true, out at, out formationIndex))
+                || TryFindSpawnPosition(owner, previous, world, null, agent, opposite: true, out at, out formationIndex);
         }
 
         bool TryFindSpawnPosition(Character owner, NpcCharacter? previous, PlayfieldWorldSimulation world,
-            NavMeshPathfinder? finder, NavMeshBuildSettings agent, out Vector3 at, out int formationIndex)
+            NavMeshPathfinder? finder, NavMeshBuildSettings agent, bool opposite, out Vector3 at, out int formationIndex)
         {
             at = owner.Position;
             formationIndex = 0;
             float radius = agent.AgentRadius;
             float height = agent.AgentHeight;
             int candidates = PetFormation.SlotCount + owner.OwnedPets.Count;
-            for (int index = 0; index < candidates; index++)
+            for (int candidateIndex = 0; candidateIndex < candidates; candidateIndex++)
             {
+                int index = opposite ? PetFormation.OppositeSlot(candidateIndex) : candidateIndex;
                 if (owner.OwnedPets.IsFormationIndexOccupied(index, previous))
                     continue;
 

@@ -14,9 +14,10 @@ namespace ZoneEngine_New.Core.Quests
     using ZoneEngine_New.Core.Logging;
 
     /// <summary>
-    /// GameData/Quests.json templates keyed by hash. Start items may be named by ItemTemplates.json hash and must resolve
-    /// to template ids before publication. Reward items come from QuestRewards.json. Loaded whole and swapped on reload;
-    /// a file that fails to load keeps the old templates. A quest already held keeps its accepted template.
+    /// GameData/Quests.json templates keyed by hash. Start items may be named by ItemTemplates.json hash, which must
+    /// resolve before the item can be granted. Unresolved item bindings are reported on the affected quest. Reward items
+    /// come from QuestRewards.json. A file that fails to load keeps the old templates. A quest already held keeps its
+    /// accepted template.
     /// </summary>
     public sealed class QuestCatalog
     {
@@ -139,7 +140,13 @@ namespace ZoneEngine_New.Core.Quests
                     template.Reward.Records = null;
                 }
 
-                BindRequiredItems(template);
+                if (BindRequiredItems(template) is string problem)
+                {
+                    template.LoadProblem = problem;
+                    string warning = $"Quest {template.Hash}: {problem}";
+                    warnings.Add(warning);
+                    logger.Warn(warning);
+                }
             }
 
             if (recordsIgnored.Count > 0)
@@ -156,11 +163,12 @@ namespace ZoneEngine_New.Core.Quests
         /// Resolves every hash-named start item of <paramref name="template"/> to its template ids for the item's quality.
         /// A start item hash must name one item family so the quest always hands over the same item.
         /// </summary>
-        void BindRequiredItems(QuestTemplate template)
+        string? BindRequiredItems(QuestTemplate template)
         {
             var items = new List<QuestRewardItem>(template.StartItems ?? []);
 
             var leaves = new List<HashInstance>();
+            string? problem = null;
             foreach (QuestRewardItem item in items)
             {
                 if (string.IsNullOrEmpty(item.Hash))
@@ -171,20 +179,28 @@ namespace ZoneEngine_New.Core.Quests
                 // Only the ids come from the hash: the item keeps the quest's Quality, as it did when quests named ids.
                 if (leaves.Count != 1 || _minter == null
                     || !_minter.TryRollIds(item.Hash, item.Quality, out int lowId, out int highId, out _))
-                    throw new InvalidDataException($"Quest {template.Hash} start item hash '{item.Hash}' must resolve to one item family.");
+                {
+                    // The grant must not fall back to preexisting ids for an invalid hash.
+                    item.Id = 0;
+                    item.HighId = null;
+                    problem ??= $"Start item hash '{item.Hash}' must resolve to one item family.";
+                    continue;
+                }
 
                 item.Id = lowId;
                 item.HighId = highId;
             }
 
             if (template.Action is not (QuestTemplate.AssembleAction or QuestTemplate.EquipAction))
-                return;
+                return problem;
 
             string? specItem = template.Objective.SpecItem;
             if (string.IsNullOrWhiteSpace(specItem))
-                throw new InvalidDataException($"Quest {template.Hash} requires an objective SpecItem for {template.Action}.");
+                return problem ?? $"Objective SpecItem is required for {template.Action}.";
             if (!_gameData.CanResolveItemHash(specItem))
-                throw new InvalidDataException($"Quest {template.Hash} objective SpecItem '{specItem}' does not resolve.");
+                return problem ?? $"Objective SpecItem '{specItem}' does not resolve.";
+
+            return problem;
         }
     }
 }
