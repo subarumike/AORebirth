@@ -14,10 +14,9 @@ namespace ZoneEngine_New.Core.Quests
     using ZoneEngine_New.Core.Logging;
 
     /// <summary>
-    /// GameData/Quests.json templates keyed by hash. Start items may be named by ItemTemplates.json hash and are resolved
-    /// to template ids here; one that does not resolve is recorded on the quest (<see cref="QuestTemplate.LoadProblem"/>),
-    /// which still loads. Reward items come from QuestRewards.json. Loaded whole and swapped on reload; a file that fails
-    /// to load keeps the old templates. A quest a player already holds keeps the template it was accepted with.
+    /// GameData/Quests.json templates keyed by hash. Start items may be named by ItemTemplates.json hash and must resolve
+    /// to template ids before publication. Reward items come from QuestRewards.json. Loaded whole and swapped on reload;
+    /// a file that fails to load keeps the old templates. A quest already held keeps its accepted template.
     /// </summary>
     public sealed class QuestCatalog
     {
@@ -140,14 +139,7 @@ namespace ZoneEngine_New.Core.Quests
                     template.Reward.Records = null;
                 }
 
-                // A hash that does not resolve keeps the quest (its chain still runs); the item is left out when it
-                // would be given, and the problem shows in the log and in .quests info.
-                if (UnresolvedItem(template) is string unresolved)
-                {
-                    template.LoadProblem = "item hash " + unresolved + " does not resolve to one item";
-                    warnings.Add("Quest " + template.Hash + ": " + template.LoadProblem);
-                    logger.Warn(string.Format(CultureInfo.InvariantCulture, "Quest {0}: {1}", template.Hash, template.LoadProblem));
-                }
+                BindRequiredItems(template);
             }
 
             if (recordsIgnored.Count > 0)
@@ -162,10 +154,9 @@ namespace ZoneEngine_New.Core.Quests
 
         /// <summary>
         /// Resolves every hash-named start item of <paramref name="template"/> to its template ids for the item's quality.
-        /// Returns the first hash that does not resolve, or null. A hash must name one item family (an ItemTemplates.json
-        /// leaf) so the quest always hands over the same item.
+        /// A start item hash must name one item family so the quest always hands over the same item.
         /// </summary>
-        string? UnresolvedItem(QuestTemplate template)
+        void BindRequiredItems(QuestTemplate template)
         {
             var items = new List<QuestRewardItem>(template.StartItems ?? []);
 
@@ -180,22 +171,20 @@ namespace ZoneEngine_New.Core.Quests
                 // Only the ids come from the hash: the item keeps the quest's Quality, as it did when quests named ids.
                 if (leaves.Count != 1 || _minter == null
                     || !_minter.TryRollIds(item.Hash, item.Quality, out int lowId, out int highId, out _))
-                {
-                    // Left at 0, so the grant leaves it out instead of handing over a wrong item.
-                    item.Id = 0;
-                    item.HighId = null;
-                    return item.Hash;
-                }
+                    throw new InvalidDataException($"Quest {template.Hash} start item hash '{item.Hash}' must resolve to one item family.");
 
                 item.Id = lowId;
                 item.HighId = highId;
             }
 
-            if ((template.Action is QuestTemplate.AssembleAction or QuestTemplate.EquipAction)
-                && (template.Objective.SpecItem is not { Length: > 0 } specItem || !_gameData.CanResolveItemHash(specItem)))
-                return template.Objective.SpecItem ?? "(no SpecItem)";
+            if (template.Action is not (QuestTemplate.AssembleAction or QuestTemplate.EquipAction))
+                return;
 
-            return null;
+            string? specItem = template.Objective.SpecItem;
+            if (string.IsNullOrWhiteSpace(specItem))
+                throw new InvalidDataException($"Quest {template.Hash} requires an objective SpecItem for {template.Action}.");
+            if (!_gameData.CanResolveItemHash(specItem))
+                throw new InvalidDataException($"Quest {template.Hash} objective SpecItem '{specItem}' does not resolve.");
         }
     }
 }
