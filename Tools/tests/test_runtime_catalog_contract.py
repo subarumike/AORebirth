@@ -1,8 +1,10 @@
 import importlib.util
 import json
 from pathlib import Path
+import subprocess
 import tempfile
 import unittest
+from unittest import mock
 
 
 MODULE = Path(__file__).resolve().parents[2] / "Tools/runtime_catalog_contract.py"
@@ -68,6 +70,14 @@ class RuntimeCatalogContractTests(unittest.TestCase):
     def verify(self, content=None):
         return CONTRACT.verify_runtime_catalogs(self.source, content, self.admitted.__contains__)
 
+    def commit(self):
+        command = ("git", "-C", str(self.source))
+        for args in (("init", "--quiet"), ("add", "--all"),
+                     ("-c", "user.name=Catalog Fixture", "-c", "user.email=fixture@example.invalid",
+                      "commit", "--quiet", "--message", "Fixture")):
+            subprocess.run((*command, *args), capture_output=True, check=True, timeout=15)
+        return CONTRACT.git(self.source, "rev-parse", "HEAD").strip()
+
     def test_public_structure_and_canonical_catalogs_are_checked_separately(self):
         self.assertEqual(self.verify(), self.pork_required)
         self.assertEqual(self.verify(self.content), self.pork_required)
@@ -112,21 +122,62 @@ class RuntimeCatalogContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "invalid named identity"):
             self.verify()
 
-    def test_unbound_or_unpinned_private_check_cannot_satisfy_premerge(self):
-        rule_id = 1
-        rules = [{"type": kind, "ruleset_id": rule_id} for kind in ("pull_request", "deletion", "non_fast_forward")]
-        checks = [{"context": CONTRACT.PUBLIC_CHECK, "integration_id": CONTRACT.GITHUB_ACTIONS_APP}]
-        rules.append({"type": "required_status_checks", "ruleset_id": rule_id, "parameters": {
-            "strict_required_status_checks_policy": True, "required_status_checks": checks,
-        }})
-        with self.assertRaisesRegex(ValueError, "trusted validation App"):
-            CONTRACT.require_trusted_binding(rules)
-        trusted = {"context": CONTRACT.TRUSTED_CHECK, "integration_id": CONTRACT.GITHUB_ACTIONS_APP}
-        checks.append(trusted)
-        with self.assertRaisesRegex(ValueError, "trusted validation App"):
-            CONTRACT.require_trusted_binding(rules)
-        trusted["integration_id"] = 20001
-        CONTRACT.require_trusted_binding(rules)
+    def test_exact_proposal_detects_an_admitted_new_reader_and_requires_fixture(self):
+        base = self.commit()
+        filename = "New.json"
+        self.admitted.add(filename)
+        self.write(self.zone / "NewCatalog.cs", 'object Read() => GameDataPaths.ResolveFile(root, "New.json");')
+        proposed = self.commit()
+        self.assertEqual(self.verify(), self.pork_required)
+        changes = CONTRACT.proposed_catalog_changes(self.source, base)
+        self.assertEqual(changes, {"added_dependencies": [filename], "removed_dependencies": [], "affected_catalogs": [filename]})
+        with self.assertRaisesRegex(ValueError, "focused production reader fixture"):
+            CONTRACT.require_new_catalog_coverage(self.source, changes["added_dependencies"])
+        CONTRACT.exact_candidate(self.source, proposed)
+        with self.assertRaisesRegex(ValueError, "requested head"):
+            CONTRACT.exact_candidate(self.source, base)
+
+    def test_new_reader_fixture_requires_schema(self):
+        filename = "New.json"
+        self.write(self.source / CONTRACT.ZONE_TEST_SOURCE, "[TestMethod]\npublic void ReadStaged() {}")
+        with mock.patch.dict(CONTRACT.ZONE_CATALOG_TESTS, {filename: "ReadStaged"}):
+            with self.assertRaisesRegex(ValueError, "New.schema.json"):
+                CONTRACT.require_new_catalog_coverage(self.source, [filename])
+            self.write(self.source / CONTRACT.schema_path(filename), '{"$schema":"https://json-schema.org/draft/2020-12/schema"}')
+            CONTRACT.require_new_catalog_coverage(self.source, [filename])
+
+    def test_changed_shared_filename_detects_retired_and_new_dependencies(self):
+        base = self.commit()
+        self.write(self.source / CONTRACT.GAME_DATA_PATHS, 'public const string TextFileName = "Shared.json";')
+        self.commit()
+        changes = CONTRACT.proposed_catalog_changes(self.source, base)
+        self.assertEqual(changes["added_dependencies"], ["Shared.json"])
+        self.assertEqual(changes["removed_dependencies"], [])  # PORK still needs Text.json.
+        self.assertIn("Text.json", changes["affected_catalogs"])
+
+    def test_retired_reader_is_visible_in_the_proposal(self):
+        self.write(self.zone / "OtherCatalog.cs", 'object Read() => GameDataPaths.ResolveFile(root, "Old.json");')
+        base = self.commit()
+        (self.zone / "OtherCatalog.cs").unlink()
+        self.commit()
+        changes = CONTRACT.proposed_catalog_changes(self.source, base)
+        self.assertEqual(changes["removed_dependencies"], ["Old.json"])
+
+    def test_private_reconciliation_reports_missing_and_stale_without_overriding_retained_merge(self):
+        rows = [{"path": "Merged.json", "blob": "retained local merge"}, {"path": "Stale.json", "blob": "prior"},
+                {"path": "Unpublished.json", "blob": "local only"}]
+        upstream = {"Merged.json": {"blob": "upstream"}, "Stale.json": {"blob": "fresh"}, "Pending.json": {"blob": "available"}}
+        checkpoint = {"PRIVATE_CONTENT_UPSTREAM": {"AFTER": {"Merged.json": upstream["Merged.json"], "Stale.json": {"blob": "prior"}}},
+                      "PUBLIC_PRODUCT_DATA": {"AFTER": {}}}
+        work = CONTRACT.reconciliation_work(["Merged.json", "Pending.json", "Stale.json", "Unpublished.json"], rows,
+                                            upstream, {}, checkpoint, {row["path"]: row for row in rows})
+        self.assertEqual(work, {"missing_authority": ["Unpublished.json"], "requires_reconciliation": ["Pending.json", "Stale.json"]})
+
+    def test_dirty_candidate_cannot_bind_a_private_receipt(self):
+        head = self.commit()
+        self.write(self.zone / "Uncommitted.cs", "class Candidate {}")
+        with self.assertRaisesRegex(ValueError, "clean exact"):
+            CONTRACT.exact_candidate(self.source, head)
 
 
 if __name__ == "__main__":

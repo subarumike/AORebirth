@@ -54,7 +54,7 @@ jobs:
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           python -B -m unittest discover -s Tools/tests -p test_windows_release_contract.py -k test_pvp_and_pork_catalog_admission -k test_authoritative_catalog_validation -k test_hash_bound_prior_checkpoint
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
-          python -B Tools/runtime_catalog_contract.py
+          python -B Tools/runtime_catalog_contract.py --base $baseline
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $results = Join-Path $env:RUNNER_TEMP catalog-fixture-results
           dotnet test AORebirth/Server/ZoneEngine_New.Tests/ZoneEngine_New.Tests.csproj -m:1 -p:RuntimeCatalogFocusedTests=true --nologo --filter 'FullyQualifiedName~RuntimeCatalogTests.LegacyPvpTitlesResolveTheirTextCategoryAndAuthoredFallback' --results-directory $results --logger 'trx;LogFileName=catalog-fixture.trx'
