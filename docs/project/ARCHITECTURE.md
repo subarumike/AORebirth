@@ -89,13 +89,9 @@ The existing `content-boundary` job also runs the runtime catalog contract.
 The contract checks explicit admission for fixed paths used by Zone and Chat
 readers and checks the required declarations in the PORK reader. The public
 fixture executes the production Legacy PvP loader using synthetic content.
-For a change to the catalog contract, `master` must require the strict
-`dao-canonical-validation` status from the trusted validation App. The public
-job checks this binding through GitHub's effective branch rules. GitHub then
-requires the separate check on the candidate commit.
 
-The trusted worker uses the staged canonical GameData selected for that exact
-source and measured manifest. Its focused runtime checks include these commands.
+For canonical validation, use the private GameData selected for the exact
+source and measured manifest. Run these focused production loader checks.
 
 ```text
 python -B Tools/runtime_catalog_contract.py --catalog-root <selected-GameData>
@@ -104,10 +100,9 @@ dotnet test AORebirth/Server/ZoneEngine_New.Tests/ZoneEngine_New.Tests.csproj -p
 ```
 
 Set `AO_REBIRTH_RUNTIME_CATALOG_VALIDATION_ROOT` to that absolute GameData
-path for the C# check and clear the GameData override. The worker must verify
-the focused check executed before attesting to it. Keep private inputs and
-evidence on the trusted worker and keep publisher credentials on its separate
-controller. Missing trusted validation blocks the catalog change.
+path for the C# check and clear the GameData override. Verify that the
+focused check executed and passed. Keep private inputs and evidence in the
+governed workspace.
 
 ## Data Flow
 
