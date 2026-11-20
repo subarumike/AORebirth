@@ -19,6 +19,7 @@ namespace ZoneEngine_New.Tests
     using ZoneEngine_New.Core.Ai;
     using ZoneEngine_New.Core.Data;
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Nanos;
@@ -31,7 +32,7 @@ namespace ZoneEngine_New.Tests
     using Vector3 = AORebirth.Core.Vector.Vector3;
 
     [TestClass]
-    public sealed class CastNanoTests
+    public sealed partial class CastNanoTests
     {
         const int BuffId = 21001;
         const int InstantId = 21002;
@@ -729,6 +730,98 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
+        public void TeamCastNanoAppliesHostileFlaggedExperienceBonusToTeammates()
+        {
+            const int leadership = 225573;
+            NanoFlags leadershipFlags = NanoFlags.IsBuff | NanoFlags.IsHostile | NanoFlags.NotRemovable
+                | NanoFlags.NoResistCannotFumble | NanoFlags.NoTimerNotify;
+            var bonus = new ItemSpell
+            {
+                FunctionType = (int)FunctionType.Modify,
+                Target = (int)ItemTarget.Wearer,
+                Arguments = [(int)CharacterStat.XPModifier, 50]
+            };
+            var debuff = new ItemSpell
+            {
+                FunctionType = (int)FunctionType.Modify,
+                Target = (int)ItemTarget.Wearer,
+                Arguments = [(int)CharacterStat.XPModifier, -50]
+            };
+            var items = new StubItemBuilder()
+                .Add(TestNanos.Create(leadership, durationCentiseconds: 4500, ncuCost: 999, strain: 611,
+                    can: 0, flags: leadershipFlags, modifiers: [bonus]))
+                .Add(TestNanos.Create(HostileId, can: 0, flags: leadershipFlags, modifiers: [debuff]));
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            Player mate = world.Player(2, 10, 0, 0);
+            Player bystander = world.Player(3, 5, 0, 0);
+            world.Join(caster, mate);
+            world.MakeVisible(caster, mate, bystander);
+
+            TeamSnapshot? team = world.Playfield.GetRequiredService<TeamService>().GetImmediateTeam(caster);
+            Assert.IsNotNull(team);
+            CollectionAssert.AreEquivalent(new[] { 1, 2 }, team.MemberIds.ToArray());
+            Assert.IsTrue(world.Playfield.GetRequiredService<PlayfieldLocality>().IsVisibleTo(mate, caster));
+            mate.Stats.Set(CharacterStat.XPModifier, 0);
+            Assert.IsFalse(NanoRuntime.TryApplyImmediate(
+                caster, mate, leadership, items, new SilentInventory(), DateTime.UtcNow));
+            Assert.IsTrue(UseCast(caster, items, FunctionType.TeamCastNano, HostileId));
+            Assert.IsFalse(mate.TryGetBuff(HostileId, out _), "An actual debuff must still be rejected on a teammate.");
+            Assert.IsTrue(UseCast(caster, items, FunctionType.TeamCastNano, leadership));
+            Assert.IsTrue(caster.TryGetBuff(leadership, out _));
+            Assert.IsFalse(bystander.TryGetBuff(leadership, out _));
+            Assert.IsTrue(mate.TryGetBuff(leadership, out Buff? applied), "Leadership must reach a visible teammate.");
+            Assert.IsNotNull(applied);
+            Assert.AreEqual(4500, applied.DurationCentiseconds);
+            Assert.AreEqual(0, mate.UsedNcu);
+            Assert.IsFalse(applied.CanCancel);
+            mate.RebaseStats();
+            Assert.AreEqual(50, mate.Stats.GetOrZero(CharacterStat.XPModifier));
+        }
+
+        [TestMethod]
+        public void TeamCastNanoChecksChildLevelPerRecipient()
+        {
+            NanoSpell restricted = Timed(BuffId);
+            restricted.Actions.Add(new ItemAction
+            {
+                ActionType = (int)ActionType.ToUse,
+                Requirements =
+                [
+                    new ItemRequirement
+                    {
+                        Target = (int)ItemTarget.Self,
+                        Operator = (int)Operator.GreaterThan,
+                        StatNumber = (int)CharacterStat.Level,
+                        Value = 24
+                    }
+                ]
+            });
+            var items = new StubItemBuilder().Add(restricted).Add(Timed(ChildId));
+            using var world = new FanoutWorld(items);
+            Player caster = world.Player(1, 0, 0, 0);
+            Player ineligible = world.Player(2, 10, 0, 0);
+            Player eligible = world.Player(3, 5, 0, 0);
+            caster.Stats.Set(CharacterStat.Level, 25);
+            ineligible.Stats.Set(CharacterStat.Level, 24);
+            eligible.Stats.Set(CharacterStat.Level, 25);
+            world.Join(caster, ineligible);
+            world.Join(caster, eligible);
+            world.MakeVisible(caster, ineligible, eligible);
+
+            TeamSnapshot? team = world.Playfield.GetRequiredService<TeamService>().GetImmediateTeam(caster);
+            Assert.IsNotNull(team);
+            CollectionAssert.AreEquivalent(new[] { 1, 2, 3 }, team.MemberIds.ToArray());
+            Assert.IsTrue(world.Playfield.GetRequiredService<PlayfieldLocality>().IsVisibleTo(ineligible, caster));
+            Assert.IsTrue(UseCast(caster, items, FunctionType.TeamCastNano, ChildId));
+            Assert.IsTrue(ineligible.TryGetBuff(ChildId, out _), "An unrestricted child must reach the lower-level teammate.");
+            Assert.IsTrue(UseCast(caster, items, FunctionType.TeamCastNano, BuffId));
+            Assert.IsTrue(caster.TryGetBuff(BuffId, out _));
+            Assert.IsTrue(eligible.TryGetBuff(BuffId, out _));
+            Assert.IsFalse(ineligible.TryGetBuff(BuffId, out _), "Level 24 must not receive a child that requires level 25.");
+        }
+
+        [TestMethod]
         public void PeriodicTeamCastNanoRefreshesTheCasterAndTeamAtTheConfiguredIntervalAndCount()
         {
             var refresh = new ItemSpell
@@ -1086,7 +1179,7 @@ namespace ZoneEngine_New.Tests
 
             public Playfield Playfield { get; }
 
-            public FanoutWorld(StubItemBuilder items)
+            public FanoutWorld(StubItemBuilder items, StubGameData? gameData = null)
             {
                 _registry = new DynelRegistry();
                 _manager = (PlayfieldManager)RuntimeHelpers.GetUninitializedObject(typeof(PlayfieldManager));
@@ -1096,14 +1189,25 @@ namespace ZoneEngine_New.Tests
                     .SetValue(_manager, new Dictionary<int, Player>());
 
                 Playfield = (Playfield)RuntimeHelpers.GetUninitializedObject(typeof(Playfield));
-                _services = new ServiceCollection()
+                typeof(Playfield).GetField("<FightModes>k__BackingField", BindingFlags.Instance | BindingFlags.NonPublic)!
+                    .SetValue(Playfield, DistrictFightModes.None);
+                var services = new ServiceCollection()
                     .AddSingleton(_registry)
                     .AddSingleton(_teams)
                     .AddSingleton(_manager)
+                    .AddSingleton(new PlayfieldLocality(1, metaData: null))
                     .AddSingleton<WorldSimulationAccess>()
                     .AddSingleton<IItemBuilder>(items)
-                    .AddSingleton<IInventoryRepository>(new SilentInventory())
-                    .BuildServiceProvider();
+                    .AddSingleton<IInventoryRepository>(new SilentInventory());
+                if (gameData != null)
+                {
+                    services.AddSingleton<IGameData>(gameData);
+                    // Death cancels pending inventory moves before interrupting the cast.
+                    var flush = (InventoryFlushService)RuntimeHelpers.GetUninitializedObject(typeof(InventoryFlushService));
+                    var actions = (InventoryActionService)RuntimeHelpers.GetUninitializedObject(typeof(InventoryActionService));
+                    services.AddSingleton(new InventoryMoveService(new StubLogger(), flush, actions));
+                }
+                _services = services.BuildServiceProvider();
                 typeof(Playfield).GetField("_serviceProvider", BindingFlags.Instance | BindingFlags.NonPublic)!
                     .SetValue(Playfield, _services);
                 typeof(Playfield).GetField("_lifecycleSync", BindingFlags.Instance | BindingFlags.NonPublic)!
@@ -1128,13 +1232,14 @@ namespace ZoneEngine_New.Tests
                 return player;
             }
 
-            public NpcCharacter Npc(int id, double x, double y, double z, bool attackable)
+            public NpcCharacter Npc(int id, double x, double y, double z, bool attackable, string? spawnHash = null)
             {
                 var npc = new NpcCharacter(new Identity { Type = IdentityType.CanbeAffected, Instance = id }, new StubItemBuilder())
                 {
                     Playfield = Playfield,
                     Position = new Vector3(x, y, z),
-                    Attackable = attackable
+                    Attackable = attackable,
+                    SpawnHash = spawnHash
                 };
                 npc.Stats.Set(CharacterStat.MaxNCU, 60);
                 _registry.Register(npc);
@@ -1156,6 +1261,15 @@ namespace ZoneEngine_New.Tests
                     Target = inviter.Identity,
                     Parameter2 = 1
                 });
+            }
+
+            public void MakeVisible(params Player[] players)
+            {
+                PlayfieldLocality locality = _services.GetRequiredService<PlayfieldLocality>();
+                foreach (Player player in players)
+                    locality.RegisterDynel(player);
+                foreach (Player player in players)
+                    locality.ActivatePlayerVisibility(player);
             }
 
             public void Dispose() => _services.Dispose();

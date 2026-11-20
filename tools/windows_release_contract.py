@@ -9,6 +9,7 @@ import argparse
 import base64
 import ctypes
 import hashlib
+import importlib.util
 import json
 import ntpath
 import os
@@ -34,7 +35,8 @@ OUTPUTS = (
 )
 PRODUCT_PATHS = ("AORebirth/Server", "AORebirth/Libraries", "AORebirth/Config", "WindowsBuildNet10",
                  "NewZoneEngineBuild", "Tools/DatabaseMigrationTool", "Directory.Build.targets", "tools/windows_release_contract.py",
-                 "tools/windows_release_contract.cmd", "tools/build_aorebirth_debug.cmd", "start-engines.cmd", "start-engines.ps1")
+                 "tools/windows_release_contract.cmd", "Tools/runtime_catalog_contract.py", "Tools/PorkForAor/src/GameData.php",
+                 "tools/build_aorebirth_debug.cmd", "start-engines.cmd", "start-engines.ps1")
 CONFIG_OVERRIDES = {"AORebirth/Config/Config.xml", "AORebirth/Config/ChatEngine.Config.xml"}
 PATCH_TOOL = "tools/windows_release_contract.py"
 PATCH_ENTRYPOINT = "AORebirth/Server/ZoneEngine_New/ZoneEngine_New.csproj"
@@ -47,12 +49,12 @@ PATCH_OUTPUTS = tuple(path for path in OUTPUTS if "/ZoneEngine_New/" in path)
 PRIVATE_CHEST_CATALOGS = {"Loot/MissionChestRKAllowlist.json", "Loot/MissionChestSeasonalExclusions.json", "Loot/MissionChestSpecialExclusions.json"}
 INDEPENDENT_PRIVATE_CATALOGS = {"QuestRewards.json", "ObjectStateMachines.json"}
 # Named catalog loaders and GameDataPaths; no extension-only root admission.
-RUNTIME_ROOT_CATALOGS = frozenset("""AbilityCosts.json AlienXp.json ChatChannels.json ComboNames.json
+RUNTIME_ROOT_CATALOGS = frozenset("""AbilityCosts.json AlienXp.json Breed.json ChatChannels.json ComboNames.json
 DungeonDoorStyles.json DungeonEntrances.json DungeonGeneration.json DynelCollision.json GoverningForms.json
-ItemBehavior.json items.dat ItemTemplates.json MonsterCombatRules.json MonsterData.json
+ItemBehavior.json items.dat ItemTemplates.json MonsterCombatRules.json MonsterData.json NpcPetSummons.json
 MonsterWeapons.json nanos.dat NewCharacter.json NpcTemplates.json ObjectStateMachines.json PerkActions.json
-Perks.json PetReplies.json PetTypes.json Quests.json QuestRewards.json Research.json Respawn.json
-SkillCosts.json SkillTrickle.json SpawnExclusions.json StartPackages.json TeleportRoutes.json Tradeskills.json VendingMachines.json
+Perks.json PetReplies.json PetTypes.json Profession.json PvpLegacyTitles.json Quests.json QuestRewards.json Research.json Respawn.json
+Sex.json Side.json SkillCosts.json SkillTrickle.json SpawnExclusions.json StartPackages.json TeleportRoutes.json Text.json Tradeskills.json VendingMachines.json
 WaterExits.json Xp.json""".split())
 RUNTIME_MISSION_FILES = frozenset("""Locations.json Text.json RollPolicy.json RollMixes.json
 MissionOffers.json Keys.json RewardObservations.json RareLoot.json RareLootChancePercent.json
@@ -120,6 +122,40 @@ def write_json(path, value, exclusive=False):
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("xb" if exclusive else "wb") as stream:
         stream.write(encoded(value))
+
+
+def release_catalog_contract():
+    # Portable consumers may load this file by path without the tools directory on sys.path.
+    path = Path(__file__).resolve().parents[1] / "Tools/runtime_catalog_contract.py"
+    if not path.is_file():
+        raise ValueError("Current source is missing the runtime catalog validator")
+    spec = importlib.util.spec_from_file_location("runtime_catalog_contract", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def source_declares_runtime_catalog_validation(public_sha):
+    # A retained release can predate this guard and may be read outside its source checkout.
+    source_root = Path(__file__).resolve().parents[1]
+    try:
+        probe = subprocess.run(["git", "--no-replace-objects", "cat-file", "-e", public_sha + ":Tools/runtime_catalog_contract.py"],
+                               cwd=source_root, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=False)
+    except FileNotFoundError:
+        return False
+    return probe.returncode == 0
+
+
+def catalog_manifest_validation(required, rows, reconciliation):
+    installed = {row["path"]: row for row in rows}
+    available = {path for snapshot in reconciliation["SOURCE_SNAPSHOTS"].values() for path in snapshot["AFTER"]}
+    missing_files = sorted(set(required) - installed.keys())
+    missing_authority = sorted(set(required) - available)
+    if missing_files or missing_authority:
+        raise ValueError("Required runtime catalogs are incomplete: missing from canonical manifest="
+                         + (", ".join(missing_files) or "none") + "; missing from current authority="
+                         + (", ".join(missing_authority) or "none"))
+    return [installed[path] for path in required]
 
 
 def relative(value):
@@ -512,7 +548,7 @@ def value_hash(value):
     return "MISSING" if value is MISSING else digest(encoded(value))
 
 
-def merge_value(base, incoming, private, resolutions, pointer=""):
+def merge_value(base, incoming, private, resolutions, pointer="", *, recorded=MISSING):
     """Three-way merge; independently owned keys survive and conflicts fail closed."""
     if value_hash(private) == value_hash(base):
         return incoming
@@ -524,36 +560,59 @@ def merge_value(base, incoming, private, resolutions, pointer=""):
         if (not isinstance(resolution, dict) or resolution.get("INPUT_HASHES") != expected
                 or not resolution.get("APPROVAL") or resolution.get("ACTION") not in ("PRESERVE_PRIVATE", "RESOLVED_VALUE")):
             raise ContentConflict(pointer, expected)
-        return private if resolution["ACTION"] == "PRESERVE_PRIVATE" else resolution["VALUE"]
+        if resolution["ACTION"] == "PRESERVE_PRIVATE":
+            return private
+        approved = resolution["VALUE"]
+        if recorded is not MISSING and value_hash(recorded) == value_hash(approved):
+            return recorded
+        # The receipt recursively sorts keys. Materialize the approved value in that same order.
+        return json.loads(encoded(approved), object_pairs_hook=pairs)
     if isinstance(base, dict) and isinstance(private, dict) and (isinstance(incoming, dict) or incoming is MISSING):
         incoming_missing = incoming is MISSING
         incoming = {} if incoming is MISSING else incoming
         result = {}
         for key in dict.fromkeys([*private, *incoming, *base]):
             child = pointer + "/" + key.replace("~", "~0").replace("/", "~1")
-            value = merge_value(base.get(key, MISSING), incoming.get(key, MISSING), private.get(key, MISSING), resolutions, child)
+            recorded_child = recorded.get(key, MISSING) if isinstance(recorded, dict) else MISSING
+            value = merge_value(base.get(key, MISSING), incoming.get(key, MISSING), private.get(key, MISSING),
+                                resolutions, child, recorded=recorded_child)
             if value is not MISSING:
                 result[key] = value
         return MISSING if incoming_missing and not result else result
     if base is MISSING and isinstance(incoming, dict) and isinstance(private, dict):
-        return merge_value({}, incoming, private, resolutions, pointer)
+        return merge_value({}, incoming, private, resolutions, pointer, recorded=recorded)
     raise ContentConflict(pointer, expected)
 
 
-def merge_bytes(base, incoming, private, resolutions):
+def merge_bytes(base, incoming, private, resolutions, *, recorded_resolution_order=None):
     if private == base:
         return incoming
     if incoming == base or incoming == private:
         return private
     def parse(value):
         return MISSING if value is None else json.loads(value.decode("utf-8-sig"), object_pairs_hook=pairs)
-    result = merge_value(parse(base), parse(incoming), parse(private), resolutions)
+    result = merge_value(parse(base), parse(incoming), parse(private), resolutions,
+                         recorded=parse(recorded_resolution_order))
     if result is MISSING:
         return None
     for raw in (private, incoming):
         if raw is not None and value_hash(parse(raw)) == value_hash(result):
             return raw
     return (json.dumps(result, ensure_ascii=False, indent=2) + "\n").encode()
+
+
+def verify_merge_bytes(base, incoming, private, resolutions, result, *, historical_checkpoint=False):
+    if merge_bytes(base, incoming, private, resolutions) == result:
+        return
+    if historical_checkpoint and result is not None and any(
+            isinstance(resolution, dict) and resolution.get("ACTION") == "RESOLVED_VALUE"
+            for resolution in resolutions.values()):
+        # The old writer lost approved key order in the receipt. Only a matching resolved
+        # value can recover that order from the hash-bound payload. The complete replay must
+        # still reproduce the original bytes, including data outside those approved values.
+        if merge_bytes(base, incoming, private, resolutions, recorded_resolution_order=result) == result:
+            return
+    raise ValueError("Content result is not the guarded three-way reconciliation")
 
 
 def changes(before, after):
@@ -1305,7 +1364,9 @@ def validate_runtime_exclusions(bundle, value, actual, portable=False, *, histor
             raise ValueError("Runtime exclusion schema differs")
         path = row["PATH"]
         relative(path)
-        if admitted(path) or path in seen or row["REASON"] != "DENIED_ADMISSION":
+        # An applied checkpoint records its own exclusion; current admission still applies
+        # to every new plan and its portable summary.
+        if (admitted(path) and not historical_checkpoint) or path in seen or row["REASON"] != "DENIED_ADMISSION":
             raise ValueError("Runtime exclusion does not identify a denied path")
         seen.append(path)
         identities = {}
@@ -1421,8 +1482,8 @@ def reconcile_plan(root, profile, bundle, public_sha, dump_sha, baseline, before
     prior, prior_link = None, None
     if baseline.get("APPLIED_RECONCILIATION_BUNDLE"):
         state_root = Path(profile["STATE_ROOT"]).resolve()
-        previous = Path(baseline["APPLIED_RECONCILIATION_BUNDLE"])
-        if not previous.resolve().is_relative_to(state_root):
+        previous = Path(baseline["APPLIED_RECONCILIATION_BUNDLE"]).resolve(strict=True)
+        if not previous.is_relative_to(state_root):
             raise ValueError("Prior reconciliation escaped local release state")
         prior_file = previous / "reconciliation.json"
         prior_bytes = prior_file.read_bytes()
@@ -1687,8 +1748,8 @@ def validate_reconciliation(bundle, reconciliation, *, historical_checkpoint=Fal
         if ((private is None) != (old is None) or (private is not None and
                 (digest(private) != old["sha256"] or blob(private) != old["blob"] or len(private) != old["size"]))):
             raise ValueError("Canonical before-payload differs from the complete manifest")
-        if merge_bytes(base, incoming, private, change["RESOLUTIONS"]) != result:
-            raise ValueError("Content result is not the guarded three-way reconciliation")
+        verify_merge_bytes(base, incoming, private, change["RESOLUTIONS"], result,
+                           historical_checkpoint=historical_checkpoint)
         if path in reconciliation["PROTECTED_GENERATED_FILES"] and private != result:
             raise ValueError("Required generated/private content was overwritten")
         if result is None:
@@ -1792,11 +1853,13 @@ def intake(root, profile, resolutions=None, generated_receipt=None, surfaces_rec
     else:
         plan, projected = unchanged_patch_content(root, profile, bundle, public_sha, dump_sha, reused_context, rows), {}
     validate_reconciliation(bundle, plan, selected_patch=patch is not None)
+    finished = now()
     attempt = {"FORMAT_VERSION": 1, "PUBLIC_MASTER_SHA": public_sha, "LOCAL_WINDOWS_SOURCE_SHA": public_sha,
                "ATTEMPT_ID": attempt_id, "ATTEMPT_STARTED_UTC": started,
                "CONTENT_DUMP_SHA": dump_sha, "WINDOWS_GAMEDATA_MANIFEST": plan["WINDOWS_GAMEDATA_MANIFEST"],
                "PUBLIC_FETCH": public_fetch, "CONTENT_DUMP_FETCH": dump_fetch,
-               "CREATED_UTC": now(), "WINDOWS_BUILD": "NOT_RUN", "WINDOWS_USER_ACCEPTED": "NO",
+               "CREATED_UTC": finished, "WINDOWS_BUILD": "NOT_RUN", "WINDOWS_USER_ACCEPTED": "NO",
+               "PHASE_TIMINGS": {"GAMEDATA_INTAKE_SECONDS": round((timestamp(finished) - timestamp(started)).total_seconds(), 3)},
                "RECONCILIATION": descriptor(bundle, bundle / "reconciliation.json"),
                "CANONICAL_MANIFEST": descriptor(bundle, bundle / "manifest.json"),
                "LAUNCHER_SHA256": digest((Path(root) / "start-engines.ps1").read_bytes())}
@@ -2166,6 +2229,13 @@ def run_build(root, profile, child, patch=None, reuse=None):
         bundle, attempt, plan, projected, states = intake(root, profile, patch=patch, reused_context=prior)
     if plan["CANONICAL_BEFORE_MANIFEST"] != plan["WINDOWS_GAMEDATA_MANIFEST"]:
         raise ValueError("Approved content A/M/D must be reconciled before Windows build; inspect latest-plan.json")
+    contract = release_catalog_contract()
+    required_catalogs = contract.required_catalog_paths(root)
+    catalog_rows = read_json(load_descriptor(bundle, attempt["CANONICAL_MANIFEST"]))
+    catalog_validation = catalog_manifest_validation(required_catalogs, catalog_rows, plan)
+    if contract.verify_runtime_catalogs(root, Path(profile["CANONICAL_GAMEDATA_ROOT"]), runtime_content_path) != required_catalogs:
+        raise ValueError("Required runtime catalog validation scope changed")
+    attempt["WINDOWS_RUNTIME_CATALOG_VALIDATION"] = catalog_validation
     current_states, directories = content_states(profile["CANONICAL_GAMEDATA_ROOT"])
     if current_states != states:
         raise ValueError("Canonical file set/state changed before compilation")
@@ -2189,6 +2259,8 @@ def run_build(root, profile, child, patch=None, reuse=None):
         result = subprocess.run(child, cwd=root, env=env, check=False)
         attempt["WINDOWS_BUILD_EXIT_CODE"] = result.returncode
         attempt["BUILD_FINISHED_UTC"] = now()
+        attempt["PHASE_TIMINGS"]["WINDOWS_COMPILATION_SECONDS"] = round(
+            (timestamp(attempt["BUILD_FINISHED_UTC"]) - timestamp(attempt["BUILD_STARTED_UTC"])).total_seconds(), 3)
         if result.returncode:
             attempt["WINDOWS_BUILD"] = "FAIL"
         else:
@@ -2519,6 +2591,14 @@ def require_successful_attempt(bundle, attempt, *, selected_checkpoint=False):
         validate_windows_reuse(bundle, attempt, selection)
     reconciliation = read_json(load_descriptor(bundle, attempt["RECONCILIATION"]))
     rows = validate_reconciliation_summary(bundle, reconciliation, selected_patch=selection is not None or selected_checkpoint)
+    if "WINDOWS_RUNTIME_CATALOG_VALIDATION" in attempt:
+        catalog_validation = attempt["WINDOWS_RUNTIME_CATALOG_VALIDATION"]
+        validate_manifest(catalog_validation)
+        measured_catalogs = tuple(row["path"] for row in catalog_validation)
+        if catalog_validation != catalog_manifest_validation(measured_catalogs, rows, reconciliation):
+            raise ValueError("Windows runtime catalog validation differs from the authoritative accepted manifest")
+    elif source_declares_runtime_catalog_validation(attempt["PUBLIC_MASTER_SHA"]):
+        raise ValueError("Windows runtime catalog validation is required by the accepted source")
     validation = attempt.get("WINDOWS_CONTENT_VALIDATION", {})
     if (set(validation) != {"METHOD", "SUMMARY_SHA256", "LOCAL_REPLAY_SHA256", "CANONICAL_MANIFEST", "VALIDATED_AT_UTC"}
             or validation["METHOD"] != "LOCAL_GUARDED_REPLAY_AND_WHOLE_TREE_MEASUREMENT"
@@ -2541,6 +2621,8 @@ def require_successful_attempt(bundle, attempt, *, selected_checkpoint=False):
 
 def current_matches(root, profile, bundle, attempt):
     require_successful_attempt(bundle, attempt)
+    if "WINDOWS_RUNTIME_CATALOG_VALIDATION" not in attempt:
+        raise ValueError("Current Windows startup requires runtime catalog validation")
     selection = attempt.get("WINDOWS_PATCH_SELECTION")
     if selection is None:
         source_exact(root, attempt["PUBLIC_MASTER_SHA"], profile.get("LOCAL_CONFIG_OVERRIDES", ()))
@@ -2548,6 +2630,10 @@ def current_matches(root, profile, bundle, attempt):
         authority = fresh_public(root, profile)
         verify_patch_source(root, profile, authority, load_descriptor(bundle, selection), selection["SHA256"],
                             attempt["WINDOWS_PATCH_TOOL_SOURCE_SHA"])
+    required_catalogs = release_catalog_contract().required_catalog_paths(root)
+    measured_catalogs = tuple(row["path"] for row in attempt["WINDOWS_RUNTIME_CATALOG_VALIDATION"])
+    if measured_catalogs != required_catalogs:
+        raise ValueError("Windows runtime catalog validation scope differs from the current source")
     rows, _ = inventory(profile["CANONICAL_GAMEDATA_ROOT"])
     if validate_manifest(rows) != attempt["WINDOWS_GAMEDATA_MANIFEST"]:
         raise ValueError("Current Windows GameData differs from the build handed to Mike")
@@ -2716,6 +2802,12 @@ def record_startup(root, profile, attempt_path, raw_receipt_path):
     windows["CANONICAL_GAMEDATA_ROOT_AT_STARTUP"] = str(Path(profile["CANONICAL_GAMEDATA_ROOT"]).resolve())
     windows["STARTUP_GAMEDATA_MANIFEST"] = attempt["CANONICAL_MANIFEST"]
     validate_startup(bundle, windows, attempt)
+    timings = dict(attempt.get("PHASE_TIMINGS", {}))
+    observation_path = next(path for path in copied if PurePosixPath(path).name == "world-status-observation.json")
+    observed = read_json(checked(bundle, observation_path))["captured_utc"]
+    started = read_json(checked(bundle, ready_path))["COMMANDS"]["startup"]["started_utc"]
+    timings["WINDOWS_VALIDATION_SECONDS"] = round((timestamp(observed) - timestamp(started)).total_seconds(), 3)
+    windows["PHASE_TIMINGS"] = timings
     target = bundle / "windows-receipt.json"
     write_json(target, windows, exclusive=True)
     print("WINDOWS_USER_ACCEPTED=NO")
@@ -2853,6 +2945,9 @@ def main(argv=None):
                                                 patch=patch, reused_context=prior)
             print("CONTENT_PLAN_SHA256=" + digest(encoded(plan)))
             print("BUILD_ATTEMPT_RECEIPT=" + (bundle / "prepared.json").relative_to(root).as_posix())
+            catalog_rows = read_json(load_descriptor(bundle, attempt["CANONICAL_MANIFEST"]))
+            required_catalogs = release_catalog_contract().required_catalog_paths(root)
+            catalog_manifest_validation(required_catalogs, catalog_rows, plan)
             if plan["CANONICAL_BEFORE_MANIFEST"] != plan["WINDOWS_GAMEDATA_MANIFEST"]:
                 raise ValueError("Canonical content must be reconciled before build")
         elif args.mode == "record-startup":

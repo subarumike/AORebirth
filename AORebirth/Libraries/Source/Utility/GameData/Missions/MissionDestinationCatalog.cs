@@ -10,6 +10,8 @@ namespace Utility.GameData.Missions
     using System.Runtime.Serialization.Json;
     using System.Xml;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     /// <summary>
     /// Immutable entrance placements and destination pools loaded from editable runtime data.
     /// A cohort may reference the same placement repeatedly.
@@ -52,7 +54,7 @@ namespace Utility.GameData.Missions
                 placementList.Add(placement);
                 if (row.WorldPos != null)
                 {
-                    Require(row.WorldPos.PlayfieldIdentityType == 40016,
+                    Require(row.WorldPos.PlayfieldIdentityType == (uint)IdentityType.Playfield2,
                         "Invalid WorldPos playfield identity type: " + placement.Identity);
                     worldPositions.Add(placement.Identity, new MissionDestinationWorldPosition(placement.Identity, row.WorldPos));
                 }

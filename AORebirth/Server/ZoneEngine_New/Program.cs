@@ -108,6 +108,7 @@ namespace ZoneEngine_New
                         gameData.HashInstanceCount,
                         gameData.MonsterDataCount));
                 IItemTemplateCatalog itemTemplates = rootServices.GetRequiredService<IItemTemplateCatalog>();
+                MonsterCombatRulesCatalog.For(gameData.RootPath).ValidateEncounterReferences(itemTemplates, gameData);
                 // NPC scripts compile now, so a bad program is reported at startup rather than at the first spawn.
                 rootServices.GetRequiredService<ZoneEngine_New.Core.NpcScripts.NpcScriptCatalog>();
                 var missionOffers = rootServices.GetRequiredService<GeneratedMissionRollService>().OfferCatalog;
@@ -285,6 +286,7 @@ namespace ZoneEngine_New
             services.AddSingleton<OrgLockoutClock>();
             services.AddSingleton<OrgTaxTickService>();
             services.AddSingleton<OrgMembershipService>();
+            services.AddSingleton<OrgVoteService>();
             services.AddSingleton<ICharacterPlayedBornRepository, MySqlCharacterPlayedBornRepository>();
             services.AddSingleton<CharacterPlayedClock>();
             services.AddSingleton<ICharacterCoalesceCommit, MySqlCharacterCoalesceCommit>();

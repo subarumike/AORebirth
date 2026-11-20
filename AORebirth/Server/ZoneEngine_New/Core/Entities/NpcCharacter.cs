@@ -381,6 +381,8 @@ namespace ZoneEngine_New.Core.Entities
             if ((attacker.IsPlayer || attacker is NpcCharacter) && !ReferenceEquals(attacker, this))
                 Brain?.AddThreatFrom(attacker, hpRemoved, fromDamage: true);
 
+            Brain?.ObserveNanoHealth();
+
             // The percent is only computed when the program listens for health thresholds.
             if (Scripts is { } scripts && scripts.Program.Subscribes(NpcScripts.NpcScriptTrigger.HealthBelow))
             {
@@ -397,6 +399,8 @@ namespace ZoneEngine_New.Core.Entities
         /// </summary>
         public void OnReset()
         {
+            Brain?.ResetEncounterAbilities();
+
             // An NPC that resets sends its pets away.
             if (OwnedPets.Count > 0)
                 Playfield?.GetService<Pets.PetService>()?.DismissAll(this, "owner reset");
@@ -595,18 +599,8 @@ namespace ZoneEngine_New.Core.Entities
         /// </summary>
         void UploadNanoCrystal(Item item)
         {
-            foreach (KeyValuePair<EventType, List<ItemSpell>> pair in item.SpellList)
-            {
-                List<ItemSpell>? spells = pair.Value;
-                if (spells == null)
-                    continue;
-
-                for (int i = 0; i < spells.Count; i++)
-                {
-                    if (spells[i].Is(FunctionType.UploadNano) && spells[i].TryReadInt(0, out int nanoId))
-                        TryAddUploadedNano(nanoId);
-                }
-            }
+            foreach (int nanoId in item.Definition.UploadedNanoIds())
+                TryAddUploadedNano(nanoId);
         }
 
         internal static bool TryFindEquipMonsterWeaponHash(Item item, out string hash)

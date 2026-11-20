@@ -7,6 +7,7 @@ import io
 import json
 import os
 from pathlib import Path
+import re
 import shutil
 import subprocess
 import sys
@@ -72,13 +73,18 @@ def make_generated_fixture(root, data=b"new generated fixture"):
     return path, receipt, proof
 
 
-def make_portable_fixture(root, generated=False):
-    """Synthetic two-file dataset and measured-looking fixture; never a real release."""
+def make_portable_fixture(root, generated=False, catalogs=False):
+    """Synthetic dataset and measured-looking fixture; never a real release."""
     root = Path(root)
     canonical = root / "canonical"
     canonical.mkdir(parents=True)
     (canonical / "catalog.json").write_bytes(b'{"upstream":1,"private":2}\n')
     (canonical / "items.dat").write_bytes(b"generated-fixture")
+    required = gate.release_catalog_contract().required_catalog_paths(ROOT) if catalogs else ()
+    for path in required:
+        target = canonical / path
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_bytes(gate.encoded({"fixture": path}))
     rows, _ = gate.inventory(canonical)
     index = gate.validate_manifest(rows)
     bundle = root / "bundle"
@@ -87,6 +93,9 @@ def make_portable_fixture(root, generated=False):
     gate.write_json(bundle / "manifest.json", rows)
     snapshots = {authority: {"BASE_SHA": sha, "CURRENT_SHA": sha, "BEFORE": {}, "AFTER": {}}
                  for authority, sha in (("PRIVATE_CONTENT_UPSTREAM", DUMP), ("PUBLIC_PRODUCT_DATA", PUBLIC))}
+    catalog_source = {row["path"]: {key: row[key] for key in ("blob", "size")}
+                      for row in rows if row["path"] in required}
+    snapshots["PRIVATE_CONTENT_UPSTREAM"].update(BEFORE=catalog_source, AFTER=catalog_source)
     reconciliation = {"FORMAT_VERSION": 1, "PUBLIC_MASTER_SHA": PUBLIC, "CONTENT_DUMP_SHA": DUMP,
                       "CANONICAL_BEFORE_MANIFEST": index, "WINDOWS_GAMEDATA_MANIFEST": index,
                       "SOURCE_SNAPSHOTS": snapshots, "CHANGES": [], "PROTECTED_GENERATED_FILES": ["items.dat"],
@@ -124,6 +133,8 @@ def make_portable_fixture(root, generated=False):
                    "SUMMARY_SHA256": gate.digest(gate.encoded(summary)), "LOCAL_REPLAY_SHA256": summary["LOCAL_REPLAY_SHA256"],
                    "CANONICAL_MANIFEST": index, "VALIDATED_AT_UTC": "2026-01-01T00:00:05Z"},
                "CANONICAL_MANIFEST": gate.descriptor(bundle, bundle / "manifest.json")}
+    if catalogs:
+        attempt["WINDOWS_RUNTIME_CATALOG_VALIDATION"] = gate.catalog_manifest_validation(required, rows, reconciliation)
     gate.write_json(bundle / "build-attempt.json", attempt)
     held = []
     selected_root = "C:/canonical-fixture/GameData"
@@ -186,6 +197,147 @@ def make_portable_fixture(root, generated=False):
 
 
 class ReleaseContractTests(unittest.TestCase):
+    def test_pet_catalog_admission_is_exact_and_requires_a_source_snapshot_for_restoration(self):
+        path = "NpcPetSummons.json"
+        self.assertTrue(gate.runtime_content_path(path))
+        for unknown in ("NpcPetSummons.backup.json", "NpcPetSummons.JSON", "Arbitrary.json"):
+            self.assertFalse(gate.runtime_content_path(unknown), unknown)
+
+        bundle, _ = make_portable_fixture(self.root)
+        plan = gate.read_json(bundle / "reconciliation.json")
+        plan["REQUIRED_CURRENT_CATALOGS"] = [{"AUTHORITY": "PRIVATE_CONTENT_UPSTREAM", "PATH": path,
+                                             "APPROVAL": "fixture explicit catalog requirement"}]
+        with self.assertRaisesRegex(ValueError, "no current source identity"):
+            gate.validate_reconciliation(bundle, plan)
+
+    def test_pet_catalog_has_the_same_identity_in_local_and_packaging_manifests(self):
+        path = "NpcPetSummons.json"
+        content = b'{"Version":1}\n'
+        source = {path: {"blob": gate.blob(content), "size": len(content)}}
+        canonical = self.root / "canonical"
+        canonical.mkdir()
+        (canonical / "items.dat").write_bytes(b"existing runtime data")
+        rows, _ = gate.inventory(canonical)
+        bundle = self.root / "bundle"
+        bundle.mkdir()
+        gate.write_json(bundle / "before-manifest.json", rows)
+        profile = {"STATE_ROOT": str(self.root), "CANONICAL_GAMEDATA_ROOT": str(canonical)}
+        baseline = {"PUBLIC_MASTER_SHA": PUBLIC, "CONTENT_DUMP_SHA": DUMP}
+        with mock.patch.object(gate, "tree_files", side_effect=[{}, source, {}, {}]), \
+                mock.patch.object(gate, "source_blob", return_value=content):
+            plan, projected = gate.reconcile_plan(self.root, profile, bundle, PUBLIC, "d" * 40, baseline, rows)
+        self.assertEqual(projected, {path: content})
+        after = gate.validate_reconciliation(bundle, plan)
+        self.assertIn(gate.content_identity(content, path), after)
+        summary = gate.summarize_reconciliation(bundle, plan)
+        self.assertEqual(gate.validate_reconciliation_summary(bundle, summary), after)
+        summary["CHANGES"][0]["CANONICAL_AFTER"]["sha256"] = "0" * 64
+        with self.assertRaises(ValueError):
+            gate.validate_reconciliation_summary(bundle, summary)
+
+    def test_new_admission_does_not_reclassify_prior_exclusion_or_allow_current_exclusion(self):
+        path = "NpcPetSummons.json"
+        data = b'{"Version":1}\n'
+        row = gate.content_identity(data, path)
+        bundle = self.root / "bundle"
+        bundle.mkdir()
+        gate.write_json(bundle / "before.json", [])
+        plan = {"BEFORE_MANIFEST": gate.descriptor(bundle, bundle / "before.json"),
+                "RUNTIME_EXCLUSIONS": [{"PATH": path, "CANONICAL_BEFORE": None,
+                    "EXCLUDED_CONTENT": gate.stash(bundle, "archived", data), "REASON": "DENIED_ADMISSION"}]}
+        historical = {path: row}
+        gate.validate_runtime_exclusions(bundle, plan, historical, historical_checkpoint=True)
+        self.assertEqual(historical, {})
+        with self.assertRaisesRegex(ValueError, "denied path"):
+            gate.validate_runtime_exclusions(bundle, plan, {path: row})
+        with self.assertRaisesRegex(ValueError, "projected identities"):
+            gate.validate_runtime_exclusions(bundle, plan, {path: gate.content_identity(b"changed", path)},
+                                             historical_checkpoint=True)
+
+    def test_resolved_json_replays_deterministically_and_preserves_only_approved_historical_order(self):
+        base = b'{"Template":[0],"Private":{"Z":0,"A":0}}'
+        incoming = b'{"Template":[1],"Private":{"Z":0,"A":0}}'
+        private = b'{"Template":[2],"Private":{"Z":2,"A":0}}'
+        approved = [{"Z": 3, "A": {"Z": 4, "A": 5}}]
+        resolutions = {"/Template": {"ACTION": "RESOLVED_VALUE", "APPROVAL": "fixture decision",
+            "INPUT_HASHES": {key: gate.value_hash([i]) for i, key in enumerate(("BASE", "UPSTREAM", "PRIVATE"))},
+            "VALUE": approved}}
+        stored_resolutions = json.loads(gate.encoded(resolutions))
+        current = gate.merge_bytes(base, incoming, private, resolutions)
+        self.assertEqual(current, gate.merge_bytes(base, incoming, private, stored_resolutions))
+        self.assertEqual(current, gate.merge_bytes(incoming, incoming, current, stored_resolutions))
+        self.assertEqual(list(json.loads(current)["Template"][0]), ["A", "Z"])
+
+        old = {"Template": approved, "Private": {"Z": 2, "A": 0}}
+        historical_bytes = (json.dumps(old, indent=2) + "\n").encode()
+        self.assertNotEqual(current, historical_bytes)
+        self.assertEqual(gate.value_hash(json.loads(current)), gate.value_hash(old))
+        args = (base, incoming, private, stored_resolutions)
+        with self.assertRaisesRegex(ValueError, "guarded three-way reconciliation"):
+            gate.verify_merge_bytes(*args, historical_bytes)
+        gate.verify_merge_bytes(*args, historical_bytes, historical_checkpoint=True)
+        self.assertEqual(gate.content_identity(historical_bytes),
+                         gate.content_identity(gate.merge_bytes(*args, recorded_resolution_order=historical_bytes)))
+
+        for unrelated in ({"A": 0, "Z": 2}, {"Z": 2, "A": 99}):
+            changed = (json.dumps({**old, "Private": unrelated}, indent=2) + "\n").encode()
+            with self.assertRaisesRegex(ValueError, "guarded three-way reconciliation"):
+                gate.verify_merge_bytes(*args, changed, historical_checkpoint=True)
+        with self.assertRaisesRegex(ValueError, "guarded three-way reconciliation"):
+            gate.verify_merge_bytes(*args, historical_bytes.replace(b'"Z": 3', b'"Z": 9'),
+                                    historical_checkpoint=True)
+        with self.assertRaises(gate.ContentConflict):
+            gate.merge_bytes(base, incoming, private, {})
+
+    @unittest.skipUnless(os.environ.get("AOREBIRTH_TEST_APPLIED_CONTENT_STATE"), "requires a local applied checkpoint")
+    def test_retained_applied_checkpoint_replays_recorded_payload_bytes(self):
+        state_path = Path(os.environ["AOREBIRTH_TEST_APPLIED_CONTENT_STATE"]).resolve(strict=True)
+        original_state = state_path.read_bytes()
+        state = gate.read_json(state_path)
+        bundle = Path(state["APPLIED_RECONCILIATION_BUNDLE"]).resolve(strict=True)
+        self.assertTrue(bundle.is_relative_to(state_path.parent))
+        checkpoint = bundle / "reconciliation.json"
+        original = checkpoint.read_bytes()
+        self.assertEqual(gate.digest(original), state["APPLIED_RECONCILIATION_SHA256"])
+        plan = gate.read_json(checkpoint)
+        manifest = gate.validate_reconciliation(bundle, plan, historical_checkpoint=True)
+        self.assertEqual(gate.validate_manifest(manifest), state["WINDOWS_GAMEDATA_MANIFEST"])
+        self.assertEqual(checkpoint.read_bytes(), original)
+        self.assertEqual(state_path.read_bytes(), original_state)
+
+    def test_pvp_and_pork_catalog_admission_is_exact_in_local_and_portable_plans(self):
+        required = ("Breed.json", "GoverningForms.json", "Profession.json", "PvpLegacyTitles.json",
+                    "Sex.json", "Side.json", "Text.json")
+        unknown = ("Arbitrary.json", "PvpLegacyTitles.JSON", "Text.backup.json", "Other/Breed.json")
+        for path in required:
+            self.assertTrue(gate.runtime_content_path(path), path)
+        for path in unknown:
+            self.assertFalse(gate.runtime_content_path(path), path)
+
+        canonical = self.root / "canonical"
+        canonical.mkdir()
+        (canonical / "items.dat").write_bytes(b"existing runtime data")
+        rows, _ = gate.inventory(canonical)
+        bundle = self.root / "bundle"
+        bundle.mkdir()
+        gate.write_json(bundle / "before-manifest.json", rows)
+        payloads = {path: gate.encoded({"fixture": path}) for path in (*required, *unknown)}
+        blobs = {gate.blob(payload): payload for payload in payloads.values()}
+        snapshot = {path: {"blob": gate.blob(payload), "size": len(payload)} for path, payload in payloads.items()}
+        profile = {"STATE_ROOT": str(self.root), "CANONICAL_GAMEDATA_ROOT": str(canonical)}
+        baseline = {"PUBLIC_MASTER_SHA": PUBLIC, "CONTENT_DUMP_SHA": DUMP}
+        with mock.patch.object(gate, "tree_files", side_effect=[{}, snapshot, {}, {}]), \
+                mock.patch.object(gate, "source_blob", side_effect=lambda r, p, a, identity: blobs[identity]):
+            plan, projected = gate.reconcile_plan(self.root, profile, bundle, PUBLIC, "d" * 40, baseline, rows)
+
+        self.assertEqual({path: projected[path] for path in required}, {path: payloads[path] for path in required})
+        self.assertEqual({row["PATH"] for row in plan["RUNTIME_EXCLUSIONS"]}, set(unknown))
+        after = gate.validate_reconciliation(bundle, plan)
+        self.assertEqual({row["path"] for row in after}, {*required, "items.dat"})
+        summary = gate.summarize_reconciliation(bundle, plan)
+        self.assertEqual(gate.validate_reconciliation_summary(bundle, summary), after)
+        self.assertEqual(gate.inventory(canonical)[0], rows)
+
     def test_admits_typed_mission_content_and_excludes_recorded_packets(self):
         for path in ("Missions/MissionOffers.json", "Missions/Keys.json"):
             self.assertTrue(gate.runtime_content_path(path), path)
@@ -671,11 +823,53 @@ class ReleaseContractTests(unittest.TestCase):
                 with self.assertRaises(ValueError):
                     gate.require_successful_attempt(bundle, bad)
 
+    def test_authoritative_catalog_validation_is_bound_to_current_portable_acceptance(self):
+        bundle, _ = make_portable_fixture(self.root, catalogs=True)
+        attempt_path = bundle / "build-attempt.json"
+        original = gate.read_json(attempt_path)
+        measured = original["WINDOWS_RUNTIME_CATALOG_VALIDATION"]
+        with mock.patch.object(gate, "release_catalog_contract", side_effect=AssertionError("current source consulted")):
+            loaded = gate.load_accepted_release(self.root, "bundle/acceptance.json")
+        self.assertEqual(loaded["build_attempt"]["WINDOWS_RUNTIME_CATALOG_VALIDATION"], measured)
+
+        for mutation in (None, [], measured + measured[:1]):
+            changed = {**original, "WINDOWS_RUNTIME_CATALOG_VALIDATION": mutation}
+            with self.assertRaises(ValueError):
+                gate.require_successful_attempt(bundle, changed)
+
+        wrong_hash = copy.deepcopy(original)
+        wrong_hash["WINDOWS_RUNTIME_CATALOG_VALIDATION"][0]["sha256"] = "0" * 64
+        with self.assertRaisesRegex(ValueError, "catalog validation differs"):
+            gate.require_successful_attempt(bundle, wrong_hash)
+
+        gate.write_json(attempt_path, {**original, "WINDOWS_RUNTIME_CATALOG_VALIDATION": measured[:-1]})
+        with self.assertRaises(ValueError):
+            gate.load_accepted_release(self.root, "bundle/acceptance.json")
+        gate.write_json(attempt_path, original)
+
+        no_proof = {key: value for key, value in original.items() if key != "WINDOWS_RUNTIME_CATALOG_VALIDATION"}
+        with mock.patch.object(gate, "source_declares_runtime_catalog_validation", return_value=True):
+            with self.assertRaisesRegex(ValueError, "required by the accepted source"):
+                gate.require_successful_attempt(bundle, no_proof)
+
+        required = gate.release_catalog_contract().required_catalog_paths(ROOT)
+        reconciliation = loaded["reconciliation"]
+        unsupported = copy.deepcopy(reconciliation)
+        unsupported["SOURCE_SNAPSHOTS"]["PRIVATE_CONTENT_UPSTREAM"]["AFTER"].pop(required[0])
+        with self.assertRaisesRegex(ValueError, "missing from current authority=" + re.escape(required[0])):
+            gate.catalog_manifest_validation(required, loaded["manifest"], unsupported)
+
     def test_actual_binary_and_data_changes_invalidate_pre_acceptance(self):
-        bundle, profile = make_portable_fixture(self.root)
+        bundle, profile = make_portable_fixture(self.root, catalogs=True)
         attempt = gate.read_json(bundle / "build-attempt.json")
-        with mock.patch.object(gate, "source_exact"):
+        required = gate.release_catalog_contract().required_catalog_paths(ROOT)
+        contract = mock.Mock()
+        contract.required_catalog_paths.return_value = required
+        with mock.patch.object(gate, "source_exact"), mock.patch.object(gate, "release_catalog_contract", return_value=contract):
             gate.current_matches(self.root, profile, bundle, attempt)
+            with mock.patch.object(contract, "required_catalog_paths", return_value=required[:-1]):
+                with self.assertRaisesRegex(ValueError, "catalog validation scope differs"):
+                    gate.current_matches(self.root, profile, bundle, attempt)
             output = self.root / gate.OUTPUTS[0]
             old = output.read_bytes()
             output.write_bytes(b"modified")
@@ -1209,6 +1403,16 @@ class ReleaseContractTests(unittest.TestCase):
         self.assertFalse((receipt_path.parent / "build-attempt.json").exists())
         with self.assertRaisesRegex(ValueError, "not a production build"):
             gate.require_successful_attempt(receipt_path.parent, attempt)
+
+    def test_authority_fetch_never_follows_a_fork_parent(self):
+        profile = {"PRIVATE_CONTENT_REPOSITORY": "owner/configured-fork", "PRIVATE_CONTENT_BRANCH": "main"}
+        expected = ["gh", "api", "-H", "Cache-Control: no-cache", "repos/owner/configured-fork/commits/main"]
+        with mock.patch.object(gate, "fresh_public", return_value=PUBLIC), \
+                mock.patch.object(gate, "source_exact"), \
+                mock.patch.object(gate, "command", side_effect=ValueError("private authority unavailable")) as request:
+            with self.assertRaisesRegex(ValueError, "private authority unavailable"):
+                gate.fresh_sources(self.root, profile)
+        request.assert_called_once_with(expected, role="Private content authority fetch")
 
     def test_fresh_authority_fetch_failures_do_not_fall_back_to_cached_state(self):
         profile = {"PUBLIC_PRODUCT_REMOTE": "origin", "PRIVATE_CONTENT_BRANCH": "main"}

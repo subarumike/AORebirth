@@ -63,7 +63,8 @@
     "anarchistLeaderKickLockoutSeconds": 43200,
     "disbandLockoutSeconds": 43200,
     "taxTickSeconds": 7200,
-    "taxPeriodSeconds": 1800
+    "taxPeriodSeconds": 1800,
+    "voteCooldownSeconds": 1800
   },
   "worldClock": {
     "epochUtc": "2026-01-01T00:00:00Z",

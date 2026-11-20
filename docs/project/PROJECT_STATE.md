@@ -1,5 +1,15 @@
 # AORebirth Project State
 
+IN PROGRESS, LOCAL (2026-11-17, PORK bio API): the read-only PORK-compatible export
+(characters, organizations, online members per organization) is implemented on
+`api-pork-doc` and not committed. Three engine-written change tables
+(`character_bio_meta`, `org_stats_meta`, `org_online_meta`) are created by migration
+`20261116_pork_meta.sql`, and the engines touch them (compiled). The PHP 8.2 exporter
+in `Tools/PorkForAor` writes the retail-named files and runs a 30 s tick, an online
+heartbeat and a 24 h sweep. Verified on localhost by the owner: file generation.
+Not yet verified: the sweep on real data and the heartbeat cost. Web server mapping and Linux servicing belong to the server
+owner. See [the specification](../api/character-bio-api.md).
+
 IMPLEMENTED, CLIENT UNVERIFIED (2026-11-04, Mongo landing): hostile nanos with
 no positively weighted authored defense now land without a defense roll. This
 removes the invented Nano Resist/Add All Def contest from standard Mongo taunt

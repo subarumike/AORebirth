@@ -143,6 +143,46 @@ namespace AORebirth.Database.Domain.Characters
             return memberOf.Count > 0 && memberOf[0] == organizationId;
         }
 
+        // PORK change tracking (docs/api/character-bio-api.md, section 6.1). Each helper upserts last_updated in the
+        // caller's transaction; the exporter re-renders any row newer than its last check.
+        private static void TouchCharacterBio(IDbConnection c, IDbTransaction t, int characterId)
+        {
+            if (characterId <= 0) return;
+            Execute(c, t, "INSERT INTO character_bio_meta (id_char,last_updated) VALUES (@Id,UTC_TIMESTAMP(6)) "
+                + "ON DUPLICATE KEY UPDATE last_updated=VALUES(last_updated)", "@Id", characterId);
+        }
+
+        private static void TouchOrgStats(IDbConnection c, IDbTransaction t, int organizationId)
+        {
+            if (organizationId <= 0) return;
+            Execute(c, t, "INSERT INTO org_stats_meta (id_org,last_updated) VALUES (@Id,UTC_TIMESTAMP(6)) "
+                + "ON DUPLICATE KEY UPDATE last_updated=VALUES(last_updated)", "@Id", organizationId);
+        }
+
+        private static void TouchOrgOnline(IDbConnection c, IDbTransaction t, int organizationId)
+        {
+            if (organizationId <= 0) return;
+            Execute(c, t, "INSERT INTO org_online_meta (id_org,last_updated) VALUES (@Id,UTC_TIMESTAMP(6)) "
+                + "ON DUPLICATE KEY UPDATE last_updated=VALUES(last_updated)", "@Id", organizationId);
+        }
+
+        // Must run before the members' Clan rows are removed or changed.
+        private static void TouchOrgMembersBio(IDbConnection c, IDbTransaction t, int organizationId)
+        {
+            if (organizationId <= 0) return;
+            Execute(c, t, "INSERT INTO character_bio_meta (id_char,last_updated) "
+                + "SELECT Instance, UTC_TIMESTAMP(6) FROM stats WHERE Type=@Type AND StatId=@Clan AND StatValue=@Org "
+                + "ON DUPLICATE KEY UPDATE last_updated=VALUES(last_updated)",
+                "@Type", (int)IdentityType.CanbeAffected, "@Clan", (int)CharacterStat.Clan, "@Org", organizationId);
+        }
+
+        private static int ReadOrgId(IDbConnection c, IDbTransaction t, int characterId)
+        {
+            IList<int> ids = QueryWithin(c, t, "SELECT StatValue FROM stats WHERE Type=@Type AND Instance=@Id AND StatId=@Clan",
+                r => r.GetInt32(0), "@Type", (int)IdentityType.CanbeAffected, "@Id", characterId, "@Clan", (int)CharacterStat.Clan);
+            return ids.Count > 0 ? ids[0] : 0;
+        }
+
         private IList<T> Query<T>(string sql, Func<IDataRecord, T> map, params object[] parameters)
         {
             return Read<IList<T>>(connection =>
@@ -220,33 +260,66 @@ namespace AORebirth.Database.Domain.Characters
                 case OrganizationTextField.History: column = "History"; break;
                 default: throw new ArgumentOutOfRangeException(nameof(field));
             }
-            Transaction((c, t) => Execute(c, t, "UPDATE organizations SET " + column + "=@Value WHERE Id=@Id",
-                "@Value", value, "@Id", organizationId));
+            Transaction((c, t) =>
+            {
+                Execute(c, t, "UPDATE organizations SET " + column + "=@Value WHERE Id=@Id",
+                    "@Value", value, "@Id", organizationId);
+                // The organization name is on every member's page; the other texts are on the organization page only.
+                if (field == OrganizationTextField.Name) TouchOrgMembersBio(c, t, organizationId);
+                TouchOrgStats(c, t, organizationId);
+                return 0;
+            });
         }
 
         public void SaveOrganizationRank(int characterId, int rank)
         {
             if (characterId <= 0) throw new ArgumentOutOfRangeException(nameof(characterId));
-            Transaction((c, t) => Execute(c, t, "INSERT INTO stats (Type,Instance,StatId,StatValue) VALUES (@Type,@Id,@Level,@Rank) "
-                + "ON DUPLICATE KEY UPDATE StatValue=VALUES(StatValue)",
-                "@Rank", rank, "@Type", (int)IdentityType.CanbeAffected, "@Id", characterId, "@Level", (int)CharacterStat.ClanLevel));
+            Transaction((c, t) =>
+            {
+                Execute(c, t, "INSERT INTO stats (Type,Instance,StatId,StatValue) VALUES (@Type,@Id,@Level,@Rank) "
+                    + "ON DUPLICATE KEY UPDATE StatValue=VALUES(StatValue)",
+                    "@Rank", rank, "@Type", (int)IdentityType.CanbeAffected, "@Id", characterId, "@Level", (int)CharacterStat.ClanLevel);
+                TouchCharacterBio(c, t, characterId);
+                int organizationId = ReadOrgId(c, t, characterId);
+                TouchOrgStats(c, t, organizationId);
+                TouchOrgOnline(c, t, organizationId);
+                return 0;
+            });
         }
 
         public void SaveOrganizationMembership(int characterId, int organizationId)
         {
             if (characterId <= 0) throw new ArgumentOutOfRangeException(nameof(characterId));
             if (organizationId <= 0) throw new ArgumentOutOfRangeException(nameof(organizationId));
-            Transaction((c, t) => Execute(c, t, "INSERT INTO stats (Type,Instance,StatId,StatValue) VALUES (@Type,@Id,@Clan,@Org) "
-                + "ON DUPLICATE KEY UPDATE StatValue=VALUES(StatValue)",
-                "@Type", (int)IdentityType.CanbeAffected, "@Id", characterId, "@Clan", (int)CharacterStat.Clan, "@Org", organizationId));
+            Transaction((c, t) =>
+            {
+                int previousOrganizationId = ReadOrgId(c, t, characterId);
+                Execute(c, t, "INSERT INTO stats (Type,Instance,StatId,StatValue) VALUES (@Type,@Id,@Clan,@Org) "
+                    + "ON DUPLICATE KEY UPDATE StatValue=VALUES(StatValue)",
+                    "@Type", (int)IdentityType.CanbeAffected, "@Id", characterId, "@Clan", (int)CharacterStat.Clan, "@Org", organizationId);
+                TouchCharacterBio(c, t, characterId);
+                TouchOrgStats(c, t, organizationId);
+                TouchOrgOnline(c, t, organizationId);
+                if (previousOrganizationId > 0 && previousOrganizationId != organizationId)
+                {
+                    TouchOrgStats(c, t, previousOrganizationId);
+                    TouchOrgOnline(c, t, previousOrganizationId);
+                }
+                return 0;
+            });
         }
 
         public void SaveOrganizationLeader(int organizationId, int leaderId)
         {
             if (organizationId <= 0) throw new ArgumentOutOfRangeException(nameof(organizationId));
             if (leaderId <= 0) throw new ArgumentOutOfRangeException(nameof(leaderId));
-                Transaction((c, t) => Execute(c, t, "UPDATE organizations SET LeaderId=@Leader WHERE Id=@Id",
-                    "@Leader", leaderId, "@Id", organizationId));
+                Transaction((c, t) =>
+                {
+                    Execute(c, t, "UPDATE organizations SET LeaderId=@Leader WHERE Id=@Id",
+                        "@Leader", leaderId, "@Id", organizationId);
+                    TouchOrgStats(c, t, organizationId);
+                    return 0;
+                });
             }
 
             public void SaveOrganizationTax(int organizationId, int tax)
@@ -447,6 +520,12 @@ namespace AORebirth.Database.Domain.Characters
                 Execute(c, t, "DELETE FROM stats WHERE Type=@Type AND Instance=@Id AND (StatId=@Clan OR StatId=@Level)",
                     "@Type", (int)IdentityType.CanbeAffected, "@Id", characterId,
                     "@Clan", (int)CharacterStat.Clan, "@Level", (int)CharacterStat.ClanLevel);
+                if (memberOf.Count > 0 && memberOf[0] > 0)
+                {
+                    TouchCharacterBio(c, t, characterId);
+                    TouchOrgStats(c, t, memberOf[0]);
+                    TouchOrgOnline(c, t, memberOf[0]);
+                }
                 Execute(c, t, "DELETE FROM org_anar_pend_kick WHERE kicked_id=@Id OR kicker_id=@Id", "@Id", characterId);
                 // Leave, kick and side change end the tax schedule; its unpaid debt is dropped with the row.
                 Execute(c, t, "DELETE FROM org_member_tax WHERE char_id=@Id", "@Id", characterId);
@@ -475,6 +554,9 @@ namespace AORebirth.Database.Domain.Characters
             {
                 // Organizations row first, the same lock order as RecordAnarchistKick.
                 QueryWithin(c, t, "SELECT Id FROM organizations WHERE Id=@Id FOR UPDATE", r => r.GetInt32(0), "@Id", organizationId);
+                TouchOrgMembersBio(c, t, organizationId);
+                TouchOrgStats(c, t, organizationId);
+                TouchOrgOnline(c, t, organizationId);
                 // Members become orgless: their ClanLevel and Clan rows are removed, not zeroed.
                 Execute(c, t, "DELETE r FROM stats r JOIN stats m ON m.Type=r.Type AND m.Instance=r.Instance "
                     + "AND m.StatId=@Clan AND m.StatValue=@Id "
@@ -506,6 +588,10 @@ namespace AORebirth.Database.Domain.Characters
                     "@Clan", (int)CharacterStat.Clan, "@Id", organizationId, "@Lowest", lowestRank,
                     "@Type", (int)IdentityType.CanbeAffected, "@Level", (int)CharacterStat.ClanLevel,
                     "@Leader", leaderId);
+                // Ranks reset even when the form is re-saved, so every member and the organization page change.
+                TouchOrgMembersBio(c, t, organizationId);
+                TouchOrgStats(c, t, organizationId);
+                TouchOrgOnline(c, t, organizationId);
                 // Stored Anarchism kick requests belong to the form that recorded them; a re-save keeps them.
                 if (previous.Count > 0 && previous[0] != governingForm)
                     Execute(c, t, "DELETE FROM org_anar_pend_kick WHERE org_id=@Id", "@Id", organizationId);
@@ -714,8 +800,82 @@ namespace AORebirth.Database.Domain.Characters
         // Well under MySQL's 65535 placeholder limit while keeping each statement a single round trip.
         private const int StatRowsPerStatement = 256;
 
+        // Published statistics (spec section 6.1): level, alien level, breed, gender, faction, profession, title level, PvP rating.
+        private static readonly int[] BioStatIds =
+        {
+            (int)CharacterStat.Level, (int)CharacterStat.AlienLevel, (int)CharacterStat.Breed, (int)CharacterStat.Sex,
+            (int)CharacterStat.Side, (int)CharacterStat.Profession, (int)CharacterStat.TitleLevel, (int)CharacterStat.PvP_Rating
+        };
+
+        // The subset that the organization statistics page aggregates (spec section 5.5).
+        private static readonly int[] OrgStatsStatIds =
+        {
+            (int)CharacterStat.Level, (int)CharacterStat.AlienLevel, (int)CharacterStat.Breed, (int)CharacterStat.Sex,
+            (int)CharacterStat.Profession, (int)CharacterStat.TitleLevel
+        };
+
+        // The subset shown by the online list (spec section 12.6): level, alien level and profession.
+        private static readonly int[] OnlineListStatIds =
+        {
+            (int)CharacterStat.Level, (int)CharacterStat.AlienLevel, (int)CharacterStat.Profession
+        };
+
+        private static void TouchChangedBioStats(IDbConnection c, IDbTransaction t, int characterId, IList<CharacterStatData> stats)
+        {
+            var incoming = new Dictionary<int, long>();
+            foreach (CharacterStatData stat in stats)
+                if (Array.IndexOf(BioStatIds, stat.StatId) >= 0)
+                    incoming[stat.StatId] = Convert.ToInt64(stat.StatValue, CultureInfo.InvariantCulture);
+            if (incoming.Count == 0) return;
+
+            var current = new Dictionary<int, long>();
+            var sql = new StringBuilder("SELECT StatId,StatValue FROM stats WHERE Type=@Type AND Instance=@Id AND StatId IN (");
+            var parameters = new List<object> { "@Type", (int)IdentityType.CanbeAffected, "@Id", characterId };
+            int index = 0;
+            foreach (int statId in incoming.Keys)
+            {
+                string name = "@S" + index.ToString(CultureInfo.InvariantCulture);
+                if (index > 0) sql.Append(',');
+                sql.Append(name);
+                parameters.Add(name);
+                parameters.Add(statId);
+                index++;
+            }
+            sql.Append(')');
+            foreach (KeyValuePair<int, long> row in QueryWithin(c, t, sql.ToString(),
+                r => new KeyValuePair<int, long>(Convert.ToInt32(r.GetValue(0), CultureInfo.InvariantCulture),
+                    Convert.ToInt64(r.GetValue(1), CultureInfo.InvariantCulture)), parameters.ToArray()))
+                current[row.Key] = row.Value;
+
+            bool bioChanged = false, orgStatsChanged = false, onlineListChanged = false, sideChanged = false;
+            foreach (KeyValuePair<int, long> stat in incoming)
+            {
+                if (current.TryGetValue(stat.Key, out long existing) && existing == stat.Value) continue;
+                bioChanged = true;
+                if (Array.IndexOf(OrgStatsStatIds, stat.Key) >= 0) orgStatsChanged = true;
+                if (Array.IndexOf(OnlineListStatIds, stat.Key) >= 0) onlineListChanged = true;
+                if (stat.Key == (int)CharacterStat.Side) sideChanged = true;
+            }
+            if (!bioChanged) return;
+
+            TouchCharacterBio(c, t, characterId);
+            if (orgStatsChanged || onlineListChanged)
+            {
+                int organizationId = ReadOrgId(c, t, characterId);
+                if (orgStatsChanged) TouchOrgStats(c, t, organizationId);
+                if (onlineListChanged) TouchOrgOnline(c, t, organizationId);
+            }
+            // The organization faction is its leader's side.
+            if (sideChanged)
+                Execute(c, t, "INSERT INTO org_stats_meta (id_org,last_updated) "
+                    + "SELECT Id, UTC_TIMESTAMP(6) FROM organizations WHERE LeaderId=@Id "
+                    + "ON DUPLICATE KEY UPDATE last_updated=VALUES(last_updated)", "@Id", characterId);
+        }
+
         private static void WriteStats(IDbConnection c, IDbTransaction t, int characterId, IList<CharacterStatData> stats)
         {
+            // Read before the upsert below overwrites the values being compared.
+            TouchChangedBioStats(c, t, characterId, stats);
             for (int start = 0; start < stats.Count; start += StatRowsPerStatement)
             {
                 int count = Math.Min(StatRowsPerStatement, stats.Count - start);

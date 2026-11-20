@@ -85,6 +85,31 @@ definitions and typed protocol fields. The Roslyn checks cover documented source
 patterns and the existing project graph inventory. Semantic review remains
 required for new APIs and indirect flows outside those patterns.
 
+The existing `content-boundary` job also runs the runtime catalog contract.
+The contract compares fixed `GameDataPaths.ResolveFile` dependencies and PORK
+catalog declarations with the exact PR base. A newly discovered dependency needs
+runtime admission, a schema contract, and a focused production reader fixture.
+The public fixture executes the production Legacy PvP loader using synthetic
+content. The job identifies which changes require private review.
+
+Before merging a change flagged for private review, an authorized maintainer
+reviews the exact proposed source and runs the existing catalog contract from a
+clean candidate checkout. Use the owning product checkout for the private
+profile and run storage preflight before the focused .NET validation.
+
+```text
+python -B Tools/runtime_catalog_contract.py --base <exact-public-base> --expected-source <reviewed-head> --authority-root <PUBLIC_PRODUCT_CHECKOUT>
+```
+
+The command checks the authenticated current upstream and the selected canonical
+manifest, reports missing or unreconciled catalogs by path, and runs the real
+PHP PORK, Legacy PvP and NPC encounter readers. For new catalog bytes still
+awaiting governed reconciliation, pass `--catalog-root` with a private staged
+selection inside the owning profile's ignored state root. Keep the selected
+GameData, logs and exact source/content/manifest receipt in that private state.
+Run the check again if the source, content or selected manifest changes before
+merge. Public CI receives no private input or private validation credentials.
+
 ## Data Flow
 
 Typical login/playfield flow:

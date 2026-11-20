@@ -950,6 +950,7 @@ namespace ZoneEngine_New.Core.Playfield
             services.AddSingleton(_playfieldManager.ItemTemplates);
             services.AddSingleton(_playerHydrator);
             services.AddSingleton(_gameData);
+            services.AddSingleton<ZoneEngine_New.Core.GameData.PvpLegacyTitleCatalog>();
             services.AddSingleton(_items);
             services.AddSingleton(_hashItems);
             services.AddSingleton(_inventoryRepository);
