@@ -1853,11 +1853,13 @@ def intake(root, profile, resolutions=None, generated_receipt=None, surfaces_rec
     else:
         plan, projected = unchanged_patch_content(root, profile, bundle, public_sha, dump_sha, reused_context, rows), {}
     validate_reconciliation(bundle, plan, selected_patch=patch is not None)
+    finished = now()
     attempt = {"FORMAT_VERSION": 1, "PUBLIC_MASTER_SHA": public_sha, "LOCAL_WINDOWS_SOURCE_SHA": public_sha,
                "ATTEMPT_ID": attempt_id, "ATTEMPT_STARTED_UTC": started,
                "CONTENT_DUMP_SHA": dump_sha, "WINDOWS_GAMEDATA_MANIFEST": plan["WINDOWS_GAMEDATA_MANIFEST"],
                "PUBLIC_FETCH": public_fetch, "CONTENT_DUMP_FETCH": dump_fetch,
-               "CREATED_UTC": now(), "WINDOWS_BUILD": "NOT_RUN", "WINDOWS_USER_ACCEPTED": "NO",
+               "CREATED_UTC": finished, "WINDOWS_BUILD": "NOT_RUN", "WINDOWS_USER_ACCEPTED": "NO",
+               "PHASE_TIMINGS": {"GAMEDATA_INTAKE_SECONDS": round((timestamp(finished) - timestamp(started)).total_seconds(), 3)},
                "RECONCILIATION": descriptor(bundle, bundle / "reconciliation.json"),
                "CANONICAL_MANIFEST": descriptor(bundle, bundle / "manifest.json"),
                "LAUNCHER_SHA256": digest((Path(root) / "start-engines.ps1").read_bytes())}
@@ -2257,6 +2259,8 @@ def run_build(root, profile, child, patch=None, reuse=None):
         result = subprocess.run(child, cwd=root, env=env, check=False)
         attempt["WINDOWS_BUILD_EXIT_CODE"] = result.returncode
         attempt["BUILD_FINISHED_UTC"] = now()
+        attempt["PHASE_TIMINGS"]["WINDOWS_COMPILATION_SECONDS"] = round(
+            (timestamp(attempt["BUILD_FINISHED_UTC"]) - timestamp(attempt["BUILD_STARTED_UTC"])).total_seconds(), 3)
         if result.returncode:
             attempt["WINDOWS_BUILD"] = "FAIL"
         else:
@@ -2798,6 +2802,12 @@ def record_startup(root, profile, attempt_path, raw_receipt_path):
     windows["CANONICAL_GAMEDATA_ROOT_AT_STARTUP"] = str(Path(profile["CANONICAL_GAMEDATA_ROOT"]).resolve())
     windows["STARTUP_GAMEDATA_MANIFEST"] = attempt["CANONICAL_MANIFEST"]
     validate_startup(bundle, windows, attempt)
+    timings = dict(attempt.get("PHASE_TIMINGS", {}))
+    observation_path = next(path for path in copied if PurePosixPath(path).name == "world-status-observation.json")
+    observed = read_json(checked(bundle, observation_path))["captured_utc"]
+    started = read_json(checked(bundle, ready_path))["COMMANDS"]["startup"]["started_utc"]
+    timings["WINDOWS_VALIDATION_SECONDS"] = round((timestamp(observed) - timestamp(started)).total_seconds(), 3)
+    windows["PHASE_TIMINGS"] = timings
     target = bundle / "windows-receipt.json"
     write_json(target, windows, exclusive=True)
     print("WINDOWS_USER_ACCEPTED=NO")
