@@ -39,6 +39,8 @@ namespace ZoneEngine_New.Core.Organizations
         public const string InviteAlreadyInOrganization = "\"Y^0o";
         public const string InviteOtherSide = "%`cZp";
         public const string OrganizationDisbanded = "%.Neo";
+        public const string LeaderCannotLeave = "$*)i[";
+        public const string DisbandNotLeader = "\"3ue2";
         public const string TaxChangedOrg = "\"]9V7";
 
     }
@@ -172,6 +174,16 @@ namespace ZoneEngine_New.Core.Organizations
             Unknown1 = RefFlags,
             Unknown2 = 0,
             Unknown3 = RefTrailer
+        };
+
+        /// <summary>A ref text with trailer 0, as captured for the leader's refused /org leave (162192978) and the disband confirmation.</summary>
+        public static ChatTextMessage MessageWithoutTrailer(Identity recipient, string text) => new()
+        {
+            Identity = recipient,
+            Text = text,
+            Unknown1 = RefFlags,
+            Unknown2 = 0,
+            Unknown3 = 0
         };
     }
 }

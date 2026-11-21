@@ -89,7 +89,8 @@ namespace ZoneEngine_New.Core.Organizations
         {
             if (IsLeader(player, org))
             {
-                DisbandAsLeader(player, org);
+                // Captured: a leader cannot leave; he must disband or hand over the organization.
+                player.Session?.Send(OrgChatText.MessageWithoutTrailer(player.Identity, OrgChatText.Wrap(OrgChatRefs.LeaderCannotLeave)));
                 return;
             }
 
@@ -102,7 +103,7 @@ namespace ZoneEngine_New.Core.Organizations
 
         public void DisbandAsLeader(Player leader, OrganizationRecord org)
         {
-            leader.Session?.Send(OrgChatText.Message(leader.Identity, OrgChatText.Wrap(OrgChatRefs.OrganizationDisbanded)));
+            leader.Session?.Send(OrgChatText.MessageWithoutTrailer(leader.Identity, OrgChatText.Wrap(OrgChatRefs.OrganizationDisbanded)));
 
             string leaderName = leader.Name ?? string.Empty;
             Disband(org, orgMessage: null, notifyOnlineMember: member =>

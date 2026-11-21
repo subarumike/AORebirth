@@ -393,6 +393,9 @@ namespace ZoneEngine_New.Core.Configuration
         /// <summary>Lockout after an organization is disbanded (applied to every former member, as after leave).</summary>
         public long DisbandLockoutSeconds { get; init; } = 43200;
 
+        /// <summary>Temporary live-test lock: when true, only a GM can run /org create. Set to false to open creation to everyone.</summary>
+        public bool CreateGmOnly { get; init; } = true;
+
         /// <summary>Personal /played seconds between two organization tax deductions for each non-leader member.</summary>
         public long TaxTickSeconds { get; init; } = 7200;
 

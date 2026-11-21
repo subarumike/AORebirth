@@ -17,6 +17,11 @@ Rules are **declared**, confirmed where indicated by captures. Packet evidence a
 
 - Leader of a full team of 6, same side, nobody already in an org. Leader gets rank 0, the 5 others the lowest rank (Peasant = 3 in Feudalism).
 - Name: first letter upper case, 4-40 characters, at least 3 alphabetical characters, not already used, no invalid characters.
+- Implemented (`OrgClientMessageHandler.Create.cs`): the checks run in the captured order (length, at least 3 letters, invalid character, lowercase initial, name taken, team). Accepted characters: ASCII letters, digits, spaces and the punctuation `. - ' ( ) &` seen in the Rubi-Ka 2019 org names on people.anarchy-online.com (341 orgs, longest 37 characters, none starting with a lowercase letter). The same validator now guards `/org name`.
+- Name column and uniqueness: `organizations.Name` is `varchar(40)` and carries the unique key `UX_organizations_name` (migration `20261121_organizations_name_unique.sql`, registered in `SchemaContract` and `DatabaseMigrationTool`, also in the `SqlTables/organizations.sql` baseline; the migration stops if duplicate names already exist, and the engines report the schema as incompatible without the unique key). `/org create` checks the name inside its transaction and maps a duplicate-key error to the "name taken" refusal.
+- Team, side and membership: the team is read from `TeamService` (leader, 6 members, not a raid). The DAO (`CreateOrganization`) then checks under lock that no member has a Clan stat and that every member's stored Side equals the leader's, so members on another zone or engine are covered.
+- GM lock: `org.createGmOnly` in `Config/Gameplay.json` (default `true`) limits `/org create` to GMs; a refused player gets no text (none was captured) and a log line. Set it to `false` to open creation.
+- Leader `/org leave` is refused with ref `$*)i[` (Text.json 162192978, category 508, capture `leaderleave`); the leader must disband.
 - Refusals use the Feedback ids and sentences in the catalog.
 - DB: row in `organizations` (Comission 1, other fields default), stat 5 = org id, stat 48 = rank for each member.
 - Team membership is not org membership: former leavers/kicked characters (no org) can be in a team. `/org create` ignores locks.
@@ -27,7 +32,7 @@ A GM may also disband the organization of a targeted leader (Org Msg 119220807, 
 - Governing form change resets everybody except the president to the lowest rank. Re-applying the SAME form is accepted and also resets the ranks (a way to rebuild the hierarchy).
 credits given with `bank add` reduce the debt first (step [4B]; AOR choice, not captured).
 - Bank: view refused to the lowest rank (except anarchism, message 237299844; others get 78644776 with the Bank value). `bank add` by anyone who owns the amount, no success message; org bank capped at 3999999999 and the giver keeps the difference (decided, not captured). `bank remove` leader only (non-leader gets 222804051), limited by the org balance (210489620 with %i) and by the leader's 999999999 limit (5429092). Tested with 1 credit.
-- Disband needs a client dialog; every member gets a 12 h lock (`disbandLockoutSeconds` 43200 in Gameplay.json).
+- Disband needs a client dialog; every member gets a 12 h lock (`disbandLockoutSeconds` 43200 in Gameplay.json). A non-leader member who tries to disband gets ref `"3ue2` (Text.json 63867572, trailer 0, captured in `full/` 20261101-142747); a character without an org gets the usual not-in-organization ref.
 
 ## 4. Promote / demote / ranks
 

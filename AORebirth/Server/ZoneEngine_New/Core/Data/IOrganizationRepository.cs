@@ -12,6 +12,13 @@ namespace ZoneEngine_New.Core.Data
 
         bool IsNameTaken(string name, int exceptOrganizationId);
 
+        /// <summary>
+        /// Creates an organization with every member (leader included) in one transaction. The checks of name, membership and
+        /// side run under lock in the database; nothing is stored unless the outcome is Created.
+        /// </summary>
+        AORebirth.Interfaces.Persistence.Characters.PersistedOrganizationCreateResult Create(string name, int leaderId,
+            System.Collections.Generic.IList<int> memberIds, int leaderRank, int memberRank);
+
         void SaveText(int organizationId, AORebirth.Interfaces.Persistence.Characters.OrganizationTextField field, string value);
 
         /// <summary>Stores the form and resets every member except the leader to <paramref name="lowestRank"/>.</summary>

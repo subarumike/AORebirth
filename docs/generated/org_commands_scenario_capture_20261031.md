@@ -58,6 +58,7 @@ Org system messages arrive as chat-server `GroupMessage`, `ChannelId=1`, `Sender
 | invite (declined/ignored) | no packet | - | - |
 | kick | kicked: `&!!!":$6F,Ns<kicker>` | `!]C$ks<kicker>s<kicked>` | `Clan=0` |
 | leave | Feedback 508 / 45846567 | `!kjeAs<name>` | `Clan=0`, SocialStatus 1 |
+| leave (leader) | ChatText ref `$*)i[` (162192978, category 508), trailer 0; nothing else changes | - | - |
 | disband | `%.Neo` | `#`QX`s<leader>` | `Clan=0` online members |
 | promote to president (dialog 0x0009) | - | `%UKqGs<newPresident>`; new president `&!!!":"lW;as<old>` | - |
 | tax (no arg) | `#ge1Du!!!!<n>` | - | - |
@@ -98,7 +99,7 @@ Create refusals are Feedback 501 (see 5.2). Governing form: applying the CURRENT
 | `#L.-2` / `$cZ=l` / `"!Qr$` | description / objective / history by a non-leader | Only the leader is allowed to change the description / objective / history. |
 | `#L8'X` | name by a non-leader | Only the leader is allowed to change the name. |
 | `$[a;"` | tax by a non-leader | Only leaders can change the organization tax. |
-| `"3ue2` | disband by a non-leader | Only the leader or a GM can disband your organization. |
+| `"3ue2` | disband by a non-leader (captured, ChatText trailer 0) | Only the leader or a GM can disband your organization. |
 | `%r0M2` | startvote by a non-leader | Only the leader or a GM can initiate voting for your organization. |
 | `";`_V` | startvote with a duration out of range (1 min tested) | The legal vote time is between 2 and 10080 minutes. ( 10080 minutes is 1 week ). |
 | `"l9r3` | startvote with 0, 1 or 11 entries | Voting should have a minimum of 2 and a maximum of 10 choices. |

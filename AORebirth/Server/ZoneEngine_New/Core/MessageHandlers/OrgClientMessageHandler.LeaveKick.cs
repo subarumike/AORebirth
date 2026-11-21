@@ -38,9 +38,14 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 return;
             }
 
-            // A member's disband is refused silently; only the leader's confirmed disband acts.
-            if (OrgMembershipService.IsLeader(player, org))
-                _memberships.DisbandAsLeader(player, org);
+            // Captured retail refusal for a non-leader (Text.json 63867572, trailer 0).
+            if (!OrgMembershipService.IsLeader(player, org))
+            {
+                session.Send(OrgChatText.MessageWithoutTrailer(player.Identity, OrgChatText.Wrap(OrgChatRefs.DisbandNotLeader)));
+                return;
+            }
+
+            _memberships.DisbandAsLeader(player, org);
         }
 
         // A GM may kick from an organization he does not belong to, so the requester's membership is not checked here.
