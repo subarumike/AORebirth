@@ -42,7 +42,8 @@ public static class SchemaContract
         "20261111_character_played_born.sql",
         "20261112_org_member_tax.sql",
         "20261112_org_vote.sql",
-        "20261116_pork_meta.sql"
+        "20261116_pork_meta.sql",
+        "20261121_organizations_name_unique.sql"
     });
 
     // Other governed components may legitimately record these unrelated migrations.
@@ -94,7 +95,8 @@ public static class SchemaContract
         ("characterplayedborn", "char_id"),
         ("org_member_tax", "char_id"),
         ("org_vote", "vote_id"), ("org_vote_choice", "vote_id,choice_no"), ("org_vote_member", "vote_id,char_id"),
-        ("character_bio_meta", "id_char"), ("org_stats_meta", "id_org"), ("org_online_meta", "id_org")
+        ("character_bio_meta", "id_char"), ("org_stats_meta", "id_org"), ("org_online_meta", "id_org"),
+        ("organizations", "Name")
     });
 
     private static IReadOnlyList<ColumnRequirement> BuildColumns()

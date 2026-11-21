@@ -10,7 +10,7 @@ namespace ZoneEngine_New.Core.Data
         readonly ICharacterPersistenceDao _persistence;
 
         public MySqlOrganizationRepository(ICharacterPersistenceDao? persistence = null)
-            => _persistence = persistence ?? Create();
+            => _persistence = persistence ?? SharedCharacterPersistence.Create();
 
         public OrganizationRecord? GetById(int organizationId)
         {
@@ -26,6 +26,10 @@ namespace ZoneEngine_New.Core.Data
 
         public bool IsNameTaken(string name, int exceptOrganizationId)
             => Run(() => _persistence.IsOrganizationNameTaken(name, exceptOrganizationId));
+
+        public PersistedOrganizationCreateResult Create(string name, int leaderId, System.Collections.Generic.IList<int> memberIds,
+            int leaderRank, int memberRank)
+            => Run(() => _persistence.CreateOrganization(name, leaderId, memberIds, leaderRank, memberRank));
 
         public void SaveText(int organizationId, OrganizationTextField field, string value)
             => Run(() => _persistence.SaveOrganizationText(organizationId, field, value));

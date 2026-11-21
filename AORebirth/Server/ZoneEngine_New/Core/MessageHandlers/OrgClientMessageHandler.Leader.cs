@@ -22,7 +22,10 @@ namespace ZoneEngine_New.Core.MessageHandlers
     {
         const int MaxTextLength = 255;
         const int MinNameLength = 4;
+        // organizations.Name is varchar(40) (migration 20261121_organizations_name_unique.sql), the retail limit.
         const int MaxNameLength = 40;
+        // Punctuation seen in the live Rubi-Ka 2019 organization names (people.anarchy-online.com), besides letters, digits and spaces.
+        const string NamePunctuation = ".-'()&";
         const int MinNameLetters = 3;
 
         void HandleLeaderCommand(OrgClientMessage message, IZoneSession session, Player player)
@@ -98,11 +101,20 @@ namespace ZoneEngine_New.Core.MessageHandlers
             ChangeText(org, OrganizationTextField.Name, name);
         }
 
-        // Retail rules (rules.txt): upper-case first letter, 4-40 characters, at least 3 letters.
-        static bool IsValidName(string name)
-            => name.Length is >= MinNameLength and <= MaxNameLength
-               && char.IsUpper(name[0])
-               && name.Count(char.IsLetter) >= MinNameLetters;
+        // Retail rules (rules.txt), checked in the captured order: 4 characters minimum, at least 3 letters, only ASCII
+        // letters, digits, spaces and the punctuation above, upper-case first letter.
+        static OrgNameCheck CheckName(string name)
+        {
+            if (name.Length is < MinNameLength or > MaxNameLength)
+                return OrgNameCheck.InvalidLength;
+            if (name.Count(char.IsAsciiLetter) < MinNameLetters)
+                return OrgNameCheck.TooFewLetters;
+            if (!name.All(c => char.IsAsciiLetterOrDigit(c) || c == ' ' || NamePunctuation.Contains(c)))
+                return OrgNameCheck.InvalidCharacter;
+            return char.IsAsciiLetterUpper(name[0]) ? OrgNameCheck.Valid : OrgNameCheck.LowercaseInitial;
+        }
+
+        static bool IsValidName(string name) => CheckName(name) == OrgNameCheck.Valid;
 
         void ChangeText(OrganizationRecord org, OrganizationTextField field, string value)
         {

@@ -224,6 +224,10 @@
         },
         "disbandLockoutSeconds": {
           "type": "number"
+        },
+        "createGmOnly": {
+          "type": "boolean",
+          "description": "Temporary live-test lock: when true, only a GM can run /org create. Set to false to open creation to everyone."
         }
       },
       "additionalProperties": false

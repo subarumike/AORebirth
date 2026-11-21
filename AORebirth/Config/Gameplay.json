@@ -62,6 +62,7 @@
     "sideChangeLockoutSeconds": 21600,
     "anarchistLeaderKickLockoutSeconds": 43200,
     "disbandLockoutSeconds": 43200,
+    "createGmOnly": true,
     "taxTickSeconds": 7200,
     "taxPeriodSeconds": 1800,
     "voteCooldownSeconds": 1800

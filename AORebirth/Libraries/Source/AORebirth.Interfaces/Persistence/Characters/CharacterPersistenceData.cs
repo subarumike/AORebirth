@@ -228,6 +228,25 @@ namespace AORebirth.Interfaces.Persistence.Characters
         public IList<PersistedAnarchistKickerData> Requesters { get; set; } = new List<PersistedAnarchistKickerData>();
     }
 
+    public enum OrganizationCreateOutcome
+    {
+        /// <summary>The organizations row and the membership of every member are stored.</summary>
+        Created,
+        /// <summary>Another organization already uses the name; nothing was stored.</summary>
+        NameTaken,
+        /// <summary>At least one member already belongs to an organization; nothing was stored.</summary>
+        MemberInOrganization,
+        /// <summary>A member's stored side differs from the leader's; nothing was stored.</summary>
+        SideMismatch
+    }
+
+    public sealed class PersistedOrganizationCreateResult
+    {
+        public OrganizationCreateOutcome Outcome { get; set; }
+        /// <summary>The new organizations.Id when <see cref="Outcome"/> is Created, otherwise 0.</summary>
+        public int OrganizationId { get; set; }
+    }
+
     public enum OrganizationBankOutcome
     {
         /// <summary>The organization no longer exists; nothing was stored.</summary>

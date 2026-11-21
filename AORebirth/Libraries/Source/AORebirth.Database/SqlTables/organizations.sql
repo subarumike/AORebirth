@@ -1,7 +1,7 @@
 CREATE TABLE  `organizations` (
   `Id` int(32) unsigned NOT NULL AUTO_INCREMENT,
   `Creation` datetime NOT NULL,
-  `Name` varchar(32) NOT NULL,
+  `Name` varchar(40) NOT NULL,
   `LeaderId` int(32) NOT NULL,
   `GovernmentForm` int(32) NOT NULL,
   `Description` varchar(255) NOT NULL DEFAULT '" "',
@@ -13,5 +13,6 @@ CREATE TABLE  `organizations` (
   `ContractsId` int(32) NOT NULL DEFAULT '0',
   `CityID` int(32) NOT NULL DEFAULT '0',
   `TowerFieldId` int(32) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`Id`)
+  PRIMARY KEY (`Id`),
+  UNIQUE KEY `UX_organizations_name` (`Name`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=latin1;

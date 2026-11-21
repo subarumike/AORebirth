@@ -7,6 +7,7 @@ namespace AORebirth.Database.Domain.Characters
     using System.Linq;
     using System.Text;
     using AORebirth.Interfaces.Persistence.Characters;
+    using MySqlConnector;
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     /// <summary>Storage for full NewEngine hydration and its existing atomic save boundaries.</summary>
@@ -269,6 +270,76 @@ namespace AORebirth.Database.Domain.Characters
                 TouchOrgStats(c, t, organizationId);
                 return 0;
             });
+        }
+
+        public PersistedOrganizationCreateResult CreateOrganization(string name, int leaderId, IList<int> memberIds, int leaderRank, int memberRank)
+        {
+            if (string.IsNullOrEmpty(name)) throw new ArgumentException("A name is required.", nameof(name));
+            if (leaderId <= 0) throw new ArgumentOutOfRangeException(nameof(leaderId));
+            if (memberIds == null || memberIds.Count == 0 || !memberIds.Contains(leaderId))
+                throw new ArgumentException("The members must include the leader.", nameof(memberIds));
+            // Ascending id order keeps the row locks of two concurrent creations in the same order.
+            List<int> members = memberIds.Distinct().OrderBy(id => id).ToList();
+            try
+            {
+                return CreateOrganizationCore(name, leaderId, members, leaderRank, memberRank);
+            }
+            catch (MySqlException exception) when (exception.Number == 1062)
+            {
+                // A concurrent creation or rename committed the same name first; the unique index rejected this insert.
+                return new PersistedOrganizationCreateResult { Outcome = OrganizationCreateOutcome.NameTaken };
+            }
+        }
+
+        private PersistedOrganizationCreateResult CreateOrganizationCore(string name, int leaderId, List<int> members, int leaderRank, int memberRank)
+        {
+            return Transaction((c, t) =>
+            {
+                if (QueryWithin(c, t, "SELECT Id FROM organizations WHERE Name=@Name", r => r.GetInt32(0), "@Name", name).Count > 0)
+                    return new PersistedOrganizationCreateResult { Outcome = OrganizationCreateOutcome.NameTaken };
+
+                foreach (int member in members)
+                {
+                    IList<int> clan = QueryWithin(c, t,
+                        "SELECT StatValue FROM stats WHERE Type=@Type AND Instance=@Id AND StatId=@Clan FOR UPDATE",
+                        r => r.GetInt32(0), "@Type", (int)IdentityType.CanbeAffected, "@Id", member, "@Clan", (int)CharacterStat.Clan);
+                    if (clan.Count > 0 && clan[0] > 0)
+                        return new PersistedOrganizationCreateResult { Outcome = OrganizationCreateOutcome.MemberInOrganization };
+                }
+
+                int leaderSide = ReadStoredStat(c, t, leaderId, CharacterStat.Side);
+                foreach (int member in members)
+                    if (ReadStoredStat(c, t, member, CharacterStat.Side) != leaderSide)
+                        return new PersistedOrganizationCreateResult { Outcome = OrganizationCreateOutcome.SideMismatch };
+
+                Execute(c, t, "INSERT INTO organizations (Creation,Name,LeaderId,GovernmentForm,Description,Objective,History,Tax,Bank,Comission,ContractsId,CityID,TowerFieldId) "
+                    + "VALUES (NOW(),@Name,@Leader,0,'','','',0,0,1,0,0,0)", "@Name", name, "@Leader", leaderId);
+                int organizationId = QueryWithin(c, t, "SELECT LAST_INSERT_ID()",
+                    r => Convert.ToInt32(r.GetValue(0), CultureInfo.InvariantCulture))[0];
+
+                foreach (int member in members)
+                {
+                    Execute(c, t, "INSERT INTO stats (Type,Instance,StatId,StatValue) VALUES (@Type,@Id,@Clan,@Org) "
+                        + "ON DUPLICATE KEY UPDATE StatValue=VALUES(StatValue)",
+                        "@Type", (int)IdentityType.CanbeAffected, "@Id", member, "@Clan", (int)CharacterStat.Clan, "@Org", organizationId);
+                    Execute(c, t, "INSERT INTO stats (Type,Instance,StatId,StatValue) VALUES (@Type,@Id,@Level,@Rank) "
+                        + "ON DUPLICATE KEY UPDATE StatValue=VALUES(StatValue)",
+                        "@Type", (int)IdentityType.CanbeAffected, "@Id", member, "@Level", (int)CharacterStat.ClanLevel,
+                        "@Rank", member == leaderId ? leaderRank : memberRank);
+                    TouchCharacterBio(c, t, member);
+                }
+                TouchOrgStats(c, t, organizationId);
+                TouchOrgOnline(c, t, organizationId);
+                return new PersistedOrganizationCreateResult { Outcome = OrganizationCreateOutcome.Created, OrganizationId = organizationId };
+            });
+        }
+
+        // A stat without a stored row reads as 0, like a character that never had it set.
+        private static int ReadStoredStat(IDbConnection c, IDbTransaction t, int characterId, CharacterStat stat)
+        {
+            IList<int> values = QueryWithin(c, t, "SELECT StatValue FROM stats WHERE Type=@Type AND Instance=@Id AND StatId=@Stat",
+                r => r.GetInt32(0), "@Type", (int)IdentityType.CanbeAffected, "@Id", characterId, "@Stat", (int)stat);
+            return values.Count > 0 ? values[0] : 0;
         }
 
         public void SaveOrganizationRank(int characterId, int rank)

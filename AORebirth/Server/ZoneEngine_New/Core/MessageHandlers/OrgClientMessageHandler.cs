@@ -11,6 +11,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Chat;
+    using ZoneEngine_New.Core.Configuration;
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Helpers;
     using ZoneEngine_New.Core.Network;
@@ -33,11 +34,13 @@ namespace ZoneEngine_New.Core.MessageHandlers
         readonly OrgMembershipService _memberships;
         readonly OrgTaxTickService _tax;
         readonly OrgVoteService _votes;
+        readonly GameplaySettings _settings;
 
         // Lazy: PlayfieldManager depends on the message router, which depends on the handlers.
         public OrgClientMessageHandler(IGameData gameData, Lazy<PlayfieldManager> playfieldManager,
             IOrganizationRepository organizations, IZoneLogger logger, IChatEngineLink chat,
-            OrgLockoutClock lockouts, OrgMembershipService memberships, OrgTaxTickService tax, OrgVoteService votes)
+            OrgLockoutClock lockouts, OrgMembershipService memberships, OrgTaxTickService tax, OrgVoteService votes,
+            GameplaySettings settings)
         {
             _gameData = gameData;
             _playfieldManager = playfieldManager;
@@ -48,6 +51,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
             _memberships = memberships;
             _tax = tax;
             _votes = votes;
+            _settings = settings;
         }
 
         public Type MessageBodyType => typeof(OrgClientMessage);
@@ -73,6 +77,9 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     return;
                 case OrgClientCommand.Info:
                     HandleInfo(message, session, player);
+                    return;
+                case OrgClientCommand.Create:
+                    HandleCreate(message, session, player);
                     return;
                 case OrgClientCommand.Tax when !string.IsNullOrEmpty(message.CommandArgs):
                     HandleTaxChange(message, session, player);

@@ -20,6 +20,13 @@ namespace AORebirth.Interfaces.Persistence.Characters
         /// <summary>Updates one text column of the organizations row.</summary>
         void SaveOrganizationText(int organizationId, OrganizationTextField field, string value);
         /// <summary>
+        /// Creates an organization in one transaction: checks, under lock, that the name is free, that no member has a Clan
+        /// stat and that every member's stored Side equals the leader's; then inserts the organizations row and stores Clan
+        /// for every member and ClanLevel (<paramref name="leaderRank"/> for the leader, <paramref name="memberRank"/> for the others).
+        /// <paramref name="memberIds"/> includes the leader.
+        /// </summary>
+        PersistedOrganizationCreateResult CreateOrganization(string name, int leaderId, IList<int> memberIds, int leaderRank, int memberRank);
+        /// <summary>
         /// Sets organizations.GovernmentForm and, in the same transaction, resets the rank stat (ClanLevel) of every
         /// member except the leader to <paramref name="lowestRank"/>.
         /// </summary>
