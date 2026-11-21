@@ -3,13 +3,15 @@ namespace ZoneEngine_New.Core.Quests
     using System;
     using System.Collections.Generic;
 
+    using AORebirth.Interfaces.Persistence.Missions;
+
     public enum QuestSource
     {
         /// <summary>GameData/Quests.json template. Never expires.</summary>
-        Template = 0,
+        Template = (int)CharacterQuestSourceCode.Template,
 
         /// <summary>Generated in Quests.json format and stored once in generatedquests. Expires.</summary>
-        Generated = 1,
+        Generated = (int)CharacterQuestSourceCode.Generated,
     }
 
     /// <summary>Who a generated quest belongs to.</summary>
@@ -21,13 +23,13 @@ namespace ZoneEngine_New.Core.Quests
 
     public enum QuestState
     {
-        Active = 1,
-        Completed = 2,
-        Failed = 3,
-        Expired = 4,
+        Active = (int)CharacterQuestStateCode.Active,
+        Completed = (int)CharacterQuestStateCode.Completed,
+        Failed = (int)CharacterQuestStateCode.Failed,
+        Expired = (int)CharacterQuestStateCode.Expired,
 
         /// <summary>The player deleted it from the journal.</summary>
-        Abandoned = 5,
+        Abandoned = (int)CharacterQuestStateCode.Abandoned,
     }
 
     /// <summary>

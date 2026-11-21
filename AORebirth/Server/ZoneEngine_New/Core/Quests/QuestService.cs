@@ -508,8 +508,18 @@ namespace ZoneEngine_New.Core.Quests
         PlayerQuest Assign(Player player, QuestLog log, string questId, QuestSource source, QuestTemplate template,
             DateTime? expiresAtUtc, string? acgJson)
         {
-            DateTime assignedAtUtc = _now();
-            var quest = new PlayerQuest
+            PlayerQuest quest = NewAssignment(questId, source, template, _now(), expiresAtUtc, acgJson);
+            log.Quests[questId] = quest;
+            Save(player, quest);
+            // The announce flag makes the client print "You got a new mission" itself.
+            QuestJournal.Send(player, quest, announce: true);
+            GrantStartItems(player, quest);
+            return quest;
+        }
+
+        static PlayerQuest NewAssignment(string questId, QuestSource source, QuestTemplate template,
+            DateTime assignedAtUtc, DateTime? expiresAtUtc = null, string? acgJson = null)
+            => new()
             {
                 QuestId = questId,
                 Source = source,
@@ -522,14 +532,6 @@ namespace ZoneEngine_New.Core.Quests
                 AcgBuildingGeneratorJson = acgJson
             };
 
-            log.Quests[questId] = quest;
-            Save(player, quest);
-            // The announce flag makes the client print "You got a new mission" itself.
-            QuestJournal.Send(player, quest, announce: true);
-            GrantStartItems(player, quest);
-            return quest;
-        }
-
         /// <summary>
         /// The step's <see cref="QuestTemplate.StartItems"/>, handed over as it is assigned: to the first free inventory
         /// slot, else overflow, like a Knubot <c>{spawn}</c>. A Unique item already held is left out; one whose item hash did
@@ -537,8 +539,22 @@ namespace ZoneEngine_New.Core.Quests
         /// </summary>
         void GrantStartItems(Player player, PlayerQuest quest)
         {
+            foreach (Item item in MintStartItems(player, quest))
+            {
+                if (UniqueItems.WouldDuplicate(player, item, out string uniqueName))
+                {
+                    ClientFeedback.SendFormatted(player, ClientFeedback.AlreadyHaveUniqueItem, uniqueName);
+                    continue;
+                }
+
+                Knubot.KnubotItems.Give(player, item, _flush);
+            }
+        }
+
+        IEnumerable<Item> MintStartItems(Player player, PlayerQuest quest)
+        {
             if (quest.Template.StartItems is not { Count: > 0 } startItems)
-                return;
+                yield break;
 
             foreach (QuestRewardItem definition in startItems)
             {
@@ -550,14 +566,8 @@ namespace ZoneEngine_New.Core.Quests
                     continue;
                 }
 
-                Item item = _items.CreateWithNewInstance(definition.Id, definition.HighId ?? definition.Id, definition.Quality, ItemSource.Quest);
-                if (UniqueItems.WouldDuplicate(player, item, out string uniqueName))
-                {
-                    ClientFeedback.SendFormatted(player, ClientFeedback.AlreadyHaveUniqueItem, uniqueName);
-                    continue;
-                }
-
-                Knubot.KnubotItems.Give(player, item, _flush);
+                yield return _items.CreateWithNewInstance(definition.Id, definition.HighId ?? definition.Id,
+                    definition.Quality, ItemSource.Quest);
             }
         }
 
