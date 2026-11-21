@@ -18,16 +18,18 @@ namespace ZoneEngine_New.Core.Playfield
         private Quaternion? _originHeading;
         private readonly PlayfieldAdmission _destinationAdmission;
         private readonly Func<bool>? _stillAuthorized;
+        private readonly bool _clearReturnDoor;
 
         public PlayfieldTransfer(ZoneSession session, Player player, Playfield source,
             Playfield destination, Vector3 landing, Quaternion heading, PlayfieldAdmission destinationAdmission,
-            Func<bool>? stillAuthorized = null)
+            Func<bool>? stillAuthorized = null, bool clearReturnDoor = false)
         {
             Session = session; Player = player; Source = source; Destination = destination;
             Landing = new Vector3(landing.x, landing.y, landing.z);
             Heading = new Quaternion(heading.x, heading.y, heading.z, heading.w);
             _destinationAdmission = destinationAdmission;
             _stillAuthorized = stillAuthorized;
+            _clearReturnDoor = clearReturnDoor;
         }
 
         public ZoneSession Session { get; }
@@ -96,6 +98,9 @@ namespace ZoneEngine_New.Core.Playfield
                     // the existing reconnect grace so an abandoned redirect cannot live forever.
                     Player.EnterLinkDead(PlayfieldManager.ResolveLinkDeadTimeout());
                     Session.UnbindPlayer();
+                    // Clear only after the handoff succeeds. A returned character keeps the source door.
+                    if (_clearReturnDoor)
+                        Player.ClearReturnDoor();
                     Finish(Phase.Arrived);
                 }
                 catch (Exception exception)

@@ -925,6 +925,11 @@ namespace ZoneEngine_New.Core.Playfield
             if (command.Envelope != null)
             {
                 // Arriving from another zone instance: the zone-change rules a same-instance arrival applies.
+                if (command.Envelope.ClearReturnDoor)
+                {
+                    player.ClearReturnDoor();
+                    _playfield.WorldAccess.Instance?.ForgetCharacterTriggers(characterId);
+                }
                 // Buffs with a playshift requirement the character no longer meets end before FullCharacter.
                 Nanos.NanoRuntime.StripPlayshiftFailures(player);
                 if (command.Envelope.ExitProxyDoor != 0 && _playfield is ACGPlayfield acg)
