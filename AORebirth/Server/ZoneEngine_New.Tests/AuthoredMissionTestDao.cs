@@ -100,6 +100,14 @@ internal sealed partial class AuthoredMissionTestDao : IMissionDao, IMissionDaoT
             Items.Add(row.InstanceId, Copy(row));
         }
     }
+
+    public void RetireNpcTradeOffer(MissionItemInstanceData offered)
+    {
+        if (offered.ContainerType != (int)IdentityType.OverflowWindow || offered.ContainerInstance != CharacterId
+            || offered.InstanceId <= 0 || offered.ContainerPlacement != offered.InstanceId || offered.StackCount != 1)
+            throw new InvalidOperationException("Invalid parked NPC trade offer.");
+        ApplyInventoryMutation([], [offered]);
+    }
     internal static CharacterQuestCompletionSnapshotData? CloneCharacterQuest(CharacterQuestCompletionSnapshotData? row)
         => row == null ? null : new()
         {
