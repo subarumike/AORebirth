@@ -3,6 +3,7 @@ namespace ZoneEngine_New.Core.Helpers
     using System;
     using System.Globalization;
 
+    using AORebirth.Core.GameData;
     using AORebirth.Enums;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
@@ -472,8 +473,12 @@ namespace ZoneEngine_New.Core.Helpers
             if (!roll.IsHit)
                 return roll;
 
-            string? gameDataRoot = attacker.Playfield?.GetService<IGameData>()?.RootPath;
-            int multiplier = multiplied && gameDataRoot != null ? StealthMultiplierTable.Roll(gameDataRoot, specialSkill) : 1;
+            int multiplier = 1;
+            if (multiplied)
+            {
+                string gameDataRoot = attacker.Playfield?.GetService<IGameData>()?.RootPath ?? GameDataPaths.ResolveRuntimeRoot();
+                multiplier = StealthMultiplierTable.Roll(gameDataRoot, specialSkill);
+            }
             int damage = (int)Math.Min(StealthStrikeMaxDamage, (long)roll.Damage * multiplier);
             return new DamageCalculator.DamageResult(true, Math.Max(1, damage), roll.HitType);
         }

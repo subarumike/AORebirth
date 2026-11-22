@@ -7,6 +7,7 @@ namespace ZoneEngine_New.Tests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Utility.Network;
     using ZoneEngine_New.Core.Data;
+    using ZoneEngine_New.Core.Helpers;
 
     [TestClass]
     public sealed class RuntimeStartupTests
@@ -73,6 +74,9 @@ namespace ZoneEngine_New.Tests
                 File.WriteAllText(Path.Combine(gameData, "Xp.json"), "{}");
                 File.WriteAllText(Path.Combine(gameData, "AlienXp.json"), "{}");
                 File.WriteAllBytes(Path.Combine(gameData, "items.dat"), [1]);
+                // The package fixture only exercises presence. Its valid sample comes from the shipped 100-skill row.
+                File.WriteAllText(Path.Combine(gameData, StealthMultiplierTable.FileName),
+                    """{"rows":[{"skill":100,"weights":[0.998269896,0.001730104]}]}""");
 
                 RuntimeStartup.ValidatePackage(root, skipPlayfieldPackagePin: true);
 

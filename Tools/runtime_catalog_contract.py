@@ -23,6 +23,7 @@ PRODUCTION_READERS = (
 REQUIRED_ZONE_READERS = {"PvpLegacyTitleCatalog.cs", "MonsterCombatRules.cs", "NpcPetSummonProfile.cs"}
 PVP_TITLES = "PvpLegacyTitles.json"
 ROOT_TEXT = "Text.json"
+STEALTH_MULTIPLIERS = "SpecialAttackMultipliers.json"
 PORK_NAME_SECTIONS = {
     "Breed.json": "Breeds",
     "Sex.json": "Sex",
@@ -36,6 +37,7 @@ ZONE_CATALOG_TESTS = {
     ROOT_TEXT: "StagedLegacyPvpCatalogLoadsEveryAuthoredBand",
     "MonsterCombatRules.json": "StagedEncounterCatalogsLoadAndResolveReferences",
     "NpcPetSummons.json": "StagedEncounterCatalogsLoadAndResolveReferences",
+    STEALTH_MULTIPLIERS: "StagedStealthMultiplierCatalogLoadsAndUsesShippedSkillBands",
 }
 ZONE_TEST_SOURCE = "AORebirth/Server/ZoneEngine_New.Tests/RuntimeCatalogTests.cs"
 ZONE_TEST_PROJECT = "AORebirth/Server/ZoneEngine_New.Tests/ZoneEngine_New.Tests.csproj"
@@ -222,6 +224,37 @@ def pork_text_categories(source_root):
         yield int(values[0])
 
 
+def validate_stealth_multipliers(path):
+    """Check the selected table before compiling or packaging a release."""
+    try:
+        document = read_json(path)
+        rows = case_insensitive_fields(document).get("rows")
+        if not isinstance(rows, list) or not rows:
+            fail("requires a nonempty rows array")
+        skills = set()
+        for value in rows:
+            row = case_insensitive_fields(value)
+            skill, weights = row.get("skill"), row.get("weights")
+            if type(skill) is not int or not 0 <= skill <= 2_147_483_647 or skill in skills:
+                fail("skill must be a unique nonnegative Int32")
+            if (not isinstance(weights, list) or not weights
+                    or any(type(weight) not in (int, float) or not 0 <= weight <= 1 for weight in weights)
+                    or not any(weight > 0 for weight in weights)):
+                fail(f"skill {skill} requires weights in [0, 1] with at least one positive weight")
+            skills.add(skill)
+    except ValueError as error:
+        raise ValueError(f"Invalid stealth multiplier catalog {path}: {error}") from error
+
+
+def case_insensitive_fields(value):
+    if not isinstance(value, dict):
+        fail("expected a JSON object")
+    fields = {key.casefold(): item for key, item in value.items()}
+    if len(fields) != len(value):
+        fail("duplicate JSON property")
+    return fields
+
+
 def verify_runtime_catalogs(source_root: Path, catalog_root: Path | None, is_admitted) -> tuple[str, ...]:
     source_root = Path(source_root)
     paths, csharp_reads = catalog_dependencies(source_root)
@@ -234,6 +267,8 @@ def verify_runtime_catalogs(source_root: Path, catalog_root: Path | None, is_adm
     for name, section in PORK_NAME_SECTIONS.items():
         validate_names(name, section, read_json(public_data / name))
     validate_title_bands(read_json(public_data / PVP_TITLES))
+    if STEALTH_MULTIPLIERS in paths:
+        validate_stealth_multipliers(public_data / STEALTH_MULTIPLIERS)
     if catalog_root is None:
         return paths
 
@@ -242,6 +277,8 @@ def verify_runtime_catalogs(source_root: Path, catalog_root: Path | None, is_adm
     if missing:
         fail("Required catalogs unavailable in selected GameData: " + ", ".join(missing))
     files = {name: content_path(canonical, name) for name in paths}
+    if STEALTH_MULTIPLIERS in files:
+        validate_stealth_multipliers(files[STEALTH_MULTIPLIERS])
     for name, section in PORK_NAME_SECTIONS.items():
         validate_names(name, section, read_json(files[name]))
     texts = text_index(read_json(files[ROOT_TEXT]))

@@ -48,6 +48,12 @@ PATCH_FORBIDDEN_SOURCE = ("aorebirth/gamedata/", "aorebirth/libraries/source/aor
 PATCH_OUTPUTS = tuple(path for path in OUTPUTS if "/ZoneEngine_New/" in path)
 PRIVATE_CHEST_CATALOGS = {"Loot/MissionChestRKAllowlist.json", "Loot/MissionChestSeasonalExclusions.json", "Loot/MissionChestSpecialExclusions.json"}
 INDEPENDENT_PRIVATE_CATALOGS = {"QuestRewards.json", "ObjectStateMachines.json"}
+STEALTH_MULTIPLIERS = "SpecialAttackMultipliers.json"
+STEALTH_MULTIPLIER_RESTORATION = {
+    "AUTHORITY": "PUBLIC_PRODUCT_DATA",
+    "PATH": STEALTH_MULTIPLIERS,
+    "SOURCE_CONTRACT": "REQUIRED_ZONEENGINE_RUNTIME_CATALOG",
+}
 # Named catalog loaders and GameDataPaths; no extension-only root admission.
 RUNTIME_ROOT_CATALOGS = frozenset("""AbilityCosts.json AlienXp.json Breed.json ChatChannels.json ComboNames.json
 DungeonDoorStyles.json DungeonEntrances.json DungeonGeneration.json DynelCollision.json GoverningForms.json
@@ -55,7 +61,7 @@ ItemBehavior.json items.dat ItemTemplates.json MonsterCombatRules.json MonsterDa
 MonsterWeapons.json nanos.dat NewCharacter.json NpcTemplates.json ObjectStateMachines.json PerkActions.json
 Perks.json PetReplies.json PetTypes.json Profession.json PvpLegacyTitles.json Quests.json QuestRewards.json Research.json Respawn.json
 Sex.json Side.json SkillCosts.json SkillTrickle.json SpawnExclusions.json StartPackages.json TeleportRoutes.json Text.json Tradeskills.json VendingMachines.json
-WaterExits.json Xp.json""".split())
+WaterExits.json Xp.json""".split()) | {STEALTH_MULTIPLIERS}
 RUNTIME_MISSION_FILES = frozenset("""Locations.json Text.json RollPolicy.json RollMixes.json
 MissionOffers.json Keys.json RewardObservations.json RareLoot.json RareLootChancePercent.json
 Source/MissionLevels.csv Source/MissionLevelRules.json Destinations/MissionDestinations.json
@@ -1097,11 +1103,16 @@ def validate_generated_surfaces_adoptions(bundle, value, actual, portable=False)
         raise ValueError("Canonical surfaces differ from their measured generated outputs")
 
 
-def required_catalogs(value):
+def required_catalogs(value, *, allow_source_contract=False):
     if not isinstance(value, list):
         raise ValueError("Explicit required-current catalog mapping required")
     seen = set()
     for row in value:
+        if allow_source_contract and row == STEALTH_MULTIPLIER_RESTORATION:
+            if STEALTH_MULTIPLIERS in seen:
+                raise ValueError("Required-current catalog mapping is invalid/duplicate")
+            seen.add(STEALTH_MULTIPLIERS)
+            continue
         fields = {"AUTHORITY", "PATH", "APPROVAL"}
         if (not isinstance(row, dict) or not fields <= set(row) or set(row) - fields - {"ENTRIES"}
                 or row["AUTHORITY"] not in ("PUBLIC_PRODUCT_DATA", "PRIVATE_CONTENT_UPSTREAM")
@@ -1388,7 +1399,7 @@ def validate_runtime_exclusions(bundle, value, actual, portable=False, *, histor
 
 def validate_supplemental_content(bundle, value, actual, portable=False, *, historical_checkpoint=False, selected_patch=False):
     """Replay restorations, private policies, generated items and runtime exclusions."""
-    catalogs = required_catalogs(value.get("REQUIRED_CURRENT_CATALOGS", []))
+    catalogs = required_catalogs(value.get("REQUIRED_CURRENT_CATALOGS", []), allow_source_contract=True)
     expected, seen = {}, set()
     for mapping in catalogs:
         path = mapping["PATH"]
@@ -1531,7 +1542,12 @@ def reconcile_plan(root, profile, bundle, public_sha, dump_sha, baseline, before
                             "CANONICAL_AFTER": stash(bundle, prefix + "canonical-after", result),
                             "RESOLUTIONS": resolved})
             projected[path] = result
-    catalogs, restorations = required_catalogs(profile.get("REQUIRED_CURRENT_CATALOGS", [])), []
+    catalogs = list(required_catalogs(profile.get("REQUIRED_CURRENT_CATALOGS", [])))
+    if (STEALTH_MULTIPLIERS in snapshots["PUBLIC_PRODUCT_DATA"]["AFTER"]
+            and all(mapping["PATH"] != STEALTH_MULTIPLIERS for mapping in catalogs)):
+        # Repair an already missing shipped dependency even without a public source delta.
+        catalogs.append(STEALTH_MULTIPLIER_RESTORATION)
+    restorations = []
     for mapping in catalogs:
         authority, path = mapping["AUTHORITY"], mapping["PATH"]
         current_source = snapshots[authority]["AFTER"].get(path)
@@ -2346,7 +2362,8 @@ def summarize_reconciliation(bundle, reconciliation, *, selected_patch=False):
     if "CATALOG_RESTORATIONS" in reconciliation:
         summary["CATALOG_RESTORATIONS"] = []
         for row in reconciliation["CATALOG_RESTORATIONS"]:
-            item = {**{key: row[key] for key in ("AUTHORITY", "PATH", "APPROVAL")},
+            justification = "SOURCE_CONTRACT" if "SOURCE_CONTRACT" in row else "APPROVAL"
+            item = {**{key: row[key] for key in ("AUTHORITY", "PATH", justification)},
                 **{key: content_identity(load_optional(bundle, row[key]), row["PATH"])
                    for key in ("CANONICAL_BEFORE", "CANONICAL_AFTER")}}
             if "ENTRIES" in row:
