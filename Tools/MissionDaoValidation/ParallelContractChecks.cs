@@ -271,7 +271,7 @@ namespace AORebirth.Tools.MissionDaoValidation
                 this.owner.Fail("execute");
                 if (this.owner.FailurePoint == "fee-ledger" && this.CommandText.StartsWith("INSERT INTO missionrewardledger",
                     StringComparison.Ordinal)) throw this.owner.OperationFailure;
-                if (this.owner.FailurePoint == "quest-completion" && this.CommandText.StartsWith("UPDATE characterquests SET State=2",
+                if (this.owner.FailurePoint == "quest-completion" && this.CommandText.StartsWith("UPDATE characterquests SET State=@Completed,Progress=RequiredCount",
                     StringComparison.Ordinal)) throw this.owner.OperationFailure;
                 return this.inner.ExecuteNonQuery();
             }
