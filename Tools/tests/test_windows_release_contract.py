@@ -859,6 +859,53 @@ class ReleaseContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "missing from current authority=" + re.escape(required[0])):
             gate.catalog_manifest_validation(required, loaded["manifest"], unsupported)
 
+    def test_stealth_multiplier_catalog_restores_an_unchanged_public_blob(self):
+        name = gate.STEALTH_MULTIPLIERS
+        payload = (ROOT / "AORebirth/GameData" / name).read_bytes()
+        identity = gate.content_identity(payload, name)
+        canonical = self.root / "canonical"
+        canonical.mkdir()
+        shipped = canonical / name
+        shipped.write_bytes(payload)
+        unrelated = canonical / "Research.json"
+        unrelated.write_bytes(b'{"private":true}')
+        shipped.unlink()  # Reproduce the accepted incomplete baseline in the disposable stage.
+        before, states = gate.inventory(canonical)
+        profile = {"CANONICAL_GAMEDATA_ROOT": str(canonical), "STATE_ROOT": str(self.root)}
+        baseline = {"PUBLIC_MASTER_SHA": PUBLIC, "CONTENT_DUMP_SHA": DUMP}
+        source = {name: {key: identity[key] for key in ("blob", "size")}}
+        bundle = self.root / "plan"
+        bundle.mkdir()
+        gate.write_json(bundle / "before-manifest.json", before)
+        with mock.patch.object(gate, "tree_files", side_effect=[{}, {}, source, source]), \
+             mock.patch.object(gate, "source_blob", return_value=payload) as source_blob:
+            plan, projected = gate.reconcile_plan(self.root, profile, bundle, PUBLIC, DUMP, baseline, before)
+        source_blob.assert_called_once_with(self.root, profile, "PUBLIC_PRODUCT_DATA", identity["blob"])
+        self.assertEqual(plan["CHANGES"], [])
+        self.assertEqual(projected, {name: payload})
+        with self.assertRaisesRegex(ValueError, "missing from canonical manifest=" + re.escape(name)):
+            gate.catalog_manifest_validation((name,), before, plan)
+
+        summary = gate.summarize_reconciliation(bundle, plan)
+        replayed = gate.validate_reconciliation_summary(bundle, summary)
+        self.assertEqual(gate.catalog_manifest_validation((name,), replayed, summary), [identity])
+        self.assertEqual(summary["CATALOG_RESTORATIONS"], [
+            {**gate.STEALTH_MULTIPLIER_RESTORATION, "CANONICAL_BEFORE": None, "CANONICAL_AFTER": identity}
+        ])
+        self.assertEqual([entry for entry in replayed if entry["path"] != name], before)
+
+        attempt = {"PUBLIC_MASTER_SHA": PUBLIC, "CONTENT_DUMP_SHA": DUMP,
+                   "WINDOWS_GAMEDATA_MANIFEST": plan["WINDOWS_GAMEDATA_MANIFEST"]}
+        with mock.patch.object(gate, "intake", return_value=(bundle, attempt, plan, projected, states)):
+            gate.apply_content(self.root, profile, gate.digest(gate.encoded(plan)))
+        self.assertEqual(shipped.read_bytes(), payload)
+        self.assertEqual(gate.inventory(canonical)[0], replayed)
+
+        altered = copy.deepcopy(summary)
+        altered["CATALOG_RESTORATIONS"][0]["CANONICAL_AFTER"]["blob"] = "0" * 40
+        with self.assertRaisesRegex(ValueError, "differs from exact current source bytes"):
+            gate.validate_reconciliation_summary(bundle, altered)
+
     def test_actual_binary_and_data_changes_invalidate_pre_acceptance(self):
         bundle, profile = make_portable_fixture(self.root, catalogs=True)
         attempt = gate.read_json(bundle / "build-attempt.json")

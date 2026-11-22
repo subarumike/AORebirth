@@ -91,6 +91,26 @@ class RuntimeCatalogContractTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, "unadmitted.*Unknown.json"):
             self.verify()
 
+    def test_stealth_multiplier_reader_requires_a_valid_staged_catalog(self):
+        name = CONTRACT.STEALTH_MULTIPLIERS
+        self.admitted.add(name)
+        self.write(self.zone / "StealthMultiplierTable.cs",
+                   f'object Read() => GameDataPaths.ResolveFile(root, "{name}");')
+        public_table = MODULE.parents[1] / "AORebirth/GameData" / name
+        self.write(self.source / "AORebirth/GameData" / name, public_table.read_text(encoding="utf-8"))
+        with self.assertRaisesRegex(ValueError, "Required catalogs unavailable.*SpecialAttackMultipliers"):
+            self.verify(self.content)
+
+        for payload in ("{}", '{"rows": [', '{"rows": [{"skill": 1000, "weights": [0, 0]}]}',
+                        '{"rows": [{"skill": 1000, "weights": [0, -0.5]}]}'):
+            with self.subTest(payload=payload):
+                self.write(self.content / name, payload)
+                with self.assertRaisesRegex(ValueError, "Invalid stealth multiplier catalog.*SpecialAttackMultipliers"):
+                    self.verify(self.content)
+
+        self.write(self.content / name, public_table.read_text(encoding="utf-8"))
+        self.assertIn(name, self.verify(self.content))
+
     def test_pork_load_requires_declaration_and_schema(self):
         self.write_pork(self.pork_required, "$this->load('Unknown.json');")
         with self.assertRaisesRegex(ValueError, "undeclared catalog"):

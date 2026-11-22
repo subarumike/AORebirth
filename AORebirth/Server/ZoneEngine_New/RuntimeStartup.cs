@@ -12,6 +12,7 @@ namespace ZoneEngine_New
     using Utility.Config;
     using Utility.Network;
     using ZoneEngine_New.Core.Data;
+    using ZoneEngine_New.Core.Helpers;
 
     /// <summary>Read-only startup contracts shared by both OS entry points.</summary>
     public static class RuntimeStartup
@@ -96,6 +97,7 @@ namespace ZoneEngine_New
         public static void ValidatePackage(string baseDirectory, bool skipPlayfieldPackagePin = false)
         {
             string gameData = GameDataPaths.Resolve(baseDirectory);
+            StealthMultiplierTable.Validate(gameData);
             // NpcTemplates.json is optional; GameDataStore logs and uses an empty catalog when it is absent.
             foreach (string file in new[] { "ItemTemplates.json", "VendingMachines.json", "MonsterData.json", "Xp.json", "AlienXp.json" })
             {

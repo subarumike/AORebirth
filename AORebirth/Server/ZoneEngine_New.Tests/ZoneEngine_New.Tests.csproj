@@ -131,6 +131,8 @@
     <Compile Remove="@(Compile)" />
     <Compile Include="TestDoubles.cs" />
     <Compile Include="RuntimeCatalogTests.cs" />
+    <Compile Include="RuntimeStartupTests.cs" />
+    <Compile Include="StealthMultiplierAndSpecialAttackTests.cs" />
   </ItemGroup>
   <ItemGroup Condition="'$(TeamRosterFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />

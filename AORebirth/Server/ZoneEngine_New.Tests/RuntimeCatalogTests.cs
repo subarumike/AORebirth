@@ -9,6 +9,7 @@ using System.Text.Json;
 using AORebirth.Core.GameData;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ZoneEngine_New.Core.GameData;
+using ZoneEngine_New.Core.Helpers;
 using ZoneEngine_New.Core.Inventory;
 using ZoneEngine_New.Core.Mobs;
 
@@ -92,7 +93,56 @@ public sealed class RuntimeCatalogTests
         MonsterCombatRulesCatalog.For(root).ValidateEncounterReferences(items, data);
     }
 
-    static string StagedRoot()
+    [TestMethod]
+    public void StagedStealthMultiplierCatalogLoadsAndUsesShippedSkillBands()
+    {
+        string root = StagedRoot();
+        StealthMultiplierTable.Validate(root);
+        using JsonDocument data = JsonDocument.Parse(File.ReadAllText(Path.Combine(root, StealthMultiplierTable.FileName)));
+        var bands = data.RootElement.GetProperty("rows").EnumerateArray().ToDictionary(
+            row => row.GetProperty("skill").GetInt32(),
+            row => row.GetProperty("weights").EnumerateArray().Select(weight => weight.GetDouble()).ToArray());
+
+        // Sample the middle of every nonzero interval in each authored row.
+        foreach ((int skill, double[] weights) in bands)
+        {
+            double total = weights.Sum();
+            double lower = 0;
+            for (int multiplier = 1; multiplier <= weights.Length; multiplier++)
+            {
+                double weight = weights[multiplier - 1];
+                if (weight > 0)
+                {
+                    double sample = (lower + weight / 2) / total;
+                    Assert.AreEqual(multiplier, StealthMultiplierTable.Roll(root, skill, sample),
+                        $"The shipped row for skill {skill} assigns this sample to {multiplier}x.");
+                }
+                lower += weight;
+            }
+        }
+
+        int first = bands.Keys.Min();
+        int last = bands.Keys.Max();
+        double firstOneX = bands[first][0] / bands[first].Sum();
+        double inFirstTwoX = (1 + firstOneX) / 2;
+        Assert.AreEqual(1, StealthMultiplierTable.Roll(root, first - 1, inFirstTwoX));
+        Assert.AreEqual(2, StealthMultiplierTable.Roll(root, first, inFirstTwoX));
+        foreach (double sample in new[] { 0, 0.5, 0.99 })
+            Assert.AreEqual(StealthMultiplierTable.Roll(root, last, sample), StealthMultiplierTable.Roll(root, last + 500, sample));
+
+        // At 950, the one-times weight lies halfway between the authored 900 and 1000 rows.
+        double midpointWeight = bands[900][0] / 2;
+        Assert.AreEqual(1, StealthMultiplierTable.Roll(root, 950, midpointWeight - 0.001));
+        Assert.AreEqual(2, StealthMultiplierTable.Roll(root, 950, midpointWeight + 0.001));
+
+        Assert.AreEqual(0.0, bands[1000][0]);
+        Assert.IsTrue(bands[1000][1] > 0);
+        Assert.AreEqual(2, StealthMultiplierTable.Roll(root, 1000, 0));
+        double sampleInThreeX = (bands[1000][1] + bands[1000][2] / 2) / bands[1000].Sum();
+        Assert.AreEqual(3, StealthMultiplierTable.Roll(root, 1000, sampleInThreeX));
+    }
+
+    internal static string StagedRoot()
     {
         string? root = Environment.GetEnvironmentVariable("AO_REBIRTH_RUNTIME_CATALOG_VALIDATION_ROOT");
         if (string.IsNullOrEmpty(root))
