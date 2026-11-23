@@ -379,18 +379,22 @@ namespace ZoneEngine_New.Core.Teams
             {
                 if (!_players.TryGetValue(presence.Viewer, out Player? viewer) || !IsActive(viewer) || presence.Subject == null) return;
                 PlayerCard subject = presence.Subject;
-                Send(viewer, InfoPacket(subject));
-                Send(viewer, new StatMessage
+                Dispatch(viewer, () =>
                 {
-                    Identity = CharacterIdentity(subject.CharacterId),
-                    Stats =
-                    [
-                        new GameTuple<CharacterStat, uint>
-                        {
-                            Value1 = CharacterStat.Level,
-                            Value2 = (uint)Math.Clamp(subject.Level, 1, 220)
-                        }
-                    ]
+                    if (!IsActive(viewer)) return;
+                    SendNow(viewer, VisibleMember(viewer, subject.CharacterId)?.BuildInfoPacket() ?? InfoPacket(subject));
+                    SendNow(viewer, new StatMessage
+                    {
+                        Identity = CharacterIdentity(subject.CharacterId),
+                        Stats =
+                        [
+                            new GameTuple<CharacterStat, uint>
+                            {
+                                Value1 = CharacterStat.Level,
+                                Value2 = (uint)Math.Clamp(subject.Level, 1, 220)
+                            }
+                        ]
+                    });
                 });
             }
         }

@@ -475,7 +475,11 @@ namespace ZoneEngine_New.Core.Inventory
             int current = Math.Max(0, target.Stats.GetOrZero(CharacterStat.Health));
             int applied = Math.Min(delta, Math.Max(0, maxHealth - current));
             if (applied <= 0)
+            {
+                if (delta > 0 && current == maxHealth && target is Player player)
+                    player.QueueOverhealHealthSync();
                 return true;
+            }
 
             int healed = current + applied;
             target.Stats.Set(CharacterStat.Health, healed, StatDetail.Base, dirty: true);

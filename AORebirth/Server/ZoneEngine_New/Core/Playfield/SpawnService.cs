@@ -931,6 +931,9 @@ namespace ZoneEngine_New.Core.Playfield
                     acg.World?.RegisterExitProxyDoor(command.Envelope.ExitProxyDoor);
             }
 
+            // Stripping a nano queues its stat rebase. Settle it before the owner and observers get their HP snapshots.
+            _playfield.RebasePendingStats(player);
+
             // Fly the playfield no longer allows ends before FullCharacter reports the movement mode.
             player.Motor.RefreshFlightAuthority();
 
@@ -1038,6 +1041,7 @@ namespace ZoneEngine_New.Core.Playfield
             PlayerSpawnPayloadValidator.RequireValidMessages(player.BuildSpawnMessage(), player.BuildFullCharacterMessage(), player.IsGm);
             StealSessionIfNeeded(player, session);
             player.EnterOnline(session);
+            _playfield.RebasePendingStats(player);
             // The reconnecting client starts with no keys held: whatever the old connection was doing (a crash never
             // sends its key releases) must not come back in the spawn's movement status.
             player.StopInPlace();
@@ -1448,11 +1452,11 @@ namespace ZoneEngine_New.Core.Playfield
             _playfield.GetService<Organizations.OrgMembershipService>()?.Attach(player);
             _playfield.GetService<Characters.CharacterPlayedClock>()?.Start(player.Identity.Instance, player.Name ?? string.Empty);
             _playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(player);
-            // Buffs with a playshift
-            // FullCharacter the client gets lists its NCU.
+            // Remove ineligible buffs, then settle their bonuses before publishing the destination state.
             Nanos.NanoRuntime.StripPlayshiftFailures(player);
             // Worn items go ineffective (or work again) by the same requirements.
             ZoneEngine_New.Core.Inventory.PlayshiftItems.Refresh(player);
+            _playfield.RebasePendingStats(player);
             // A flyer that just went ineffective (a Yalmaha in the Shadowlands) leaves Fly now, not on the next tick: the
             // FullCharacter the client gets carries CurrentMovementMode, and Fly there keeps the client flying.
             player.Motor.RefreshFlightAuthority();

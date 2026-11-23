@@ -85,7 +85,7 @@ namespace ZoneEngine_New.Tests
             }
         }
 
-        sealed class WirePeer : IAsyncDisposable
+        internal sealed class WirePeer : IAsyncDisposable
         {
             readonly TcpClient _client;
             readonly CancellationTokenSource _lifetime = new();
@@ -182,7 +182,7 @@ namespace ZoneEngine_New.Tests
             }
         }
 
-        sealed class WireLogger : IZoneLogger
+        internal sealed class WireLogger : IZoneLogger
         {
             public ConcurrentQueue<string> Errors { get; } = new();
             public void Debug(string message) { }

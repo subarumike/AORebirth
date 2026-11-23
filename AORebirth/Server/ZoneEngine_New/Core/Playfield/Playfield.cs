@@ -752,15 +752,25 @@ namespace ZoneEngine_New.Core.Playfield
             }
         }
 
+        /// <summary>Settles an actor's queued stat changes before an arrival snapshot. Does not send Stat packets.</summary>
+        internal bool RebasePendingStats(Character character)
+        {
+            RequireTick();
+            if (!_pendingStatRebases.TryRemove(character, out _) || !ReferenceEquals(character.Playfield, this))
+                return false;
+
+            character.RebaseStats();
+            return true;
+        }
+
         private void DrainRebases()
         {
             foreach (Character character in _pendingStatRebases.Keys)
             {
-                if (!_pendingStatRebases.TryRemove(character, out _) || !ReferenceEquals(character.Playfield, this)) continue;
                 try
                 {
-                    character.RebaseStats();
-                    character.FlushDirtyStats();
+                    if (RebasePendingStats(character))
+                        character.FlushDirtyStats();
                 }
                 catch (Exception exception)
                 {

@@ -246,6 +246,39 @@ namespace ZoneEngine_New.Core.Teams
             }
         }
 
+        internal void OnMemberBecameVisible(Player viewer, Player member)
+        {
+            lock (_sync)
+            {
+                int memberId = member.Identity.Instance;
+                if (Owns(member) && _membership.TryGetValue(memberId, out Team? team))
+                    PublishExistingRowVitals(viewer, memberId, team);
+            }
+        }
+
+        internal void PublishVisibleMemberVitals(Player member)
+        {
+            lock (_sync)
+            {
+                int memberId = member.Identity.Instance;
+                if (!Owns(member) || !_membership.TryGetValue(memberId, out Team? team)) return;
+
+                foreach (int viewerId in team.Members)
+                    if (viewerId != memberId && _players.TryGetValue(viewerId, out Player? viewer))
+                        PublishExistingRowVitals(viewer, memberId, team);
+            }
+        }
+
+        private void PublishExistingRowVitals(Player viewer, int memberId, Team team)
+        {
+            int viewerId = viewer.Identity.Instance;
+            if (!IsActive(viewer) || !_membership.TryGetValue(viewerId, out Team? viewerTeam) || !ReferenceEquals(team, viewerTeam)
+                || !_publishedRosters.TryGetValue(viewerId, out PublishedRoster? published)
+                || published.TeamId != team.Id || !published.Members.ContainsKey(memberId)) return;
+
+            if (BuildVisibleMemberVitals(viewer, memberId) is { } vitals) SendNow(viewer, vitals);
+        }
+
         public void OnTransportDisconnected(Player player, IZoneSession disconnectedSession)
         {
             lock (_sync)
@@ -998,20 +1031,15 @@ namespace ZoneEngine_New.Core.Teams
                 }
                 if (hasRow && !initialRoster && !refreshVitals) continue;
                 if (!hasRow && !TryLevel(id, out _)) continue;
+                // PF665 ordinary join capture 20261103-163434: the peer row precedes its vitals and SocialStatus.
+                // Live moved-viewer capture 20261104T005758Z sends the visible peer vitals and SocialStatus before its row.
+                if (!raidRosterReset && !AnnounceNow(viewer, id, team)) return;
                 if (id != viewerId)
                 {
-                    // Live moved-viewer capture 20261104T005758Z: visible peer vitals, SocialStatus, then its row.
-                    // The cross-zone part omits vitals; the original receiver requires the peer's dynel to exist.
-                    MemberData? data = DataOf(id);
-                    if (data is { HasVitals: true } && IsMemberVisibleTo(viewer, id))
-                    {
-                        SendNow(viewer, new TeamMemberInfoMessage { Identity = viewer.Identity, Unknown = 0, Member = CharacterIdentity(id),
-                            Unknown3 = data.MaxNano, Unknown4 = data.MaxNano,
-                            Unknown5 = data.MaxHealth, Unknown6 = data.MaxHealth });
-                    }
+                    if (BuildVisibleMemberVitals(viewer, id) is { } vitals) SendNow(viewer, vitals);
                     SetStatNow(viewer, CharacterStat.SocialStatus, social, true);
                 }
-                if (!AnnounceNow(viewer, id, team)) return;
+                if (raidRosterReset && !AnnounceNow(viewer, id, team)) return;
                 _publishedRosters.TryGetValue(viewerId, out published);
             }
             if (!IsActive(viewer)) return;
@@ -1081,22 +1109,14 @@ namespace ZoneEngine_New.Core.Teams
             int social = viewer.Identity.Instance == team.Leader
                 ? (team.ExplicitLeadershipTransfer ? 15 : 7)
                 : (team.ExplicitLeadershipTransfer ? 13 : 5);
-            MemberData? data = DataOf(targetId);
-            if (data == null) return;
-            Identity target = CharacterIdentity(targetId);
-            bool sendVitals = data.HasVitals && IsMemberVisibleTo(viewer, targetId);
-            if (sendVitals)
-                SendNow(viewer, new TeamMemberInfoMessage { Identity = viewer.Identity, Unknown = 0, Member = target,
-                    Unknown3 = data.MaxNano, Unknown4 = data.MaxNano,
-                    Unknown5 = data.MaxHealth, Unknown6 = data.MaxHealth });
+            if (DataOf(targetId) == null) return;
+            TeamMemberInfoMessage? vitals = BuildVisibleMemberVitals(viewer, targetId);
+            if (vitals != null) SendNow(viewer, vitals);
             SetStatNow(viewer, CharacterStat.SocialStatus, social, true);
             // The captured move left group zero; later moves must remove from the member's actual old group.
             if (!RemovePublishedMemberNow(viewer, _publishedRosters[viewer.Identity.Instance], targetId)) return;
             if (!AnnounceNow(viewer, targetId, team)) return;
-            if (sendVitals)
-                SendNow(viewer, new TeamMemberInfoMessage { Identity = viewer.Identity, Unknown = 0, Member = target,
-                    Unknown3 = data.MaxNano, Unknown4 = data.MaxNano,
-                    Unknown5 = data.MaxHealth, Unknown6 = data.MaxHealth });
+            if (vitals != null) SendNow(viewer, vitals);
             SetStatNow(viewer, CharacterStat.SocialStatus, social, true);
         }
 
@@ -1169,9 +1189,36 @@ namespace ZoneEngine_New.Core.Teams
         // Live capture 20261104T005758Z: raid group N has team instance base + N, including remote members.
         private static int ClientTeamId(Team team, int memberId) => team.Id + (team.IsRaid ? RaidListOf(team, memberId) : 0);
 
-        private bool IsMemberVisibleTo(Player viewer, int memberId)
-            => _players.TryGetValue(memberId, out Player? member)
-                && viewer.Playfield?.GetService<PlayfieldLocality>()?.IsVisibleTo(member, viewer) == true;
+        private Player? VisibleMember(Player viewer, int memberId)
+            => viewer.Identity.Instance != memberId && _players.TryGetValue(memberId, out Player? member)
+                && ReferenceEquals(viewer.Playfield, member.Playfield)
+                && viewer.Playfield?.GetService<PlayfieldLocality>()?.IsVisibleTo(member, viewer) == true
+                ? member : null;
+
+        private TeamMemberInfoMessage? BuildVisibleMemberVitals(Player viewer, int memberId)
+        {
+            if (VisibleMember(viewer, memberId) is not { } member) return null;
+
+            int maxHealth = member.Stats.GetOrZero(CharacterStat.MaxHealth);
+            int maxNano = member.Stats.Get(CharacterStat.MaxNanoEnergy);
+            int currentHealth = member.Stats.Get(CharacterStat.Health);
+            int currentNano = member.Stats.Get(CharacterStat.CurrentNano);
+            if (maxHealth <= 0 || maxNano < 0 || StatCollection.IsUnset(maxNano)
+                || StatCollection.IsUnset(currentHealth) || StatCollection.IsUnset(currentNano)) return null;
+
+            // Gamecode.dll TeamMemberInfoIIR activation (RVA 0x7A7DD) applies stats 214, 221, 1, 27
+            // from these wire fields. The live PF665 capture contains an unequal current/max nano pair.
+            return new TeamMemberInfoMessage
+            {
+                Identity = viewer.Identity,
+                Unknown = 0,
+                Member = member.Identity,
+                Unknown3 = Math.Clamp(currentNano, 0, maxNano),
+                Unknown4 = maxNano,
+                Unknown5 = maxHealth,
+                Unknown6 = Math.Clamp(currentHealth, 0, maxHealth)
+            };
+        }
 
         // Lifecycle callers are already on this actor's owner tick. Clear transient values before
         // the existing snapshot/despawn path; queued projections are invalidated by Remove/Detach.
