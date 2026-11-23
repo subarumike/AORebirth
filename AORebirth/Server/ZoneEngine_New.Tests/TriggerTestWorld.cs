@@ -19,6 +19,7 @@ namespace ZoneEngine_New.Tests
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
+    using ZoneEngine_New.Core.Teams;
     using ZoneEngine_New.Core.WorldSimulation;
     using Vector3 = AORebirth.Core.Vector.Vector3;
 
@@ -36,7 +37,7 @@ namespace ZoneEngine_New.Tests
         public RecordingZoneSession FirstSession => (RecordingZoneSession)First.Session!;
         public RecordingZoneSession SecondSession => (RecordingZoneSession)Second.Session!;
 
-        public TriggerTestWorld(StaticObjectStateMachineCatalog? catalog = null)
+        public TriggerTestWorld(StaticObjectStateMachineCatalog? catalog = null, TeamService? teams = null)
         {
             Playfield = (Playfield)RuntimeHelpers.GetUninitializedObject(typeof(Playfield));
             Locality = new PlayfieldLocality(1, null);
@@ -53,11 +54,18 @@ namespace ZoneEngine_New.Tests
                 .AddSingleton<IItemBuilder>(new StubItemBuilder())
                 .AddSingleton<IInventoryRepository>(new StubInventoryRepository())
                 .AddSingleton(catalog ?? StaticObjectStateMachineCatalog.Empty)
+                // There are no pending inventory moves in this fixture. Death still runs the real cancellation path.
+                .AddSingleton(provider => new InventoryMoveService(provider.GetRequiredService<IZoneLogger>(),
+                    (InventoryFlushService)RuntimeHelpers.GetUninitializedObject(typeof(InventoryFlushService)),
+                    (InventoryActionService)RuntimeHelpers.GetUninitializedObject(typeof(InventoryActionService))))
                 .AddSingleton<AreaTriggerService>();
+            if (teams != null)
+                services.AddSingleton(teams);
             _services = services.BuildServiceProvider();
             SetField("_serviceProvider", _services);
             SetField("_lifecycleSync", new Lock());
             SetField("_pendingStatRebases", new ConcurrentDictionary<Character, byte>());
+            SetField("<FightModes>k__BackingField", DistrictFightModes.None);
             Triggers = _services.GetRequiredService<AreaTriggerService>();
             First = AddPlayer(1);
             Second = AddPlayer(2);

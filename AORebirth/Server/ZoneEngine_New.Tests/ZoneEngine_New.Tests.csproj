@@ -139,6 +139,22 @@
     <Compile Include="TestDoubles.cs" />
     <Compile Include="TeamServiceTests.cs" />
   </ItemGroup>
+  <ItemGroup Condition="'$(HealthSynchronizationFocusedTests)' == 'true'">
+    <Compile Remove="@(Compile)" />
+    <Compile Include="TestDoubles.cs" />
+    <Compile Include="TriggerTestWorld.cs" />
+    <Compile Include="DoorNetworkIntegrationTests.cs" />
+    <Compile Include="HealthArrivalSynchronizationTests.cs" />
+    <Compile Include="HealthSynchronizationTests.cs" />
+    <Compile Include="HitHealthDamageTests.cs" />
+    <Compile Include="HitProjectionTestExtensions.cs" />
+    <Compile Include="NanoShieldCombatTests.cs" />
+    <Compile Include="PassiveRegenCalculatorTests.cs" />
+    <Compile Include="PlayerDeathRespawnTests.cs" />
+    <Compile Include="RuntimeCatalogTests.cs" />
+    <Compile Include="StealthMultiplierAndSpecialAttackTests.cs" />
+    <Compile Include="TeamVitalSynchronizationTests.cs" />
+  </ItemGroup>
   <ItemGroup Condition="'$(HalloweenActivationFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />
     <Compile Include="TestDoubles.cs" />

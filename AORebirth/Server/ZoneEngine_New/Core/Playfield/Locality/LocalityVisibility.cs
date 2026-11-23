@@ -13,6 +13,7 @@ namespace ZoneEngine_New.Core.Playfield.Locality
     using ZoneEngine_New.Core.Logging;
     using ZoneEngine_New.Core.Modules;
     using ZoneEngine_New.Core.Network;
+    using ZoneEngine_New.Core.Teams;
 
     /// <summary>
     /// Cell-neighbor interest management: enter via ISpawnable.BuildSpawnMessage, leave via Despawn.
@@ -426,6 +427,9 @@ namespace ZoneEngine_New.Core.Playfield.Locality
 
             foreach (MessageBody companion in source.BuildSpawnCompanionMessages())
                 recipient.Session.Send(companion);
+
+            if (source is Player teammate)
+                recipient.Playfield?.GetService<TeamService>()?.OnMemberBecameVisible(recipient, teammate);
 
             return true;
         }

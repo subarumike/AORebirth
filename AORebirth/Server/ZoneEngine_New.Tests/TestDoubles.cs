@@ -56,6 +56,7 @@ namespace ZoneEngine_New.Tests
         public string RootPath { get; init; } = string.Empty;
 
         public CollisionSphereData? DynelCollisionSphere { get; set; }
+        public bool AllowMissingXpLevels { get; set; }
 
         public bool TryGetDynelCollisionSphere(int templateId, out float radius, out float centerY)
         {
@@ -112,7 +113,12 @@ namespace ZoneEngine_New.Tests
         public bool TryGetVendingMachine(int templateId, out VendingMachineDefinition definition)
             => _machines.TryGetValue(templateId, out definition!);
 
-        public bool TryGetXpLevel(int level, out XpLevelEntry entry) => throw new NotSupportedException();
+        public bool TryGetXpLevel(int level, out XpLevelEntry entry)
+        {
+            if (!AllowMissingXpLevels) throw new NotSupportedException();
+            entry = null!;
+            return false;
+        }
 
         public bool CanResolveMobHash(string hash)
             => _mobs != null ? TryGetMobTemplate(hash, out _) : throw new NotSupportedException();

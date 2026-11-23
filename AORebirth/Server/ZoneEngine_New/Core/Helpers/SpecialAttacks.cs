@@ -353,13 +353,13 @@ namespace ZoneEngine_New.Core.Helpers
             int damage = DamageReturn.Resolve(attacker, target, attacker.ScaleOutgoingDamage(target, result.Damage), damageType,
                 shield: true, out DamageReturn.Returned returned);
             DamageReturn.Announce(attacker, target, returned);
-            // The shown number is the damage taken: what the target's absorb layer and the PvP hit cap leave.
+            // The hit reports what is left after the absorb layer, the PvP cap and the nano shield.
             damage = target.TakeOffShields(attacker, damage, damageType);
-            target.ApplyDamage(attacker, damage, result.HitType);
+            target.ApplyDamage(attacker, damage, result.HitType, out int healthDamage);
             if (damage == 0 || target.Stats.GetOrZero(CharacterStat.Health) < healthBefore)
-                AnnounceSpecialHit(attacker, target, special, slot, roundsLeft ?? bullets, damage);
+                AnnounceSpecialHit(attacker, target, special, slot, roundsLeft ?? bullets, healthDamage);
             ModuleHooks.CombatResolved(attacker, target, CombatSource.Special, (int)special,
-                result.HitType == HitType.Critical ? CombatResult.Critical : CombatResult.Hit, damage, damageType);
+                result.HitType == HitType.Critical ? CombatResult.Critical : CombatResult.Hit, healthDamage, damageType);
 
             // A special is a weapon hit too: offensive and defensive procs roll on it.
             Nanos.ProcRules.OnWeaponHit(attacker, target, specialItem ?? weapon.Item);

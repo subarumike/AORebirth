@@ -2248,10 +2248,10 @@ namespace ZoneEngine_New.Core.Entities
             int damage = DamageReturn.Resolve(this, target, ScaleOutgoingDamage(target, result.Damage), damageType, shield: true,
                 out DamageReturn.Returned returned);
             DamageReturn.Announce(this, target, returned);
-            // The target's absorb layer and the PvP hit cap take theirs before the hit is shown: the shown number is
-            // the damage taken.
+            // Resolve the absorb layer, PvP cap and nano shield before announcing damage or a killing hit.
             damage = target.TakeOffShields(this, damage, damageType);
-            bool killingHit = damage >= Math.Max(0, target.Stats.GetOrZero(CharacterStat.Health));
+            damage = target.ResolveHealthDamage(this, damage);
+            bool killingHit = damage > 0 && damage >= target.Stats.GetOrZero(CharacterStat.Health);
             Cell?.Announce(
                 new AttackInfoMessage
                 {
@@ -2269,7 +2269,7 @@ namespace ZoneEngine_New.Core.Entities
             Modules.ModuleHooks.CombatResolved(this, target, AutoAttackSource, 0,
                 result.HitType == HitType.Critical ? AORebirth.Modules.Events.CombatResult.Critical : AORebirth.Modules.Events.CombatResult.Hit,
                 damage, damageType);
-            target.ApplyDamage(this, damage, result.HitType);
+            target.ApplyResolvedHealthDamage(this, damage, result.HitType);
             if (weapon != null && !target.IsDead)
                 ApplyOnHitProcs(target, weapon);
             Nanos.ProcRules.OnWeaponHit(this, target, weapon);
@@ -2322,15 +2322,29 @@ namespace ZoneEngine_New.Core.Entities
         /// true when this hit killed the character.
         /// </summary>
         public virtual bool ApplyDamage(Character attacker, int damage, HitType hitType)
+            => ApplyDamage(attacker, damage, hitType, out _);
+
+        internal bool ApplyDamage(Character attacker, int damage, HitType hitType, out int healthDamage)
+        {
+            healthDamage = ResolveHealthDamage(attacker, damage);
+            return ApplyResolvedHealthDamage(attacker, healthDamage, hitType);
+        }
+
+        /// <summary>Validates damage and pays its nano-shield cost once before any HP announcement.</summary>
+        int ResolveHealthDamage(Character attacker, int damage)
         {
             if (_deathNotified || damage <= 0 || IsEvading)
-                return false;
+                return 0;
 
             // Same-character hits are item and status effects. Cross-character damage is an attack.
             if (!ReferenceEquals(attacker, this) && !CombatRules.CanAttack(attacker, this))
-                return false;
+                return 0;
 
-            damage -= AbsorbIntoNano(damage);
+            return damage - AbsorbIntoNano(damage);
+        }
+
+        bool ApplyResolvedHealthDamage(Character attacker, int damage, HitType hitType)
+        {
             if (damage <= 0)
                 return false;
 
@@ -2741,7 +2755,7 @@ namespace ZoneEngine_New.Core.Entities
         /// "attacked with nanobots for 17 points of unknown damage" between heal ticks. The stored percent only seeds the
         /// first rebase (login), when there is no old max.
         /// </summary>
-        protected void RebaseVital(CharacterStat currentStat, CharacterStat maxStat, CharacterStat percentStat, int newMax)
+        protected bool RebaseVital(CharacterStat currentStat, CharacterStat maxStat, CharacterStat percentStat, int newMax)
         {
             // The max this vital was last scaled against. The live max stat cannot serve: the bonus pass runs before the
             // rebase, so it already carries the new gear / buff bonus and the ratio would come out at about 1.
@@ -2752,7 +2766,7 @@ namespace ZoneEngine_New.Core.Entities
                 Stats.Set(maxStat, newMax, StatDetail.Base, dirty: true);
                 _vitalMaxes[maxStat] = Stats.GetOrZero(maxStat);
                 ApplyVitalFromPercent(currentStat, _vitalMaxes[maxStat], percent);
-                return;
+                return false;
             }
 
             Stats.Set(maxStat, newMax, StatDetail.Base, dirty: true);
@@ -2767,7 +2781,7 @@ namespace ZoneEngine_New.Core.Entities
                     : (long)current * max / oldMax;
             int value = (int)Math.Clamp(scaled, 0, Math.Max(0, max));
             if (value == current)
-                return;
+                return max != oldMax;
 
             _applyingVitalFromPercent = true;
             try
@@ -2778,6 +2792,7 @@ namespace ZoneEngine_New.Core.Entities
             {
                 _applyingVitalFromPercent = false;
             }
+            return max != oldMax;
         }
 
         /// <summary>Full max of each vital (MaxHealth, MaxNanoEnergy) as of its last rebase.</summary>

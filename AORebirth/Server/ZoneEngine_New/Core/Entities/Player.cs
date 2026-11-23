@@ -86,6 +86,23 @@ namespace ZoneEngine_New.Core.Entities
         const int DeathRespawnActionParameter2 = 295830;
 
         bool _respawnPending;
+        const long OverhealHealthSyncIntervalMilliseconds = 2000;
+        long _nextOverhealHealthSync;
+
+        internal void QueueOverhealHealthSync()
+        {
+            if (Session?.State != SessionState.InPlay || Playfield == null)
+                return;
+
+            long now = Environment.TickCount64;
+            if (now < _nextOverhealHealthSync)
+                return;
+
+            // A heal at full HP can repair a stale client. Coalesce stacked HoTs on the affected player
+            // and publish the absolute stat through the regular owner/visibility path.
+            _nextOverhealHealthSync = now + OverhealHealthSyncIntervalMilliseconds;
+            Stats.MarkDirty(CharacterStat.Health);
+        }
 
         /// <summary>
         /// Set when this player lands on a playfield by transfer and its client is about to reconnect for the zone
@@ -2398,8 +2415,10 @@ namespace ZoneEngine_New.Core.Entities
                 ApplyBonusLayers();
             ActionRestrictionFlags = CombatRules.CollectActionRestrictions(Buffs, Stats);
             RebaseWearAppearance();
-            RebaseMaxHealth();
+            bool maxHealthChanged = RebaseMaxHealth();
             RebaseMaxNano();
+            if (maxHealthChanged && Session?.State == SessionState.InPlay)
+                Playfield?.GetService<TeamService>()?.PublishVisibleMemberVitals(this);
 
             int currentShape = Stats.GetOrZero(CharacterStat.MonsterData);
             if (currentShape != previousShape && Session?.State == SessionState.InPlay)
@@ -2589,14 +2608,14 @@ namespace ZoneEngine_New.Core.Entities
             Playfield?.GetRequiredService<PlayfieldLocality>().Announce(this, appearance, includeSelf: true);
         }
 
-        void RebaseMaxHealth()
+        bool RebaseMaxHealth()
         {
             if (!MaxHealthCalculator.TryCompute(Stats, out int maxHealth))
-                return;
+                return false;
 
             // Regen, heals and revive cap at the full max; scaling against the base alone would
             // drop a full character below it on every rebase and restart regen.
-            RebaseVital(CharacterStat.Health, CharacterStat.MaxHealth, CharacterStat.PercentRemainingHealth, maxHealth);
+            return RebaseVital(CharacterStat.Health, CharacterStat.MaxHealth, CharacterStat.PercentRemainingHealth, maxHealth);
         }
 
         void RebaseMaxNano()
