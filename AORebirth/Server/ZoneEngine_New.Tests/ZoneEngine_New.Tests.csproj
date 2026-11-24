@@ -66,6 +66,11 @@
     <Compile Include="DoorStateTests.cs" />
     <Compile Include="DoorNetworkIntegrationTests.cs" />
   </ItemGroup>
+  <ItemGroup Condition="'$(OrganizationNameFocusedTests)' == 'true'">
+    <Compile Remove="@(Compile)" />
+    <Compile Include="TestDoubles.cs" />
+    <Compile Include="OrganizationNameSynchronizationTests.cs" />
+  </ItemGroup>
   <ItemGroup Condition="'$(DailyLoginFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />
     <Compile Include="TestDoubles.cs" />

@@ -57,6 +57,7 @@ namespace ZoneEngine_New.Tests
 
         public CollisionSphereData? DynelCollisionSphere { get; set; }
         public bool AllowMissingXpLevels { get; set; }
+        public GoverningFormCatalog GoverningForms { get; init; } = GoverningFormCatalog.Empty;
 
         public bool TryGetDynelCollisionSphere(int templateId, out float radius, out float centerY)
         {

@@ -7,8 +7,10 @@ using System.Net.Sockets;
 using System.Reflection;
 using System.Text;
 using System.Threading;
+using AORebirth.World.Contracts.V1;
 using Cell.Core;
 using ChatEngine;
+using ChatEngine.Channels;
 using ChatEngine.CoreServer;
 using ChatEngine.Lists;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -23,6 +25,105 @@ public sealed class ChatNetworkTests
 {
     const uint SenderId = 91001;
     const uint RecipientId = 91002;
+
+    [TestMethod]
+    public void OrganizationJoinAfterRenamePublishesThePersistedName()
+    {
+        const int orgId = 185;
+        string storedName = "Original Organization";
+        using var world = new ChatWorld(id => id == orgId ? storedName : null);
+        world.OrganizationCommand(SenderId, $"#aorebirth-org-join {orgId}");
+        Assert.AreEqual("Original Organization", OrganizationNames(world.Sender, orgId).Single());
+
+        storedName = "Renamed Organization";
+        world.OrganizationCommand(RecipientId, $"#aorebirth-org-join {orgId}");
+
+        Assert.AreEqual(storedName, OrganizationNames(world.Recipient, orgId).Single());
+        CollectionAssert.AreEqual(new[] { "Original Organization", storedName }, OrganizationNames(world.Sender, orgId));
+        Assert.AreEqual(1, world.OrganizationChannelCount(orgId));
+    }
+
+    [TestMethod]
+    public void OrganizationRefreshUpdatesExistingMembersWithoutRejoiningThem()
+    {
+        const int orgId = 185;
+        const int otherOrg = 186;
+        string storedName = "Original Organization";
+        using var world = new ChatWorld(id => id == orgId ? storedName : id == otherOrg ? "Other Organization" : null);
+        using var unrelated = world.Client(91003, "OtherMember");
+        world.OrganizationCommand(SenderId, $"#aorebirth-org-join {orgId}");
+        world.OrganizationCommand(91003, $"#aorebirth-org-join {otherOrg}");
+
+        storedName = "Renamed Organization";
+        world.OrganizationCommand(SenderId, $"#aorebirth-org-refresh {orgId}");
+        world.OrganizationCommand(RecipientId, $"#aorebirth-org-join {orgId}");
+        Assert.AreEqual(storedName, OrganizationNames(world.Recipient, orgId).Single());
+
+        storedName = "Final Organization";
+        world.OrganizationCommand(SenderId, $"#aorebirth-org-refresh {orgId}");
+        world.OrganizationCommand(SenderId, $"#aorebirth-org-refresh {orgId}");
+
+        CollectionAssert.AreEqual(new[] { "Original Organization", "Renamed Organization", storedName },
+            OrganizationNames(world.Sender, orgId));
+        CollectionAssert.AreEqual(new[] { "Renamed Organization", storedName }, OrganizationNames(world.Recipient, orgId));
+        Assert.AreEqual("Other Organization", OrganizationNames(unrelated, otherOrg).Single());
+        Assert.AreEqual(1, world.OrganizationChannelCount(orgId));
+        Assert.AreEqual(1, world.OrganizationChannelCount(otherOrg));
+        Assert.AreEqual(1, world.Sender.Channels.Count(c => c.channelType == ChannelType.Organization));
+        Assert.AreEqual(1, world.Recipient.Channels.Count(c => c.channelType == ChannelType.Organization));
+        Assert.AreEqual(1, world.Sender.Sent.Count(packet => IsChannelJoin(packet, ChannelType.OrgMsg, 1)));
+        Assert.AreEqual(1, world.Recipient.Sent.Count(packet => IsChannelJoin(packet, ChannelType.OrgMsg, 1)));
+        Assert.IsFalse(world.Sender.Sent.Concat(world.Recipient.Sent)
+            .Any(packet => BinaryPrimitives.ReadUInt16BigEndian(packet.AsSpan(0, 2)) == 61));
+    }
+
+    [TestMethod]
+    public void OrganizationReconnectAndNewChatServerPublishThePersistedName()
+    {
+        const int orgId = 185;
+        string storedName = "Original Organization";
+        using (var world = new ChatWorld(id => id == orgId ? storedName : null))
+        {
+            world.OrganizationCommand(SenderId, $"#aorebirth-org-join {orgId}");
+            world.OrganizationCommand(RecipientId, $"#aorebirth-org-join {orgId}");
+            storedName = "Persisted Organization";
+
+            using var reconnectedLeader = world.Replace(world.Sender);
+            using var reconnectedMember = world.Replace(world.Recipient);
+            world.OrganizationCommand(SenderId, $"#aorebirth-org-join {orgId}");
+            world.OrganizationCommand(RecipientId, $"#aorebirth-org-join {orgId}");
+
+            Assert.AreEqual(storedName, OrganizationNames(reconnectedLeader, orgId).Single());
+            Assert.AreEqual(storedName, OrganizationNames(reconnectedMember, orgId).Single());
+            Assert.AreEqual(1, world.OrganizationChannelCount(orgId));
+        }
+
+        using var restarted = new ChatWorld(id => id == orgId ? storedName : null);
+        restarted.OrganizationCommand(SenderId, $"#aorebirth-org-join {orgId}");
+        restarted.OrganizationCommand(RecipientId, $"#aorebirth-org-join {orgId}");
+        Assert.AreEqual(storedName, OrganizationNames(restarted.Sender, orgId).Single());
+        Assert.AreEqual(storedName, OrganizationNames(restarted.Recipient, orgId).Single());
+        Assert.AreEqual(1, restarted.OrganizationChannelCount(orgId));
+    }
+
+    static string[] OrganizationNames(CapturingClient client, int orgId)
+        => client.Sent.Where(packet => IsChannelJoin(packet, ChannelType.Organization, orgId))
+            .Select(packet =>
+            {
+                int nameBytes = BinaryPrimitives.ReadUInt16BigEndian(packet.AsSpan(9, 2));
+                Assert.AreEqual(17 + nameBytes, packet.Length);
+                Assert.AreEqual((uint)(ChannelFlags.NoInternational | ChannelFlags.GroupOnName),
+                    BinaryPrimitives.ReadUInt32BigEndian(packet.AsSpan(11 + nameBytes, 4)));
+                Assert.AreEqual((ushort)0, BinaryPrimitives.ReadUInt16BigEndian(packet.AsSpan(15 + nameBytes, 2)));
+                return Encoding.UTF8.GetString(packet, 11, nameBytes);
+            })
+            .ToArray();
+
+    static bool IsChannelJoin(byte[] packet, ChannelType type, int channelId)
+        => packet.Length >= 17
+            && BinaryPrimitives.ReadUInt16BigEndian(packet.AsSpan(0, 2)) == 60
+            && packet[4] == (byte)type
+            && BinaryPrimitives.ReadInt32BigEndian(packet.AsSpan(5, 4)) == channelId;
 
     [TestMethod]
     public void CompleteHtmlTellUsesTheActualParserAndOutboundPacket()
@@ -392,18 +493,43 @@ public sealed class ChatNetworkTests
 
     sealed class ChatWorld : IDisposable
     {
-        readonly ChatServer server = new();
+        readonly ChatServer server;
         public readonly CapturingClient Sender;
         public readonly CapturingClient Recipient;
 
-        public ChatWorld()
+        public ChatWorld(Func<int, string?>? readOrganizationName = null)
         {
+            server = readOrganizationName == null ? new ChatServer() : (ChatServer)Activator.CreateInstance(
+                typeof(ChatServer), BindingFlags.Instance | BindingFlags.NonPublic, null, [readOrganizationName], null)!;
             Sender = Client(SenderId, "HelpbotFixture");
             Recipient = Client(RecipientId, "ReceiverFixture");
             Recipient.KnownClients.Add(SenderId);
         }
 
-        CapturingClient Client(uint id, string name)
+        public void OrganizationCommand(uint characterId, string command)
+        {
+            var packet = new WorldToService
+            {
+                Chat = new ChatEvent
+                {
+                    ToCharacter = new CharacterChatCommand { CharacterId = (int)characterId, Command = command }
+                }
+            };
+            typeof(ChatServer).GetMethod("OnWorldMessage", BindingFlags.Instance | BindingFlags.NonPublic)!
+                .Invoke(server, [packet]);
+        }
+
+        public int OrganizationChannelCount(int orgId)
+            => server.Channels.Count(channel => channel.channelType == ChannelType.Organization && channel.ChannelId == (uint)orgId);
+
+        public CapturingClient Replace(CapturingClient previous)
+        {
+            CapturingClient replacement = Client(previous.Character.CharacterId, previous.Character.characterName);
+            server.OnClientDisconnect(previous, false);
+            return replacement;
+        }
+
+        public CapturingClient Client(uint id, string name)
         {
             var client = new CapturingClient(server);
             // Character(0) avoids the normal DAO name lookup; the fixture supplies authenticated-state fields.

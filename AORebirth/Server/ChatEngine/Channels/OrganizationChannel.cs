@@ -65,12 +65,22 @@ namespace ChatEngine.Channels
         /// <param name="orgId">
         /// </param>
         public OrganizationChannel(int orgId)
+            : this(orgId, ResolveOrganizationName(orgId))
+        {
+        }
+
+        internal OrganizationChannel(int orgId, string name)
             : base(
                 ChannelFlags.NoInternational | ChannelFlags.GroupOnName,
                 ChannelType.Organization,
                 (uint)orgId,
-                ResolveOrganizationName(orgId))
+                name)
         {
+        }
+
+        internal void RefreshName(string name)
+        {
+            this.RefreshChannelName(name);
         }
 
         private static string ResolveOrganizationName(int orgId)

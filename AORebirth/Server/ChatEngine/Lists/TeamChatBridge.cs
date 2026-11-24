@@ -25,6 +25,8 @@ namespace ChatEngine.Lists
 
         public const string OrgJoinPrefix = "#aorebirth-org-join";
 
+        public const string OrgRefreshPrefix = "#aorebirth-org-refresh";
+
         public const string OrgLeavePrefix = "#aorebirth-org-leave";
 
         /// <summary>ChatEngine → ZoneEngine: this character's chat logged in; resend its team join.</summary>
@@ -56,6 +58,13 @@ namespace ChatEngine.Lists
             if (text.StartsWith(OrgJoinPrefix, StringComparison.Ordinal))
             {
                 return HandleOrgJoin(server, chatCommand, text);
+            }
+
+            if (text.StartsWith(OrgRefreshPrefix, StringComparison.Ordinal))
+            {
+                if (TryParseId(text, out uint orgId))
+                    server.RefreshOrganizationChannel((int)orgId);
+                return true;
             }
 
             if (text.StartsWith(OrgLeavePrefix, StringComparison.Ordinal))
@@ -164,7 +173,10 @@ namespace ChatEngine.Lists
                 return true;
             }
 
-            RemoveClientFromChannel(server, client, ChannelType.Organization, orgId);
+            lock (server.Channels)
+            {
+                RemoveClientFromChannel(server, client, ChannelType.Organization, orgId);
+            }
             server.LeaveOrgMsgChannel(client);
             return true;
         }
