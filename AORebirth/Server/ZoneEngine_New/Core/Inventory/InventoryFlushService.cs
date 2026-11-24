@@ -231,7 +231,7 @@ namespace ZoneEngine_New.Core.Inventory
 
                 try
                 {
-                    activeNanos = ValidateActiveNanoSnapshot(player, activeNanos);
+                    activeNanos = ValidActiveNanoSnapshot(player, activeNanos);
                     _persist.Persist(
                         inventory?.Inserts ?? [],
                         inventory?.Updates ?? [],
@@ -292,30 +292,26 @@ namespace ZoneEngine_New.Core.Inventory
             }
         }
 
-        List<ActiveNanoRecord>? ValidateActiveNanoSnapshot(Player player, List<ActiveNanoRecord>? snapshot)
+        List<ActiveNanoRecord>? ValidActiveNanoSnapshot(Player player, List<ActiveNanoRecord>? snapshot)
         {
             if (snapshot == null || snapshot.Count == 0)
                 return snapshot;
 
             var ids = new HashSet<int>();
             var instances = new HashSet<int>();
-            int invalid = snapshot.RemoveAll(record =>
+            foreach (ActiveNanoRecord record in snapshot)
             {
                 if (record == null || !record.HasValidPersistenceFields
-                    || ids.Contains(record.NanoId) || instances.Contains(record.NanoInstance))
-                    return true;
+                    || !ids.Add(record.NanoId) || !instances.Add(record.NanoInstance))
+                {
+                    // NCU writes replace the entire set. Keep the durable set until a valid snapshot arrives.
+                    _logger.Warn(string.Format(CultureInfo.InvariantCulture,
+                        "Deferred malformed active nano snapshot for character {0}", player.Identity.Instance));
+                    return null;
+                }
+            }
 
-                ids.Add(record.NanoId);
-                instances.Add(record.NanoInstance);
-                return false;
-            });
-
-            if (invalid > 0)
-                _logger.Warn(string.Format(CultureInfo.InvariantCulture,
-                    "Ignored {0} malformed active nano rows for character {1} during save", invalid, player.Identity.Instance));
-
-            // A malformed snapshot with no usable rows cannot be treated as an intentional NCU clear.
-            return snapshot.Count == 0 ? null : snapshot;
+            return snapshot;
         }
 
         bool SaveReplacementSet<T>(Player player, T? snapshot, Action<T> save, Action restoreDirty, string what)

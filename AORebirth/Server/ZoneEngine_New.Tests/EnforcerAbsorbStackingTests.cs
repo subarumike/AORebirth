@@ -152,25 +152,34 @@ public sealed class EnforcerAbsorbStackingTests
         Player player = TestWorld.CreatePlayer(1);
         player.Stats.Set(CharacterStat.MaxNCU, 200);
         Assert.IsTrue(Land(player, Ward, DateTime.UtcNow));
+        var store = new ProgressionStore();
+        using var flush = CreateFlush(store);
+        flush.HardFlush(player);
+
+        Assert.IsTrue(Land(player, ShrugAbsorb, DateTime.UtcNow));
         List<ActiveNanoRecord> snapshot = player.TakeDirtyActiveNanos()!;
+        snapshot.RemoveAll(nano => nano.NanoId == Ward);
         var overflow = new ActiveNanoRecord
         {
-            NanoId = ShrugAbsorb, NanoInstance = 30, Strain = 219,
+            NanoId = Ward, NanoInstance = 30, Strain = 219,
             DurationCentiseconds = 3000, ExpiresAtUtcTicks = long.MaxValue
         };
         snapshot.Add(overflow);
-        snapshot.Add(snapshot[0]);
         player.RestoreDirtyActiveNanos(snapshot);
         player.TrainedPerks.Add(100);
         player.Research.Set(101, 55);
-        var store = new ProgressionStore();
-        using var flush = CreateFlush(store);
 
         flush.HardFlush(player);
-        CollectionAssert.AreEqual(new[] { Ward }, store.Nanos.Select(nano => nano.NanoId).ToArray());
+        CollectionAssert.AreEqual(new[] { Ward }, store.Nanos.Select(nano => nano.NanoId).ToArray(),
+            "A malformed replacement must preserve the previously saved Ward.");
+        CollectionAssert.AreEqual(new[] { 100 }, store.Perks);
+        CollectionAssert.AreEqual(new[] { new ResearchProgressRecord(101, 55) }, store.Research);
+
+        player.SnapshotActiveNanosForTransfer();
+        flush.HardFlush(player);
         store.Nanos = [overflow, ..store.Nanos];
         Player reconnected = Restore(store);
-        CollectionAssert.AreEqual(new[] { Ward }, reconnected.Buffs.Select(buff => buff.Id).ToArray());
+        CollectionAssert.AreEquivalent(new[] { Ward, ShrugAbsorb }, reconnected.Buffs.Select(buff => buff.Id).ToArray());
         Assert.IsTrue(reconnected.TrainedPerks.Contains(100));
         Assert.IsTrue(reconnected.Research.TryGetRemaining(101, out int remaining));
         Assert.AreEqual(55, remaining);
