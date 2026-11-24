@@ -2,9 +2,11 @@ namespace ZoneEngine_New.Core.Missions;
 using System;
 using System.Buffers.Binary;
 using System.Globalization;
+using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using SmokeLounge.AOtomation.Messaging.GameData;
+using SmokeLounge.AOtomation.Messaging.Messages;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.Network;
@@ -14,40 +16,34 @@ internal static class AuthoredQuestJournal
 {
     internal static bool Send(Player player, string questId, DateTime now, InteractionContent content, int? remainingSeconds = null)
     {
-        if (!content.Journals.TryGetValue(questId, out var definition) || player.Session == null) return false;
+        if (!content.Journals.TryGetValue(questId, out var definition) || player.Session is not { } session)
+            return false;
         if (definition.SynchronizeClock)
         {
             // The shared world clock, as at world entry; the journal's expiry below is given in it.
             GameClock.Reading reading = GameClock.Now(
                 player.Playfield?.GetService<ZoneEngine_New.Core.Configuration.GameplaySettings>()?.WorldClock, now);
-            if (player.Session is IGameTimeSession clock)
+            if (session is IGameTimeSession clock)
                 clock.RecordGameTimeSynchronization(now, reading.ServerSeconds);
-            player.Session.Send(GameClock.BuildMessage(player.Identity, reading));
+            session.Send(GameClock.BuildMessage(player.Identity, reading));
             // The clock just moved: the perk reset timer follows it.
             player.SyncLastPerkResetTime();
             player.FlushDirtyStats();
         }
-        if (definition.Packet is { } typed)
+        var json = JsonNode.Parse(definition.Packet.GetRawText())!;
+        ReplaceRecipient(json, definition.RecipientMarker, player.Identity.Instance);
+        var packet = json.Deserialize<QuestFullUpdateMessage>(InteractionContent.JsonOptions)!;
+        if (definition.ClientClockExpiryActionIndex is int index)
         {
-            var json = JsonNode.Parse(typed.GetRawText())!;
-            ReplaceRecipient(json, definition.RecipientMarker, player.Identity.Instance);
-            player.Session.Send(json.Deserialize<QuestFullUpdateMessage>(InteractionContent.JsonOptions)!);
+            long clientNow = session is IGameTimeSession { GameTimeSynchronizedAtUtc: { } anchor } clock
+                ? clock.GameTimeServerSeconds + Math.Max(0, (long)(now - anchor).TotalSeconds)
+                : GameClock.UnixSeconds(now);
+            int duration = Math.Min(remainingSeconds ?? definition.DurationSeconds, definition.DurationSeconds);
+            Span<byte> expiry = stackalloc byte[sizeof(int)];
+            BinaryPrimitives.WriteInt32BigEndian(expiry, unchecked((int)(clientNow + duration)));
+            packet.Quests[0].QuestActions[index].UnknownHash1 = Encoding.Latin1.GetString(expiry);
         }
-        else
-        {
-            byte[] bytes = Convert.FromHexString(definition.Hex);
-            Replace(bytes, definition.RecipientMarker, player.Identity.Instance);
-            if (definition.ExpiryOffset >= 0)
-            {
-                // The client's now in the clock the session was last given, plus what is left of the quest.
-                long clientNow = player.Session is IGameTimeSession { GameTimeSynchronizedAtUtc: { } anchor } clock
-                    ? clock.GameTimeServerSeconds + Math.Max(0, (long)(now - anchor).TotalSeconds)
-                    : GameClock.UnixSeconds(now);
-                int duration = Math.Min(remainingSeconds ?? definition.DurationSeconds, definition.DurationSeconds);
-                BinaryPrimitives.WriteInt32BigEndian(bytes.AsSpan(definition.ExpiryOffset, 4), unchecked((int)(clientNow + duration)));
-            }
-            player.Session.Send(bytes);
-        }
+        session.Send(packet);
         return true;
     }
     static void ReplaceRecipient(JsonNode node, int from, int to)
@@ -62,22 +58,34 @@ internal static class AuthoredQuestJournal
     }
     internal static void Delete(Player player, string questId, InteractionContent content)
     {
-        if (!content.Journals.TryGetValue(questId, out var definition)) return;
+        if (!content.Journals.TryGetValue(questId, out var definition) || player.Session is not { } session)
+            return;
+
         int instance = int.Parse(questId[(questId.LastIndexOf(':') + 1)..], NumberStyles.HexNumber, CultureInfo.InvariantCulture);
-        foreach (string hex in definition.DeleteHex)
+        var mission = new Identity { Type = IdentityType.Mission, Instance = instance };
+        foreach (JournalDeletePacket kind in definition.DeletePackets)
         {
-            byte[] packet = Convert.FromHexString(hex);
-            Replace(packet, definition.DeleteRecipientMarker, player.Identity.Instance);
-            Replace(packet, definition.DeleteQuestMarker, instance);
-            player.Session?.Send(packet);
+            MessageBody packet = kind switch
+            {
+                JournalDeletePacket.MissionAccomplished => new CharacterActionMessage
+                {
+                    Identity = player.Identity,
+                    Unknown = 0,
+                    Action = CharacterActionType.MissionAccomplished,
+                    Target = mission,
+                    Parameter1 = (int)mission.Type,
+                    Parameter2 = mission.Instance
+                },
+                JournalDeletePacket.QuestDelete => new QuestMessage
+                {
+                    Identity = player.Identity,
+                    Unknown = 0,
+                    Action = QuestAction.Delete,
+                    Mission = mission
+                },
+                _ => throw new InvalidOperationException("Unknown journal deletion packet: " + kind)
+            };
+            session.Send(packet);
         }
-        if (definition.TypedDelete) player.Session?.Send(new QuestMessage { Identity = player.Identity, Unknown = 0,
-            Action = QuestAction.Delete, Unknown1 = 0, Mission = new() { Type = IdentityType.Mission, Instance = instance }, Unknown2 = 0, Unknown3 = 0 });
-    }
-    static void Replace(byte[] packet, int from, int to)
-    {
-        for (int i = 0; i + 4 <= packet.Length; i++)
-            if (BinaryPrimitives.ReadInt32BigEndian(packet.AsSpan(i, 4)) == from)
-            { BinaryPrimitives.WriteInt32BigEndian(packet.AsSpan(i, 4), to); i += 3; }
     }
 }

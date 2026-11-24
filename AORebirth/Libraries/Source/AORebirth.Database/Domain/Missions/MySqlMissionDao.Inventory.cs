@@ -5,6 +5,7 @@ namespace AORebirth.Database.Domain.Missions
     using System.Linq;
     using AORebirth.Interfaces.Persistence.Missions;
     using Dapper;
+    using SmokeLounge.AOtomation.Messaging.GameData;
 
     public sealed partial class MySqlMissionDao
     {
@@ -18,6 +19,26 @@ namespace AORebirth.Database.Domain.Missions
                 try
                 {
                     this.ApplyInventoryMutationCore(grants, consumed);
+                }
+                catch
+                {
+                    this.failed = true;
+                    throw;
+                }
+            }
+
+            public void RetireNpcTradeOffer(MissionItemInstanceData offered)
+            {
+                this.EnsureActive();
+                try
+                {
+                    if (offered == null || offered.InstanceId <= 0 || offered.ContainerType != (int)IdentityType.OverflowWindow
+                        || offered.ContainerInstance != this.CharacterId || offered.ContainerPlacement != offered.InstanceId
+                        || offered.LowId <= 0 || offered.HighId <= 0 || offered.Quality <= 0 || offered.StackCount != 1)
+                        throw new ArgumentException("NPC trade retirement requires the exact parked row for one owned item.", nameof(offered));
+
+                    this.RequireNoItemContents(offered);
+                    RetireExactItemRow(this.connection, this.transaction, offered);
                 }
                 catch
                 {
@@ -42,13 +63,18 @@ namespace AORebirth.Database.Domain.Missions
                 // The owner transaction's repeatable-read range lock prevents orphaning races.
                 foreach (var item in consumed)
                 {
-                    if (this.connection.Query<int>(
-                        "SELECT InstanceId FROM item_instances WHERE ContainerType=0xC749 AND ContainerInstance=@InstanceId LIMIT 1 FOR UPDATE",
-                        new { item.InstanceId }, this.transaction).Any())
-                        throw new InvalidOperationException("Authored item retirement would orphan container contents.");
+                    this.RequireNoItemContents(item);
                     RetireGeneratedItem(this.connection, this.transaction, item, this.CharacterId);
                 }
                 foreach (var item in grants) InsertGeneratedItem(this.connection, this.transaction, item, this.CharacterId);
+            }
+
+            private void RequireNoItemContents(MissionItemInstanceData item)
+            {
+                if (this.connection.Query<int>(
+                    "SELECT InstanceId FROM item_instances WHERE ContainerType=0xC749 AND ContainerInstance=@InstanceId LIMIT 1 FOR UPDATE",
+                    new { item.InstanceId }, this.transaction).Any())
+                    throw new InvalidOperationException("Authored item retirement would orphan container contents.");
             }
         }
     }
