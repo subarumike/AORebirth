@@ -4,6 +4,7 @@ namespace ZoneEngine_New.Tests
     using System.Collections.Generic;
     using System.Linq;
 
+    using AORebirth.Core.GameData;
     using AORebirth.Enums;
 
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -12,6 +13,7 @@ namespace ZoneEngine_New.Tests
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 
     using ZoneEngine_New.Core.Entities;
+    using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Playfield.Locality;
@@ -62,6 +64,76 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(75, attacker.Stats.GetOrZero(CharacterStat.Health));
         }
 
+        [DataTestMethod]
+        [DataRow(250469, 24)]
+        [DataRow(250472, 42)]
+        public void SectorSevenGloryLandsOnWeaponUserAndExpires(int nanoId, int offense)
+        {
+            var items = new StubItemBuilder().Add(TestNanos.Create(nanoId, durationCentiseconds: 10000, strain: 791,
+                modifiers:
+                [
+                    new ItemSpell
+                    {
+                        FunctionType = (int)FunctionType.Skill,
+                        Target = (int)ItemTarget.Wearer,
+                        Arguments = [(int)CharacterStat.AMSModifier, offense]
+                    }
+                ]));
+            NpcCharacter attacker = Attacker(items);
+            attacker.Stats.Set(CharacterStat.MaxNCU, 60);
+            Player target = WatchedPlayer(2, maxNcu: 60);
+
+            Assert.IsTrue(Swing(attacker, target, items, roll: 6, applyOn: ItemTarget.Fightingtarget, nanoId: nanoId, chance: 5));
+            Assert.IsFalse(attacker.TryGetBuff(nanoId, out _));
+            Assert.IsFalse(target.TryGetBuff(nanoId, out _));
+
+            Assert.IsTrue(Swing(attacker, target, items, roll: 5, applyOn: ItemTarget.Fightingtarget, nanoId: nanoId, chance: 5));
+            Assert.IsTrue(attacker.TryGetBuff(nanoId, out Buff? buff));
+            Assert.AreEqual(attacker.Identity, buff!.Source);
+            Assert.IsFalse(target.TryGetBuff(nanoId, out _));
+            Assert.AreEqual(offense, attacker.Stats.GetOrZero(CharacterStat.AMSModifier));
+            Assert.AreEqual(0, target.Stats.GetOrZero(CharacterStat.AMSModifier));
+
+            NanoRuntime.Tick(attacker, buff.ExpiresAtUtc);
+            Assert.IsFalse(attacker.TryGetBuff(nanoId, out _));
+            Assert.AreEqual(0, attacker.Stats.GetOrZero(CharacterStat.AMSModifier));
+        }
+
+        [TestMethod]
+        public void SectorSevenGloryMatchesAllSixteenAuthoredWeaponTemplates()
+        {
+            var catalog = new ItemTemplateCatalog(
+                new StubGameData(HashItemCatalog.Parse("{}"), rootPath: GameDataPaths.ResolveRuntimeRoot()), new StubLogger());
+            var items = new ItemBuilder(catalog, new StubLogger());
+            for (int id = 288283; id <= 288298; id++)
+            {
+                ItemTemplate weapon = items.CreateTemplate(id, id, quality: 1);
+                Assert.AreEqual(id, weapon.Id);
+                List<ItemSpell> procs = weapon.SpellList[EventType.OnHit];
+                Assert.AreEqual(2, procs.Count);
+                for (int i = 0; i < procs.Count; i++)
+                {
+                    Assert.IsTrue(procs[i].Is(FunctionType.CastChance));
+                    Assert.AreEqual((int)ItemTarget.Fightingtarget, procs[i].Target);
+                    Assert.IsTrue(procs[i].TryReadInt(0, out int nanoId));
+                    Assert.AreEqual(i == 0 ? 250469 : 250472, nanoId);
+                    Assert.IsTrue(procs[i].TryReadInt(1, out int chance));
+                    Assert.AreEqual(5, chance);
+                }
+
+                Player attacker = WatchedPlayer(id, maxNcu: 60);
+                var opponent = new NpcCharacter(new Identity { Type = IdentityType.CanbeAffected, Instance = id + 100 }, items);
+                Assert.IsTrue(weapon.ExecuteSpells(EventType.OnHit, opponent, new StubInventoryRepository(), items,
+                    new SpellCriteria { NextRoll = () => 5 }, source: attacker));
+                Assert.IsTrue(attacker.TryGetBuff(250472, out Buff? glory));
+                Assert.AreEqual(attacker.Identity, glory!.Source);
+                Assert.AreEqual(42, attacker.Stats.GetOrZero(CharacterStat.AMSModifier));
+                Assert.AreEqual(0, opponent.Stats.GetOrZero(CharacterStat.AMSModifier));
+                Assert.IsFalse(opponent.TryGetBuff(250469, out _));
+                Assert.IsFalse(opponent.TryGetBuff(250472, out _));
+            }
+        }
+
         [TestMethod]
         public void OnHitBuffProcIsAnnouncedToOtherPlayers()
         {
@@ -103,7 +175,8 @@ namespace ZoneEngine_New.Tests
             StubItemBuilder items,
             int roll,
             ItemTarget applyOn = ItemTarget.Target,
-            int nanoId = ProcNanoId)
+            int nanoId = ProcNanoId,
+            int chance = ChancePercent)
         {
             var weapon = new ItemTemplate
             {
@@ -116,7 +189,7 @@ namespace ZoneEngine_New.Tests
                         {
                             FunctionType = (int)FunctionType.CastChance,
                             Target = (int)applyOn,
-                            Arguments = [nanoId, ChancePercent]
+                            Arguments = [nanoId, chance]
                         }
                     ]
                 }

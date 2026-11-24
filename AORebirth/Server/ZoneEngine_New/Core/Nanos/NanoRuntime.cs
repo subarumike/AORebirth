@@ -519,7 +519,8 @@ namespace ZoneEngine_New.Core.Nanos
             IInventoryRepository inventory,
             DateTime nowUtc,
             bool gmApply = false,
-            bool areaSpread = false)
+            bool areaSpread = false,
+            bool weaponProc = false)
         {
             ArgumentNullException.ThrowIfNull(source);
             ArgumentNullException.ThrowIfNull(target);
@@ -533,7 +534,13 @@ namespace ZoneEngine_New.Core.Nanos
             if (template.Id != nanoId)
                 return false;
 
-            return LandImmediate(source, target, NanoSpell.From(template), inventory, items, nowUtc, gmApply, areaSpread);
+            NanoSpell spell = NanoSpell.From(template);
+            // Some OnHit rows select the opponent even though their child is solely the wielder's buff (Glory).
+            if (weaponProc && spell.IsBuff && !spell.IsHostile && spell.IsSelfOnly
+                && spell.SpellList.TryGetValue(EventType.OnUse, out List<ItemSpell>? effects) && effects.Count > 0)
+                target = source;
+
+            return LandImmediate(source, target, spell, inventory, items, nowUtc, gmApply, areaSpread);
         }
 
         /// <summary>

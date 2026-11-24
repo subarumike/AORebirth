@@ -535,7 +535,8 @@ namespace ZoneEngine_New.Core.Inventory
             {
                 if (consumeFirst && spell.Is(FunctionType.DestroyItem))
                     continue;
-                executed |= ExecuteSpell(target, source, spell, inventoryRepository, items, skipPassiveModifiers, criteria);
+                executed |= ExecuteSpell(target, source, spell, inventoryRepository, items, skipPassiveModifiers, criteria,
+                    weaponHit: eventType == EventType.OnHit);
             }
 
             return executed;
@@ -625,7 +626,8 @@ namespace ZoneEngine_New.Core.Inventory
             bool skipPassiveModifiers,
             SpellCriteria criteria,
             bool isTick = false,
-            bool skipRequirements = false)
+            bool skipRequirements = false,
+            bool weaponHit = false)
         {
             // Each function names who it applies to (User / Wearer / Self: whoever used the item or cast the
             // nano; Target: the event target). A nano cast on someone else can still act on its caster, e.g. a
@@ -680,7 +682,8 @@ namespace ZoneEngine_New.Core.Inventory
             return ItemUseFunctions.TryExecute(Id, target, source, spell, inventoryRepository, items, criteria,
                 isTick: isTick,
                 templateDamageType: Stats.TryGetValue(CharacterStat.DamageType, out int damageType) ? damageType : 0,
-                sourceTemplate: this);
+                sourceTemplate: this,
+                weaponHit: weaponHit);
         }
 
         internal bool ExecutePeriodicSpell(Character target, Character? source, ItemSpell spell,

@@ -45,7 +45,8 @@ namespace ZoneEngine_New.Core.Inventory
             SpellCriteria? criteria = null,
             bool isTick = false,
             int templateDamageType = 0,
-            ItemTemplate? sourceTemplate = null)
+            ItemTemplate? sourceTemplate = null,
+            bool weaponHit = false)
         {
             ArgumentNullException.ThrowIfNull(target);
             ArgumentNullException.ThrowIfNull(spell);
@@ -129,7 +130,7 @@ namespace ZoneEngine_New.Core.Inventory
                 case FunctionType.NpcCastNanoIfPossibleOnFightTarget:
                     return NanoCastFunctions.TryExecute(target, source, spell, items, inventoryRepository);
                 case FunctionType.CastChance:
-                    return CastChance(target, source, spell, items, inventoryRepository, criteria);
+                    return CastChance(target, source, spell, items, inventoryRepository, criteria, weaponHit);
                 case FunctionType.AddOffProc:
                 case FunctionType.AddDefProc:
                     // Registrations, not effects: ProcRules reads them from the buff, worn item or weapon on each
@@ -371,7 +372,8 @@ namespace ZoneEngine_New.Core.Inventory
             ItemSpell spell,
             IItemBuilder items,
             IInventoryRepository inventory,
-            SpellCriteria? criteria)
+            SpellCriteria? criteria,
+            bool weaponHit)
         {
             if (!spell.TryReadInt(0, out int nanoId) || nanoId <= 0)
                 return false;
@@ -396,7 +398,8 @@ namespace ZoneEngine_New.Core.Inventory
                 nanoId,
                 items,
                 inventory,
-                DateTime.UtcNow);
+                DateTime.UtcNow,
+                weaponProc: weaponHit && spell.Target == (int)ItemTarget.Fightingtarget);
         }
 
         /// <summary>
