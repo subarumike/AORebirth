@@ -14,7 +14,7 @@ using ZoneEngine_New.Core.Nanos;
 /// inventory ownership, transactions and packet semantics remain runtime services.</summary>
 public sealed class ItemBehaviorContent
 {
-    internal const string FileName = "ItemBehavior.json";
+    const string FileName = "ItemBehavior.json";
     static readonly Lazy<ItemBehaviorContent> Runtime = new(() => Load());
 
     public static ItemBehaviorContent Current => Runtime.Value;
@@ -77,7 +77,13 @@ public sealed class ItemBehaviorContent
         return result;
     }
 
-    internal void ApplyNanoStackingOverrides(IReadOnlyDictionary<int, ItemTemplate> templates)
+    internal static void ApplyNanoStackingOverrides(string gameDataRoot, IReadOnlyDictionary<int, ItemTemplate> templates)
+    {
+        if (File.Exists(Path.Combine(gameDataRoot, FileName)))
+            Load(gameDataRoot).ApplyNanoStackingOverrides(templates);
+    }
+
+    void ApplyNanoStackingOverrides(IReadOnlyDictionary<int, ItemTemplate> templates)
     {
         foreach (NanoStackingOverrideContent value in NanoStackingOverrides)
         {

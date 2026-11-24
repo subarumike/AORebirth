@@ -22,9 +22,7 @@ namespace ZoneEngine_New.Core.Inventory
             ArgumentNullException.ThrowIfNull(logger);
             string path = Path.Combine(gameData.RootPath, GameDataPaths.ItemsFileName);
             _templates = LoadItemsDat(path, out int loadedCount);
-            string behaviorPath = GameDataPaths.ResolveFile(gameData.RootPath, ItemBehaviorContent.FileName);
-            if (File.Exists(behaviorPath))
-                ItemBehaviorContent.Parse(File.ReadAllText(behaviorPath)).ApplyNanoStackingOverrides(_templates);
+            ItemBehaviorContent.ApplyNanoStackingOverrides(gameData.RootPath, _templates);
 
             logger.Info(string.Format(CultureInfo.InvariantCulture,
                 "Loaded {0} item templates from {1}", loadedCount, path));
