@@ -1847,7 +1847,8 @@ namespace ZoneEngine_New.Core.Ai
         }
 
         /// <summary>A heal order: casts a heal on <paramref name="target"/> now if one can land.</summary>
-        internal HealOrderResult TryHeal(Character target) => _nanos.TryHeal(target, DateTime.UtcNow);
+        internal HealOrderResult TryHeal(Character target, bool trackReachWhileBusy)
+            => _nanos.TryHeal(target, DateTime.UtcNow, trackReachWhileBusy);
 
         internal void ObserveNanoHealth() => _nanos.ObserveHealth();
 

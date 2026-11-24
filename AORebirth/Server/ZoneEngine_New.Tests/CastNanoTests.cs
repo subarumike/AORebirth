@@ -8,7 +8,9 @@ namespace ZoneEngine_New.Tests
     using System.Runtime.CompilerServices;
     using System.Threading;
 
+    using AORebirth.Core.GameData;
     using AORebirth.Enums;
+    using AORebirth.World.Pathfinding;
 
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -91,7 +93,7 @@ namespace ZoneEngine_New.Tests
             NpcCharacter pet = world.Npc(3, 0, 0, 0, attackable: true);
             pet.Stats.Set(CharacterStat.CurrentNano, 0);
             pet.TryAddUploadedNano(heal.Id);
-            var controller = new PetController(owner, PetTypes.Heal, "TEST", 1, null);
+            var controller = new PetController(owner, PetTypes.Heal, "Medinos", 1, null);
             pet.BindPet(controller);
             controller.Heal(teammate.Identity);
             var tend = new PetTendNode(NpcBrain.CreatePet(pet, controller));
@@ -100,7 +102,7 @@ namespace ZoneEngine_New.Tests
 
             Assert.AreEqual(40, teammate.Stats.GetOrZero(CharacterStat.Health));
             Assert.AreEqual(inRange ? teammate.Identity : Identity.None, controller.HealTarget,
-                "Low nano may postpone an in-range heal; an out-of-range order still ends.");
+                "Low nano may postpone an in-range heal. A target beyond the owner's leash must be released.");
             if (inRange)
             {
                 pet.Stats.Set(CharacterStat.CurrentNano, 5);
@@ -108,6 +110,107 @@ namespace ZoneEngine_New.Tests
                 Assert.AreEqual(52, teammate.Stats.GetOrZero(CharacterStat.Health));
                 Assert.AreEqual(0, pet.Stats.GetOrZero(CharacterStat.CurrentNano));
             }
+        }
+
+        [TestMethod]
+        [DataRow(false)]
+        [DataRow(true)]
+        public void HealPetApproachesAndResumesHealingItsAssignedTarget(bool attackPet)
+        {
+            NanoSpell heal = InstantHit(InstantId, heal: 12);
+            heal.Stats[CharacterStat.AttackRange] = 20;
+            using var world = new FanoutWorld(new StubItemBuilder().Add(heal));
+            Player owner = world.Player(1, 0, 0, 0);
+            Player teammate = world.Player(2, 3, 0, 0);
+            world.Join(owner, teammate);
+            NpcCharacter ownedPet = world.Npc(3, 3, 0, 0, attackable: true);
+            ownedPet.BindPet(new PetController(owner, PetTypes.Attack, "Attack pet", 1, null));
+            Character target = attackPet ? ownedPet : teammate;
+            target.Stats.Set(CharacterStat.MaxHealth, 100);
+            target.Stats.Set(CharacterStat.Health, 40);
+            NpcCharacter medinos = world.Npc(4, 0, 0, 0, attackable: true);
+            medinos.TryAddUploadedNano(heal.Id);
+            var controller = new PetController(owner, PetTypes.Heal, "Medinos", 1, null);
+            medinos.BindPet(controller);
+            controller.Heal(target.Identity);
+            var tend = new PetTendNode(NpcBrain.CreatePet(medinos, controller));
+
+            tend.Evaluate(0.1f);
+            Assert.AreEqual(52, target.Stats.GetOrZero(CharacterStat.Health));
+
+            target.Position = new Vector3(30, 0, 0);
+            tend.Evaluate(0.1f);
+            Assert.AreEqual(target.Identity, controller.HealTarget);
+            Assert.IsTrue(medinos.Motor.HasPath, "Medinos should approach the patient within the owner's leash.");
+            Assert.AreEqual(52, target.Stats.GetOrZero(CharacterStat.Health));
+
+            medinos.Motor.Warp(new Vector3(22, 0, 0));
+            medinos.ClearNanoRecharge();
+            // A traversal takes longer than the duplicate-land window. The fixture moved the pet in one step.
+            medinos.RememberNanoLanded(heal.Id, target.Identity, DateTime.UtcNow.AddSeconds(-1));
+            tend.Evaluate(0.1f);
+            Assert.AreEqual(64, target.Stats.GetOrZero(CharacterStat.Health));
+            Assert.IsFalse(medinos.Motor.HasPath);
+            Assert.AreEqual(target.Identity, controller.HealTarget);
+
+            Character replacement = attackPet ? teammate : ownedPet;
+            replacement.Position = new Vector3(25, 0, 0);
+            replacement.Stats.Set(CharacterStat.MaxHealth, 100);
+            replacement.Stats.Set(CharacterStat.Health, 40);
+            controller.Heal(replacement.Identity);
+            medinos.ClearNanoRecharge();
+            tend.Evaluate(0.1f);
+            Assert.AreEqual(52, replacement.Stats.GetOrZero(CharacterStat.Health));
+            Assert.AreEqual(64, target.Stats.GetOrZero(CharacterStat.Health));
+
+            replacement.Playfield = null;
+            tend.Evaluate(0.1f);
+            Assert.AreEqual(Identity.None, controller.HealTarget);
+            controller.Heal(target.Identity);
+            controller.LeavePlayfield();
+            Assert.AreEqual(Identity.None, controller.HealTarget);
+        }
+
+        [TestMethod]
+        public void HealPetUsesIndoorNavmeshAndKeepsAnUnreachableAssignment()
+        {
+            Assert.IsTrue(NavMeshPathfinder.TryLoad(GameDataPaths.ResolveRuntimeRoot(), 127,
+                out NavMeshPathfinder? pathfinder, out string? failure), failure);
+            using var mesh = pathfinder!;
+            NanoSpell heal = InstantHit(InstantId, heal: 12);
+            heal.Stats[CharacterStat.AttackRange] = 5;
+            using var world = new FanoutWorld(new StubItemBuilder().Add(heal));
+            typeof(Playfield).GetProperty(nameof(Playfield.Pathfinder))!.SetValue(world.Playfield, mesh);
+            Player owner = world.Player(1, 210, 73, 102);
+            Player teammate = world.Player(2, 196, 73, 100);
+            world.Join(owner, teammate);
+            teammate.Stats.Set(CharacterStat.MaxHealth, 100);
+            teammate.Stats.Set(CharacterStat.Health, 40);
+            NpcCharacter medinos = world.Npc(3, 210, 73, 102, attackable: true);
+            medinos.TryAddUploadedNano(heal.Id);
+            var controller = new PetController(owner, PetTypes.Heal, "Medinos", 1, null);
+            medinos.BindPet(controller);
+            controller.Heal(teammate.Identity);
+            NpcBrain brain = NpcBrain.CreatePet(medinos, controller);
+            var tend = new PetTendNode(brain);
+
+            tend.Evaluate(0.1f);
+            Assert.IsTrue(medinos.Motor.HasPath);
+            Assert.AreEqual(teammate.Identity, controller.HealTarget);
+
+            brain.StopPathing();
+            var unreachable = new System.Numerics.Vector3(210, 113, 102);
+            Assert.IsFalse(mesh.TrySnap(unreachable, out _));
+            teammate.Position = new Vector3(unreachable.X, unreachable.Y, unreachable.Z);
+            tend.Evaluate(0.1f);
+            tend.Evaluate(0.1f);
+            Assert.IsFalse(medinos.Motor.HasPath);
+            Assert.AreEqual(teammate.Identity, controller.HealTarget);
+            Assert.AreEqual(40, teammate.Stats.GetOrZero(CharacterStat.Health));
+
+            teammate.Position = new Vector3(212, 73, 102);
+            tend.Evaluate(0.1f);
+            Assert.AreEqual(52, teammate.Stats.GetOrZero(CharacterStat.Health));
         }
 
         [TestMethod]

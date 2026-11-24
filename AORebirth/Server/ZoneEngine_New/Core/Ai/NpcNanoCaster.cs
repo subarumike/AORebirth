@@ -293,18 +293,19 @@ namespace ZoneEngine_New.Core.Ai
         /// A heal order: casts the first heal this NPC has that can land on <paramref name="target"/> now.
         /// <see cref="HealOrderResult.OutOfRange"/> when a heal exists but the target is too far or out of sight.
         /// </summary>
-        public HealOrderResult TryHeal(Character target, DateTime nowUtc)
+        public HealOrderResult TryHeal(Character target, DateTime nowUtc, bool trackReachWhileBusy)
         {
-            if (HealthPercent(target) >= 100)
+            if (Npc.IsDead || Npc.Playfield == null || Npc.UploadedNanoIds.Count == 0)
                 return HealOrderResult.Busy;
 
-            if (Npc.IsDead || Npc.IsStunned || Npc.IsCastingNano || Npc.Playfield == null || Npc.UploadedNanoIds.Count == 0)
-                return HealOrderResult.Busy;
-            if (Npc.IsInNanoRecharge(nowUtc))
+            bool canCast = HealthPercent(target) < 100 && !Npc.IsStunned && !Npc.IsCastingNano
+                && !Npc.IsInNanoRecharge(nowUtc);
+            if (!canCast && !trackReachWhileBusy)
                 return HealOrderResult.Busy;
 
             GameplayNpcNanos rules = Rules;
             bool hasHeal = false;
+            bool inReach = false;
             bool waitingForNano = false;
             foreach (int nanoId in Npc.UploadedNanoIds)
             {
@@ -317,6 +318,10 @@ namespace ZoneEngine_New.Core.Ai
                 hasHeal = true;
                 if (!InRange(spell, target, rules.SupportRange))
                     continue;
+
+                inReach = true;
+                if (!canCast)
+                    return HealOrderResult.Busy;
 
                 NanoCastRefusal refusal = NanoRuntime.PreviewStartCast(Npc, spell, target, nowUtc);
                 if (refusal == NanoCastRefusal.None)
@@ -331,7 +336,7 @@ namespace ZoneEngine_New.Core.Ai
             }
 
             // A summoned pet replenishes nano. Keep its accepted target while it can still recover in range.
-            if (waitingForNano)
+            if (waitingForNano || (trackReachWhileBusy && inReach))
                 return HealOrderResult.Busy;
             return hasHeal ? HealOrderResult.OutOfRange : HealOrderResult.NoHeal;
         }
