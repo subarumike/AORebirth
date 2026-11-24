@@ -43,6 +43,7 @@ namespace ZoneEngine_New.Core.Inventory
             Relations = other.Relations;
             ShopInventory = other.ShopInventory;
             CanCancel = other.CanCancel;
+            ExcludedNanoStackingLine = other.ExcludedNanoStackingLine;
         }
 
         public int Id { get; init; }
@@ -93,6 +94,9 @@ namespace ZoneEngine_New.Core.Inventory
 
         /// <summary>False when the owner may not dismiss the effect from NCU.</summary>
         public bool CanCancel { get; init; } = true;
+
+        /// <summary>Optional authored line to omit from stacking. The underlying nano strain is unchanged.</summary>
+        internal int ExcludedNanoStackingLine { get; set; }
 
         /// <summary>
         /// The count a freshly minted item starts with: MaxEnergy when set, otherwise MultipleCount, otherwise 1.

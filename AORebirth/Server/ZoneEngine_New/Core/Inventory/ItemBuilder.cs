@@ -219,7 +219,8 @@ namespace ZoneEngine_New.Core.Inventory
                 SpellList = LerpSpellList(low.SpellList, high.SpellList, factor),
                 Actions = LerpActions(low.Actions, high.Actions, factor),
                 Relations = new List<int>(low.Relations),
-                ShopInventory = low.ShopInventory
+                ShopInventory = low.ShopInventory,
+                ExcludedNanoStackingLine = low.ExcludedNanoStackingLine
             };
         }
 
@@ -253,7 +254,8 @@ namespace ZoneEngine_New.Core.Inventory
                 SpellList = spellList,
                 Actions = actions,
                 Relations = new List<int>(source.Relations),
-                ShopInventory = source.ShopInventory
+                ShopInventory = source.ShopInventory,
+                ExcludedNanoStackingLine = source.ExcludedNanoStackingLine
             };
         }
 

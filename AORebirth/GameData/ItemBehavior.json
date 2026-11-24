@@ -40,6 +40,9 @@
   "WornMeshOverrides": [
     { "TemplateIds": [302730], "MeshId": 245106, "OnlyWhenOverrideTextureId": 0, "OverrideTextureId": 302715 }
   ],
+  "NanoStackingOverrides": [
+    { "NanoId": 266820, "ExcludedLine": 219 }
+  ],
   "Provenance": [
     "Permanent passage-item bindings preserved from the former InventoryActionService compiled bridge.",
     "Package content preserved from capture 20260806-rabbit and existing durable transactional grant behavior.",

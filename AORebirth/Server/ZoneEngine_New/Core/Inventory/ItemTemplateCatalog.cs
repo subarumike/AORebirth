@@ -15,13 +15,16 @@ namespace ZoneEngine_New.Core.Inventory
     {
         private readonly Dictionary<int, ItemTemplate> _templates;
 
-        /// <summary>GameData items.dat is the only source of item templates, names included.</summary>
+        /// <summary>Loads item templates from GameData items.dat and validates optional stacking metadata.</summary>
         public ItemTemplateCatalog(IGameData gameData, IZoneLogger logger)
         {
             ArgumentNullException.ThrowIfNull(gameData);
             ArgumentNullException.ThrowIfNull(logger);
             string path = Path.Combine(gameData.RootPath, GameDataPaths.ItemsFileName);
             _templates = LoadItemsDat(path, out int loadedCount);
+            string behaviorPath = GameDataPaths.ResolveFile(gameData.RootPath, ItemBehaviorContent.FileName);
+            if (File.Exists(behaviorPath))
+                ItemBehaviorContent.Parse(File.ReadAllText(behaviorPath)).ApplyNanoStackingOverrides(_templates);
 
             logger.Info(string.Format(CultureInfo.InvariantCulture,
                 "Loaded {0} item templates from {1}", loadedCount, path));

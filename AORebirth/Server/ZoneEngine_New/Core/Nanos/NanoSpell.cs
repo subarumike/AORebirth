@@ -68,12 +68,12 @@ namespace ZoneEngine_New.Core.Nanos
         readonly int[] _stackingLines;
 
         /// <summary>
-        /// The strain plus every StackingLine2-6, without 0 or repeats. Composite Teachings 220331 is strain 165 and
+        /// The strain plus every StackingLine2-6, without 0, repeats or a stacking exclusion. Composite Teachings 220331 is strain 165 and
         /// lines 167, 159, 161, 157, 163: it holds each single Teachings line (MM 151767 is 157) as well as its own.
         /// </summary>
         int[] ReadStackingLines()
         {
-            int count = NanoStrain > 0 ? 1 : 0;
+            int count = NanoStrain > 0 && NanoStrain != ExcludedNanoStackingLine ? 1 : 0;
             Span<int> lines = stackalloc int[1 + ExtraStackingLineStats.Length];
             if (count == 1)
                 lines[0] = NanoStrain;
@@ -81,7 +81,7 @@ namespace ZoneEngine_New.Core.Nanos
             for (int i = 0; i < ExtraStackingLineStats.Length; i++)
             {
                 int line = ReadStat(ExtraStackingLineStats[i]);
-                if (line > 0 && lines[..count].IndexOf(line) < 0)
+                if (line > 0 && line != ExcludedNanoStackingLine && lines[..count].IndexOf(line) < 0)
                     lines[count++] = line;
             }
 
@@ -137,7 +137,7 @@ namespace ZoneEngine_New.Core.Nanos
         /// <summary>Nano strain; nanos of one strain never stack. 0 means strainless.</summary>
         public int NanoStrain { get; }
 
-        /// <summary>Every nano line this nano occupies: <see cref="NanoStrain"/> first, then StackingLine2-6. Empty when strainless.</summary>
+        /// <summary>Every line this nano occupies for stacking, excluding any line removed by template policy.</summary>
         public IReadOnlyList<int> StackingLines => _stackingLines;
 
         /// <summary>True when this nano and <paramref name="other"/> hold a nano line in common, so they cannot both run.</summary>
