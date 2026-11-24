@@ -98,6 +98,8 @@ namespace ChatEngine.CoreServer
         /// <summary>The GameData ChatChannels.json channels, fixed for the process; also in <see cref="Channels"/>.</summary>
         private readonly ConfiguredChannel[] staticChannels;
 
+        private readonly Func<int, string> readOrganizationName;
+
         #endregion
 
         #region Constructors and Destructors
@@ -105,7 +107,13 @@ namespace ChatEngine.CoreServer
         /// <summary>
         /// </summary>
         public ChatServer()
+            : this(orgId => OrganizationDao.Instance.Get(orgId)?.Name)
         {
+        }
+
+        internal ChatServer(Func<int, string> readOrganizationName)
+        {
+            this.readOrganizationName = readOrganizationName;
             // Static channels (Global, Shopping, sided, GM) and their join conditions come from GameData.
             IReadOnlyList<ChannelDefinition> definitions = ChannelCatalog.LoadRuntime().Channels;
             this.staticChannels = new ConfiguredChannel[definitions.Count];
@@ -668,27 +676,42 @@ namespace ChatEngine.CoreServer
         /// </summary>
         internal void JoinOrganizationChannels(Client client, int orgId)
         {
-            var org = OrganizationDao.Instance.Get(orgId);
-            if (org == null)
-            {
-                return;
-            }
-
-            ChannelBase orgChannel;
             lock (this.Channels)
             {
-                orgChannel = this.Channels.FirstOrDefault(
-                    x => x is OrganizationChannel && x.ChannelId == (uint)orgId);
+                string name = this.readOrganizationName(orgId);
+                if (name == null)
+                    return;
+
+                OrganizationChannel orgChannel = this.GetOrganizationChannel(orgId);
                 if (orgChannel == null)
                 {
-                    orgChannel = new OrganizationChannel(orgId);
+                    orgChannel = new OrganizationChannel(orgId, name);
                     this.Channels.Add(orgChannel);
                 }
+
+                orgChannel.RefreshName(name);
+                orgChannel.AddClient(client);
             }
 
-            orgChannel.AddClient(client);
             this.orgMsgChannel.AddClient(client);
         }
+
+        internal void RefreshOrganizationChannel(int orgId)
+        {
+            lock (this.Channels)
+            {
+                OrganizationChannel channel = this.GetOrganizationChannel(orgId);
+                if (channel == null)
+                    return;
+
+                string name = this.readOrganizationName(orgId);
+                if (name != null)
+                    channel.RefreshName(name);
+            }
+        }
+
+        private OrganizationChannel GetOrganizationChannel(int orgId)
+            => this.Channels.OfType<OrganizationChannel>().FirstOrDefault(channel => channel.ChannelId == (uint)orgId);
 
         /// <summary>
         /// Removes the client from Org Msg when it leaves its organization. The organization channel itself is

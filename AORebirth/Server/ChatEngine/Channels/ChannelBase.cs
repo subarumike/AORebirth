@@ -136,6 +136,26 @@ namespace ChatEngine.Channels
             }
         }
 
+        protected void RefreshChannelName(string name)
+        {
+            byte[] packet;
+            IClient[] recipients;
+            lock (this.clients)
+            {
+                if (this.ChannelName == name)
+                    return;
+
+                this.ChannelName = name;
+                packet = ChannelJoin.Create(this, new byte[] { 0x00, 0x00 });
+                recipients = this.SnapshotConnectedClients();
+            }
+
+            foreach (IClient client in recipients)
+            {
+                client.Send(packet);
+            }
+        }
+
         /// <summary>
         /// </summary>
         public virtual uint ChannelId { get; private set; }
@@ -265,9 +285,10 @@ namespace ChatEngine.Channels
         /// </returns>
         public bool RemoveClient(IClient client)
         {
-            if (this.clients.Contains(client))
+            lock (this.clients)
             {
-                this.clients.Remove(client);
+                if (!this.clients.Remove(client))
+                    return false;
 
                 if (this.OnClientLeaveChannel != null)
                 {
@@ -279,8 +300,6 @@ namespace ChatEngine.Channels
                 // TODO: Send feedback to client
                 return true;
             }
-
-            return false;
         }
 
         #endregion

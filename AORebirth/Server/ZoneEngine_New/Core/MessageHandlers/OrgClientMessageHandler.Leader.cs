@@ -1,9 +1,12 @@
 namespace ZoneEngine_New.Core.MessageHandlers
 {
     using System;
+    using System.Globalization;
     using System.Linq;
+    using System.Runtime.CompilerServices;
 
     using AORebirth.Interfaces.Persistence.Characters;
+    using AORebirth.World.Contracts.V1;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
@@ -27,6 +30,9 @@ namespace ZoneEngine_New.Core.MessageHandlers
         // Punctuation seen in the live Rubi-Ka 2019 organization names (people.anarchy-online.com), besides letters, digits and spaces.
         const string NamePunctuation = ".-'()&";
         const int MinNameLetters = 3;
+        const string OrganizationNameRefreshCommand = "org.refresh-name";
+        readonly object _organizationNameRefreshSync = new();
+        readonly ConditionalWeakTable<Player, object> _pendingOrganizationNames = new();
 
         void HandleLeaderCommand(OrgClientMessage message, IZoneSession session, Player player)
         {
@@ -98,7 +104,58 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 return;
             }
 
-            ChangeText(org, OrganizationTextField.Name, name);
+            lock (_organizationNameRefreshSync)
+            {
+                _organizations.SaveText(org.Id, OrganizationTextField.Name, name);
+                foreach (Player member in OnlineMembers(org.Id))
+                    PublishOrganizationName(member, org.Id, name);
+
+                string organizationId = org.Id.ToString(CultureInfo.InvariantCulture);
+                _chat.SendChatCommand(player.Identity.Instance, "#aorebirth-org-refresh " + organizationId);
+                _ = _worldCommands?.BroadcastAsync(OrganizationNameRefreshCommand, organizationId);
+            }
+        }
+
+        void OnOrganizationNameRefresh(InstanceCommand command)
+        {
+            if (command.Arguments.Count != 1
+                || !int.TryParse(command.Arguments[0], NumberStyles.None, CultureInfo.InvariantCulture, out int orgId)
+                || orgId <= 0)
+                return;
+
+            lock (_organizationNameRefreshSync)
+            {
+                Player[] members = OnlineMembers(orgId).ToArray();
+                if (members.Length == 0 || _organizations.GetById(orgId) is not { } organization)
+                    return;
+
+                foreach (Player member in members)
+                    PublishOrganizationName(member, orgId, organization.Name);
+            }
+        }
+
+        void PublishOrganizationName(Player member, int orgId, string name)
+        {
+            object publication = new();
+            _pendingOrganizationNames.AddOrUpdate(member, publication);
+            ApplyOnTick(member, () =>
+            {
+                lock (_organizationNameRefreshSync)
+                {
+                    // The active playfield can change while an earlier name update is queued.
+                    if (!_pendingOrganizationNames.TryGetValue(member, out var pending)
+                        || !ReferenceEquals(publication, pending))
+                        return;
+                    _pendingOrganizationNames.Remove(member);
+                    if (member.Organization is not { } current || current.Id != orgId)
+                        return;
+
+                    OrganizationRecord renamed = current with { Name = name };
+                    member.Organization = renamed;
+                    member.Session?.Send(BuildOrgInfoPacket(member.Identity, renamed));
+                    member.Session?.Send(OrgChatText.InfoUpdated(member.Identity));
+                }
+            });
         }
 
         // Retail rules (rules.txt), checked in the captured order: 4 characters minimum, at least 3 letters, only ASCII
@@ -121,7 +178,6 @@ namespace ZoneEngine_New.Core.MessageHandlers
             _organizations.SaveText(org.Id, field, value);
             OrganizationRecord updated = field switch
             {
-                OrganizationTextField.Name => org with { Name = value },
                 OrganizationTextField.Description => org with { Description = value },
                 OrganizationTextField.Objective => org with { Objective = value },
                 _ => org with { History = value }

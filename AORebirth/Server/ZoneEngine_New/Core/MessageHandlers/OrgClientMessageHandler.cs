@@ -17,6 +17,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Organizations;
     using ZoneEngine_New.Core.Playfield;
+    using ZoneEngine_New.Core.World;
 
     /// <summary>
     /// /org info: answers OrgClient Info with OrgServer/OrgInfo for the targeted player's organization
@@ -35,12 +36,13 @@ namespace ZoneEngine_New.Core.MessageHandlers
         readonly OrgTaxTickService _tax;
         readonly OrgVoteService _votes;
         readonly GameplaySettings _settings;
+        readonly WorldCommands? _worldCommands;
 
         // Lazy: PlayfieldManager depends on the message router, which depends on the handlers.
         public OrgClientMessageHandler(IGameData gameData, Lazy<PlayfieldManager> playfieldManager,
             IOrganizationRepository organizations, IZoneLogger logger, IChatEngineLink chat,
             OrgLockoutClock lockouts, OrgMembershipService memberships, OrgTaxTickService tax, OrgVoteService votes,
-            GameplaySettings settings)
+            GameplaySettings settings, WorldCommands? worldCommands = null)
         {
             _gameData = gameData;
             _playfieldManager = playfieldManager;
@@ -52,6 +54,8 @@ namespace ZoneEngine_New.Core.MessageHandlers
             _tax = tax;
             _votes = votes;
             _settings = settings;
+            _worldCommands = worldCommands;
+            _worldCommands?.Register(OrganizationNameRefreshCommand, OnOrganizationNameRefresh);
         }
 
         public Type MessageBodyType => typeof(OrgClientMessage);
