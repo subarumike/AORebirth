@@ -231,6 +231,7 @@ namespace ZoneEngine_New.Core.Inventory
 
                 try
                 {
+                    activeNanos = ValidateActiveNanoSnapshot(player, activeNanos);
                     _persist.Persist(
                         inventory?.Inserts ?? [],
                         inventory?.Updates ?? [],
@@ -289,6 +290,32 @@ namespace ZoneEngine_New.Core.Inventory
                 else
                     player.Research.RestoreDirty(research);
             }
+        }
+
+        List<ActiveNanoRecord>? ValidateActiveNanoSnapshot(Player player, List<ActiveNanoRecord>? snapshot)
+        {
+            if (snapshot == null || snapshot.Count == 0)
+                return snapshot;
+
+            var ids = new HashSet<int>();
+            var instances = new HashSet<int>();
+            int invalid = snapshot.RemoveAll(record =>
+            {
+                if (record == null || !record.HasValidPersistenceFields
+                    || ids.Contains(record.NanoId) || instances.Contains(record.NanoInstance))
+                    return true;
+
+                ids.Add(record.NanoId);
+                instances.Add(record.NanoInstance);
+                return false;
+            });
+
+            if (invalid > 0)
+                _logger.Warn(string.Format(CultureInfo.InvariantCulture,
+                    "Ignored {0} malformed active nano rows for character {1} during save", invalid, player.Identity.Instance));
+
+            // A malformed snapshot with no usable rows cannot be treated as an intentional NCU clear.
+            return snapshot.Count == 0 ? null : snapshot;
         }
 
         bool SaveReplacementSet<T>(Player player, T? snapshot, Action<T> save, Action restoreDirty, string what)
