@@ -208,6 +208,7 @@
     <Compile Remove="@(Compile)" />
     <Compile Include="TestDoubles.cs" />
     <Compile Include="InventoryActionTests.cs" />
+    <Compile Include="ChestCombatTests.cs" />
     <Compile Include="ItemsDatCompressionCompatibilityTests.cs" />
     <Compile Include="MissionChestLootTests.cs" />
     <Compile Include="MissionChestRKPolicyTests.cs" />
