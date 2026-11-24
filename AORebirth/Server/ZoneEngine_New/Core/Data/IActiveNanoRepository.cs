@@ -23,6 +23,9 @@ namespace ZoneEngine_New.Core.Data
 
         public long ExpiresAtUtcTicks { get; init; }
 
+        internal bool HasValidPersistenceFields => NanoId > 0 && NanoInstance > 0 && Strain >= 0
+            && DurationCentiseconds >= 0 && ExpiresAtUtcTicks >= 0 && ExpiresAtUtcTicks <= DateTime.MaxValue.Ticks;
+
         /// <summary>The stored value for a buff paused at logout with <paramref name="remaining"/> left.</summary>
         public static long Paused(TimeSpan remaining) => Math.Clamp(remaining.Ticks, 1, PausedLimitTicks - 1);
 

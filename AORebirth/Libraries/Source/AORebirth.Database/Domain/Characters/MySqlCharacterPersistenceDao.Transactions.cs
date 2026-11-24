@@ -20,12 +20,8 @@ namespace AORebirth.Database.Domain.Characters
                 && (skillLocks.Any(l => l.StatId < 0 || l.ExpiresAtUtcTicks <= 0)
                     || skillLocks.Select(l => l.StatId).Distinct().Count() != skillLocks.Count))
                 throw new ArgumentException("Invalid or duplicate skill lock.", nameof(skillLocks));
-            if (activeNanos != null
-                && (activeNanos.Any(n => n.NanoId <= 0 || n.NanoInstance <= 0 || n.DurationCentiseconds < 0 || n.ExpiresAtUtcTicks < 0)
-                    // Strain 0 is "no strain": those nanos never conflict in NCU, so only real strains must be unique.
-                    || activeNanos.Where(n => n.Strain > 0).Select(n => n.Strain).Distinct().Count() != activeNanos.Count(n => n.Strain > 0)
-                    || activeNanos.Select(n => n.NanoInstance).Distinct().Count() != activeNanos.Count))
-                throw new ArgumentException("Invalid or duplicate active nano identity.", nameof(activeNanos));
+            if (activeNanos != null)
+                ValidateActiveNanos(activeNanos, nameof(activeNanos));
             Transaction((c, t) =>
             {
                 WriteItems(c, t, inserts, locations);
@@ -101,9 +97,9 @@ namespace AORebirth.Database.Domain.Characters
         {
             if (characterId <= 0) throw new ArgumentOutOfRangeException(nameof(characterId));
             return Query("SELECT NanoId,Strain,NanoInstance,DurationCentiseconds,ExpiresAtUtcTicks FROM charactersactivenanos "
-                + "WHERE CharacterId=@Id ORDER BY Strain,NanoInstance", r => new PersistedActiveNanoData
+                + "WHERE CharacterId=@Id AND NanoId<=@MaxRuntimeId AND Strain<=@MaxRuntimeId ORDER BY Strain,NanoInstance", r => new PersistedActiveNanoData
                 { NanoId = r.GetInt32(0), Strain = r.GetInt32(1), NanoInstance = r.GetInt32(2),
-                    DurationCentiseconds = r.GetInt32(3), ExpiresAtUtcTicks = r.GetInt64(4) }, "@Id", characterId);
+                    DurationCentiseconds = r.GetInt32(3), ExpiresAtUtcTicks = r.GetInt64(4) }, "@Id", characterId, "@MaxRuntimeId", int.MaxValue);
         }
 
         public void CommitActiveNanos(IList<CharacterActiveNanoData> characters)
@@ -113,10 +109,7 @@ namespace AORebirth.Database.Domain.Characters
                 || characters.Select(c => c.CharacterId).Distinct().Count() != characters.Count)
                 throw new ArgumentException("Distinct positive nano owners are required.", nameof(characters));
             foreach (var character in characters)
-                if (character.ActiveNanos.Any(n => n.NanoId <= 0 || n.NanoInstance <= 0 || n.DurationCentiseconds < 0 || n.ExpiresAtUtcTicks < 0)
-                    || character.ActiveNanos.Select(n => n.Strain).Distinct().Count() != character.ActiveNanos.Count
-                    || character.ActiveNanos.Select(n => n.NanoInstance).Distinct().Count() != character.ActiveNanos.Count)
-                    throw new ArgumentException("Invalid or duplicate active nano identity.", nameof(characters));
+                ValidateActiveNanos(character.ActiveNanos, nameof(characters));
             Transaction((c, t) =>
             {
                 foreach (var character in characters.OrderBy(x => x.CharacterId)) LockCharacter(c, t, character.CharacterId);
@@ -132,6 +125,16 @@ namespace AORebirth.Database.Domain.Characters
                 }
                 return 0;
             });
+        }
+
+        private static void ValidateActiveNanos(IList<PersistedActiveNanoData> nanos, string parameterName)
+        {
+            // The runtime decides stacking. Different active nanos may preserve the same original strain.
+            if (nanos.Any(n => n == null || n.NanoId <= 0 || n.NanoInstance <= 0 || n.Strain < 0
+                    || n.DurationCentiseconds < 0 || n.ExpiresAtUtcTicks < 0 || n.ExpiresAtUtcTicks > DateTime.MaxValue.Ticks)
+                || nanos.Select(n => n.NanoId).Distinct().Count() != nanos.Count
+                || nanos.Select(n => n.NanoInstance).Distinct().Count() != nanos.Count)
+                throw new ArgumentException("Invalid or duplicate active nano identity.", parameterName);
         }
     }
 }

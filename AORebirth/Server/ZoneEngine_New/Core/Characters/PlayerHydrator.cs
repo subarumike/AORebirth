@@ -1,6 +1,8 @@
 namespace ZoneEngine_New.Core.Characters
 {
     using System;
+    using System.Collections.Generic;
+    using System.Globalization;
 
     using SmokeLounge.AOtomation.Messaging.GameData;
 
@@ -96,9 +98,17 @@ namespace ZoneEngine_New.Core.Characters
         void RestoreActiveNanos(Player player, CharacterHydrationResult hydration)
         {
             DateTime nowUtc = DateTime.UtcNow;
+            var instances = new HashSet<int>();
+            int invalid = 0;
             foreach (ActiveNanoRecord record in hydration.ActiveNanos)
             {
-                if (record.NanoId <= 0 || record.ExpiresAtUtcTicks <= 0)
+                if (record == null || !record.HasValidPersistenceFields || instances.Contains(record.NanoInstance))
+                {
+                    invalid++;
+                    continue;
+                }
+
+                if (record.ExpiresAtUtcTicks == 0)
                     continue;
 
                 DateTime expiresAtUtc = record.ResolveExpiry(nowUtc);
@@ -107,8 +117,13 @@ namespace ZoneEngine_New.Core.Characters
 
                 NanoSpell spell = NanoSpell.From(
                     _items.CreateTemplate(record.NanoId, record.NanoId, quality: 1));
-                player.TryRestoreBuff(spell, player.Identity, record.NanoInstance, expiresAtUtc);
+                if (player.TryRestoreBuff(spell, player.Identity, record.NanoInstance, expiresAtUtc) != null)
+                    instances.Add(record.NanoInstance);
             }
+
+            if (invalid > 0)
+                player.Logger.Warn(string.Format(CultureInfo.InvariantCulture,
+                    "Ignored {0} malformed active nano rows for character {1} during login", invalid, player.Identity.Instance));
 
             // The absorb pools came back with the stats; hand them to the buffs that grant them, and drop the rest.
             player.ReconcileAbsorbs();

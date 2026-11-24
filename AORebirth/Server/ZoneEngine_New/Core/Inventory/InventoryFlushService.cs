@@ -231,6 +231,7 @@ namespace ZoneEngine_New.Core.Inventory
 
                 try
                 {
+                    activeNanos = ValidActiveNanoSnapshot(player, activeNanos);
                     _persist.Persist(
                         inventory?.Inserts ?? [],
                         inventory?.Updates ?? [],
@@ -289,6 +290,28 @@ namespace ZoneEngine_New.Core.Inventory
                 else
                     player.Research.RestoreDirty(research);
             }
+        }
+
+        List<ActiveNanoRecord>? ValidActiveNanoSnapshot(Player player, List<ActiveNanoRecord>? snapshot)
+        {
+            if (snapshot == null || snapshot.Count == 0)
+                return snapshot;
+
+            var ids = new HashSet<int>();
+            var instances = new HashSet<int>();
+            foreach (ActiveNanoRecord record in snapshot)
+            {
+                if (record == null || !record.HasValidPersistenceFields
+                    || !ids.Add(record.NanoId) || !instances.Add(record.NanoInstance))
+                {
+                    // NCU writes replace the entire set. Keep the durable set until a valid snapshot arrives.
+                    _logger.Warn(string.Format(CultureInfo.InvariantCulture,
+                        "Deferred malformed active nano snapshot for character {0}", player.Identity.Instance));
+                    return null;
+                }
+            }
+
+            return snapshot;
         }
 
         bool SaveReplacementSet<T>(Player player, T? snapshot, Action<T> save, Action restoreDirty, string what)

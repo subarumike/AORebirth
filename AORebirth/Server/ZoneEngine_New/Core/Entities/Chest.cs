@@ -112,10 +112,10 @@ namespace ZoneEngine_New.Core.Entities
             }
         }
 
-        protected override bool CanOpenLoot(Player player) => !IsLocked && CanInteract(player);
+        protected override bool CanOpenLoot(Player player) => !IsLocked && !player.IsInCombat && CanInteract(player);
 
         public bool CanTransferLoot(Player player)
-            => OpenerIdentity == player.Identity && !IsLocked && CanInteract(player);
+            => OpenerIdentity == player.Identity && !IsLocked && !player.IsInCombat && CanInteract(player);
 
         public override void Tick(double deltaTime)
         {

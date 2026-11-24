@@ -22,14 +22,15 @@ if (args.Length != 1 || args[0] != "--run-character-creation")
 }
 #else
 bool dailyLogin = args.Length == 1 && args[0] == "--run-daily-login";
+bool activeNanoPersistence = args.Length == 1 && args[0] == "--run-active-nano-persistence";
 bool connectedChests = args.Length == 7 && args[0] == "--run-connected-chests" && args[3] == "--login-engine"
     && File.Exists(args[4]) && args[5] == "--world-engine" && File.Exists(args[6]);
 bool connectedLifecycle = args.Length == 7 && args[0] == "--run-connected-lifecycle" && args[3] == "--login-engine"
     && File.Exists(args[4]) && args[5] == "--world-engine" && File.Exists(args[6]);
 bool connected = connectedChests || connectedLifecycle || args.Length == 5 && args[0] == "--run-connected" && args[3] == "--login-engine" && File.Exists(args[4]);
-if (!dailyLogin && ((!connected && (args.Length != 3 || args[0] != "--run-disposable")) || args[1] != "--engine" || !File.Exists(args[2])))
+if (!dailyLogin && !activeNanoPersistence && ((!connected && (args.Length != 3 || args[0] != "--run-disposable")) || args[1] != "--engine" || !File.Exists(args[2])))
 {
-    Console.Error.WriteLine("USAGE: ZoneEngineSchemaValidation --run-daily-login OR --run-disposable --engine <absolute ZoneEngine_New.dll> OR --run-connected --engine <absolute ZoneEngine_New.dll> --login-engine <absolute LoginEngine.exe-or-dll> OR --run-connected-chests/--run-connected-lifecycle --engine <absolute ZoneEngine_New.dll> --login-engine <absolute LoginEngine.exe-or-dll> --world-engine <absolute WorldEngine.dll>. Creates its own loopback-only, labeled disposable MySQL. Never reads production connection settings.");
+    Console.Error.WriteLine("USAGE: ZoneEngineSchemaValidation --run-active-nano-persistence OR --run-daily-login OR --run-disposable --engine <absolute ZoneEngine_New.dll> OR --run-connected --engine <absolute ZoneEngine_New.dll> --login-engine <absolute LoginEngine.exe-or-dll> OR --run-connected-chests/--run-connected-lifecycle --engine <absolute ZoneEngine_New.dll> --login-engine <absolute LoginEngine.exe-or-dll> --world-engine <absolute WorldEngine.dll>. Creates its own loopback-only, labeled disposable MySQL. Never reads production connection settings.");
     return 64;
 }
 #endif
@@ -46,6 +47,12 @@ try
     Console.WriteLine("CHARACTER_CREATION_VALIDATION=PASS PRODUCTION_CONTACT=NO ENGINES_STARTED=NO");
     return 0;
 #else
+    if (activeNanoPersistence)
+    {
+        SharedStrainPersistenceSmoke.Validate(fixture, connection);
+        return 0;
+    }
+
     if (dailyLogin)
     {
         DailyLoginPersistenceSmoke.Validate(fixture, connection);

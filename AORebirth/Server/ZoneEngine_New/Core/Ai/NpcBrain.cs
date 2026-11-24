@@ -1379,7 +1379,7 @@ namespace ZoneEngine_New.Core.Ai
         /// from it, or its end is nearly reached, so the NPC neither re-announces its path constantly nor brakes
         /// at an end that is already stale.
         /// </summary>
-        public void PathTo(Vector3 destination, float? replanDeltaMeters)
+        public void PathTo(Vector3 destination, float? replanDeltaMeters, bool stopOnFailedRoute = false)
         {
             _replanDeltaMeters = replanDeltaMeters ?? NpcFollowTarget.MinAnnounceDeltaMeters;
             // Rooted, or a body that cannot move at all: settle where it stands; the stuck clock restarts once a root
@@ -1454,7 +1454,8 @@ namespace ZoneEngine_New.Core.Ai
                     _stuckWarps++;
                     active = false;
                 }
-                else if (active && !ShouldReplan(destination))
+                else if (active && !ShouldReplan(destination)
+                    && (!stopOnFailedRoute || Vector3.Abs(destination - _segmentDestination) < _replanDeltaMeters))
                     return;
                 else if (!active && (now - _segmentPlannedUtc).TotalSeconds < NpcFollowTarget.PathReplanSeconds)
                     return;
@@ -1466,7 +1467,11 @@ namespace ZoneEngine_New.Core.Ai
             if (PathEndsUnderNpc(
                 new System.Numerics.Vector3((float)start.x, (float)start.y, (float)start.z),
                 new System.Numerics.Vector3((float)routeEnd.x, (float)routeEnd.y, (float)routeEnd.z)))
+            {
+                if (stopOnFailedRoute)
+                    StopPathing();
                 return;
+            }
 
             // A direct scripted leg is one straight line with nothing to re-plan around: the whole leg goes out as one
             // segment (observers get the destination itself), not a lookahead's worth re-sent as the NPC walks.
@@ -1847,7 +1852,8 @@ namespace ZoneEngine_New.Core.Ai
         }
 
         /// <summary>A heal order: casts a heal on <paramref name="target"/> now if one can land.</summary>
-        internal HealOrderResult TryHeal(Character target) => _nanos.TryHeal(target, DateTime.UtcNow);
+        internal HealOrderResult TryHeal(Character target, bool trackReachWhileBusy)
+            => _nanos.TryHeal(target, DateTime.UtcNow, trackReachWhileBusy);
 
         internal void ObserveNanoHealth() => _nanos.ObserveHealth();
 

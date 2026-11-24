@@ -267,7 +267,8 @@ namespace ZoneEngine_New.Core.Ai
 
             if (pet.HealTarget.Instance != 0)
             {
-                if (ResolveFriend(brain.Npc, pet.HealTarget) is Character ordered)
+                if (ResolveFriend(brain.Npc, pet.HealTarget) is Character ordered
+                    && (!healPet || !pet.IsPlayerPet || ordered is Player or NpcCharacter { PetOwner: Player }))
                     return ordered;
                 pet.EndHeal();
             }
@@ -425,6 +426,8 @@ namespace ZoneEngine_New.Core.Ai
         {
             TickStallWatch.Stage("node.pet-rejoin", _brain.Npc.Identity.Instance);
             PetController pet = _brain.Pet!;
+            if (pet.WarpRequested && pet.IsPlayerPet && PetTypes.Slot(pet.Type) == PetTypes.Slot(PetTypes.Heal))
+                pet.EndHeal();
             pet.WarpRequested = false;
 
             // A waiting pet pulled back to its owner has left its post: it follows from here on.
@@ -481,14 +484,16 @@ namespace ZoneEngine_New.Core.Ai
     }
 
     /// <summary>
-    /// Keeps the pet's charge (<see cref="PetAi.Charge"/>) healed: when the charge is hurt and a heal can land,
-    /// the pet casts it and that is its action this tick. Otherwise it carries on with everything else. A heal
-    /// order whose target is out of heal range ends, and the pet goes back to its owner and its default duty; the
-    /// pet never runs off after a heal target.
+    /// A player's heal pet keeps its assigned charge in reach while its owner is nearby. A passive pet still
+    /// follows its owner when it cannot heal. Failed routes are retried after either participant moves.
     /// </summary>
     sealed class PetTendNode : BehaviourNode
     {
         readonly NpcBrain _brain;
+        Identity _approachTarget;
+        int _approachOrderVersion;
+        Vector3? _failedFrom;
+        Vector3? _failedDestination;
 
         public PetTendNode(NpcBrain brain)
             : base("pet-tend")
@@ -501,24 +506,80 @@ namespace ZoneEngine_New.Core.Ai
             TickStallWatch.Stage("node.pet-tend", _brain.Npc.Identity.Instance);
             PetController pet = _brain.Pet!;
             Character? charge = PetAi.Charge(_brain);
-            if (charge == null || PetAi.HealthPercent(charge) >= PetAi.TendBelowPercent)
+            if (charge == null)
+            {
+                _approachTarget = Identity.None;
                 return _nodeState = NodeState.Failure;
+            }
 
-            switch (_brain.TryHeal(charge))
+            bool followCharge = pet.IsPlayerPet && PetTypes.Slot(pet.Type) == PetTypes.Slot(PetTypes.Heal)
+                && pet.HealTarget == charge.Identity;
+            if (!followCharge)
+            {
+                _approachTarget = Identity.None;
+                if (PetAi.HealthPercent(charge) >= PetAi.TendBelowPercent)
+                    return _nodeState = NodeState.Failure;
+            }
+
+            switch (_brain.TryHeal(charge, followCharge))
             {
                 case HealOrderResult.Cast:
+                    _failedFrom = null;
+                    _brain.StopPathing();
+                    return _nodeState = NodeState.Success;
+                case HealOrderResult.OutOfRange when followCharge
+                    && PetAi.Distance(pet.Owner, charge) <= PetService.MaxPlayerPetDistance:
+                    ApproachCharge(charge, pet.HealOrderVersion);
+                    return _nodeState = NodeState.Success;
+                case HealOrderResult.Busy when followCharge:
+                    _failedFrom = null;
                     _brain.StopPathing();
                     return _nodeState = NodeState.Success;
                 case HealOrderResult.OutOfRange:
                 case HealOrderResult.NoHeal:
-                    // Out of range of an ordered target (or no heal to give): back to the owner and default duty.
-                    // Out of range of the owner: following brings the pet back in range.
+                case HealOrderResult.InvalidTarget:
                     if (!ReferenceEquals(charge, pet.Owner))
                         pet.EndHeal();
+                    _approachTarget = Identity.None;
                     return _nodeState = NodeState.Failure;
                 default:
                     return _nodeState = NodeState.Failure;
             }
+        }
+
+        void ApproachCharge(Character charge, int orderVersion)
+        {
+            if (_approachTarget != charge.Identity)
+            {
+                _approachTarget = charge.Identity;
+                _failedFrom = null;
+                _brain.StopPathing();
+            }
+            if (_approachOrderVersion != orderVersion)
+            {
+                _approachOrderVersion = orderVersion;
+                _failedFrom = null;
+            }
+
+            NpcCharacter npc = _brain.Npc;
+            if (npc.IsRooted || npc.IsImmobile)
+                return;
+
+            const float replanMeters = NpcFollowTarget.MinAnnounceDeltaMeters;
+            if (_failedFrom is not null && _failedDestination is not null
+                && Vector3.Abs(npc.Position - _failedFrom) < replanMeters
+                && Vector3.Abs(charge.Position - _failedDestination) < replanMeters)
+                return;
+
+            _brain.PathTo(charge.Position, replanMeters, stopOnFailedRoute: true);
+            if (npc.Motor.HasPath)
+            {
+                _failedFrom = null;
+                return;
+            }
+
+            _failedFrom = new Vector3(npc.Position.x, npc.Position.y, npc.Position.z);
+            _failedDestination = new Vector3(charge.Position.x, charge.Position.y, charge.Position.z);
         }
     }
 
