@@ -131,7 +131,13 @@ namespace ZoneEngine_New.Core.Pets
             AttackTarget = Identity.None;
         }
 
-        internal void Heal(Identity target) => HealTarget = target == Owner.Identity ? Identity.None : target;
+        internal int HealOrderVersion { get; private set; }
+
+        internal void Heal(Identity target)
+        {
+            HealTarget = target == Owner.Identity ? Identity.None : target;
+            HealOrderVersion++;
+        }
 
         internal void EndHeal() => HealTarget = Identity.None;
 

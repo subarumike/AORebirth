@@ -34,7 +34,8 @@ namespace ZoneEngine_New.Core.Ai
         Cast,
         OutOfRange,
         Busy,
-        NoHeal
+        NoHeal,
+        InvalidTarget
     }
 
     /// <summary>What a nano is for, which decides when the NPC casts it and how long it waits afterwards.</summary>
@@ -295,8 +296,10 @@ namespace ZoneEngine_New.Core.Ai
         /// </summary>
         public HealOrderResult TryHeal(Character target, DateTime nowUtc, bool trackReachWhileBusy)
         {
-            if (Npc.IsDead || Npc.Playfield == null || Npc.UploadedNanoIds.Count == 0)
+            if (Npc.IsDead || Npc.Playfield == null)
                 return HealOrderResult.Busy;
+            if (Npc.UploadedNanoIds.Count == 0)
+                return trackReachWhileBusy ? HealOrderResult.NoHeal : HealOrderResult.Busy;
 
             bool canCast = HealthPercent(target) < 100 && !Npc.IsStunned && !Npc.IsCastingNano
                 && !Npc.IsInNanoRecharge(nowUtc);
@@ -306,6 +309,7 @@ namespace ZoneEngine_New.Core.Ai
             GameplayNpcNanos rules = Rules;
             bool hasHeal = false;
             bool inReach = false;
+            bool rejectedTarget = false;
             bool waitingForNano = false;
             foreach (int nanoId in Npc.UploadedNanoIds)
             {
@@ -319,13 +323,20 @@ namespace ZoneEngine_New.Core.Ai
                 if (!InRange(spell, target, rules.SupportRange))
                     continue;
 
-                inReach = true;
                 if (!canCast)
                     return HealOrderResult.Busy;
 
                 NanoCastRefusal refusal = NanoRuntime.PreviewStartCast(Npc, spell, target, nowUtc);
                 if (refusal == NanoCastRefusal.None)
                     refusal = NanoRuntime.TryStartCast(Npc, spell.Id, target.Identity, nowUtc);
+                if (trackReachWhileBusy && refusal is NanoCastRefusal.InvalidTarget or NanoCastRefusal.TargetDead
+                    or NanoCastRefusal.FriendlyOnNpc or NanoCastRefusal.FriendlyOnEnemy)
+                {
+                    rejectedTarget = true;
+                    continue;
+                }
+
+                inReach = true;
                 if (refusal == NanoCastRefusal.NotEnoughNano)
                     waitingForNano = true;
                 if (refusal != NanoCastRefusal.None)
@@ -338,6 +349,8 @@ namespace ZoneEngine_New.Core.Ai
             // A summoned pet replenishes nano. Keep its accepted target while it can still recover in range.
             if (waitingForNano || (trackReachWhileBusy && inReach))
                 return HealOrderResult.Busy;
+            if (rejectedTarget)
+                return HealOrderResult.InvalidTarget;
             return hasHeal ? HealOrderResult.OutOfRange : HealOrderResult.NoHeal;
         }
 

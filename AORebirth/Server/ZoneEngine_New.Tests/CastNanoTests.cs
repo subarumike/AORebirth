@@ -70,9 +70,10 @@ namespace ZoneEngine_New.Tests
         }
 
         [TestMethod]
-        [DataRow(3.0, true)]
-        [DataRow(60.0, false)]
-        public void HealPetKeepsInRangeOrderWhileNanoRecovers(double distance, bool inRange)
+        [DataRow(3.0, 0.0, true)]
+        [DataRow(60.0, 0.0, false)]
+        [DataRow(55.0, 40.0, true)]
+        public void HealPetKeepsInRangeOrderWhileNanoRecovers(double distance, double petPosition, bool inRange)
         {
             NanoSpell heal = TestNanos.Create(InstantId, durationCentiseconds: 0, nanoPointCost: 5,
                 modifiers:
@@ -90,7 +91,7 @@ namespace ZoneEngine_New.Tests
             world.Join(owner, teammate);
             teammate.Stats.Set(CharacterStat.MaxHealth, 100);
             teammate.Stats.Set(CharacterStat.Health, 40);
-            NpcCharacter pet = world.Npc(3, 0, 0, 0, attackable: true);
+            NpcCharacter pet = world.Npc(3, petPosition, 0, 0, attackable: true);
             pet.Stats.Set(CharacterStat.CurrentNano, 0);
             pet.TryAddUploadedNano(heal.Id);
             var controller = new PetController(owner, PetTypes.Heal, "Medinos", 1, null);
@@ -198,7 +199,6 @@ namespace ZoneEngine_New.Tests
             Assert.IsTrue(medinos.Motor.HasPath);
             Assert.AreEqual(teammate.Identity, controller.HealTarget);
 
-            brain.StopPathing();
             var unreachable = new System.Numerics.Vector3(210, 113, 102);
             Assert.IsFalse(mesh.TrySnap(unreachable, out _));
             teammate.Position = new Vector3(unreachable.X, unreachable.Y, unreachable.Z);

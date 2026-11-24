@@ -491,6 +491,7 @@ namespace ZoneEngine_New.Core.Ai
     {
         readonly NpcBrain _brain;
         Identity _approachTarget;
+        int _approachOrderVersion;
         Vector3? _failedFrom;
         Vector3? _failedDestination;
 
@@ -513,12 +514,6 @@ namespace ZoneEngine_New.Core.Ai
 
             bool followCharge = pet.IsPlayerPet && PetTypes.Slot(pet.Type) == PetTypes.Slot(PetTypes.Heal)
                 && pet.HealTarget == charge.Identity;
-            if (followCharge && PetAi.Distance(pet.Owner, charge) > PetService.MaxPlayerPetDistance)
-            {
-                pet.EndHeal();
-                _approachTarget = Identity.None;
-                return _nodeState = NodeState.Failure;
-            }
             if (!followCharge)
             {
                 _approachTarget = Identity.None;
@@ -532,8 +527,9 @@ namespace ZoneEngine_New.Core.Ai
                     _failedFrom = null;
                     _brain.StopPathing();
                     return _nodeState = NodeState.Success;
-                case HealOrderResult.OutOfRange when followCharge:
-                    ApproachCharge(charge);
+                case HealOrderResult.OutOfRange when followCharge
+                    && PetAi.Distance(pet.Owner, charge) <= PetService.MaxPlayerPetDistance:
+                    ApproachCharge(charge, pet.HealOrderVersion);
                     return _nodeState = NodeState.Success;
                 case HealOrderResult.Busy when followCharge:
                     _failedFrom = null;
@@ -541,21 +537,28 @@ namespace ZoneEngine_New.Core.Ai
                     return _nodeState = NodeState.Success;
                 case HealOrderResult.OutOfRange:
                 case HealOrderResult.NoHeal:
+                case HealOrderResult.InvalidTarget:
                     if (!ReferenceEquals(charge, pet.Owner))
                         pet.EndHeal();
+                    _approachTarget = Identity.None;
                     return _nodeState = NodeState.Failure;
                 default:
                     return _nodeState = NodeState.Failure;
             }
         }
 
-        void ApproachCharge(Character charge)
+        void ApproachCharge(Character charge, int orderVersion)
         {
             if (_approachTarget != charge.Identity)
             {
                 _approachTarget = charge.Identity;
                 _failedFrom = null;
                 _brain.StopPathing();
+            }
+            if (_approachOrderVersion != orderVersion)
+            {
+                _approachOrderVersion = orderVersion;
+                _failedFrom = null;
             }
 
             NpcCharacter npc = _brain.Npc;
@@ -568,7 +571,7 @@ namespace ZoneEngine_New.Core.Ai
                 && Vector3.Abs(charge.Position - _failedDestination) < replanMeters)
                 return;
 
-            _brain.PathTo(charge.Position, replanMeters);
+            _brain.PathTo(charge.Position, replanMeters, stopOnFailedRoute: true);
             if (npc.Motor.HasPath)
             {
                 _failedFrom = null;
