@@ -45,7 +45,8 @@ namespace ZoneEngine_New.Core.Inventory
             SpellCriteria? criteria = null,
             bool isTick = false,
             int templateDamageType = 0,
-            ItemTemplate? sourceTemplate = null)
+            ItemTemplate? sourceTemplate = null,
+            bool weaponHit = false)
         {
             ArgumentNullException.ThrowIfNull(target);
             ArgumentNullException.ThrowIfNull(spell);
@@ -129,7 +130,7 @@ namespace ZoneEngine_New.Core.Inventory
                 case FunctionType.NpcCastNanoIfPossibleOnFightTarget:
                     return NanoCastFunctions.TryExecute(target, source, spell, items, inventoryRepository);
                 case FunctionType.CastChance:
-                    return CastChance(target, source, spell, items, inventoryRepository, criteria);
+                    return CastChance(target, source, spell, items, inventoryRepository, criteria, weaponHit);
                 case FunctionType.AddOffProc:
                 case FunctionType.AddDefProc:
                     // Registrations, not effects: ProcRules reads them from the buff, worn item or weapon on each
@@ -283,13 +284,12 @@ namespace ZoneEngine_New.Core.Inventory
 
         /// <summary>
         /// DrainHit args: Stat, Min, Max, AC, Percent (Shade Dimach 213269-213274: Health, Melee AC, 70-80).
-        /// Damages <paramref name="target"/> like a hostile Hit, then heals the source by Percent of the
-        /// damage actually dealt. Only Health damage is supported.
+        /// Removes Health or CurrentNano from the target, then returns Percent of the actual loss to the source.
         /// </summary>
         static bool DrainHit(Character target, Character? source, ItemSpell spell, bool addDamage,
             (CombatSource Source, int Id) origin)
         {
-            if (!spell.TryReadInt(0, out int statId) || (CharacterStat)statId != CharacterStat.Health
+            if (!spell.TryReadInt(0, out int statId) || (CharacterStat)statId is not (CharacterStat.Health or CharacterStat.CurrentNano)
                 || !spell.TryReadInt(1, out int minHit) || !spell.TryReadInt(2, out int maxHit))
                 return false;
             spell.TryReadInt(3, out int acStat);
@@ -299,14 +299,24 @@ namespace ZoneEngine_New.Core.Inventory
             if (maxHit >= 0 || source == null || ReferenceEquals(source, target) || target.IsDead)
                 return false;
 
-            int before = Math.Max(0, target.Stats.GetOrZero(CharacterStat.Health));
-            ApplyHealthDelta(target, source, Random.Shared.Next(minHit, maxHit + 1), acStat, addDamage, direct: addDamage,
-                origin: origin);
-            int dealt = before - Math.Max(0, target.Stats.GetOrZero(CharacterStat.Health));
-            int drained = (int)((long)dealt * Math.Clamp(percent, 0, 100) / 100);
+            var stat = (CharacterStat)statId;
+            int before = Math.Max(0, target.Stats.GetOrZero(stat));
+            int delta = Random.Shared.Next(minHit, maxHit + 1);
+            if (stat == CharacterStat.Health)
+                ApplyHealthDelta(target, source, delta, acStat, addDamage, direct: addDamage, origin: origin);
+            else
+                ApplyNanoDelta(target, delta);
+
+            int lost = before - Math.Max(0, target.Stats.GetOrZero(stat));
+            int drained = (int)((long)lost * Math.Clamp(percent, 0, 100) / 100);
             // The drain returns a share of the damage dealt; healing efficiency and reactivity do not change it.
             if (drained > 0 && !source.IsDead)
-                ApplyHealthDelta(source, source, drained, 0, healModifiers: false);
+            {
+                if (stat == CharacterStat.Health)
+                    ApplyHealthDelta(source, source, drained, 0, healModifiers: false);
+                else
+                    ApplyNanoDelta(source, drained);
+            }
             return true;
         }
 
@@ -362,7 +372,8 @@ namespace ZoneEngine_New.Core.Inventory
             ItemSpell spell,
             IItemBuilder items,
             IInventoryRepository inventory,
-            SpellCriteria? criteria)
+            SpellCriteria? criteria,
+            bool weaponHit)
         {
             if (!spell.TryReadInt(0, out int nanoId) || nanoId <= 0)
                 return false;
@@ -387,7 +398,8 @@ namespace ZoneEngine_New.Core.Inventory
                 nanoId,
                 items,
                 inventory,
-                DateTime.UtcNow);
+                DateTime.UtcNow,
+                weaponProc: weaponHit && spell.Target == (int)ItemTarget.Fightingtarget);
         }
 
         /// <summary>

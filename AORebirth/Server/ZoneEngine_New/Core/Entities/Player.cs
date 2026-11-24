@@ -1598,7 +1598,7 @@ namespace ZoneEngine_New.Core.Entities
                 if (!perk.MeetsActionRequirements(stat => stats.Get(stat), ActionType.ToWear, ResolvePerkRequirement))
                     continue;
                 if (perk.SpellList.TryGetValue(EventType.OnWear, out List<ItemSpell>? wear))
-                    StatModifierSpells.Apply(wear, stats);
+                    StatModifierSpells.Apply(wear, stats, resolve: ResolvePerkRequirement);
             }
         }
 

@@ -1,5 +1,6 @@
 namespace ZoneEngine_New.Core.Inventory
 {
+    using System;
     using System.Collections.Generic;
 
     using AORebirth.Enums;
@@ -16,11 +17,13 @@ namespace ZoneEngine_New.Core.Inventory
     public static class StatModifierSpells
     {
         /// <param name="overEquipLevel">The source item's over-equipped level (<see cref="Inventory.OverEquip"/>); it scales Modify only.</param>
-        public static void Apply(IReadOnlyList<ItemSpell> spells, StatCollection stats, int overEquipLevel = 0)
+        public static void Apply(IReadOnlyList<ItemSpell> spells, StatCollection stats, int overEquipLevel = 0,
+            Func<ItemRequirement, bool?>? resolve = null)
         {
             if (spells == null || stats == null)
                 return;
 
+            Func<CharacterStat, int> getStat = stat => stats.Get(stat);
             for (int i = 0; i < spells.Count; i++)
             {
                 ItemSpell spell = spells[i];
@@ -33,7 +36,7 @@ namespace ZoneEngine_New.Core.Inventory
                     && !spell.Is(FunctionType.Modify) && !spell.Is(FunctionType.ScalingModify)
                     && !spell.Is(FunctionType.Skill))
                     continue;
-                if (!spell.MeetsRequirements(stats))
+                if (!ItemTemplate.MeetsRequirements(spell.Requirements, getStat, resolve))
                     continue;
                 if (canFly)
                 {

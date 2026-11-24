@@ -325,7 +325,7 @@ namespace ZoneEngine_New.Core.Nanos
 
         /// <param name="area">
         /// An AreaCastNano spread: a hostile child catches only what its caster could attack
-        /// (<see cref="IsCaughtByHostileArea"/>); a friendly one reaches all.
+        /// (<see cref="IsCaughtByHostileArea"/>); a friendly child checks each recipient's own criteria.
         /// </param>
         internal static bool AcceptsRecipient(Character source, Character candidate, NanoSpell child, bool area = false)
         {
@@ -337,7 +337,14 @@ namespace ZoneEngine_New.Core.Nanos
             if (child.IsHostile && !self && IsSparedByNpcArea(source, candidate))
                 return false;
             if (area)
-                return !child.IsHostile || IsCaughtByHostileArea(source, candidate);
+            {
+                bool hostileRecipient = IsCaughtByHostileArea(source, candidate);
+                if (child.IsHostile)
+                    return hostileRecipient;
+
+                return !hostileRecipient && child.MeetsActionRequirements(
+                    stat => candidate.Stats.Get(stat), ActionType.ToUse, candidate.ResolveRequirement);
+            }
             if ((can & (CanFlags.ApplyOnSelf | CanFlags.ApplyOnFriendly | CanFlags.ApplyOnHostile)) == 0)
             {
                 // Area nukes such as Volcanic Eruption store Can as 0 and IsHostile on the child.

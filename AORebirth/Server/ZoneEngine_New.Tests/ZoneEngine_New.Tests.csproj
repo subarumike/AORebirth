@@ -121,6 +121,12 @@
     <Compile Include="CastNanoTests.cs" />
     <Compile Include="CastNanoTests.EncounterTriggers.cs" />
   </ItemGroup>
+  <ItemGroup Condition="'$(NanoPerkRepairFocusedTests)' == 'true'">
+    <Compile Remove="@(Compile)" />
+    <Compile Include="TestDoubles.cs;InventoryActionTests.cs;TriggerTestWorld.cs;CastNanoTests.cs;CastNanoTests.*.cs;HitProcTests.cs" />
+    <Compile Include="BuffTests.cs;BuffApplyRulesTests.cs;EnforcerAbsorbStackingTests.cs;NotumRingNanoEligibilityTests.cs" />
+    <Compile Include="Accumulator*Tests.cs;Sabretooth*Tests.cs" />
+  </ItemGroup>
   <ItemGroup Condition="'$(PetPlacementFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />
     <Compile Include="TestDoubles.cs" />

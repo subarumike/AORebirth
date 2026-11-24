@@ -43,6 +43,7 @@ namespace ZoneEngine_New.Core.Inventory
             Relations = other.Relations;
             ShopInventory = other.ShopInventory;
             CanCancel = other.CanCancel;
+            ExcludedNanoStackingLine = other.ExcludedNanoStackingLine;
         }
 
         public int Id { get; init; }
@@ -93,6 +94,9 @@ namespace ZoneEngine_New.Core.Inventory
 
         /// <summary>False when the owner may not dismiss the effect from NCU.</summary>
         public bool CanCancel { get; init; } = true;
+
+        /// <summary>Optional authored line to omit from stacking. The underlying nano strain is unchanged.</summary>
+        internal int ExcludedNanoStackingLine { get; set; }
 
         /// <summary>
         /// The count a freshly minted item starts with: MaxEnergy when set, otherwise MultipleCount, otherwise 1.
@@ -531,7 +535,8 @@ namespace ZoneEngine_New.Core.Inventory
             {
                 if (consumeFirst && spell.Is(FunctionType.DestroyItem))
                     continue;
-                executed |= ExecuteSpell(target, source, spell, inventoryRepository, items, skipPassiveModifiers, criteria);
+                executed |= ExecuteSpell(target, source, spell, inventoryRepository, items, skipPassiveModifiers, criteria,
+                    weaponHit: eventType == EventType.OnHit);
             }
 
             return executed;
@@ -621,7 +626,8 @@ namespace ZoneEngine_New.Core.Inventory
             bool skipPassiveModifiers,
             SpellCriteria criteria,
             bool isTick = false,
-            bool skipRequirements = false)
+            bool skipRequirements = false,
+            bool weaponHit = false)
         {
             // Each function names who it applies to (User / Wearer / Self: whoever used the item or cast the
             // nano; Target: the event target). A nano cast on someone else can still act on its caster, e.g. a
@@ -631,7 +637,19 @@ namespace ZoneEngine_New.Core.Inventory
             // pick exactly one branch.
             Character eventTarget = target;
             Character user = source ?? target;
-            target = ResolveApplyOn(target, source, spell);
+            // A timed nano transfer attached to another character (Escrow, Rigid Liquidation) acts on the original
+            // buff owner and caster. Fightingtarget must not follow a later fight, and a missing caster gets no restore.
+            bool transferredNano = this is Nanos.NanoSpell && !UserIsRecipient && spell.TickCount > 1
+                && spell.TickInterval > 0 && spell.Is(FunctionType.Hit)
+                && spell.TryReadInt(0, out int hitStat) && hitStat == (int)CharacterStat.CurrentNano
+                && (this is Nanos.Buff buff ? buff.Source != eventTarget.Identity
+                    : source != null && !ReferenceEquals(source, eventTarget));
+            if (transferredNano && spell.Target is (int)ItemTarget.User or (int)ItemTarget.Wearer or (int)ItemTarget.Self
+                && (source == null || source.IsDead || !ReferenceEquals(source.Playfield, eventTarget.Playfield)))
+                return false;
+
+            target = transferredNano && spell.Target == (int)ItemTarget.Fightingtarget
+                ? eventTarget : ResolveApplyOn(target, source, spell);
             Character applyOn = target;
             if (!skipRequirements && !ItemTemplate.MeetsRequirements(
                     spell.Requirements,
@@ -664,7 +682,8 @@ namespace ZoneEngine_New.Core.Inventory
             return ItemUseFunctions.TryExecute(Id, target, source, spell, inventoryRepository, items, criteria,
                 isTick: isTick,
                 templateDamageType: Stats.TryGetValue(CharacterStat.DamageType, out int damageType) ? damageType : 0,
-                sourceTemplate: this);
+                sourceTemplate: this,
+                weaponHit: weaponHit);
         }
 
         internal bool ExecutePeriodicSpell(Character target, Character? source, ItemSpell spell,

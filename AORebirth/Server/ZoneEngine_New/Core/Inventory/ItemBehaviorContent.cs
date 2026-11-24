@@ -1,18 +1,23 @@
 namespace ZoneEngine_New.Core.Inventory;
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using AORebirth.Core.GameData;
 using SmokeLounge.AOtomation.Messaging.GameData;
+using ZoneEngine_New.Core.Nanos;
 
 /// <summary>Editable item mechanic bindings. Identity/loot/curve values are content;
 /// inventory ownership, transactions and packet semantics remain runtime services.</summary>
 public sealed class ItemBehaviorContent
 {
-    public static ItemBehaviorContent Current { get; } = Load();
+    const string FileName = "ItemBehavior.json";
+    static readonly Lazy<ItemBehaviorContent> Runtime = new(() => Load());
+
+    public static ItemBehaviorContent Current => Runtime.Value;
     public int[] ProtectedItems { get; set; } = [];
     public ItemPackageContent[] Packages { get; set; } = [];
     public VitalItemContent[] VitalItems { get; set; } = [];
@@ -24,10 +29,11 @@ public sealed class ItemBehaviorContent
     /// <summary>Dimach Item template pairs by profession (null = everyone else) and Dimach skill tier.</summary>
     public FistWeaponContent[] DimachWeapons { get; set; } = [];
     public WornMeshOverrideContent[] WornMeshOverrides { get; set; } = [];
+    public NanoStackingOverrideContent[] NanoStackingOverrides { get; set; } = [];
     public string[] Provenance { get; set; } = [];
 
     public static ItemBehaviorContent Load(string? gameDataRoot = null)
-        => Parse(File.ReadAllText(Path.Combine(gameDataRoot ?? GameDataPaths.ResolveRuntimeRoot(), "ItemBehavior.json")));
+        => Parse(File.ReadAllText(Path.Combine(gameDataRoot ?? GameDataPaths.ResolveRuntimeRoot(), FileName)));
 
     public static ItemBehaviorContent Parse(string json)
     {
@@ -64,7 +70,32 @@ public sealed class ItemBehaviorContent
             || result.WornMeshOverrides.SelectMany(value => value.TemplateIds.Select(id => (id, value.MeshId)))
                 .Distinct().Count() != result.WornMeshOverrides.Sum(value => value.TemplateIds.Length))
             throw new InvalidDataException("Invalid or ambiguous worn mesh override content.");
+        if (result.NanoStackingOverrides == null
+            || result.NanoStackingOverrides.Any(value => value == null || value.NanoId <= 0 || value.ExcludedLine <= 0)
+            || result.NanoStackingOverrides.Select(value => value.NanoId).Distinct().Count() != result.NanoStackingOverrides.Length)
+            throw new InvalidDataException("Invalid or ambiguous nano stacking override content.");
         return result;
+    }
+
+    internal static void ApplyNanoStackingOverrides(string gameDataRoot, IReadOnlyDictionary<int, ItemTemplate> templates)
+    {
+        if (File.Exists(Path.Combine(gameDataRoot, FileName)))
+            Load(gameDataRoot).ApplyNanoStackingOverrides(templates);
+    }
+
+    void ApplyNanoStackingOverrides(IReadOnlyDictionary<int, ItemTemplate> templates)
+    {
+        foreach (NanoStackingOverrideContent value in NanoStackingOverrides)
+        {
+            if (!templates.TryGetValue(value.NanoId, out ItemTemplate? template))
+                throw new InvalidDataException($"Nano stacking override requires missing item template {value.NanoId}.");
+
+            NanoSpell nano = NanoSpell.From(template);
+            if (!nano.IsBuff || !nano.StackingLines.Contains(value.ExcludedLine))
+                throw new InvalidDataException($"Nano stacking override for {value.NanoId} expects authored line {value.ExcludedLine}.");
+
+            template.ExcludedNanoStackingLine = value.ExcludedLine;
+        }
     }
 
     public ItemPackageContent? FindPackage(Item item) => Packages.SingleOrDefault(p => p.SourceIds.Contains(item.LowId) || p.SourceIds.Contains(item.HighId));
@@ -131,4 +162,10 @@ public sealed class WornMeshOverrideContent
     public int MeshId { get; set; }
     public int OnlyWhenOverrideTextureId { get; set; }
     public int OverrideTextureId { get; set; }
+}
+
+public sealed class NanoStackingOverrideContent
+{
+    public int NanoId { get; set; }
+    public int ExcludedLine { get; set; }
 }
