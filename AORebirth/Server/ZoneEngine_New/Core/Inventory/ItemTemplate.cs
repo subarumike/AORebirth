@@ -635,7 +635,19 @@ namespace ZoneEngine_New.Core.Inventory
             // pick exactly one branch.
             Character eventTarget = target;
             Character user = source ?? target;
-            target = ResolveApplyOn(target, source, spell);
+            // A timed nano transfer attached to another character (Escrow, Rigid Liquidation) acts on the original
+            // buff owner and caster. Fightingtarget must not follow a later fight, and a missing caster gets no restore.
+            bool transferredNano = this is Nanos.NanoSpell && !UserIsRecipient && spell.TickCount > 1
+                && spell.TickInterval > 0 && spell.Is(FunctionType.Hit)
+                && spell.TryReadInt(0, out int hitStat) && hitStat == (int)CharacterStat.CurrentNano
+                && (this is Nanos.Buff buff ? buff.Source != eventTarget.Identity
+                    : source != null && !ReferenceEquals(source, eventTarget));
+            if (transferredNano && spell.Target is (int)ItemTarget.User or (int)ItemTarget.Wearer or (int)ItemTarget.Self
+                && (source == null || source.IsDead || !ReferenceEquals(source.Playfield, eventTarget.Playfield)))
+                return false;
+
+            target = transferredNano && spell.Target == (int)ItemTarget.Fightingtarget
+                ? eventTarget : ResolveApplyOn(target, source, spell);
             Character applyOn = target;
             if (!skipRequirements && !ItemTemplate.MeetsRequirements(
                     spell.Requirements,
