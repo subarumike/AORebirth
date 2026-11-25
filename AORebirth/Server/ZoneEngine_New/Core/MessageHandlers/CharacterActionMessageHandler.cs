@@ -339,6 +339,13 @@ namespace ZoneEngine_New.Core.MessageHandlers
                     if (player.IsInCombat)
                     {
                         ClientFeedback.Send(player, ClientFeedback.CantLogoutInFight);
+                        // Gamecode.dll dispatches CharacterAction 0x7A to the client camp cancellation handler.
+                        session.Send(new CharacterActionMessage
+                        {
+                            Identity = player.Identity,
+                            Action = CharacterActionType.StopLogout,
+                            Target = Identity.None,
+                        });
                         break;
                     }
 

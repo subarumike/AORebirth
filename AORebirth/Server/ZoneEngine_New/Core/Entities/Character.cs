@@ -4819,31 +4819,8 @@ namespace ZoneEngine_New.Core.Entities
                 scfu.CharacterInfo = pcInfo;
             }
 
-            int displayMaxHealth = maxHealth;
-            int displayCurrentHealth = currentHealth;
-            if (maxHealth > ushort.MaxValue)
-            {
-                displayMaxHealth = ushort.MaxValue;
-                if (maxHealth > 0)
-                {
-                    displayCurrentHealth = (int)((long)currentHealth * ushort.MaxValue / maxHealth);
-                    if (displayCurrentHealth < 0)
-                    {
-                        displayCurrentHealth = 0;
-                    }
-                    else if (displayCurrentHealth > displayMaxHealth)
-                    {
-                        displayCurrentHealth = displayMaxHealth;
-                    }
-                }
-                else
-                {
-                    displayCurrentHealth = 0;
-                }
-            }
-
-            scfu.Health = displayMaxHealth;
-            scfu.HealthDamage = displayMaxHealth - displayCurrentHealth;
+            scfu.Health = Math.Max(0, maxHealth);
+            scfu.HealthDamage = scfu.Health - Math.Clamp(currentHealth, 0, scfu.Health);
 
             if (Playfield?.GetService<IGameData>()
                     ?.TryGetPlayfieldCharacterAppearanceOverride(playfieldId, out uint appearanceMonsterData) == true)

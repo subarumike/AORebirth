@@ -167,7 +167,7 @@ namespace ZoneEngine_New.Core.Entities
             FlushDirtyStats();
         }
 
-        public void FlushDirtyStats()
+        public virtual void FlushDirtyStats()
         {
             GameTuple<CharacterStat, uint>[] dirtyStats = Stats.DrainDirty();
             if (dirtyStats.Length == 0)
