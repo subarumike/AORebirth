@@ -97,6 +97,9 @@ namespace ZoneEngine_New.Core.Inventory
         /// <summary>The playfield instance <see cref="WeaponInstanceIdentity"/> was allocated on.</summary>
         public int WeaponInstancePlayfield { get; internal set; }
 
+        /// <summary>The weapon binding on the owner's current inventory view.</summary>
+        internal (Identity Identity, short Flags)? ClientWeaponBinding { get; set; }
+
         /// <summary>
         /// Worn but disabled: the wearer does not meet its PlayShiftRequirements in this playfield
         /// (<see cref="PlayshiftItems"/>). No effects are active and the client gets <see cref="AORebirth.Enums.ItemFlags.Disabled"/>
@@ -129,8 +132,8 @@ namespace ZoneEngine_New.Core.Inventory
         {
             const int baselinePacketFlags = 0x00A1;
             const int visibilityNibble = 0x00A0;
-            // In the slot field 0x02 means "bound to an instance announced under its own identity" (PlayerInventory
-            // adds it for announced hand weapons). The template's ModifiedDescription bit has the same value and must
+            // In the slot field 0x02 selects the instance identity (PlayerInventory adds it for announced hand weapons
+            // and stable backpack identities). The template's ModifiedDescription bit has the same value and must
             // not leak in: the client then runs its temporary-item test on the slot (Gamecode.dll 0x1002ac44 gate,
             // TimeExist check at 0x1004cbd2) and refuses the bag move ("Temporary items can't be moved into a bag!").
             const int announcedInstanceSlotFlag = 0x0002;

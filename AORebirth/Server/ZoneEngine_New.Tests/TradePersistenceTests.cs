@@ -277,6 +277,104 @@ namespace ZoneEngine_New.Tests
             AssertNoGrantsOrComplete(world.FirstSession);
         }
 
+        [TestMethod]
+        public void PlayerBackpackTradeRebindsTheSameIdentityAfterCompleteInBothDirections()
+        {
+            using var world = new Fixture();
+            Item bag = TestWorld.CreateItem(instanceId: 175);
+            bag.Identity = new Identity { Type = IdentityType.Container, Instance = 175 };
+            Item child = TestWorld.CreateItem(instanceId: 176);
+            Item worn = TestWorld.CreateItem(instanceId: 177);
+            Assert.IsTrue(world.Second.Inventory.Equipment.Add(8, worn));
+            Assert.IsTrue(world.First.Inventory.Inventory.Add(65, bag));
+            BindBagContents(world.First, 65, bag, child);
+
+            world.OfferItem(world.First, world.Trade, 65);
+            world.Persistence.BeforeCommit = batch =>
+            {
+                var moved = batch.Updates.Single();
+                Assert.AreEqual(bag.InstanceId, moved.InstanceId);
+                Assert.AreEqual(world.Second.Identity.Instance, moved.ContainerInstance);
+            };
+            world.Commit();
+            Assert.IsFalse(world.First.Inventory.Inventory.Content.ContainsKey(65));
+            Assert.AreSame(bag, world.Second.Inventory.Inventory.Content[64]);
+            AssertReceivedBag(world.SecondSession, world.Second, bag, 64);
+
+            world.FirstSession.Messages.Clear();
+            world.SecondSession.Messages.Clear();
+            BindBagContents(world.Second, 64, bag, child);
+            var returnTrade = new TradeSession(new Identity { Type = IdentityType.TradeWindow, Instance = 91 },
+                TradeKind.Player, world.First, world.Second, null);
+            world.OfferItem(world.Second, returnTrade, 64);
+            world.Persistence.BeforeCommit = batch =>
+            {
+                var moved = batch.Updates.Single();
+                Assert.AreEqual(bag.InstanceId, moved.InstanceId);
+                Assert.AreEqual(world.First.Identity.Instance, moved.ContainerInstance);
+            };
+            world.Commit(returnTrade);
+            Assert.IsFalse(world.Second.Inventory.Inventory.Content.ContainsKey(64));
+            Assert.AreSame(bag, world.First.Inventory.Inventory.Content[64]);
+            AssertReceivedBag(world.FirstSession, world.First, bag, 64);
+            Assert.AreEqual(2, world.Persistence.Calls);
+        }
+
+        [TestMethod]
+        public void PlayerTradeWithoutBackpacksKeepsTheNormalCompletionPackets()
+        {
+            using var world = new Fixture();
+            var item = TestWorld.CreateItem(instanceId: 175);
+            Assert.IsTrue(world.First.Inventory.Inventory.Add(64, item));
+            world.OfferItem(world.First, world.Trade, 64);
+            world.Commit();
+
+            Assert.AreSame(item, world.Second.Inventory.Inventory.Content[64]);
+            foreach (RecordingSession session in new[] { world.FirstSession, world.SecondSession })
+            {
+                Assert.AreEqual(2, session.Messages.OfType<TradeMessage>().Count(message => message.Action == TradeAction.Complete));
+                Assert.IsFalse(session.Messages.Any(message => message is InventoryUpdateMessage or AddTemplateMessage));
+            }
+        }
+
+        static void BindBagContents(Player owner, int placement, Item bag, Item child)
+        {
+            Container page = owner.Inventory.GetOrCreateBackpackPage(bag, bag.Identity,
+                new Identity { Type = IdentityType.Inventory, Instance = placement });
+            Assert.IsTrue(page.Add(3, child));
+            page.IsHydrated = true;
+        }
+
+        static void AssertReceivedBag(RecordingSession session, Player owner, Item bag, int placement)
+        {
+            var codec = new ZoneMessageCodec();
+            var packets = session.Messages.Where(message => message is TemplateActionMessage or TradeMessage
+                    or InventoryUpdateMessage or AddTemplateMessage)
+                .Select(message => codec.Deserialize(codec.Serialize(message, 0, owner.Identity.Instance))!.Body)
+                .ToArray();
+            int render = Array.FindIndex(packets,
+                message => message is TemplateActionMessage { Action: TemplateActionType.TradeRender });
+            int complete = Array.FindLastIndex(packets, message => message is TradeMessage { Action: TradeAction.Complete });
+            int bind = Array.FindIndex(packets, message => message is InventoryUpdateMessage);
+            Assert.IsTrue(render >= 0 && complete > render && bind > complete,
+                "The instance must be bound to the rendered bag after the client places it in inventory.");
+            var view = packets.OfType<InventoryUpdateMessage>().Single();
+            Assert.AreEqual(owner.Identity, view.Identity);
+            Assert.AreEqual(owner.Identity, view.BagIdentity);
+            Assert.AreEqual((int)IdentityType.Inventory, view.SlotnumberInMainInventory);
+            Assert.AreEqual(94, view.NumberOfSlots);
+            Assert.AreEqual(3, view.Unknown1);
+            var entry = view.Entries.Single(slot => slot.Slotnumber == placement);
+            Assert.AreEqual(bag.Identity, entry.Identity);
+            Assert.AreEqual(2, entry.UnknownFlags & 2);
+            Assert.AreEqual(bag.HighId, entry.HighId);
+            CollectionAssert.AreEquivalent(owner.Inventory.BuildInventorySlots().Select(slot =>
+                    (slot.Placement, slot.Identity, slot.Flags, slot.Count, slot.ItemLowId, slot.ItemHighId, slot.Quality, slot.Unknown)).ToArray(),
+                view.Entries.Select(slot =>
+                    (slot.Slotnumber, slot.Identity, slot.UnknownFlags, slot.Unknown1, slot.LowId, slot.HighId, slot.Quality, slot.Unknown2)).ToArray());
+            Assert.IsFalse(packets.OfType<AddTemplateMessage>().Any());
+        }
+
         static void AssertNoGrantsOrComplete(params RecordingSession[] sessions)
         {
             Assert.IsFalse(sessions.SelectMany(s => s.Messages).OfType<AddTemplateMessage>().Any());
@@ -315,7 +413,15 @@ namespace ZoneEngine_New.Tests
                     _minter, new Ids(), Flush, Persistence);
                 Trade = new TradeSession(new Identity { Type = IdentityType.TradeWindow, Instance = 90 }, TradeKind.Player, First, Second, null);
             }
-            public void Commit() => typeof(TradeService).GetMethod("CommitPlayerTrade", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(_service, new object[] { Trade });
+            public void Commit() => Commit(Trade);
+            public void Commit(TradeSession trade) => typeof(TradeService).GetMethod("CommitPlayerTrade", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(_service, new object[] { trade });
+            public void OfferItem(Player player, TradeSession session, int slot) =>
+                typeof(TradeService).GetMethod("HandleAddItem", BindingFlags.Instance | BindingFlags.NonPublic)!
+                    .Invoke(_service, new object[] { player, session, new TradeMessage
+                    {
+                        Identity = player.Identity, Action = TradeAction.AddItem, Target = player.Identity,
+                        Container = new Identity { Type = IdentityType.Inventory, Instance = slot }
+                    }});
             public TradeSession CreateShop()
             {
                 var machine = new VendingMachine(new Identity { Type = IdentityType.VendingMachine, Instance = 91 }, new ItemTemplate { Id = 9000 });
@@ -363,7 +469,7 @@ namespace ZoneEngine_New.Tests
             public Player? Player { get; private set; }
             public void BindPlayer(Player player) => Player = player;
             public void UnbindPlayer() => Player = null;
-            public void TransferToPlayfield(Playfield destination, Vector3 landing) => throw new NotSupportedException();
+            public bool TransferToPlayfield(Playfield destination, Vector3 landing) => throw new NotSupportedException();
             public void Send(byte[] packet) => throw new NotSupportedException();
             public void Send(Message message) => throw new NotSupportedException();
             public void Send(MessageBody body) => Messages.Add(body);

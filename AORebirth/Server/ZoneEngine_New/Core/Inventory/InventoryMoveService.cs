@@ -699,7 +699,7 @@ namespace ZoneEngine_New.Core.Inventory
 
             WeaponItemFullUpdateMessage? wifu = player.BuildSocialWeaponItemFullUpdate(item, slot);
             if (wifu != null)
-                player.Session?.Send(wifu);
+                player.SendOwnWeaponInstance(item, wifu);
             if (stopFight)
                 SendSocialWeaponStopFight(player);
             SendEquipCharacterAction(player, wifu?.Identity ?? ResolveEquipTarget(item), slot);

@@ -27,15 +27,22 @@ bool connectedChests = args.Length == 7 && args[0] == "--run-connected-chests" &
     && File.Exists(args[4]) && args[5] == "--world-engine" && File.Exists(args[6]);
 bool connectedLifecycle = args.Length == 7 && args[0] == "--run-connected-lifecycle" && args[3] == "--login-engine"
     && File.Exists(args[4]) && args[5] == "--world-engine" && File.Exists(args[6]);
-bool connected = connectedChests || connectedLifecycle || args.Length == 5 && args[0] == "--run-connected" && args[3] == "--login-engine" && File.Exists(args[4]);
+bool connectedBackpack = args.Length == 7 && args[0] == "--run-connected-backpack" && args[3] == "--login-engine"
+    && File.Exists(args[4]) && args[5] == "--world-engine" && File.Exists(args[6]);
+bool connected = connectedChests || connectedLifecycle || connectedBackpack
+    || args.Length == 5 && args[0] == "--run-connected" && args[3] == "--login-engine" && File.Exists(args[4]);
 if (!dailyLogin && !activeNanoPersistence && ((!connected && (args.Length != 3 || args[0] != "--run-disposable")) || args[1] != "--engine" || !File.Exists(args[2])))
 {
-    Console.Error.WriteLine("USAGE: ZoneEngineSchemaValidation --run-active-nano-persistence OR --run-daily-login OR --run-disposable --engine <absolute ZoneEngine_New.dll> OR --run-connected --engine <absolute ZoneEngine_New.dll> --login-engine <absolute LoginEngine.exe-or-dll> OR --run-connected-chests/--run-connected-lifecycle --engine <absolute ZoneEngine_New.dll> --login-engine <absolute LoginEngine.exe-or-dll> --world-engine <absolute WorldEngine.dll>. Creates its own loopback-only, labeled disposable MySQL. Never reads production connection settings.");
+    Console.Error.WriteLine("USAGE: ZoneEngineSchemaValidation --run-active-nano-persistence OR --run-daily-login OR --run-disposable --engine <absolute ZoneEngine_New.dll> OR --run-connected --engine <absolute ZoneEngine_New.dll> --login-engine <absolute LoginEngine.exe-or-dll> OR --run-connected-chests/--run-connected-lifecycle/--run-connected-backpack --engine <absolute ZoneEngine_New.dll> --login-engine <absolute LoginEngine.exe-or-dll> --world-engine <absolute WorldEngine.dll>. Creates its own loopback-only, labeled disposable MySQL. Never reads production connection settings.");
     return 64;
 }
 #endif
 try
 {
+#if !LOGIN_CHARACTER_CREATION_TESTS
+    if (connectedBackpack)
+        ConnectedAcceptanceSmoke.VerifyBackpackEnginePaths(args[2], args[4], args[6]);
+#endif
     using var fixture = new DisposableSchemaDatabase();
     fixture.Start();
     using var connection = fixture.Open();
@@ -59,7 +66,7 @@ try
         Console.WriteLine("DAILY_LOGIN_PERSISTENCE_VALIDATION=PASS PRODUCTION_CONTACT=NO ENGINES_STARTED=NO");
         return 0;
     }
-    string? chestSchema = connectedChests || connectedLifecycle
+    string? chestSchema = connectedChests || connectedLifecycle || connectedBackpack
         ? Environment.GetEnvironmentVariable("AO_REBIRTH_CHEST_FIXTURE_SCHEMA_PATH") : null;
     if (connectedLifecycle)
     {
@@ -81,7 +88,7 @@ try
     {
         FixtureSql.CreateBaseline(connection);
         AuthoredMissionSmoke.CreateBaseline(connection);
-        if (connectedChests)
+        if (connectedChests || connectedBackpack)
         {
             // Account migrations now require the baseline login table before engine startup.
             FixtureSql.Execute(connection, File.ReadAllText(Path.Combine(ConnectedAcceptanceSmoke.RepositoryRoot(),
@@ -93,6 +100,11 @@ try
         if (string.IsNullOrWhiteSpace(chestSchema))
             Require(MigrationSmoke.Run(fixture, MigrateArgs(), Console.Out) == 0, "connected-explicit-migration");
         EngineSmoke.Validate(args[2], fixture, SchemaState.SCHEMA_CURRENT);
+        if (connectedBackpack)
+        {
+            ConnectedAcceptanceSmoke.ValidateBackpacks(args[2], args[4], args[6], fixture, connection);
+            return 0;
+        }
         if (connectedChests || connectedLifecycle)
         {
             ConnectedAcceptanceSmoke.ValidateChests(args[2], args[4], args[6], fixture, connection, lifecycleOnly: connectedLifecycle);
