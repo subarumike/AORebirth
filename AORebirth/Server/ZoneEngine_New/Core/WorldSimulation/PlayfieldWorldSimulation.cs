@@ -1365,7 +1365,8 @@
 
             var criteria = new SpellCriteria { SourceDoorInstance = pad.DynelInstance };
             if (events.SpellList.TryGetValue(pad.StaticEvent, out List<ItemSpell>? rows)
-                && rows.Exists(DynelEventSpells.IsAreaTrigger))
+                && (rows.Exists(DynelEventSpells.IsAreaTrigger)
+                    || (pad.StaticEvent == EventType.OnTargetInVicinity && rows.Exists(AreaTriggerService.EndsVicinityOwner))))
             {
                 // Never infer a placed owner from proximity or its instance number alone.
                 if (playfield.GetRequiredService<DynelRegistry>().TryGet(pad.DynelIdentity, out ZoneEngine_New.Core.Entities.Dynel? dynel)

@@ -113,15 +113,25 @@ namespace ZoneEngine_New.Core.WorldSimulation
             if (!owner.Template.SpellList.TryGetValue(eventType, out List<ItemSpell>? rows))
                 return eventType == EventType.OnUse;
 
-            // Leave unrelated static item behavior on its existing execution path. Only authored
-            // trigger lists and bound state machines need the native retained-action scheduler.
-            if (runtime.Machine == null && !rows.Any(IsAreaTrigger))
+            bool hasAreaTrigger = rows.Any(IsAreaTrigger);
+            bool consumableVicinity = runtime.Machine == null && !hasAreaTrigger
+                && eventType == EventType.OnTargetInVicinity && rows.Any(EndsVicinityOwner);
+            // A consumable vicinity event also needs the static context so its owner actions
+            // are distinct from effects on the entering character.
+            if (runtime.Machine == null && !hasAreaTrigger && !consumableVicinity)
                 return owner.Template.ExecuteSpells(eventType, user,
                     _playfield.GetRequiredService<IInventoryRepository>(),
                     _playfield.GetRequiredService<IItemBuilder>(), criteria);
 
-            return ApplyRows(rows, context);
+            return ApplyRows(rows, context, consumableVicinity);
         }
+
+        internal static bool EndsVicinityOwner(ItemSpell row)
+            => IsImmediateOwnerSet(row, CharacterStat.Health) && row.TryReadInt(1, out int health) && health <= 0;
+
+        static bool IsImmediateOwnerSet(ItemSpell row, CharacterStat stat)
+            => row.Target == (int)ItemTarget.User && row.TickCount == 1 && row.TickInterval == 0
+                && row.Is(FunctionType.Set) && row.TryReadInt(0, out int id) && id == (int)stat;
 
         /// <summary>Dispatches an already selected action; callers own its scheduling/requirements.</summary>
         public bool TryExecute(ItemSpell spell, AreaTriggerContext context)
@@ -301,9 +311,11 @@ namespace ZoneEngine_New.Core.WorldSimulation
             }
         }
 
-        bool ApplyRows(IReadOnlyList<ItemSpell> rows, AreaTriggerContext context)
+        bool ApplyRows(IReadOnlyList<ItemSpell> rows, AreaTriggerContext context, bool consumableVicinity = false)
         {
             bool admitted = rows.Count == 0;
+            bool invokedEffect = false;
+            bool endedOwner = false;
             foreach (ItemSpell row in rows)
             {
                 if (!TryResolveTarget(row, context, out AreaTriggerContext selected))
@@ -311,17 +323,36 @@ namespace ZoneEngine_New.Core.WorldSimulation
                 int interval = unchecked((int)row.TickInterval);
                 if (row.TickCount is 0 or -1 || interval == int.MinValue)
                     continue;
+
+                // The owner cleanup rows are unconditional. Keep the trap armed if the
+                // preceding invoker effects did not pass their authored criteria.
+                bool endsOwner = consumableVicinity && EndsVicinityOwner(row);
+                if (consumableVicinity && !invokedEffect
+                    && (endsOwner || IsImmediateOwnerSet(row, CharacterStat.TimeExist)))
+                    continue;
+
                 var action = new RetainedAction(row.Copy(), selected, _time);
                 if (row.TickCount > 1 || interval != 0)
                 {
                     Get(selected.ExecutionTarget).Retained.Add(action);
                     admitted = true;
                 }
-                else
+                else if (ExecuteDue(action))
                 {
-                    admitted |= ExecuteDue(action);
+                    admitted = true;
+                    if (consumableVicinity)
+                    {
+                        invokedEffect |= ReferenceEquals(selected.ExecutionTarget, context.Invoker);
+                        endedOwner |= endsOwner;
+                    }
                 }
             }
+
+            if (endedOwner && context.Owner is WorldItem worldItem && IsCurrent(worldItem)
+                && worldItem.Stats.GetOrZero(CharacterStat.Health) <= 0
+                && !_playfield.GetRequiredService<HashSpawnSystem>().TryDespawnStaticAsDeath(worldItem))
+                _playfield.GetRequiredService<SpawnService>().DespawnStatic(worldItem);
+
             return admitted;
         }
 
