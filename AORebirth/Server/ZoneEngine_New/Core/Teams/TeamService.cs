@@ -256,7 +256,7 @@ namespace ZoneEngine_New.Core.Teams
             }
         }
 
-        internal void PublishVisibleMemberVitals(Player member)
+        internal void PublishVisibleMemberVitals(Player member, Action<IZoneSession> onSent)
         {
             lock (_sync)
             {
@@ -265,18 +265,18 @@ namespace ZoneEngine_New.Core.Teams
 
                 foreach (int viewerId in team.Members)
                     if (viewerId != memberId && _players.TryGetValue(viewerId, out Player? viewer))
-                        PublishExistingRowVitals(viewer, memberId, team);
+                        PublishExistingRowVitals(viewer, memberId, team, onSent);
             }
         }
 
-        private void PublishExistingRowVitals(Player viewer, int memberId, Team team)
+        private void PublishExistingRowVitals(Player viewer, int memberId, Team team, Action<IZoneSession>? onSent = null)
         {
             int viewerId = viewer.Identity.Instance;
             if (!IsActive(viewer) || !_membership.TryGetValue(viewerId, out Team? viewerTeam) || !ReferenceEquals(team, viewerTeam)
                 || !_publishedRosters.TryGetValue(viewerId, out PublishedRoster? published)
                 || published.TeamId != team.Id || !published.Members.ContainsKey(memberId)) return;
 
-            if (BuildVisibleMemberVitals(viewer, memberId) is { } vitals) SendNow(viewer, vitals);
+            if (BuildVisibleMemberVitals(viewer, memberId) is { } vitals) SendNow(viewer, vitals, onSent);
         }
 
         public void OnTransportDisconnected(Player player, IZoneSession disconnectedSession)
@@ -1325,14 +1325,14 @@ namespace ZoneEngine_New.Core.Teams
             else throw new InvalidOperationException("Team projections require the owning playfield dispatcher.");
         }
 
-        private static bool SendNow(Player player, MessageBody message)
+        private static bool SendNow(Player player, MessageBody message, Action<IZoneSession>? onSent = null)
         {
-            if (player.Session?.State == SessionState.InPlay && ReferenceEquals(player.Session.Player, player))
-            {
-                player.Session.Send(message);
-                return true;
-            }
-            return false;
+            if (player.Session is not { State: SessionState.InPlay } session || !ReferenceEquals(session.Player, player))
+                return false;
+
+            session.Send(message);
+            onSent?.Invoke(session);
+            return true;
         }
         private bool Error(Player player, string text)
         {

@@ -2376,6 +2376,10 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         bool _inFullRebase;
+        bool _observerMaximumChanged;
+        int _teamPublishedMaximum;
+        int _teamPublishedHealth;
+        List<IZoneSession>? _teamHealthRecipients;
 
         /// <summary>Bonus rebuilds allowed for worn OE levels to settle. Each item can rise at most four levels.</summary>
         const int MaxOverEquipPasses = 8;
@@ -2417,8 +2421,16 @@ namespace ZoneEngine_New.Core.Entities
             RebaseWearAppearance();
             bool maxHealthChanged = RebaseMaxHealth();
             RebaseMaxNano();
-            if (maxHealthChanged && Session?.State == SessionState.InPlay)
-                Playfield?.GetService<TeamService>()?.PublishVisibleMemberVitals(this);
+            if (maxHealthChanged)
+            {
+                _observerMaximumChanged = true;
+                _teamHealthRecipients?.Clear();
+                _teamPublishedMaximum = Stats.GetOrZero(CharacterStat.MaxHealth);
+                _teamPublishedHealth = Stats.GetOrZero(CharacterStat.Health);
+                if (Session?.State == SessionState.InPlay)
+                    Playfield?.GetService<TeamService>()?.PublishVisibleMemberVitals(this,
+                        recipient => (_teamHealthRecipients ??= []).Add(recipient));
+            }
 
             int currentShape = Stats.GetOrZero(CharacterStat.MonsterData);
             if (currentShape != previousShape && Session?.State == SessionState.InPlay)
@@ -2448,6 +2460,67 @@ namespace ZoneEngine_New.Core.Entities
             if (!_inFullRebase && Inventory.IsHydrated && QualifiesForCombinedMartialArts() != _combinedMartialArts)
                 RebaseWeapons();
         }
+
+        public override void FlushDirtyStats()
+        {
+            var dirty = Stats.DrainDirty();
+            bool observerMaximumChanged = _observerMaximumChanged;
+            _observerMaximumChanged = false;
+            if (dirty.Length == 0 && !observerMaximumChanged)
+                return;
+
+            if (Playfield is not { } playfield)
+            {
+                _teamHealthRecipients?.Clear();
+                return;
+            }
+            var locality = playfield.GetRequiredService<PlayfieldLocality>();
+            int maximum = Stats.GetOrZero(CharacterStat.MaxHealth);
+            if (!observerMaximumChanged && !dirty.Any(stat => stat.Value1 == CharacterStat.MaxHealth
+                && unchecked((int)stat.Value2) != maximum))
+            {
+                locality.Announce(this, StatUpdate(dirty), includeSelf: true);
+                return;
+            }
+
+            // The owner derives MaxHealth from its base and modifiers. Remote character stats are replaced by the
+            // incoming value (native StatIIR), so sending the later base update would undo TeamMemberInfo's full value.
+            if (dirty.Length != 0)
+                Session?.Send(StatUpdate(dirty));
+
+            int current = Stats.GetOrZero(CharacterStat.Health);
+            var shared = dirty.Where(stat => stat.Value1 is not (CharacterStat.MaxHealth or CharacterStat.Health)).ToArray();
+            var maximumUpdate = new GameTuple<CharacterStat, uint>
+            {
+                Value1 = CharacterStat.MaxHealth, Value2 = unchecked((uint)maximum)
+            };
+            var currentUpdate = new GameTuple<CharacterStat, uint>
+            {
+                Value1 = CharacterStat.Health, Value2 = unchecked((uint)current)
+            };
+            StatMessage observerUpdate = StatUpdate([.. shared, maximumUpdate, currentUpdate]);
+            if (_teamHealthRecipients is not { Count: > 0 } teamRecipients || maximum != _teamPublishedMaximum)
+            {
+                locality.Announce(this, observerUpdate);
+            }
+            else
+            {
+                // TeamMemberInfo already reached these sessions. Retain a current-HP change made since that send.
+                GameTuple<CharacterStat, uint>[] teamStats = current == _teamPublishedHealth ? shared : [.. shared, currentUpdate];
+                StatMessage? teamUpdate = teamStats.Length == 0 ? null : StatUpdate(teamStats);
+                foreach (Player observer in locality.SnapshotObservers(this))
+                {
+                    if (observer.Session is not { } recipient)
+                        continue;
+                    StatMessage? update = teamRecipients.Contains(recipient) ? teamUpdate : observerUpdate;
+                    if (update != null)
+                        recipient.Send(update);
+                }
+            }
+            _teamHealthRecipients?.Clear();
+        }
+
+        StatMessage StatUpdate(GameTuple<CharacterStat, uint>[] stats) => new() { Identity = Identity, Stats = stats };
 
         /// <summary>
         /// XPKillRange (275) follows the level's Xp.json row. The client needs it to color targets; without it every

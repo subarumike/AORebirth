@@ -157,7 +157,7 @@
     <Compile Include="TestDoubles.cs" />
     <Compile Include="TeamServiceTests.cs" />
   </ItemGroup>
-  <ItemGroup Condition="'$(HealthSynchronizationFocusedTests)' == 'true'">
+  <ItemGroup Condition="'$(HealthSynchronizationFocusedTests)' == 'true' Or '$(LostEdenRepairsFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />
     <Compile Include="TestDoubles.cs" />
     <Compile Include="TriggerTestWorld.cs" />
@@ -172,6 +172,11 @@
     <Compile Include="RuntimeCatalogTests.cs" />
     <Compile Include="StealthMultiplierAndSpecialAttackTests.cs" />
     <Compile Include="TeamVitalSynchronizationTests.cs" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(LostEdenRepairsFocusedTests)' == 'true'">
+    <Compile Include="BossSpawnHealthTests*.cs;CampRefusalTests*.cs;EngineerPetGuardTests*.cs;ObserverMaxHealthPublicationTests*.cs;ScheolVicinityTrapTests*.cs" />
+    <Compile Include="AreaTriggerTests.cs;AreaTriggerSchedulerTests.cs;DoorStateTests.cs;PetPlacementTests.cs;NpcPetSummonsTests.cs" />
+    <Compile Include="InventoryActionTests.cs;TradePersistenceTests.cs;CharacterPersistenceOwnershipTests.cs" />
   </ItemGroup>
   <ItemGroup Condition="'$(HalloweenActivationFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />
