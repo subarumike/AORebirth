@@ -4,6 +4,7 @@ namespace ZoneEngine_New.Tests
     using System.IO;
     using System.Linq;
 
+    using AORebirth.Core.GameData;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using SmokeLounge.AOtomation.Messaging.GameData;
     using SmokeLounge.AOtomation.Messaging.Messages;
@@ -11,12 +12,21 @@ namespace ZoneEngine_New.Tests
     using SmokeLounge.AOtomation.Messaging.Serialization;
     using ZoneEngine_New.Core.Entities;
     using ZoneEngine_New.Core.GameData;
+    using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Nanos;
     using ZoneEngine_New.Core.Teams;
 
     [TestClass]
     public sealed class TeamVitalSynchronizationTests
     {
+        const int MongosGolem = 95705;
+        const int MetabolismBooster = 95718;
+        const int MetabolismBoosterChild = 95677;
+        const int LifegivingElixir = 43878;
+        static readonly Lazy<ItemBuilder> AuthoredNanos = new(() => new ItemBuilder(
+            new ItemTemplateCatalog(new StubGameData(HashItemCatalog.Parse("{}"), rootPath: GameDataPaths.ResolveRuntimeRoot()),
+                new StubLogger()), new StubLogger()));
+
         [TestMethod]
         public void VisibleJoinPublishesFourAuthoritativeVitalsInTheOriginalWireOrder()
         {
@@ -164,6 +174,119 @@ namespace ZoneEngine_New.Tests
             Assert.AreEqual(baseline, expired.Unknown5);
             Assert.AreEqual(member.Stats.GetOrZero(CharacterStat.Health), expired.Unknown6);
             Assert.IsFalse(sent.OfType<TeamMemberMessage>().Any());
+        }
+
+        [TestMethod]
+        public void AuthoredHealthBuffsAndHealingPublishFullVitalsToTheTeam()
+        {
+            var teams = new TeamService(dispatchOnOwner: (_, action) => action());
+            ItemBuilder items = AuthoredNanos.Value;
+            using var world = new TriggerTestWorld(teams: teams, items: items, trackPlayers: true);
+            Player tank = world.First;
+            Player doctor = world.Second;
+            Player teammate = world.AddPlayer(3);
+            Player[] players = [tank, doctor, teammate];
+            var data = (StubGameData)world.Playfield.GetRequiredService<IGameData>();
+            data.AllowMissingXpLevels = true;
+            foreach (Player player in players)
+            {
+                Attach(teams, player);
+                player.Stats.Set(CharacterStat.MaxNCU, 200);
+                player.Stats.Set(CharacterStat.PercentRemainingHealth, 100);
+                player.RebaseStats();
+                world.Locality.ActivatePlayerVisibility(player);
+            }
+
+            Join(teams, tank, doctor);
+            Join(teams, tank, teammate);
+            int tankBefore = tank.Stats.GetOrZero(CharacterStat.MaxHealth);
+            int doctorBefore = doctor.Stats.GetOrZero(CharacterStat.MaxHealth);
+            int teammateBefore = teammate.Stats.GetOrZero(CharacterStat.MaxHealth);
+            var doctorSession = world.SecondSession;
+            var tankSession = world.FirstSession;
+            var inventory = new StubInventoryRepository();
+            DateTime now = DateTime.UtcNow;
+
+            doctorSession.Sent.Clear();
+            Assert.IsTrue(NanoRuntime.TryApplyImmediate(tank, tank, MongosGolem, items, inventory, now));
+            world.PublishPendingStats(tank);
+            Assert.IsTrue(tank.TryGetBuff(MongosGolem, out _));
+            AssertHp(doctorSession.Sent.OfType<TeamMemberInfoMessage>().Single(), tank, tankBefore + 1500, tankBefore + 1500);
+
+            foreach (Player player in players)
+                ((RecordingZoneSession)player.Session!).Sent.Clear();
+            Assert.IsTrue(NanoRuntime.TryApplyImmediate(doctor, doctor, MetabolismBooster, items, inventory, now));
+            world.PublishPendingStats(players);
+            Assert.IsTrue(players.All(player => player.TryGetBuff(MetabolismBoosterChild, out _)));
+            int tankMax = tankBefore + 1500 + 196;
+            AssertHp(doctorSession.Sent.OfType<TeamMemberInfoMessage>().Single(info => info.Member == tank.Identity), tank, tankMax, tankMax);
+            AssertHp(tankSession.Sent.OfType<TeamMemberInfoMessage>().Single(info => info.Member == doctor.Identity), doctor, doctorBefore + 196, doctorBefore + 196);
+            AssertHp(tankSession.Sent.OfType<TeamMemberInfoMessage>().Single(info => info.Member == teammate.Identity), teammate, teammateBefore + 196, teammateBefore + 196);
+
+            doctorSession.Sent.Clear();
+            tankSession.Sent.Clear();
+            tank.ApplyDamage(tank, 301, HitType.Normal);
+            tank.FlushDirtyStats();
+            AssertLastHealth(doctorSession, tank, tankMax - 301);
+            AssertLastHealth(tankSession, tank, tankMax - 301);
+            Assert.IsTrue(NanoRuntime.TryApplyImmediate(doctor, tank, LifegivingElixir, items, inventory, now));
+            Assert.AreEqual(tankMax, tank.Stats.GetOrZero(CharacterStat.Health));
+            foreach (RecordingZoneSession session in new[] { doctorSession, tankSession })
+            {
+                HealthDamageMessage heal = session.Sent.OfType<HealthDamageMessage>().Single();
+                Assert.AreEqual(tank.Identity, heal.Identity);
+                Assert.AreEqual(tankMax, heal.Unknown1);
+                Assert.AreEqual(301, heal.Unknown2);
+            }
+
+            Assert.IsFalse(doctorSession.Sent.OfType<TeamMemberInfoMessage>().Any());
+
+            world.Locality.DeactivatePlayerVisibility(doctor);
+            doctorSession.Sent.Clear();
+            teams.RefreshPlayer(doctor, preserveRoster: true);
+            world.Locality.ActivatePlayerVisibility(doctor);
+            AssertHp(doctorSession.Sent.OfType<TeamMemberInfoMessage>().Single(info => info.Member == tank.Identity), tank, tankMax, tankMax);
+        }
+
+        [TestMethod]
+        [DataRow(3988, true)]
+        [DataRow(3989, false)]
+        [DataRow(3500, true)]
+        public void DoctorReceivesTheEffectiveMaximumNeededForAnEightyFivePercentDecision(int current, bool belowThreshold)
+        {
+            const int nakedMax = 2648;
+            const int effectiveMax = 4692;
+            var teams = new TeamService(dispatchOnOwner: (_, action) => action());
+            using var world = new TriggerTestWorld(teams: teams);
+            Player tank = world.First;
+            Player doctor = world.Second;
+            Attach(teams, tank);
+            Attach(teams, doctor);
+            tank.Stats.Set(CharacterStat.MaxHealth, nakedMax);
+            tank.Stats.Set(CharacterStat.MaxHealth, effectiveMax - nakedMax, StatDetail.Bonus);
+            tank.Stats.Set(CharacterStat.Health, current);
+            world.Locality.ActivatePlayerVisibility(tank);
+            world.Locality.ActivatePlayerVisibility(doctor);
+            Join(teams, tank, doctor);
+
+            TeamMemberInfoMessage packet = world.SecondSession.Sent.OfType<TeamMemberInfoMessage>().Single();
+            AssertHp(packet, tank, effectiveMax, current);
+            Assert.AreEqual(belowThreshold, packet.Unknown6 * 100 < packet.Unknown5 * 85);
+            Assert.IsTrue(current * 100 >= nakedMax * 85);
+        }
+
+        static void AssertLastHealth(RecordingZoneSession session, Player member, int expected)
+        {
+            uint value = session.Sent.OfType<StatMessage>().Where(message => message.Identity == member.Identity)
+                .SelectMany(message => message.Stats).Last(stat => stat.Value1 == CharacterStat.Health).Value2;
+            Assert.AreEqual((uint)expected, value);
+        }
+
+        static void AssertHp(TeamMemberInfoMessage packet, Player member, int max, int current)
+        {
+            Assert.AreEqual(member.Identity, packet.Member);
+            Assert.AreEqual(max, packet.Unknown5);
+            Assert.AreEqual(current, packet.Unknown6);
         }
 
         private static void Attach(TeamService teams, Player player)
