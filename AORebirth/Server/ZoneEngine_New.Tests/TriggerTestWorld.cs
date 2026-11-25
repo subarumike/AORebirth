@@ -27,6 +27,8 @@ namespace ZoneEngine_New.Tests
     internal sealed class TriggerTestWorld : IDisposable
     {
         readonly ServiceProvider _services;
+        readonly Lock _tick = new();
+        readonly Dictionary<int, Player>? _players;
         public Playfield Playfield { get; }
         public DynelRegistry Registry { get; } = new();
         public PlayfieldWorldSimulation World { get; }
@@ -37,7 +39,8 @@ namespace ZoneEngine_New.Tests
         public RecordingZoneSession FirstSession => (RecordingZoneSession)First.Session!;
         public RecordingZoneSession SecondSession => (RecordingZoneSession)Second.Session!;
 
-        public TriggerTestWorld(StaticObjectStateMachineCatalog? catalog = null, TeamService? teams = null)
+        public TriggerTestWorld(StaticObjectStateMachineCatalog? catalog = null, TeamService? teams = null,
+            IItemBuilder? items = null, bool trackPlayers = false)
         {
             Playfield = (Playfield)RuntimeHelpers.GetUninitializedObject(typeof(Playfield));
             Locality = new PlayfieldLocality(1, null);
@@ -51,7 +54,7 @@ namespace ZoneEngine_New.Tests
                 .AddSingleton(Playfield).AddSingleton(Registry).AddSingleton(Locality).AddSingleton(access)
                 .AddSingleton<IGameData>(gameData)
                 .AddSingleton<IZoneLogger>(new StubLogger())
-                .AddSingleton<IItemBuilder>(new StubItemBuilder())
+                .AddSingleton<IItemBuilder>(items ?? new StubItemBuilder())
                 .AddSingleton<IInventoryRepository>(new StubInventoryRepository())
                 .AddSingleton(catalog ?? StaticObjectStateMachineCatalog.Empty)
                 // There are no pending inventory moves in this fixture. Death still runs the real cancellation path.
@@ -61,9 +64,20 @@ namespace ZoneEngine_New.Tests
                 .AddSingleton<AreaTriggerService>();
             if (teams != null)
                 services.AddSingleton(teams);
+            if (trackPlayers)
+            {
+                _players = new Dictionary<int, Player>();
+                var manager = (PlayfieldManager)RuntimeHelpers.GetUninitializedObject(typeof(PlayfieldManager));
+                typeof(PlayfieldManager).GetField("_sync", BindingFlags.Instance | BindingFlags.NonPublic)!
+                    .SetValue(manager, new Lock());
+                typeof(PlayfieldManager).GetField("_playersByCharacterId", BindingFlags.Instance | BindingFlags.NonPublic)!
+                    .SetValue(manager, _players);
+                services.AddSingleton(manager);
+            }
             _services = services.BuildServiceProvider();
             SetField("_serviceProvider", _services);
             SetField("_lifecycleSync", new Lock());
+            SetField("_tickSync", _tick);
             SetField("_pendingStatRebases", new ConcurrentDictionary<Character, byte>());
             SetField("<FightModes>k__BackingField", DistrictFightModes.None);
             Triggers = _services.GetRequiredService<AreaTriggerService>();
@@ -83,7 +97,16 @@ namespace ZoneEngine_New.Tests
             player.Playfield = Playfield;
             Registry.Register(player);
             Locality.RegisterDynel(player);
+            _players?.Add(id, player);
             return player;
+        }
+
+        public void PublishPendingStats(params Player[] players)
+        {
+            lock (_tick)
+                foreach (Player player in players)
+                    if (Playfield.RebasePendingStats(player))
+                        player.FlushDirtyStats();
         }
 
         public StaticDynel Add(int id, double x, double y, double z, params ItemSpell[] rows)

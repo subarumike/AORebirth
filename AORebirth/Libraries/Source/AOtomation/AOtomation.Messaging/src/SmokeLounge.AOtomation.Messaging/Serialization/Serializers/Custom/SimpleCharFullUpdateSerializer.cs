@@ -170,13 +170,13 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             {
                 message.HealthDamage = streamReader.ReadByte();
             }
-            else if (flags.HasFlag(SimpleCharFullUpdateFlags.HasSmallHealth))
-            {
-                message.HealthDamage = streamReader.ReadUInt16();
-            }
             else
             {
-                message.HealthDamage = streamReader.ReadInt32();
+                // Only the byte form carries missing HP. The wide forms carry current HP.
+                int currentHealth = flags.HasFlag(SimpleCharFullUpdateFlags.HasSmallHealth)
+                    ? streamReader.ReadUInt16()
+                    : streamReader.ReadInt32();
+                message.HealthDamage = message.Health - currentHealth;
             }
 
             message.MonsterData = streamReader.ReadUInt32();
@@ -427,11 +427,11 @@ namespace SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom
             }
             else if (flags.HasFlag(SimpleCharFullUpdateFlags.HasSmallHealth))
             {
-                streamWriter.WriteUInt16((ushort)scfu.HealthDamage);
+                streamWriter.WriteUInt16((ushort)(scfu.Health - scfu.HealthDamage));
             }
             else
             {
-                streamWriter.WriteInt32(scfu.HealthDamage);
+                streamWriter.WriteInt32(scfu.Health - scfu.HealthDamage);
             }
 
             streamWriter.WriteUInt32(scfu.MonsterData);

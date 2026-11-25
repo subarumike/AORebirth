@@ -3,6 +3,7 @@ namespace ZoneEngine_New.Tests;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
@@ -13,7 +14,10 @@ using AORebirth.World.Contracts.V1;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SmokeLounge.AOtomation.Messaging.GameData;
+using SmokeLounge.AOtomation.Messaging.Messages;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
+using SmokeLounge.AOtomation.Messaging.Serialization;
+using SmokeLounge.AOtomation.Messaging.Serialization.Serializers.Custom;
 using ZoneEngine_New.Core.Characters;
 using ZoneEngine_New.Core.Data;
 using ZoneEngine_New.Core.Entities;
@@ -41,6 +45,61 @@ public sealed class HealthArrivalSynchronizationTests
     const int RemovedNanoId = 602002;
     const int RetainedHealthBonus = 200;
     const int RemovedHealthBonus = 300;
+    // An unnamed PC at level 1 without optional prefixes has its HP fields at byte 67 of the N3 body.
+    const int MinimalPlayerHealthOffset = 67;
+    const int MessageHeaderLength = 16;
+
+    [TestMethod]
+    [DataRow(4692, 4437, "1254FF")]
+    [DataRow(4692, 4436, "12541154")]
+    [DataRow(4408, 3699, "11380E73")]
+    [DataRow(100000, 85901, "000186A000014F8D")]
+    public void SpawnSnapshotWritesTheClientHealthValueForEachWireWidth(int max, int current, string expectedFields)
+    {
+        byte[] body = MakeSpawnBody(max, current);
+        byte[] expected = Convert.FromHexString(expectedFields);
+        CollectionAssert.AreEqual(expected, body.AsSpan(MinimalPlayerHealthOffset, expected.Length).ToArray());
+    }
+
+    [TestMethod]
+    [DataRow(4692, 4437, "1254FF")]
+    [DataRow(4692, 4436, "12541154")]
+    [DataRow(4408, 3699, "11380E73")]
+    [DataRow(100000, 85901, "000186A000014F8D")]
+    public void SpawnSnapshotReadsTheClientHealthValueForEachWireWidth(int max, int current, string capturedFields)
+    {
+        byte[] body = MakeSpawnBody(max, current);
+        Convert.FromHexString(capturedFields).CopyTo(body, MinimalPlayerHealthOffset);
+        using var stream = new MemoryStream(body);
+        using var reader = new SmokeLounge.AOtomation.Messaging.Serialization.StreamReader(stream);
+        var resolver = new SerializerResolverBuilder<MessageBody>().Build();
+        var result = (SimpleCharFullUpdateMessage)new SimpleCharFullUpdateSerializer()
+            .Deserialize(reader, new SerializationContext(resolver));
+        Assert.AreEqual(max, result.Health);
+        Assert.AreEqual(max - current, result.HealthDamage);
+    }
+
+    static byte[] MakeSpawnBody(int max, int current)
+    {
+        var message = new SimpleCharFullUpdateMessage
+        {
+            Identity = new Identity { Type = IdentityType.CanbeAffected, Instance = ArrivingCharacterId },
+            Version = 58,
+            Coordinates = new SmokeLounge.AOtomation.Messaging.GameData.Vector3(),
+            Appearance = new Appearance(),
+            CharacterInfo = new SimplePcInfo(),
+            Level = 1,
+            Health = max,
+            HealthDamage = max - current,
+            Unknown1 = [],
+        };
+        using var stream = new MemoryStream();
+        using var writer = new SmokeLounge.AOtomation.Messaging.Serialization.StreamWriter(stream);
+        writer.Position = MessageHeaderLength;
+        var resolver = new SerializerResolverBuilder<MessageBody>().Build();
+        new SimpleCharFullUpdateSerializer().Serialize(writer, new SerializationContext(resolver), message);
+        return stream.ToArray()[MessageHeaderLength..];
+    }
 
     [TestMethod]
     public void CrossInstanceArrivalPublishesSettledVitalsAfterRemovingAPlayshiftNano()
