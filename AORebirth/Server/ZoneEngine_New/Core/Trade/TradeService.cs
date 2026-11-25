@@ -727,6 +727,15 @@ namespace ZoneEngine_New.Core.Trade
             // After the Complete frames: the client moves the other side's items in on them (see SendTradeDelivery).
             foreach (Delivery delivery in deliveries)
                 SendTradeDelivery(delivery);
+
+            // TradeRender creates template-only slots. Replace the resulting view once for each backpack
+            // recipient so even a bag the client already knows resolves to its original instance identity.
+            foreach (Player receiver in deliveries
+                .Where(static delivery => delivery.Page.Identity.Type == IdentityType.Inventory
+                    && delivery.MergeTarget == null && InventoryMoveService.IsBagItem(delivery.Item))
+                .Select(static delivery => delivery.Receiver).Distinct())
+                receiver.Session?.Send(receiver.Inventory.BuildCarriedInventoryUpdate(receiver.Identity));
+
             SendSocialStatus(initiator, 0);
             SendSocialStatus(partner, 0);
 
@@ -833,6 +842,7 @@ namespace ZoneEngine_New.Core.Trade
                 if (!delivery.Page.Add(delivery.Slot, delivery.Item))
                     throw new InvalidOperationException("Reserved trade location changed after durable commit.");
                 delivery.Item.IsPersisted = true;
+                delivery.Item.ClientWeaponBinding = null;
                 if (delivery.Page.Identity.Type == IdentityType.OverflowWindow)
                     delivery.Receiver.Inventory.NoteOverflowArrival(delivery.Item);
             }

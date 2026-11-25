@@ -961,6 +961,7 @@ namespace ZoneEngine_New.Core.Playfield
             // boundary. The complete locality activation below sends every remaining dynel.
             _playfield.GetRequiredService<PlayfieldLocality>().PrimeVendingMachineVisibility(player);
             SendRetailWorldEntryReadyBlock(session, player);
+            player.Inventory.ResetClientWeaponBindings(full.InventorySlots);
             session.Send(full);
             SendRetailWorldEntryCompletion(session, player);
             player.MarkServerInPlay(DateTime.UtcNow);
@@ -1066,6 +1067,7 @@ namespace ZoneEngine_New.Core.Playfield
             // Reconnect must use the same pre-FullCharacter vending boundary as initial entry.
             _playfield.GetRequiredService<PlayfieldLocality>().PrimeVendingMachineVisibility(player);
             SendRetailWorldEntryReadyBlock(session, player);
+            player.Inventory.ResetClientWeaponBindings(reconnectFull.InventorySlots);
             session.Send(reconnectFull);
             SendRetailWorldEntryCompletion(session, player);
             player.MarkServerInPlay(DateTime.UtcNow);
@@ -1410,7 +1412,9 @@ namespace ZoneEngine_New.Core.Playfield
                 session.Send(wifu);
             foreach (MessageBody stance in player.BuildCombatStanceMessages())
                 session.Send(stance);
-            session.Send(player.BuildFullCharacterMessage());
+            FullCharacterMessage full = player.BuildFullCharacterMessage();
+            player.Inventory.ResetClientWeaponBindings(full.InventorySlots);
+            session.Send(full);
             player.SendPerkActions();
 
             SendGameTime(session, player);

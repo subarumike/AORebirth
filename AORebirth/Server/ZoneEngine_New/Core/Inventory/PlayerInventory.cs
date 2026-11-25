@@ -648,10 +648,11 @@ namespace ZoneEngine_New.Core.Inventory
                 .Select(pair =>
                 {
                     Item item = pair.Value;
+                    item.ClientWeaponBinding = null;
                     return new BankSlot
                     {
                         Placement = pair.Key,
-                        Flags = item.ToInventoryPacketFlags(),
+                        Flags = GetInventoryViewFlags(item),
                         Count = InventoryStacking.WireCount(item.StackCount),
                         Identity = item.Identity.Instance != 0
                             ? item.Identity
@@ -671,6 +672,46 @@ namespace ZoneEngine_New.Core.Inventory
                 Unknown1 = 0,
                 Unknown2 = Identity.None
             };
+        }
+
+        /// <summary>
+        /// Replaces the client's combined inventory view. The native 0x68 InventoryUpdate uses the same
+        /// absolute placements for carried, worn, implant and social slots as FullCharacter.
+        /// </summary>
+        internal InventoryUpdateMessage BuildCarriedInventoryUpdate(Identity owner)
+            => new()
+            {
+                Identity = owner,
+                Unknown = 1,
+                NumberOfSlots = Inventory.Offset + Inventory.Capacity,
+                Unknown1 = 3,
+                Entries = BuildInventorySlots(preserveClientWeaponBindings: true).Select(static slot => new InventoryEntry
+                {
+                    Slotnumber = slot.Placement,
+                    UnknownFlags = slot.Flags,
+                    Unknown1 = slot.Count,
+                    Identity = slot.Identity,
+                    LowId = slot.ItemLowId,
+                    HighId = slot.ItemHighId,
+                    Quality = slot.Quality,
+                    Unknown2 = slot.Unknown
+                }).ToArray(),
+                BagIdentity = owner,
+                SlotnumberInMainInventory = (int)IdentityType.Inventory,
+                Unknown2 = 0
+            };
+
+        internal void ResetClientWeaponBindings(IReadOnlyList<InventorySlot> initialSlots)
+        {
+            foreach (Item item in EnumerateHeldItems())
+                item.ClientWeaponBinding = null;
+
+            foreach (InventorySlot slot in initialSlots)
+            {
+                if (slot.Identity.Type == IdentityType.WeaponInstance && (slot.Flags & AnnouncedInstanceFlag) != 0
+                    && Equipment.Content.TryGetValue(slot.Placement, out Item? item) && item.Identity == slot.Identity)
+                    item.ClientWeaponBinding = (slot.Identity, slot.Flags);
+            }
         }
 
         /// <summary>
@@ -1157,17 +1198,19 @@ namespace ZoneEngine_New.Core.Inventory
             yield return Implant;
         }
 
-        public IEnumerable<InventorySlot> BuildInventorySlots()
+        public IEnumerable<InventorySlot> BuildInventorySlots() => BuildInventorySlots(preserveClientWeaponBindings: false);
+
+        IEnumerable<InventorySlot> BuildInventorySlots(bool preserveClientWeaponBindings)
         {
-            foreach (InventorySlot slot in BuildPageSlots(IdentityType.Inventory, Inventory))
+            foreach (InventorySlot slot in BuildPageSlots(IdentityType.Inventory, Inventory, preserveClientWeaponBindings))
                 yield return slot;
-            foreach (InventorySlot slot in BuildPageSlots(IdentityType.WeaponPage, Equipment))
+            foreach (InventorySlot slot in BuildPageSlots(IdentityType.WeaponPage, Equipment, preserveClientWeaponBindings))
                 yield return slot;
-            foreach (InventorySlot slot in BuildPageSlots(IdentityType.ArmorPage, Armor))
+            foreach (InventorySlot slot in BuildPageSlots(IdentityType.ArmorPage, Armor, preserveClientWeaponBindings))
                 yield return slot;
-            foreach (InventorySlot slot in BuildPageSlots(IdentityType.ImplantPage, Implant))
+            foreach (InventorySlot slot in BuildPageSlots(IdentityType.ImplantPage, Implant, preserveClientWeaponBindings))
                 yield return slot;
-            foreach (InventorySlot slot in BuildPageSlots(IdentityType.SocialPage, Social))
+            foreach (InventorySlot slot in BuildPageSlots(IdentityType.SocialPage, Social, preserveClientWeaponBindings))
                 yield return slot;
         }
 
@@ -1209,15 +1252,28 @@ namespace ZoneEngine_New.Core.Inventory
             };
         }
 
-        /// <summary>FullCharacter slot flag of an entry whose object was announced on its own (retail weapons and bags).</summary>
-        const short AnnouncedInstanceFlag = 0x0002;
+        /// <summary>Lets the client resolve a slot to its instance identity, including for locally named backpacks.</summary>
+        internal const short AnnouncedInstanceFlag = 0x0002;
 
-        static IEnumerable<InventorySlot> BuildPageSlots(IdentityType pageType, Container page)
+        static short GetInventoryViewFlags(Item item)
+        {
+            const short templateSlotFlag = 0x0001;
+            short flags = item.ToInventoryPacketFlags();
+            // Retail FullCharacter and Bank carry the instance bit for stable Container identities.
+            // TemplateIDToDynelID requires it before the client can load its local name for the bag.
+            if (item.Identity.Type == IdentityType.Container && item.InstanceId > 0
+                && item.Identity.Instance == item.InstanceId)
+                return (short)((flags & ~templateSlotFlag) | AnnouncedInstanceFlag);
+
+            return flags;
+        }
+
+        static IEnumerable<InventorySlot> BuildPageSlots(IdentityType pageType, Container page, bool preserveClientWeaponBindings)
         {
             foreach (KeyValuePair<int, Item> slotEntry in page.Content)
             {
                 Item item = slotEntry.Value;
-                short flags = item.ToInventoryPacketFlags();
+                short flags = GetInventoryViewFlags(item);
                 // A hand weapon already announced under its own identity (WeaponItemFullUpdate, before FullCharacter)
                 // carries 0x02: the client then binds the slot to that weapon object and its Energy (the clip) instead of
                 // building one from the template with the slot count as its ammo ("1/30"). Retail zone-in 2026-10-23:
@@ -1231,14 +1287,23 @@ namespace ZoneEngine_New.Core.Inventory
                     && AttackInfoRules.ShouldAnnounceWeaponItemFullUpdate(item))
                     flags |= AnnouncedInstanceFlag;
 
+                Identity identity = item.Identity.Instance != 0
+                    ? item.Identity
+                    : new Identity { Type = pageType, Instance = slotEntry.Key };
+                if (preserveClientWeaponBindings && item.ClientWeaponBinding is { } binding)
+                {
+                    // Native moves carry the bound weapon identity with the row, even after unequipping.
+                    const short disabledFlag = (short)AORebirth.Enums.ItemFlags.Disabled;
+                    identity = binding.Identity;
+                    flags = (short)((binding.Flags & ~disabledFlag) | (flags & disabledFlag));
+                }
+
                 yield return new InventorySlot
                 {
                     Placement = slotEntry.Key,
                     Flags = flags,
                     Count = InventoryStacking.WireCount(item.StackCount),
-                    Identity = item.Identity.Instance != 0
-                        ? item.Identity
-                        : new Identity { Type = pageType, Instance = slotEntry.Key },
+                    Identity = identity,
                     ItemLowId = item.LowId,
                     ItemHighId = item.HighId,
                     Quality = item.Quality,

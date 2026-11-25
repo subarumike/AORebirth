@@ -2774,8 +2774,17 @@ namespace ZoneEngine_New.Core.Entities
                 var fresh = new Identity { Type = IdentityType.WeaponInstance, Instance = Playfield.AllocateWeaponInstanceId() };
                 WeaponItemFullUpdateMessage? own = TryBuildWeaponItemFullUpdate(item, slot.Placement, carriedIdentity: fresh);
                 if (own != null)
-                    Session.Send(own);
+                    SendOwnWeaponInstance(item, own);
             }
+        }
+
+        internal void SendOwnWeaponInstance(Item item, WeaponItemFullUpdateMessage message)
+        {
+            if (Session is not IZoneSession session)
+                return;
+
+            session.Send(message);
+            item.ClientWeaponBinding = (message.Identity, PlayerInventory.AnnouncedInstanceFlag);
         }
 
         WeaponItemFullUpdateMessage? TryBuildEquippedHandWifu(int equipmentSlot)

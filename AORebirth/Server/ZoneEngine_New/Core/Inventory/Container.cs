@@ -166,6 +166,8 @@ namespace ZoneEngine_New.Core.Inventory
             foreach (KeyValuePair<int, Item> slot in Content.OrderBy(static pair => pair.Key))
             {
                 Item item = slot.Value;
+                // This page is rebuilt from the persistent slot identity, which supersedes a local weapon alias.
+                item.ClientWeaponBinding = null;
                 short count = (short)Math.Clamp(Math.Max(1, item.StackCount), 1, short.MaxValue);
 
                 entries[index++] = new InventoryEntry

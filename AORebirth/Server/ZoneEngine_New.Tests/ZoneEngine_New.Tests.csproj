@@ -71,6 +71,13 @@
     <Compile Include="TestDoubles.cs" />
     <Compile Include="OrganizationNameSynchronizationTests.cs" />
   </ItemGroup>
+  <ItemGroup Condition="'$(BackpackNameFocusedTests)' == 'true'">
+    <Compile Remove="@(Compile)" />
+    <Compile Include="TestDoubles.cs" />
+    <Compile Include="BackpackNamePublicationTests.cs" />
+    <Compile Include="InventoryActionTests.cs" />
+    <Compile Include="TradePersistenceTests.cs" />
+  </ItemGroup>
   <ItemGroup Condition="'$(DailyLoginFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />
     <Compile Include="TestDoubles.cs" />
