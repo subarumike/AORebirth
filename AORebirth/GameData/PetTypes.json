@@ -1,6 +1,7 @@
 {
   "_comment": "Pet type per summoned mob hash, for SummonPet. The type is the pet slot the summon item's own requirement checks (Pets stat 251, operator TestNumPets): value = type * 1000 + how many of that type may be owned. 1 = Attack, 1001 = Heal, 2001 = Support, 3001 = unicorn, 4001 = social pets, 5001 = towers, 7001 = charm. Generated from items.dat (each SummonPet item's TestNumPets value); every pet summoned by a nanoline 1015 nano is Attack (1) and every pet summoned by a nanoline 1017 nano is Support (2001), overriding the item value. Hashes not listed use DefaultType.",
   "DefaultType": 1,
+  "MezzPets": ["BLTH", "DEMD", "DISP", "EMEN", "GCBI", "HGMG", "IGMI", "ISTR", "ONFA", "UMUL", "URTX"],
   "Types": {
     "2APK": 4001,
     "3W64": 4001,

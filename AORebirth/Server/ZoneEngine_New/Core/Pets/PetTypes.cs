@@ -117,8 +117,8 @@ namespace ZoneEngine_New.Core.Pets
     }
 
     /// <summary>
-    /// GameData/PetTypes.json: the pet type of each summoned mob hash, taken from the TestNumPets requirement of
-    /// the item that summons it. Loaded once per GameData root.
+    /// GameData/PetTypes.json: the slot from each summon's TestNumPets requirement, plus the support pets with
+    /// mezz behavior. Loaded once per GameData root.
     /// </summary>
     public sealed class PetTypeCatalog
     {
@@ -127,11 +127,13 @@ namespace ZoneEngine_New.Core.Pets
         static readonly ConcurrentDictionary<string, PetTypeCatalog> ByRoot = new(StringComparer.OrdinalIgnoreCase);
 
         readonly Dictionary<string, int> _types;
+        readonly HashSet<string>? _mezzPets;
 
-        PetTypeCatalog(int defaultType, Dictionary<string, int> types)
+        PetTypeCatalog(int defaultType, Dictionary<string, int> types, HashSet<string>? mezzPets)
         {
             DefaultType = defaultType;
             _types = types;
+            _mezzPets = mezzPets;
         }
 
         public int DefaultType { get; }
@@ -148,11 +150,17 @@ namespace ZoneEngine_New.Core.Pets
         public int TypeOf(string hash)
             => !string.IsNullOrWhiteSpace(hash) && _types.TryGetValue(hash.Trim(), out int type) ? type : DefaultType;
 
+        /// <summary>Older catalogs without role metadata keep their original Support behavior.</summary>
+        internal bool IsMezzPet(string hash, int type)
+            => PetTypes.Slot(type) == PetTypes.Slot(PetTypes.Support) && (_mezzPets?.Contains(hash.Trim()) ?? true);
+
         sealed class CatalogFile
         {
             public int DefaultType { get; set; } = PetTypes.Attack;
 
             public Dictionary<string, int> Types { get; set; } = new();
+
+            public string[]? MezzPets { get; set; }
         }
 
         static PetTypeCatalog Load(string root)
@@ -160,7 +168,7 @@ namespace ZoneEngine_New.Core.Pets
             var types = new Dictionary<string, int>(StringComparer.OrdinalIgnoreCase);
             string path = Path.Combine(root, FileName);
             if (!File.Exists(path))
-                return new PetTypeCatalog(PetTypes.Attack, types);
+                return new PetTypeCatalog(PetTypes.Attack, types, null);
 
             CatalogFile? file = JsonSerializer.Deserialize<CatalogFile>(File.ReadAllText(path),
                 new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
@@ -170,8 +178,22 @@ namespace ZoneEngine_New.Core.Pets
                     types[entry.Key.Trim()] = entry.Value;
             }
 
+            HashSet<string>? mezzPets = null;
+            if (file?.MezzPets is { } listedMezzPets)
+            {
+                mezzPets = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+                foreach (string? entry in listedMezzPets)
+                {
+                    string hash = entry?.Trim() ?? string.Empty;
+                    if (!types.TryGetValue(hash, out int type) || PetTypes.Slot(type) != PetTypes.Slot(PetTypes.Support))
+                        throw new InvalidDataException($"{FileName}: mezz pet '{hash}' must name a listed support pet.");
+                    if (!mezzPets.Add(hash))
+                        throw new InvalidDataException($"{FileName}: duplicate mezz pet '{hash}'.");
+                }
+            }
+
             int fallback = file?.DefaultType > 0 ? file.DefaultType : PetTypes.Attack;
-            return new PetTypeCatalog(fallback, types);
+            return new PetTypeCatalog(fallback, types, mezzPets);
         }
     }
 }

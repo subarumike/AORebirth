@@ -92,7 +92,7 @@ namespace ZoneEngine_New.Core.Pets
 
             var controller = new PetController(owner, type, hash, level, expires, summonRequirements);
             if (owner is Player)
-                controller.Order(DefaultMode(type));
+                controller.Order(DefaultMode(controller));
 
             NpcCharacter pet = _playfield.GetRequiredService<SpawnService>().SpawnMob(
                 template,
@@ -700,7 +700,7 @@ namespace ZoneEngine_New.Core.Pets
                             controller.Order(PetMode.Guard);
                             controller.EndHeal();
                         }
-                        else if (IsMezzPet(controller.Type))
+                        else if (IsMezzPet(controller))
                         {
                             controller.Order(PetMode.Follow);
                             StandDown(pet);
@@ -888,13 +888,13 @@ namespace ZoneEngine_New.Core.Pets
         static bool IsHealPet(int type) => PetTypes.Slot(type) == PetTypes.Slot(PetTypes.Heal);
 
         /// <summary>The Metaphysicist's mezz pet: it only fights when sent at a target.</summary>
-        static bool IsMezzPet(int type) => PetTypes.Slot(type) == PetTypes.Slot(PetTypes.Support);
+        bool IsMezzPet(PetController pet) => Types.IsMezzPet(pet.Hash, pet.Type);
 
         /// <summary>
         /// A newly summoned heal pet follows until told to heal or guard, and a mezz pet follows until sent at a
         /// target; other pets guard.
         /// </summary>
-        static PetMode DefaultMode(int type) => IsHealPet(type) || IsMezzPet(type) ? PetMode.Follow : PetMode.Guard;
+        PetMode DefaultMode(PetController pet) => IsHealPet(pet.Type) || IsMezzPet(pet) ? PetMode.Follow : PetMode.Guard;
 
         IEnumerable<NpcCharacter> ResolveOwned(Player owner, IReadOnlyList<Identity> petIdentities)
         {
