@@ -7,6 +7,8 @@ namespace ZoneEngine_New.Core.Mobs
     using System.Linq;
     using System.Text.Json;
 
+    using SmokeLounge.AOtomation.Messaging.GameData;
+
     using ZoneEngine_New.Core.GameData;
     using ZoneEngine_New.Core.Inventory;
     using ZoneEngine_New.Core.Nanos;
@@ -164,6 +166,10 @@ namespace ZoneEngine_New.Core.Mobs
                 if (string.IsNullOrWhiteSpace(entry.Key) || entry.Value == null || !rules.TryAdd(entry.Key.Trim(), entry.Value))
                     throw new InvalidDataException($"{FileName}: empty, invalid or duplicate NPC rule '{entry.Key}'.");
 
+                if (entry.Value.ExcludedProximityAggroTargetGender is { } gender
+                    && (gender == Gender.None || !Enum.IsDefined(gender)))
+                    throw new JsonException($"{FileName}: NPC '{entry.Key}' needs a valid ExcludedProximityAggroTargetGender.");
+
                 entry.Value.Pets?.Validate($"{FileName}: NPC '{entry.Key}'");
                 if (entry.Value.TriggeredSelfNanos is { } triggers)
                 {
@@ -210,6 +216,9 @@ namespace ZoneEngine_New.Core.Mobs
 
         /// <summary>Behaviour switches: NoCombat, NoMove, Wander, Guard, Boss (<see cref="NpcFeature"/>).</summary>
         public List<NpcFeature>? Features { get; set; }
+
+        /// <summary>Base character gender skipped when the NPC looks for a player to attack on sight.</summary>
+        public Gender? ExcludedProximityAggroTargetGender { get; set; }
 
         /// <summary>
         /// NPCFamily (stat 455) values this NPC attacks on sight: an NPC of one of these families that comes within

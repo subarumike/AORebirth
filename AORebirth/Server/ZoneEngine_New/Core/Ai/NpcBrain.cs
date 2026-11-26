@@ -806,29 +806,34 @@ namespace ZoneEngine_New.Core.Ai
             }
         }
 
-        /// <summary>
-        /// The NPC families this NPC attacks on sight (GameData MonsterCombatRules.json "Hates", by its spawn hash or
-        /// its template's); null when none. Looked up once.
-        /// </summary>
         IReadOnlySet<int>? HatedFamilies()
         {
-            if (_hatedLookedUp)
-                return _hated;
-            _hatedLookedUp = true;
-            if (Pet == null && Npc.Playfield?.GetService<GameData.IGameData>()?.RootPath is string root && root.Length > 0)
-            {
-                var catalog = Mobs.MonsterCombatRulesCatalog.For(root);
-                if (catalog.TryGet(Npc.SpawnHash, out Mobs.MonsterCombatRules rules) && rules.HatedFamilies is { } bySpawn)
-                    _hated = bySpawn;
-                else if (catalog.TryGet(Npc.MobTemplate?.Hash, out rules))
-                    _hated = rules.HatedFamilies;
-            }
-
+            LoadProximityRules();
             return _hated;
         }
 
+        /// <summary>
+        /// Resolve the NPC's authored proximity rules once. Each spawn rule takes precedence over its template rule.
+        /// </summary>
+        void LoadProximityRules()
+        {
+            if (_proximityRulesLoaded)
+                return;
+            _proximityRulesLoaded = true;
+            if (Pet == null && Npc.Playfield?.GetService<GameData.IGameData>()?.RootPath is string root && root.Length > 0)
+            {
+                var catalog = Mobs.MonsterCombatRulesCatalog.For(root);
+                var spawnRules = catalog.TryGet(Npc.SpawnHash, out var spawn) ? spawn : null;
+                var templateRules = catalog.TryGet(Npc.MobTemplate?.Hash, out var template) ? template : null;
+                _hated = spawnRules?.HatedFamilies ?? templateRules?.HatedFamilies;
+                _excludedProximityAggroTargetGender = spawnRules?.ExcludedProximityAggroTargetGender
+                    ?? templateRules?.ExcludedProximityAggroTargetGender;
+            }
+        }
+
         IReadOnlySet<int>? _hated;
-        bool _hatedLookedUp;
+        Gender? _excludedProximityAggroTargetGender;
+        bool _proximityRulesLoaded;
 
         /// <summary>The NPC this one was fighting started resetting and nobody else is left: reset as well.</summary>
         bool _resetForTargetReset;
@@ -886,6 +891,10 @@ namespace ZoneEngine_New.Core.Ai
             if (!hostile && !guard)
                 return;
             if (Hate.Contains(player.Identity))
+                return;
+            LoadProximityRules();
+            if (_excludedProximityAggroTargetGender is { } excluded
+                && player.Stats.GetOrZero(CharacterStat.Sex, StatDetail.Base) == (int)excluded)
                 return;
             int npcSide = Npc.Stats.GetOrZero(CharacterStat.Side);
             int playerSide = player.Stats.GetOrZero(CharacterStat.Side);
