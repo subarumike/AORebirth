@@ -46,6 +46,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Remove="ChatNetworkTests.cs;ClientSendTests.cs" />
+    <None Include="../../GameData/MonsterCombatRules.json" Link="Fixtures/MonsterCombatRules.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
   <!-- Explicit focused run: the clean baseline contains unrelated stale test types.
        The default/full suite remains unchanged and continues reporting those failures. -->
@@ -189,6 +190,7 @@
   <ItemGroup Condition="'$(NpcAiFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />
     <Compile Include="TestDoubles.cs" />
+    <Compile Include="MedusaProximityAggroTests.cs" />
     <Compile Include="NpcBrainTests.cs" />
     <Compile Include="NpcPatrolTests.cs" />
     <Compile Include="NpcPetSummonProfileTests.cs" />

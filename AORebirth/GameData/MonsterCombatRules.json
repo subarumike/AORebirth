@@ -86,6 +86,24 @@
       "Guard"
     ]
   },
+  "ME03": {
+    "ExcludedProximityAggroTargetGender": "Female"
+  },
+  "ME04": {
+    "ExcludedProximityAggroTargetGender": "Female"
+  },
+  "ME15": {
+    "ExcludedProximityAggroTargetGender": "Female"
+  },
+  "ME16": {
+    "ExcludedProximityAggroTargetGender": "Female"
+  },
+  "ME19": {
+    "ExcludedProximityAggroTargetGender": "Female"
+  },
+  "ME20": {
+    "ExcludedProximityAggroTargetGender": "Female"
+  },
   "N032": {
     "Hates": [
       1
