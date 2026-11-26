@@ -40,6 +40,7 @@ namespace ZoneEngine_New.Core.Modules
 
         readonly Lazy<PlayfieldManager> _manager;
         readonly ConcurrentDictionary<int, Slot> _slots = new();
+        long _snapshotOrder;
 
         public ZoneModuleWorld(Func<PlayfieldManager> manager)
         {
@@ -50,8 +51,28 @@ namespace ZoneEngine_New.Core.Modules
         public IReadOnlyList<PlayerInfo> Players()
         {
             var players = new List<PlayerInfo>();
+            var entries = new Dictionary<int, (int Index, long CaptureOrder)>();
             foreach (Snapshot snapshot in ReadAll())
-                players.AddRange(snapshot.Players);
+            {
+                foreach (PlayerInfo player in snapshot.Players)
+                {
+                    // A transfer can leave the character in the source snapshot until its next publish.
+                    if (entries.TryGetValue(player.CharacterId, out var entry))
+                    {
+                        if (snapshot.CaptureOrder > entry.CaptureOrder)
+                        {
+                            players[entry.Index] = player;
+                            entries[player.CharacterId] = (entry.Index, snapshot.CaptureOrder);
+                        }
+
+                        continue;
+                    }
+
+                    entries.Add(player.CharacterId, (players.Count, snapshot.CaptureOrder));
+                    players.Add(player);
+                }
+            }
+
             return players.ToArray();
         }
 
@@ -314,8 +335,10 @@ namespace ZoneEngine_New.Core.Modules
         }
 
         /// <summary>Copies everything a reader can ask for. Runs on <paramref name="playfield"/>'s tick only.</summary>
-        static Snapshot Build(Playfield playfield, Slot slot, long now)
+        Snapshot Build(Playfield playfield, Slot slot, long now)
         {
+            // Order captures under the playfield tick lock, including when the clock returns the same timestamp.
+            long captureOrder = Interlocked.Increment(ref _snapshotOrder);
             int playfieldId = playfield.Identity.Instance;
             Knubot.KnubotCatalog? knubot = playfield.GetService<Knubot.KnubotCatalog>();
             Teams.TeamService? teams = playfield.GetService<Teams.TeamService>();
@@ -351,7 +374,7 @@ namespace ZoneEngine_New.Core.Modules
                     cooldowns[watched.Key] = ModuleCooldowns.Read(watchedPlayer);
             }
 
-            return new Snapshot(now, players.ToArray(), npcs.ToArray(), stats, cooldowns);
+            return new Snapshot(now, captureOrder, players.ToArray(), npcs.ToArray(), stats, cooldowns);
         }
 
         static int? LiveStat(Playfield playfield, StatKey key)
@@ -425,6 +448,7 @@ namespace ZoneEngine_New.Core.Modules
 
         sealed record Snapshot(
             long BuiltAt,
+            long CaptureOrder,
             PlayerInfo[] Players,
             NpcInfo[] Npcs,
             Dictionary<StatKey, int?> Stats,
