@@ -72,6 +72,102 @@ public sealed class ModuleApiTests
     }
 
     [TestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public void WorldPlayersKeepsNewestSnapshotDuringTransferOverlap(bool destinationFirst)
+    {
+        using var rig = new Rig();
+        Playfield second = rig.AddPlayfield(PlayfieldId + 1);
+        Playfield source = destinationFirst ? second : rig.World;
+        Playfield destination = destinationFirst ? rig.World : second;
+        Player moving = rig.AddPlayer(906, new Vector3(10, 0, 10), source);
+        Player resident = rig.AddPlayer(907, new Vector3(20, 0, 20), destination);
+        var snapshots = new ZoneModuleWorld(() => rig.Manager);
+        IZoneWorld world = new GatedWorld(snapshots,
+            new CapabilityGate("WorldReader", [ModuleCapabilities.ReadWorld], new StubLogger()));
+
+        rig.ObserveFromOtherTick(world.Players);
+        rig.Publish(snapshots, source);
+        PlayerInfo before = rig.ObserveFromOtherTick(world.Players).Single();
+        Assert.AreEqual(source.Identity.Instance, before.PlayfieldId);
+        Assert.IsTrue(before.IsConnected);
+
+        rig.Depart(moving);
+        rig.Arrive(moving, destination, new Vector3(30, 0, 40));
+        rig.Owner(destination, () =>
+        {
+            moving.Stats.Set(CharacterStat.Health, 73);
+            moving.EnterLinkDead(TimeSpan.FromMinutes(1));
+        });
+        rig.Publish(snapshots, destination);
+
+        IReadOnlyList<PlayerInfo> overlapping = rig.ObserveFromOtherTick(world.Players);
+        CollectionAssert.AreEquivalent(new[] { moving.Identity.Instance, resident.Identity.Instance },
+            overlapping.Select(info => info.CharacterId).ToArray());
+        PlayerInfo transferred = overlapping.Single(info => info.CharacterId == moving.Identity.Instance);
+        Assert.AreEqual(overlapping.Single(info => info.CharacterId == resident.Identity.Instance).Name, transferred.Name,
+            "Display names do not identify characters.");
+        Assert.AreEqual(destination.Identity.Instance, transferred.PlayfieldId);
+        Assert.AreEqual(new WorldPosition(30, 0, 40), transferred.Position);
+        Assert.AreEqual(73, transferred.Health);
+        Assert.IsFalse(transferred.IsConnected);
+        Assert.AreEqual(transferred, rig.ObserveFromOtherTick(() => world.Player(moving.Identity.Instance)));
+
+        rig.Owner(destination, () => moving.EnterOnline(new CaptureSession()));
+        rig.Publish(snapshots, destination);
+
+        PlayerInfo reconnected = rig.ObserveFromOtherTick(world.Players).Single(info => info.CharacterId == moving.Identity.Instance);
+        Assert.AreEqual(destination.Identity.Instance, reconnected.PlayfieldId);
+        Assert.IsTrue(reconnected.IsConnected);
+        Assert.IsFalse(transferred.IsConnected, "Previously returned snapshots remain detached.");
+        Assert.AreEqual(source.Identity.Instance, before.PlayfieldId);
+    }
+
+    [TestMethod]
+    public void WorldPlayersMergesInterleavedAndRepeatedTransfersIndependently()
+    {
+        using var rig = new Rig();
+        Playfield first = rig.World;
+        Playfield second = rig.AddPlayfield(PlayfieldId + 1);
+        Playfield third = rig.AddPlayfield(PlayfieldId + 2);
+        Player a = rig.AddPlayer(908, new Vector3(10, 0, 10), first);
+        Player b = rig.AddPlayer(909, new Vector3(20, 0, 20), second);
+        var snapshots = new ZoneModuleWorld(() => rig.Manager);
+        IZoneWorld world = snapshots;
+
+        rig.ObserveFromOtherTick(world.Players);
+        rig.Publish(snapshots, first);
+        rig.Publish(snapshots, second);
+
+        rig.Depart(a);
+        rig.Depart(b);
+        rig.Arrive(a, third, new Vector3(30, 0, 30));
+        rig.Arrive(b, first, new Vector3(40, 0, 40));
+        rig.Publish(snapshots, third);
+
+        Dictionary<int, PlayerInfo> partial = rig.ObserveFromOtherTick(world.Players).ToDictionary(info => info.CharacterId);
+        Assert.AreEqual(2, partial.Count);
+        Assert.AreEqual(third.Identity.Instance, partial[a.Identity.Instance].PlayfieldId);
+        Assert.AreEqual(second.Identity.Instance, partial[b.Identity.Instance].PlayfieldId,
+            "The destination has yet to publish the moved character.");
+
+        rig.Publish(snapshots, first);
+        rig.Depart(a);
+        rig.Arrive(a, second, new Vector3(50, 0, 50));
+        rig.Publish(snapshots, second);
+        rig.Depart(a);
+        rig.Arrive(a, first, new Vector3(60, 0, 60));
+        rig.Publish(snapshots, first);
+
+        Dictionary<int, PlayerInfo> latest = rig.ObserveFromOtherTick(world.Players).ToDictionary(info => info.CharacterId);
+        Assert.AreEqual(2, latest.Count);
+        Assert.AreEqual(first.Identity.Instance, latest[a.Identity.Instance].PlayfieldId);
+        Assert.AreEqual(new WorldPosition(60, 0, 60), latest[a.Identity.Instance].Position);
+        Assert.AreEqual(first.Identity.Instance, latest[b.Identity.Instance].PlayfieldId);
+        Assert.AreEqual(new WorldPosition(40, 0, 40), latest[b.Identity.Instance].Position);
+    }
+
+    [TestMethod]
     public void ModuleThreadReadWaitsForTheTickPublish()
     {
         using var rig = new Rig();
@@ -283,6 +379,7 @@ public sealed class ModuleApiTests
         internal readonly KnubotCatalog Knubot;
         readonly Dictionary<int, CaptureSession> _sessions = [];
         readonly ServiceProvider _services;
+        readonly List<ServiceProvider> _additionalServices = [];
 
         internal Rig()
         {
@@ -318,19 +415,55 @@ public sealed class ModuleApiTests
             Knubot.Reloaded += change => KnubotNpcRefresh.Queue(Manager, change);
         }
 
-        internal Player AddPlayer(int id, Vector3 at)
+        internal Playfield AddPlayfield(int id)
+        {
+            var playfield = Blank<Playfield>();
+            var registry = new DynelRegistry();
+            var locality = new PlayfieldLocality(id, null);
+            ServiceProvider services = new ServiceCollection().AddSingleton(registry).AddSingleton(locality).BuildServiceProvider();
+            _additionalServices.Add(services);
+            Set(playfield, "<Identity>k__BackingField", new Identity { Type = IdentityType.Playfield2, Instance = id });
+            Set(playfield, "_tickSync", new Lock());
+            Set(playfield, "_lifecycleSync", new Lock());
+            Set(playfield, "_dynelRegistry", registry);
+            Set(playfield, "_serviceProvider", services);
+            Set(playfield, "_playfieldManager", Manager);
+            ((Dictionary<int, Playfield>)Get(Manager, "_playfields")).Add(id, playfield);
+            return playfield;
+        }
+
+        internal Player AddPlayer(int id, Vector3 at, Playfield? playfield = null)
         {
             Player player = TestWorld.CreatePlayer(id);
-            player.Playfield = World;
-            player.Position = at;
             player.Stats.Set(CharacterStat.Health, 100);
             var session = new CaptureSession();
             _sessions[id] = session;
             player.EnterOnline(session);
+            Arrive(player, playfield ?? World, at);
             Manager.RegisterPlayer(player);
-            Registry.Register(player);
-            Locality.RegisterDynel(player);
             return player;
+        }
+
+        internal void Depart(Player player)
+        {
+            Playfield playfield = player.Playfield!;
+            Owner(playfield, () =>
+            {
+                playfield.GetRequiredService<PlayfieldLocality>().UnregisterDynel(player);
+                playfield.GetRequiredService<DynelRegistry>().Unregister(player.Identity);
+                player.Playfield = null;
+            });
+        }
+
+        internal void Arrive(Player player, Playfield playfield, Vector3 at)
+        {
+            Owner(playfield, () =>
+            {
+                player.Playfield = playfield;
+                player.Position = at;
+                playfield.GetRequiredService<DynelRegistry>().Register(player);
+                playfield.GetRequiredService<PlayfieldLocality>().RegisterDynel(player);
+            });
         }
 
         internal NpcCharacter AddNpc(int instance, string hash, Vector3 at)
@@ -349,16 +482,32 @@ public sealed class ModuleApiTests
         /// <summary>A host with no Modules.json (no module loaded), to register into directly.</summary>
         internal ZoneModuleHost ModuleHost() => ZoneModuleHost.Load(Root, new StubLogger(), () => Knubot, () => Manager);
 
-        internal void Owner(Action work)
+        internal void Owner(Action work) => Owner(World, work);
+
+        internal void Owner(Playfield playfield, Action work)
         {
-            lock ((Lock)Get(World, "_tickSync"))
+            lock ((Lock)Get(playfield, "_tickSync"))
                 work();
+        }
+
+        internal void Publish(ZoneModuleWorld world, Playfield playfield) => Owner(playfield, () => world.OnTick(playfield));
+
+        internal T ObserveFromOtherTick<T>(Func<T> read)
+        {
+            // A module event on another tick asks these worlds to publish without refreshing or waiting for either here.
+            FieldInfo ticking = typeof(Playfield).GetField("t_ticking", BindingFlags.Static | BindingFlags.NonPublic)!;
+            int previous = (int)ticking.GetValue(null)!;
+            ticking.SetValue(null, previous + 1);
+            try { return read(); }
+            finally { ticking.SetValue(null, previous); }
         }
 
         internal void Drain() => Owner(() => ((PlayfieldInboundQueue)Get(World, "_inbound")).Drain(null!, null!, World));
 
         public void Dispose()
         {
+            foreach (ServiceProvider services in _additionalServices)
+                services.Dispose();
             _services.Dispose();
             if (Directory.Exists(Root))
                 Directory.Delete(Root, true);
@@ -369,7 +518,7 @@ public sealed class ModuleApiTests
         static object Get(object target, string name)
             => target.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.GetValue(target)!;
 
-        static void Set(object target, string name, object value)
+        static void Set<T>(object target, string name, T value)
             => target.GetType().GetField(name, BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(target, value);
     }
 
@@ -380,7 +529,7 @@ public sealed class ModuleApiTests
         public Player? Player { get; private set; }
         public void BindPlayer(Player player) => Player = player;
         public void UnbindPlayer() => Player = null;
-        public void TransferToPlayfield(Playfield destination, Vector3 landing) => throw new NotSupportedException();
+        public bool TransferToPlayfield(Playfield destination, Vector3 landing) => throw new NotSupportedException();
         public void Send(byte[] packet) { }
         public void Send(Message message) => Bodies.Add(message.Body);
         public void Send(MessageBody body) => Bodies.Add(body);
