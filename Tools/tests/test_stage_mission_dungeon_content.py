@@ -2,8 +2,10 @@
 
 import importlib.util
 import json
+import os
 from pathlib import Path
 import tempfile
+import subprocess
 import unittest
 
 
@@ -65,6 +67,42 @@ class RetainedDungeonStagingTests(unittest.TestCase):
             dungeon.stage(self.source, candidate, prior)
         self.assertFalse((candidate / dungeon.FOLDER / "Current.json").exists())
         self.assertEqual(b"corrupted", corrupted.read_bytes())
+
+    @unittest.skipUnless(os.name == "nt", "Windows junction protection")
+    def test_root_validation_rejects_source_and_output_junctions(self):
+        link = self.root / "redirected"
+        subprocess.run(["cmd.exe", "/d", "/c", "mklink", "/J", str(link), str(self.source)],
+                       capture_output=True, check=True)
+        self.addCleanup(link.rmdir)
+        with self.assertRaisesRegex(ValueError, "Link or junction rejected"):
+            dungeon.stage(link, self.root / "candidate")
+        with self.assertRaisesRegex(ValueError, "Link or junction rejected"):
+            dungeon.stage(self.source, link / "new")
+        with self.assertRaisesRegex(ValueError, "Link or junction rejected"):
+            dungeon.stage(self.source, self.root / "candidate", link)
+        self.assertFalse((self.source / "new").exists())
+
+    def test_root_validation_rejects_traversal(self):
+        with self.assertRaisesRegex(ValueError, "Traversal rejected"):
+            dungeon.stage(self.source, self.root / "nested" / ".." / "candidate")
+        with self.assertRaisesRegex(ValueError, "Traversal rejected"):
+            dungeon.checked(self.source, "../outside")
+
+    def test_prior_archive_rejects_unowned_files_and_dangling_active_index(self):
+        prior = self.root / "prior"
+        candidate = self.root / "candidate"
+        old = dungeon.stage(self.source, prior)
+        root = prior / dungeon.FOLDER
+        extra = root / old[21] / "unexpected.json"
+        extra.write_text("{}", encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "Unexpected or missing retained dungeon members"):
+            dungeon.stage(self.source, candidate, prior)
+        extra.unlink()
+        (root / "Current.json").write_text(
+            json.dumps({"SchemaVersion": 1, "Styles": {"21": "e" * 64}}), encoding="utf-8")
+        with self.assertRaisesRegex(ValueError, "Missing or conflicting prior retained dungeon archive"):
+            dungeon.stage(self.source, candidate, prior)
+        self.assertFalse((candidate / dungeon.FOLDER / "Current.json").exists())
 
     def test_runtime_admission_is_limited_to_declared_dungeon_pack_members(self):
         sha = "a" * 64

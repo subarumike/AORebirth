@@ -28,10 +28,27 @@ def check_path(path):
     return attributes
 
 
+def rooted(path, *, must_exist=True):
+    if ".." in path.parts:
+        raise ValueError(f"Traversal rejected in dungeon content root: {path}")
+    path = path.absolute()
+    for component in (*reversed(path.parents), path):
+        try:
+            check_path(component)
+        except FileNotFoundError:
+            if must_exist:
+                raise
+            break
+    return path.resolve(strict=must_exist)
+
+
 def checked(root, relative):
+    relative = Path(relative)
+    if relative.anchor or ".." in relative.parts:
+        raise ValueError(f"Traversal rejected in dungeon content member: {relative}")
     path = root
     check_path(path)
-    for part in Path(relative).parts:
+    for part in relative.parts:
         path /= part
         check_path(path)
     return path
@@ -55,7 +72,16 @@ def relative_style_files(style):
     return tuple(f"Playfields/{style}/{name}" for name in STYLE_FILES)
 
 
+def exact_members(directory, expected):
+    if {entry.name for entry in directory.iterdir()} != set(expected):
+        raise ValueError(f"Unexpected or missing retained dungeon members: {directory}")
+
+
 def gather(source, style):
+    exact_members(source, (*COMMON, NPC_LINK, "Playfields"))
+    playfields = checked(source, "Playfields")
+    exact_members(playfields, (str(style),))
+    exact_members(checked(playfields, str(style)), STYLE_FILES)
     paths = (*COMMON, NPC_LINK, *relative_style_files(style))
     return {path: read(source, path) for path in paths}
 
@@ -71,7 +97,13 @@ def retain(destination, revision, files):
     package = destination / revision
     if package.exists() or package.is_symlink():
         checked(destination, revision)
-        if any(read(package, path) != data for path, data in files.items()):
+        expected = set(files)
+        expected.update(parent.as_posix() for path in files for parent in Path(path).parents if parent != Path("."))
+        entries = set()
+        for member in package.rglob("*"):
+            check_path(member)
+            entries.add(member.relative_to(package).as_posix())
+        if entries != expected or any(read(package, path) != data for path, data in files.items()):
             raise ValueError(f"Existing retained dungeon revision failed byte verification: {revision}")
         return
 
@@ -86,43 +118,77 @@ def retain(destination, revision, files):
 
 def retain_existing(retained, destination):
     directory = checked(retained, FOLDER)
-    npc_revisions = set()
+    current_path = directory / "Current.json"
+    current_styles = {}
+    if current_path.exists() or current_path.is_symlink():
+        current = json.loads(read(directory, "Current.json"), object_pairs_hook=json_object)
+        if (set(current) != {"SchemaVersion", "Styles"} or current["SchemaVersion"] != 1
+                or not isinstance(current["Styles"], dict) or not current["Styles"]):
+            raise ValueError("Invalid prior retained dungeon current index")
+        current_styles = current["Styles"]
+    archived_styles, npc_references = {}, set()
     for package in sorted(directory.iterdir()):
-        if not DIGEST.fullmatch(package.name):
+        if package.name in ("Current.json", NPC_FOLDER):
             continue
+        if not DIGEST.fullmatch(package.name):
+            raise ValueError(f"Unexpected retained dungeon archive owner: {package.name}")
         playfields = checked(directory, Path(package.name) / "Playfields")
-        styles = tuple(entry for entry in playfields.iterdir() if entry.is_dir())
+        styles = tuple(playfields.iterdir())
         if len(styles) != 1 or not re.fullmatch(r"[1-9][0-9]*", styles[0].name):
             raise ValueError(f"Retained dungeon revision {package.name} does not describe one original style.")
-        files = gather(package, int(styles[0].name))
+        style = styles[0].name
+        files = gather(package, int(style))
         if identity(files) != package.name:
             raise ValueError(f"Prior retained dungeon digest mismatch: {package.name}")
-        retain(destination, package.name, files)
-        reference = json.loads(files[NPC_LINK])
-        revision = reference["Sha256"]
-        if reference["SchemaVersion"] != 1 or not DIGEST.fullmatch(revision):
+        reference = json.loads(files[NPC_LINK], object_pairs_hook=json_object)
+        revision = reference.get("Sha256")
+        if (set(reference) != {"SchemaVersion", "Sha256"} or reference["SchemaVersion"] != 1
+                or not isinstance(revision, str) or not DIGEST.fullmatch(revision)):
             raise ValueError(f"Invalid retained NPC catalog reference for {package.name}.")
-        if revision not in npc_revisions:
-            npc_directory = checked(directory, Path(NPC_FOLDER) / revision)
-            npc_files = {path: read(npc_directory, path) for path in NPC_FILES}
-            if identity(npc_files, NPC_HEADER) != revision:
-                raise ValueError(f"Prior retained NPC catalog digest mismatch: {revision}")
-            retain(destination / NPC_FOLDER, revision, npc_files)
-            npc_revisions.add(revision)
+        retain(destination, package.name, files)
+        archived_styles[package.name] = style
+        npc_references.add(revision)
 
+    for style, revision in current_styles.items():
+        if not isinstance(revision, str) or archived_styles.get(revision) != style:
+            raise ValueError(f"Missing or conflicting prior retained dungeon archive for style {style}.")
+
+    npc_root = checked(directory, NPC_FOLDER)
+    npc_archives = set()
+    for package in sorted(npc_root.iterdir()):
+        if not DIGEST.fullmatch(package.name):
+            raise ValueError(f"Unexpected retained NPC catalog owner: {package.name}")
+        checked(npc_root, package.name)
+        exact_members(package, NPC_FILES)
+        npc_files = {path: read(package, path) for path in NPC_FILES}
+        if identity(npc_files, NPC_HEADER) != package.name:
+            raise ValueError(f"Prior retained NPC catalog digest mismatch: {package.name}")
+        retain(destination / NPC_FOLDER, package.name, npc_files)
+        npc_archives.add(package.name)
+    if not npc_references <= npc_archives:
+        raise ValueError("Missing prior retained NPC catalog reference.")
+
+
+def json_object(entries):
+    result = {}
+    for name, value in entries:
+        if name in result:
+            raise ValueError(f"Duplicate dungeon archive key: {name}")
+        result[name] = value
+    return result
 
 def stage(source, output, retained_from=None):
-    source = source.resolve(strict=True)
-    output = output.resolve()
+    source = rooted(source)
+    output = rooted(output, must_exist=False)
     if output == source or output.is_relative_to(source) or source.is_relative_to(output):
         raise ValueError("Stage into a distinct candidate GameData tree outside the active input tree.")
     if retained_from is not None:
-        retained_from = retained_from.resolve(strict=True)
+        retained_from = rooted(retained_from)
         if output == retained_from or output.is_relative_to(retained_from) or retained_from.is_relative_to(output):
             raise ValueError("Stage into a distinct candidate tree outside the previous retained source.")
 
     common = {path: read(source, path) for path in COMMON}
-    policy = json.loads(common["DungeonGeneration.json"])
+    policy = json.loads(common["DungeonGeneration.json"], object_pairs_hook=json_object)
     styles = {style for profile in policy["Profiles"] for style in profile["Styles"]}
     if not styles:
         raise ValueError("Generation policy defines no dungeon styles.")

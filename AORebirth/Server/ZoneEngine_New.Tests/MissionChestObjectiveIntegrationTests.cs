@@ -449,7 +449,7 @@ public sealed class MissionChestObjectiveIntegrationTests
         TestContext.WriteLine($"MISSION_OBJECTIVE_FULL_LIFECYCLE type={missionType} destination={accepted.EntrancePlayfield} quality={accepted.Quality} objective={quest.Template.Objective.Npc ?? quest.Template.Objective.WorldItem} reward={f.Offer.RewardLowId}/{f.Offer.RewardHighId}QL{f.Offer.RewardQuality} completion=APPLIED keyCleanup=APPLIED persistence=IN_MEMORY");
     }
 
-    static DungeonLayoutGenerator CreateRetainedGenerator(string root)
+    internal static DungeonLayoutGenerator CreateRetainedGenerator(string root)
     {
         // The archive-only root supplies policy and retained original geometry for the generator. The fixture's
         // other services still use complete canonical GameData for normal item/NPC/mission interactions.
@@ -635,11 +635,11 @@ public sealed class MissionChestObjectiveIntegrationTests
         };
     }
 
-    static byte[][] ChestBodies(QuestDungeonPlayfield world)
+    internal static byte[][] ChestBodies(QuestDungeonPlayfield world)
         => world.GetRequiredService<DynelRegistry>().Dynels().OfType<Chest>().OrderBy(chest => chest.Identity.Instance)
             .Select(chest => MissionChestProtocolTests.Serialize(chest.BuildSpawnMessage())).ToArray();
 
-    static void AssertObjectiveBinding(QuestDungeonPlayfield world, QuestDungeonParameters parameters)
+    internal static void AssertObjectiveBinding(QuestDungeonPlayfield world, QuestDungeonParameters parameters)
     {
         var registry = world.GetRequiredService<DynelRegistry>();
         if (parameters.ObjectiveItem is { } item)
@@ -663,7 +663,7 @@ public sealed class MissionChestObjectiveIntegrationTests
         }
     }
 
-    sealed class ObjectiveRun : IDisposable
+    internal sealed class ObjectiveRun : IDisposable
     {
         internal readonly AuthoredMissionTestDao Dao = new();
         internal readonly Fixture Fixture;
@@ -674,7 +674,9 @@ public sealed class MissionChestObjectiveIntegrationTests
         readonly CharacterSnapshotService? _snapshots;
         internal PlayerQuest Quest => Fixture.Quests.GetLog(Fixture.Player).Quests[Fixture.Store.Generated!.QuestId];
 
-        internal ObjectiveRun(int missionType, bool fromRoll = false, DungeonLayoutGenerator? retainedLayouts = null)
+        internal ObjectiveRun(int missionType, bool fromRoll = false, DungeonLayoutGenerator? retainedLayouts = null,
+            DungeonColdPathPerformanceTests.Measurement? performance = null, int? seed = null, int? quality = null,
+            bool useMultiFloorProfile = false)
         {
             var ids = new StubInstanceIdAllocator();
             IItemTemplateCatalog templates = MissionChestPlacementTests.Templates.Value;
@@ -686,12 +688,13 @@ public sealed class MissionChestObjectiveIntegrationTests
             }
             Fixture = new Fixture(Dao, new ItemBuilder(templates, ids, new StubLogger()),
                 snapshots: _snapshots, templates: templates, inventory: new ObjectiveInventory(Dao), ids: ids, playerId: RolledOwner,
-                enableMissionPopulationPersistence: true, rolledOffer: roll?.Offer, layouts: retainedLayouts);
+                enableMissionPopulationPersistence: true, rolledOffer: roll?.Offer, layouts: retainedLayouts, performance: performance);
             Assert.IsTrue(Fixture.Layouts.ChestPolicy?.RoomDensity > 0);
             if (retainedLayouts == null)
                 ConfigureRepresentativeSoloProfile(Fixture);
             else
-                Fixture.TestSeed = 9;
+                Fixture.TestSeed = seed ?? 9;
+            Fixture.TestMultiFloorProfile = useMultiFloorProfile;
             Exterior = Fixture.Player.Playfield!;
             if (roll is { } fromCatalog)
             {
@@ -706,11 +709,11 @@ public sealed class MissionChestObjectiveIntegrationTests
             else
             {
                 Fixture.Offer.MissionType = missionType;
-                Fixture.Offer.Quality = 125;
+                Fixture.Offer.Quality = quality ?? 125;
                 Fixture.Offer.IssuingTerminalType = MissionTerminal.LiveIdentityType;
                 Fixture.Offer.IssuingTerminalInstance = 123456;
                 Fixture.Offer.IssuingTerminalPlayfield = Fixture.Entrance.PlayfieldId;
-                Fixture.Player.Stats.Set(CharacterStat.Level, 125);
+                Fixture.Player.Stats.Set(CharacterStat.Level, quality ?? 125);
                 Terminal = new MissionTerminal(new Identity { Type = (IdentityType)MissionTerminal.LiveIdentityType, Instance = 123456 },
                     new ItemTemplate { Id = 1, Quality = 1 })
                 {
@@ -741,7 +744,11 @@ public sealed class MissionChestObjectiveIntegrationTests
                     item.ContainerPlacement = retired.ContainerPlacement;
                 };
             }
-            Assert.IsNull(Fixture.Accept());
+            if (performance == null)
+                Assert.IsNull(Fixture.Accept());
+            else
+                Assert.IsNull(performance.Measure("accept_offer", () => Fixture.Service.AcceptOffer(Fixture.Player,
+                    new Identity { Type = (IdentityType)Fixture.Offer.OfferType, Instance = Fixture.Offer.OfferInstance })));
             var row = Fixture.Store.Character!;
             var generated = Fixture.Store.Generated!;
             Dao.CharacterQuest = new()
@@ -767,7 +774,8 @@ public sealed class MissionChestObjectiveIntegrationTests
                 Fixture.SetExteriorIdentity(Fixture.Entrance.PlayfieldId);
                 Fixture.Player.Position = new AoVector3(Fixture.Entrance.LocalX, Fixture.Entrance.LocalY, Fixture.Entrance.LocalZ);
             }
-            Assert.IsTrue(Fixture.Service.TryEnter(Fixture.Player, Fixture.Target));
+            bool Enter() => Fixture.Service.TryEnter(Fixture.Player, Fixture.Target);
+            Assert.IsTrue(performance == null ? Enter() : performance.Measure("first_world", Enter));
             World = (QuestDungeonPlayfield)Fixture.Session.Transfers.Single().World;
             Fixture.Player.Playfield = World;
         }
@@ -850,7 +858,7 @@ public sealed class MissionChestObjectiveIntegrationTests
         public void UpsertForCharacter(int characterId, IReadOnlyList<StatRecord> stats) => throw new NotSupportedException();
     }
 
-    sealed class ObjectiveInventory(AuthoredMissionTestDao dao) : IInventoryRepository
+    internal sealed class ObjectiveInventory(AuthoredMissionTestDao dao) : IInventoryRepository
     {
         public IReadOnlyList<ItemInstanceRecord> GetContainerItems(int id) => dao.Items.Values
             .Where(row => row.ContainerType == (int)IdentityType.Container && row.ContainerInstance == id)

@@ -5,10 +5,12 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 using AORebirth.Core.GameData;
 using AORebirth.DungeonGenerator;
 using AORebirth.World.Collision;
+using N3Lite;
 using SmokeLounge.AOtomation.Messaging.GameData;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.GameData;
@@ -312,6 +314,60 @@ public static class MissionChestPlacement
         };
     }
 
+    // Mesh vertices, cell ids and triangles belong to the bound layout. Keep the read-only index
+    // with that exact geometry, so reuse never crosses a content revision or retains a disposed layout.
+    static readonly ConditionalWeakTable<DungeonWorldLayout, Lazy<PlacementGeometry>> GeometryIndex = new();
+
+    sealed class PlacementGeometry
+    {
+        internal readonly record struct BoundedMesh(CollisionTriangleMesh Mesh, Vector3 Min, Vector3 Max);
+
+        internal BoundedMesh[] Meshes { get; }
+        internal IReadOnlyDictionary<int, List<CollisionTriangleMesh>> Rooms { get; }
+        internal IReadOnlyDictionary<int, List<CollisionTriangleMesh>> Ground { get; }
+
+        internal PlacementGeometry(DungeonWorldLayout dungeon)
+        {
+            var meshes = dungeon.Collision.SurfaceMeshes;
+            Meshes = new BoundedMesh[meshes.Count];
+            var rooms = new Dictionary<int, List<CollisionTriangleMesh>>();
+            var ground = new Dictionary<int, List<CollisionTriangleMesh>>();
+            for (int i = 0; i < meshes.Count; i++)
+            {
+                CollisionTriangleMesh mesh = meshes[i];
+                Vector3 min = new(float.PositiveInfinity), max = new(float.NegativeInfinity);
+                foreach (Vector3 vertex in mesh.Vertices)
+                {
+                    min = Vector3.Min(min, vertex);
+                    max = Vector3.Max(max, vertex);
+                }
+                Meshes[i] = new BoundedMesh(mesh, min, max);
+                if (mesh.CellId is int room)
+                {
+                    Add(rooms, room, mesh);
+                    if (IsGround(mesh))
+                    {
+                        Add(ground, room, mesh);
+                    }
+                }
+            }
+            Rooms = rooms;
+            Ground = ground;
+        }
+
+        internal static bool IsGround(CollisionTriangleMesh mesh)
+            => mesh.Source?.StartsWith("ground-room", StringComparison.Ordinal) == true;
+
+        static void Add(Dictionary<int, List<CollisionTriangleMesh>> meshes, int room, CollisionTriangleMesh mesh)
+        {
+            if (!meshes.TryGetValue(room, out var list))
+            {
+                meshes.Add(room, list = []);
+            }
+            list.Add(mesh);
+        }
+    }
+
     sealed class PlacementRun
     {
         readonly DungeonWorldLayout _dungeon;
@@ -335,10 +391,12 @@ public static class MissionChestPlacement
         readonly List<int> _chosen = [];
         readonly List<int[]> _requiredAnchorGroups = [];
         readonly Dictionary<int, HashSet<int>> _roomLinks = new();
-        readonly Dictionary<CollisionTriangleMesh, (Vector3 Min, Vector3 Max)> _meshBounds = new();
+        readonly PlacementGeometry _geometry;
         readonly List<(Vector3 Source, int Landing)> _floorTravel = [];
         int _start = -1;
         MissionChestProbeFailure? _lastProbeFailure;
+        static readonly Vector3[] CardinalDirections = [Vector3.UnitX, -Vector3.UnitX, Vector3.UnitZ, -Vector3.UnitZ];
+        static readonly Vector3[] OrthogonalAxes = [Vector3.UnitX, Vector3.UnitZ];
         const int MaximumCandidateFailureDetails = 128;
         const int MaximumGraphCuts = 64;
 
@@ -351,16 +409,7 @@ public static class MissionChestPlacement
             _policy = policy; _chest = chest; _player = player; _random = random;
             _eligible = eligible; _diagnostics = diagnostics;
             _coverSections = coverSections;
-            foreach (CollisionTriangleMesh mesh in dungeon.Collision.SurfaceMeshes)
-            {
-                Vector3 min = new(float.PositiveInfinity), max = new(float.NegativeInfinity);
-                foreach (Vector3 vertex in mesh.Vertices)
-                {
-                    min = Vector3.Min(min, vertex);
-                    max = Vector3.Max(max, vertex);
-                }
-                _meshBounds[mesh] = (min, max);
-            }
+            _geometry = GeometryIndex.GetValue(dungeon, static bound => new Lazy<PlacementGeometry>(() => new PlacementGeometry(bound))).Value;
         }
 
         internal IReadOnlyList<MissionChestPosition> Select(int wanted)
@@ -581,7 +630,7 @@ public static class MissionChestPlacement
                     return null;
 
             // Reuse the same floor, sweep and room-link checks for short approaches that fall between graph anchors.
-            foreach (Vector3 direction in new[] { Vector3.UnitX, -Vector3.UnitX, Vector3.UnitZ, -Vector3.UnitZ })
+            foreach (Vector3 direction in CardinalDirections)
             {
                 Vector3 sample = floor + direction * (separation + _player.Radius);
                 if (!Project(sample, out Vector3 approach) || !IsObjectiveApproach(approach)
@@ -600,7 +649,7 @@ public static class MissionChestPlacement
                     && AtSupportedHeight(approach.Y, floor.Y)
                     && Vector3.Distance(point, approach) <= LootableDynel.OpenRange
                     && OwnFloor(room, approach)
-                    && _world.HasLineOfSight(ToAo(approach + Vector3.UnitY * _player.CenterY), ToAo(target));
+                    && HasLineOfSight(approach + Vector3.UnitY * _player.CenterY, target);
             }
         }
 
@@ -618,7 +667,8 @@ public static class MissionChestPlacement
             var districts = _districts;
             if (districts?.Districts != null)
             {
-                var byIndex = districts.Districts.Where(value => value != null).ToDictionary(value => value.DistrictIndex);
+                var retainedIndex = ReferenceEquals(districts, _layout.Districts) ? _layout.DistrictByIndex : null;
+                var byIndex = retainedIndex ?? districts.Districts.Where(value => value != null).ToDictionary(value => value.DistrictIndex);
                 foreach (DungeonRoomPlacement placed in _dungeon.Placements)
                 {
                     int zone = placed.Template.InstanceId;
@@ -702,8 +752,7 @@ public static class MissionChestPlacement
         {
             // GNDA ground can lie below an authored catwalk. Cover actual upward room surfaces
             // as well as structural ground features and random interiors, without changing validation.
-            foreach (var group in _dungeon.Collision.SurfaceMeshes.Where(mesh =>
-                         mesh.Source?.StartsWith("ground-room", StringComparison.Ordinal) == true && mesh.CellId.HasValue)
+            foreach (var group in _dungeon.Collision.SurfaceMeshes.Where(mesh => PlacementGeometry.IsGround(mesh) && mesh.CellId.HasValue)
                          .GroupBy(mesh => mesh.CellId!.Value))
             {
                 var triangles = group.SelectMany(mesh => mesh.Triangles.Select(triangle =>
@@ -714,8 +763,10 @@ public static class MissionChestPlacement
                 float groundMaximum = triangles.Max(triangle => MathF.Max(triangle.A.Y, MathF.Max(triangle.B.Y, triangle.C.Y)));
                 var centres = triangles.Select(triangle => ((triangle.A + triangle.B + triangle.C) / 3,
                     Raw: false, Raised: false)).ToList();
-                foreach (CollisionTriangleMesh mesh in _dungeon.Collision.SurfaceMeshes.Where(mesh => mesh.CellId == group.Key
-                             && mesh.Source?.StartsWith("ground-room", StringComparison.Ordinal) != true))
+                foreach (CollisionTriangleMesh mesh in _geometry.Rooms[group.Key])
+                {
+                    if (PlacementGeometry.IsGround(mesh))
+                        continue;
                     foreach (CollisionTriangle triangle in mesh.Triangles)
                     {
                         Vector3 a = mesh.Vertices[triangle.A], b = mesh.Vertices[triangle.B], c = mesh.Vertices[triangle.C];
@@ -729,9 +780,17 @@ public static class MissionChestPlacement
                             centres.Add((centre, true, raised));
                         }
                     }
+                }
                 var attemptedCentres = new bool[centres.Count];
-                float[] uncovered = centres.Select(centre => _rooms.TryGetValue(group.Key, out var nodes) && nodes.Count > 0
-                    ? nodes.Min(index => Vector3.DistanceSquared(centre.Item1, _nodes[index].Point)) : float.PositiveInfinity).ToArray();
+                var uncovered = new float[centres.Count];
+                Array.Fill(uncovered, float.PositiveInfinity);
+                if (_rooms.TryGetValue(group.Key, out var nodes))
+                    for (int centre = 0; centre < centres.Count; centre++)
+                        foreach (int index in nodes)
+                        {
+                            uncovered[centre] = MathF.Min(uncovered[centre],
+                                Vector3.DistanceSquared(centres[centre].Item1, _nodes[index].Point));
+                        }
                 int added = 0;
                 for (int attempt = 0; attempt < _policy.CandidateAttemptsPerRoom && added < _policy.CandidatesPerRoom * 5; attempt++)
                 {
@@ -739,7 +798,15 @@ public static class MissionChestPlacement
                     int centreIndex = -1;
                     if (structural)
                     {
-                        bool raisedAvailable = centres.Where((centre, index) => centre.Raised && !attemptedCentres[index]).Any();
+                        bool raisedAvailable = false;
+                        for (int index = 0; index < centres.Count; index++)
+                        {
+                            if (centres[index].Raised && !attemptedCentres[index])
+                            {
+                                raisedAvailable = true;
+                                break;
+                            }
+                        }
                         bool preferRaw = (attempt / 2) % 2 == 1;
                         int start = _random.Next(centres.Count);
                         for (int preference = 0; preference < 2 && centreIndex < 0; preference++)
@@ -1055,29 +1122,31 @@ public static class MissionChestPlacement
             floor = default;
             Vector3? matchingXZ = null;
             // The generated ground triangles follow DCGA's occupied tiles, including nonrectangular rooms.
-            foreach (CollisionTriangleMesh mesh in _dungeon.Collision.SurfaceMeshes.Where(mesh =>
-                         mesh.CellId == room && mesh.Source?.StartsWith("ground-room", StringComparison.Ordinal) == true))
-                foreach (CollisionTriangle triangle in mesh.Triangles)
-                {
-                    Vector3 a = mesh.Vertices[triangle.A], b = mesh.Vertices[triangle.B], c = mesh.Vertices[triangle.C];
-                    Vector2 ab = new(b.X - a.X, b.Z - a.Z), ac = new(c.X - a.X, c.Z - a.Z);
-                    Vector2 delta = new(point.X - a.X, point.Z - a.Z);
-                    float determinant = ab.X * ac.Y - ab.Y * ac.X;
-                    if (MathF.Abs(determinant) < 1e-8f)
-                        continue;
-                    float u = (delta.X * ac.Y - delta.Y * ac.X) / determinant;
-                    float v = (ab.X * delta.Y - ab.Y * delta.X) / determinant;
-                    if (u >= -0.001f && v >= -0.001f && u + v <= 1.001f)
+            if (_geometry.Ground.TryGetValue(room, out var meshes))
+            {
+                foreach (CollisionTriangleMesh mesh in meshes)
+                    foreach (CollisionTriangle triangle in mesh.Triangles)
                     {
-                        matchingXZ = new Vector3(point.X, a.Y + u * (b.Y - a.Y) + v * (c.Y - a.Y), point.Z);
+                        Vector3 a = mesh.Vertices[triangle.A], b = mesh.Vertices[triangle.B], c = mesh.Vertices[triangle.C];
+                        Vector2 ab = new(b.X - a.X, b.Z - a.Z), ac = new(c.X - a.X, c.Z - a.Z);
+                        Vector2 delta = new(point.X - a.X, point.Z - a.Z);
+                        float determinant = ab.X * ac.Y - ab.Y * ac.X;
+                        if (MathF.Abs(determinant) < 1e-8f)
+                            continue;
+                        float u = (delta.X * ac.Y - delta.Y * ac.X) / determinant;
+                        float v = (ab.X * delta.Y - ab.Y * delta.X) / determinant;
+                        if (u >= -0.001f && v >= -0.001f && u + v <= 1.001f)
+                        {
+                            matchingXZ = new Vector3(point.X, a.Y + u * (b.Y - a.Y) + v * (c.Y - a.Y), point.Z);
+                        }
+                        if (u >= -0.001f && v >= -0.001f && u + v <= 1.001f
+                            && (!checkHeight || MathF.Abs(point.Y - (a.Y + u * (b.Y - a.Y) + v * (c.Y - a.Y))) <= 0.01f))
+                        {
+                            floor = new Vector3(point.X, a.Y + u * (b.Y - a.Y) + v * (c.Y - a.Y), point.Z);
+                            return true;
+                        }
                     }
-                    if (u >= -0.001f && v >= -0.001f && u + v <= 1.001f
-                        && (!checkHeight || MathF.Abs(point.Y - (a.Y + u * (b.Y - a.Y) + v * (c.Y - a.Y))) <= 0.01f))
-                    {
-                        floor = new Vector3(point.X, a.Y + u * (b.Y - a.Y) + v * (c.Y - a.Y), point.Z);
-                        return true;
-                    }
-                }
+            }
             ProbeFailure(matchingXZ.HasValue ? "own-floor-height" : "own-floor-xz", point, point, matchingXZ,
                 meshCell: room, distance: matchingXZ.HasValue ? MathF.Abs(point.Y - matchingXZ.Value.Y) : null, limit: 0.01f);
             return false;
@@ -1085,7 +1154,9 @@ public static class MissionChestPlacement
 
         IEnumerable<Wall> Walls(int room, float height)
         {
-            foreach (CollisionTriangleMesh mesh in _dungeon.Collision.SurfaceMeshes.Where(mesh => mesh.CellId == room))
+            if (!_geometry.Rooms.TryGetValue(room, out var meshes))
+                yield break;
+            foreach (CollisionTriangleMesh mesh in meshes)
                 foreach (CollisionTriangle triangle in mesh.Triangles)
                     if (TrySliceWall(mesh.Vertices[triangle.A], mesh.Vertices[triangle.B], mesh.Vertices[triangle.C], height, out Wall wall))
                     {
@@ -1095,28 +1166,31 @@ public static class MissionChestPlacement
 
         static bool TrySliceWall(Vector3 a, Vector3 b, Vector3 c, float height, out Wall wall)
         {
-            wall = null!;
+            wall = default;
             Vector3 normal = Vector3.Cross(b - a, c - a);
             if (normal.LengthSquared() < 1e-8f || MathF.Abs(Vector3.Normalize(normal).Y) > 0.3f)
                 return false;
-            var cuts = new List<Vector3>(3);
-            Cut(a, b); Cut(b, c); Cut(c, a);
-            if (cuts.Count < 2 || Vector3.DistanceSquared(cuts[0], cuts[1]) < 0.04f)
+            Span<Vector3> cuts = stackalloc Vector3[3];
+            int count = 0;
+            Cut(a, b, height, cuts, ref count);
+            Cut(b, c, height, cuts, ref count);
+            Cut(c, a, height, cuts, ref count);
+            if (count < 2 || Vector3.DistanceSquared(cuts[0], cuts[1]) < 0.04f)
                 return false;
             Vector3 inward = Vector3.Normalize(new Vector3(normal.X, 0, normal.Z));
             wall = new Wall(cuts[0], cuts[1], inward, a, b, c);
             return true;
 
-            void Cut(Vector3 first, Vector3 second)
+            static void Cut(Vector3 first, Vector3 second, float height, Span<Vector3> cuts, ref int count)
             {
                 if ((first.Y < height && second.Y < height) || (first.Y > height && second.Y > height)
                     || MathF.Abs(second.Y - first.Y) < 1e-6f)
                     return;
                 Vector3 cut = Vector3.Lerp(first, second, (height - first.Y) / (second.Y - first.Y));
-                if (!cuts.Any(point => Vector3.DistanceSquared(point, cut) < 1e-8f))
-                {
-                    cuts.Add(cut);
-                }
+                for (int i = 0; i < count; i++)
+                    if (Vector3.DistanceSquared(cuts[i], cut) < 1e-8f)
+                        return;
+                cuts[count++] = cut;
             }
         }
 
@@ -1211,9 +1285,17 @@ public static class MissionChestPlacement
         }
 
         bool Allowed(Vector3 point)
-            => !Near(point, ToNumerics(_layout.Spawn), _policy.EntryClearance)
-                && !_exclusions.Any(other => Near(point, other, _policy.ObjectiveClearance))
-                && !_doorPoints.Any(other => Near(point, other, _policy.DoorClearance));
+        {
+            if (Near(point, ToNumerics(_layout.Spawn), _policy.EntryClearance))
+                return false;
+            for (int i = 0; i < _exclusions.Count; i++)
+                if (Near(point, _exclusions[i], _policy.ObjectiveClearance))
+                    return false;
+            foreach (Vector3 door in _doorPoints)
+                if (Near(point, door, _policy.DoorClearance))
+                    return false;
+            return true;
+        }
 
         int Add(int room, Vector3 point, bool candidate = false, Vector3 inward = default, int approach = -1, bool corner = false)
         {
@@ -1267,8 +1349,8 @@ public static class MissionChestPlacement
                         Visit(next, transition);
                 foreach (var travel in _floorTravel)
                     if (Vector3.Distance(_nodes[current].Point, travel.Source) <= LootableDynel.OpenRange
-                        && _world.HasLineOfSight(ToAo(_nodes[current].Point + Vector3.UnitY * _player.CenterY),
-                            ToAo(travel.Source + Vector3.UnitY * _player.CenterY)))
+                        && HasLineOfSight(_nodes[current].Point + Vector3.UnitY * _player.CenterY,
+                            travel.Source + Vector3.UnitY * _player.CenterY))
                     {
                         Visit(travel.Landing, transition: true);
                     }
@@ -1378,21 +1460,21 @@ public static class MissionChestPlacement
             Vector3 centre = chest + Vector3.UnitY * _chest.CenterY;
             Vector3 point = _nodes[node.Approach].Point;
             return reachable[node.Approach] && Vector3.Distance(point, chest) <= LootableDynel.OpenRange
-                && _world.HasLineOfSight(ToAo(point + Vector3.UnitY * _player.CenterY), ToAo(centre));
+                && HasLineOfSight(point + Vector3.UnitY * _player.CenterY, centre);
         }
 
         bool Project(Vector3 source, out Vector3 floor)
         {
             floor = default;
             if (!float.IsFinite(source.X) || !float.IsFinite(source.Y) || !float.IsFinite(source.Z)
-                || !_world.TryRaycastDown(ToAo(source + Vector3.UnitY * _policy.FloorProbeLift),
-                    _policy.FloorProbeLift + _policy.MaxFloorDrop, out AoVector3 hit))
+                || !_world.TryRaycastDown(ToCollision(source + Vector3.UnitY * _policy.FloorProbeLift),
+                    _policy.FloorProbeLift + _policy.MaxFloorDrop, out float height))
             {
                 ProbeFailure("floor-ray", source, source + Vector3.UnitY * _policy.FloorProbeLift,
                     limit: _policy.FloorProbeLift + _policy.MaxFloorDrop);
                 return false;
             }
-            floor = ToNumerics(hit);
+            floor = new Vector3(source.X, height, source.Z);
             return true;
         }
 
@@ -1401,11 +1483,11 @@ public static class MissionChestPlacement
             float radius = sphere.Radius + _policy.CollisionPadding;
             Vector3 centre = feet + Vector3.UnitY * (sphere.CenterY + 2 * _policy.CollisionPadding);
             // Probe the occupied sphere itself; sweeping its centre by another radius would double wall clearance.
-            foreach (Vector3 axis in new[] { Vector3.UnitX, Vector3.UnitZ })
+            foreach (Vector3 axis in OrthogonalAxes)
                 if (!CastClear(centre - axis * _policy.CollisionPadding,
                         centre + axis * MathF.Max(0.001f, _policy.CollisionPadding), radius))
                     return false;
-            foreach (Vector3 offset in new[] { Vector3.UnitX, -Vector3.UnitX, Vector3.UnitZ, -Vector3.UnitZ })
+            foreach (Vector3 offset in CardinalDirections)
             {
                 if (!Project(feet + offset * sphere.Radius, out Vector3 support))
                     return false;
@@ -1422,12 +1504,13 @@ public static class MissionChestPlacement
 
         bool StaticSphereClear(Vector3 centre, float radius)
         {
-            foreach (CollisionTriangleMesh mesh in _dungeon.Collision.SurfaceMeshes)
+            float toleranceRadius = MathF.Max(0, radius - 0.001f); // Stable tangency at upper-floor float coordinates.
+            float toleranceSquared = toleranceRadius * toleranceRadius;
+            foreach (var (mesh, boundsMin, boundsMax) in _geometry.Meshes)
             {
-                var bounds = _meshBounds[mesh];
-                if (centre.X < bounds.Min.X - radius || centre.X > bounds.Max.X + radius
-                    || centre.Y < bounds.Min.Y - radius || centre.Y > bounds.Max.Y + radius
-                    || centre.Z < bounds.Min.Z - radius || centre.Z > bounds.Max.Z + radius)
+                if (centre.X < boundsMin.X - radius || centre.X > boundsMax.X + radius
+                    || centre.Y < boundsMin.Y - radius || centre.Y > boundsMax.Y + radius
+                    || centre.Z < boundsMin.Z - radius || centre.Z > boundsMax.Z + radius)
                     continue;
                 foreach (CollisionTriangle triangle in mesh.Triangles)
                 {
@@ -1437,10 +1520,9 @@ public static class MissionChestPlacement
                     if (centre.X < min.X || centre.X > max.X || centre.Y < min.Y || centre.Y > max.Y
                         || centre.Z < min.Z || centre.Z > max.Z)
                         continue;
-                    float toleranceRadius = MathF.Max(0, radius - 0.001f); // Stable tangency at upper-floor float coordinates.
                     Vector3 closest = ClosestTrianglePoint(centre, a, b, c);
                     float distanceSquared = Vector3.DistanceSquared(centre, closest);
-                    if (distanceSquared < toleranceRadius * toleranceRadius)
+                    if (distanceSquared < toleranceSquared)
                     {
                         Vector3 normal = Vector3.Cross(b - a, c - a);
                         ProbeFailure("static-sphere-triangle", centre, closest, closest,
@@ -1486,12 +1568,14 @@ public static class MissionChestPlacement
 
         bool CastClear(Vector3 from, Vector3 to, float radius)
         {
-            if (_world.TrySphereCast(ToAo(from), ToAo(to), radius, out AoVector3 rest, out AoVector3 normal))
+            Vec3 start = ToCollision(from), end = ToCollision(to);
+            bool firstHitOnly = _diagnostics?.CaptureFailureDetails != true;
+            if (_world.TrySphereCast(start, end, radius, firstHitOnly, out Vec3 rest, out Vec3 normal))
             {
                 ProbeFailure("sphere-cast", from, to, ToNumerics(rest), ToNumerics(normal), limit: radius);
                 return false;
             }
-            if (_world.TrySphereCast(ToAo(to), ToAo(from), radius, out rest, out normal))
+            if (_world.TrySphereCast(end, start, radius, firstHitOnly, out rest, out normal))
             {
                 ProbeFailure("sphere-cast-reverse", to, from, ToNumerics(rest), ToNumerics(normal), limit: radius);
                 return false;
@@ -1500,7 +1584,15 @@ public static class MissionChestPlacement
         }
 
         bool Blocked(Vector3 point)
-            => _selected.Any(chest => Near(chest, point, _chest.Radius + _player.Radius + _policy.CollisionPadding));
+        {
+            foreach (Vector3 chest in _selected)
+                if (Near(chest, point, _chest.Radius + _player.Radius + _policy.CollisionPadding))
+                    return true;
+            return false;
+        }
+
+        bool HasLineOfSight(Vector3 from, Vector3 to)
+            => _world.HasLineOfSight(from.X, from.Y, from.Z, to.X, to.Y, to.Z);
 
         bool BlockedSegment(Vector3 from, Vector3 to)
         {
@@ -1524,10 +1616,11 @@ public static class MissionChestPlacement
             => MathF.Abs(first.Y - second.Y) <= _chest.Radius * 2 + _policy.MaxWalkStep
                 && Vector2.DistanceSquared(new Vector2(first.X, first.Z), new Vector2(second.X, second.Z)) < distance * distance;
 
-        sealed record Node(int Room, Vector3 Point, bool Candidate, Vector3 Inward, int Approach, bool Corner);
-        sealed record Wall(Vector3 A, Vector3 B, Vector3 Inward, Vector3 TriangleA, Vector3 TriangleB, Vector3 TriangleC);
+        readonly record struct Node(int Room, Vector3 Point, bool Candidate, Vector3 Inward, int Approach, bool Corner);
+        readonly record struct Wall(Vector3 A, Vector3 B, Vector3 Inward, Vector3 TriangleA, Vector3 TriangleB, Vector3 TriangleC);
     }
 
-    static AoVector3 ToAo(Vector3 point) => new(point.X, point.Y, point.Z);
+    static Vec3 ToCollision(Vector3 point) => new(point.X, point.Y, point.Z);
+    static Vector3 ToNumerics(Vec3 point) => new(point.X, point.Y, point.Z);
     static Vector3 ToNumerics(AoVector3 point) => new(point.xf, point.yf, point.zf);
 }

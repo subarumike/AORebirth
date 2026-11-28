@@ -956,13 +956,17 @@ public sealed class QuestDungeonDestinationTests
         internal IGameData GameData => RuntimeData.Value;
         internal MissionKeyPolicy Keys => KeyPolicy.Value;
         readonly Playfield _exterior = Blank<Playfield>();
+        readonly DungeonColdPathPerformanceTests.Measurement? _performance;
+        internal bool TestMultiFloorProfile;
 
         internal Fixture(IMissionDao? completionDao = null, IItemBuilder? items = null, Func<DateTime>? now = null,
             CharacterSnapshotService? snapshots = null, IItemTemplateCatalog? templates = null,
             IInventoryRepository? inventory = null, IItemInstanceIdAllocator? ids = null, int playerId = 77,
             bool enableMissionPopulationPersistence = false, GeneratedMissionOffer? rolledOffer = null,
-            DungeonLayoutGenerator? layouts = null)
+            DungeonLayoutGenerator? layouts = null, DungeonColdPathPerformanceTests.Measurement? performance = null)
         {
+            _performance = performance;
+            _logger.BenchmarkInfo = performance == null ? null : performance.ObserveInfo;
             _enableMissionPopulationPersistence = enableMissionPopulationPersistence;
             Player = TestWorld.CreatePlayer(playerId);
             _templates = templates ?? new StubCatalog();
@@ -1006,7 +1010,8 @@ public sealed class QuestDungeonDestinationTests
                 RuntimeData.Value, _items, minter, inventory ?? new StubInventoryRepository(), _ids,
                 new InventoryMoveService(_logger, _flush, _actions), _flush,
                 new TradeService(_logger, RuntimeData.Value, _templates, minter, _ids, _flush, Persistence),
-                Blank<CharacterSnapshotService>(), new PlayfieldMetricsRegistry(), new TeamService(), authored, _templates, new Shops(), _quests);
+                Blank<CharacterSnapshotService>(), new PlayfieldMetricsRegistry(), new TeamService(), authored, _templates, new Shops(), _quests,
+                dungeonPopulation: performance, dungeonObjectives: performance);
             SetExteriorIdentity(Entrance.PlayfieldId);
             Player.Playfield = _exterior;
             Player.Position = new Vector3(Entrance.LocalX, Entrance.LocalY, Entrance.LocalZ);
@@ -1113,7 +1118,7 @@ public sealed class QuestDungeonDestinationTests
                 Layouts = layouts;
             Service = new QuestDungeonService(Store, _quests, Catalog.Value, new TestDungeonGenerator(this), Offers, _items, _ids,
                 _flush, _actions, new Lazy<PlayfieldManager>(() => Manager), RuntimeData.Value, Keys, _logger,
-                new HashItemMinter(RuntimeData.Value, _templates, _items));
+                new HashItemMinter(RuntimeData.Value, _templates, _items), objectivePlacement: _performance);
             Lifecycle = new GeneratedMissionLifecycleModule(_quests, Service, Offers, new Lazy<PlayfieldManager>(() => Manager), _logger);
         }
         // Test-only adjustments are made to the accepted plan. A shared provider snapshot is never mutated.
@@ -1130,7 +1135,8 @@ public sealed class QuestDungeonDestinationTests
             {
                 if (fixture.TestSeed is int seed)
                     parameters.Seed = seed;
-                if (!fixture.Layouts.ConfigureNewDungeon(parameters, team))
+                bool Configure() => fixture.Layouts.ConfigureNewDungeon(parameters, team || fixture.TestMultiFloorProfile);
+                if (!(fixture._performance == null ? Configure() : fixture._performance.Measure("configure_with_retained_content", Configure)))
                     return false;
                 if (!fixture._enableMissionPopulationPersistence)
                     parameters.TokenReward = null;
@@ -1140,7 +1146,14 @@ public sealed class QuestDungeonDestinationTests
             }
 
             public bool TryGenerate(QuestDungeonParameters parameters, out DungeonLayout layout)
-                => fixture.Layouts.TryGenerate(parameters, out layout);
+            {
+                if (fixture._performance == null)
+                    return fixture.Layouts.TryGenerate(parameters, out layout);
+                DungeonLayout measured = null!;
+                bool ok = fixture._performance.Measure("generate_and_bind_retained_layout", () => fixture.Layouts.TryGenerate(parameters, out measured));
+                layout = measured;
+                return ok;
+            }
         }
 
         public void Dispose() { Service?.Dispose(); Manager.Dispose(); _flush.Dispose(); }
@@ -1152,8 +1165,13 @@ public sealed class QuestDungeonDestinationTests
     {
         internal string Errors = string.Empty;
         internal readonly List<string> Information = [];
+        internal Action<string>? BenchmarkInfo;
         public void Debug(string message) { }
-        public void Info(string message) => Information.Add(message);
+        public void Info(string message)
+        {
+            Information.Add(message);
+            BenchmarkInfo?.Invoke(message);
+        }
         public void Warn(string message) { }
         public void Error(string message) => Errors += message + Environment.NewLine;
         public void Error(Exception exception, string message) => Errors += message + " " + exception + Environment.NewLine;
@@ -1217,6 +1235,9 @@ public sealed class QuestDungeonDestinationTests
         internal Action<string>? BeforeEndKeys;
         internal int AcceptCalls;
         internal int EndKeysCalls;
+        internal int QuestReads;
+        internal int GeneratedReads;
+        internal int KeyLookupReads;
         internal readonly List<int> RetiredKeys = [];
         public bool TryAcceptOfferQuest(int ownerId, int offerType, int offerInstance, GeneratedQuestRow quest,
             CharacterQuestRow characterRow, QuestDungeonKeyItemRow key, long nowUtcTicks)
@@ -1250,11 +1271,26 @@ public sealed class QuestDungeonDestinationTests
             if (!Links.TryGetValue(sourceKeyInstanceId, out string? quest) || Links.Count >= maxKeys) return null;
             Links.Add(copy.InstanceId, quest); Keys.Add(copy); return quest;
         }
-        public IList<CharacterQuestRow> Load(int characterId) => Character != null ? [Character] : [];
-        public IList<GeneratedQuestRow> LoadGeneratedFor(int characterId) => Generated != null ? [Generated] : [];
-        public GeneratedQuestRow? LoadGenerated(string questId) => Generated?.QuestId == questId ? Generated : null;
+        public IList<CharacterQuestRow> Load(int characterId)
+        {
+            QuestReads++;
+            return Character != null ? [Character] : [];
+        }
+        public IList<GeneratedQuestRow> LoadGeneratedFor(int characterId)
+        {
+            GeneratedReads++;
+            return Generated != null ? [Generated] : [];
+        }
+        public GeneratedQuestRow? LoadGenerated(string questId)
+        {
+            GeneratedReads++;
+            return Generated?.QuestId == questId ? Generated : null;
+        }
         public IDictionary<int, string> LoadKeyQuests(IReadOnlyCollection<int> keyInstanceIds)
-            => Links.Where(pair => keyInstanceIds.Contains(pair.Key)).ToDictionary(pair => pair.Key, pair => pair.Value);
+        {
+            KeyLookupReads++;
+            return Links.Where(pair => keyInstanceIds.Contains(pair.Key)).ToDictionary(pair => pair.Key, pair => pair.Value);
+        }
         public IList<int> RetireUnlinkedKeys(IReadOnlyCollection<int> keyInstanceIds, int keyLowId)
         {
             Assert.AreEqual(KeyPolicy.Value.KeyTemplateId, keyLowId);
@@ -1283,10 +1319,14 @@ public sealed class QuestDungeonDestinationTests
     internal sealed class OfferDao : IGeneratedMissionOfferReader, IGeneratedMissionDao
     {
         internal GeneratedMissionOffer Offer = null!;
+        internal int CurrentOfferReads;
         public GeneratedMissionOffer ReadCurrentOffer(int owner, int type, int instance, long now)
-            => owner == Offer.OwnerId && type == Offer.OfferType && instance == Offer.OfferInstance
+        {
+            CurrentOfferReads++;
+            return owner == Offer.OwnerId && type == Offer.OfferType && instance == Offer.OfferInstance
                 && Offer.State == GeneratedMissionState.Offered && Offer.ExpiresAtUtcTicks > now
                 ? Offer : null!;
+        }
 
         public IList<GeneratedMissionOffer> ReadOffers(int owner) => throw new AssertFailedException("Acceptance must read the exact current offer.");
         public int ReserveIdentities(string sequence, int count) => throw new AssertFailedException();

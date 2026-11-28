@@ -73,12 +73,7 @@ internal sealed class MissionDungeonPopulationModule : IMissionDungeonPopulation
             return;
         }
 
-        var byIndex = new Dictionary<int, PlayfieldDistrictEntry>();
-        foreach (PlayfieldDistrictEntry district in districts.Districts)
-        {
-            if (district != null)
-                byIndex[district.DistrictIndex] = district;
-        }
+        IReadOnlyDictionary<int, PlayfieldDistrictEntry> byIndex = world.Layout.DistrictByIndex ?? IndexDistricts(districts.Districts);
 
         // Each placed room's district and its usable spawn points.
         var rooms = new List<(DungeonRoomPlacement Placement, PlayfieldDistrictEntry District, List<PlayfieldDistrictSpawnPoint> Points)>();
@@ -196,6 +191,17 @@ internal sealed class MissionDungeonPopulationModule : IMissionDungeonPopulation
 
         logger.Info("Quest dungeon " + world.QuestId + " spawn points=" + added + " skipped=" + skipped
             + " requestedNpcLevel=" + world.Quality + " families=" + string.Join(",", population.RegularNpcHashes));
+    }
+
+    static Dictionary<int, PlayfieldDistrictEntry> IndexDistricts(IEnumerable<PlayfieldDistrictEntry> districts)
+    {
+        var result = new Dictionary<int, PlayfieldDistrictEntry>();
+        foreach (var district in districts)
+        {
+            if (district != null)
+                result[district.DistrictIndex] = district;
+        }
+        return result;
     }
 
     static InvalidDataException MissingRetainedFamily(string hash)

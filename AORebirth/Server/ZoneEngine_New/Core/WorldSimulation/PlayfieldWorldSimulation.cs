@@ -235,18 +235,24 @@
         public bool TryRaycastDown(AoVector3 origin, float maxDistance, out AoVector3 hitPosition)
         {
             hitPosition = origin;
-            if (maxDistance <= 0f)
+            if (!TryRaycastDown(ToVec3(origin), maxDistance, out float height))
                 return false;
 
-            if (Surface == null)
+            hitPosition = new AoVector3(origin.x, height, origin.z);
+            return true;
+        }
+
+        internal bool TryRaycastDown(Vec3 origin, float maxDistance, out float height)
+        {
+            height = origin.Y;
+            if (maxDistance <= 0f || Surface == null)
                 return false;
 
-            Vec3 start = ToVec3(origin);
-            var end = new Vec3(start.X, start.Y - maxDistance, start.Z);
-            if (!Surface.GetLineIntersection(start, end, out Vec3 hit, out _, false, null))
+            var end = new Vec3(origin.X, origin.Y - maxDistance, origin.Z);
+            if (!Surface.GetLineIntersection(origin, end, out Vec3 hit, out _, false, null))
                 return false;
 
-            hitPosition = new AoVector3(origin.x, hit.Y, origin.z);
+            height = hit.Y;
             return true;
         }
 
@@ -278,13 +284,25 @@
         /// </summary>
         public bool TrySphereCast(AoVector3 from, AoVector3 to, float radius, out AoVector3 rest, out AoVector3 normal)
         {
+            if (TrySphereCast(ToVec3(from), ToVec3(to), radius, firstHitOnly: false, out Vec3 contact, out Vec3 direction))
+            {
+                rest = new AoVector3(contact.X, contact.Y, contact.Z);
+                normal = new AoVector3(direction.X, direction.Y, direction.Z);
+                return true;
+            }
+
             rest = to;
             normal = new AoVector3(0, 1, 0);
+            return false;
+        }
+
+        internal bool TrySphereCast(Vec3 start, Vec3 end, float radius, bool firstHitOnly, out Vec3 rest, out Vec3 normal)
+        {
+            rest = end;
+            normal = new Vec3(0f, 1f, 0f);
             if (Surface == null)
                 return false;
 
-            Vec3 start = ToVec3(from);
-            Vec3 end = ToVec3(to);
             float dx = end.X - start.X, dy = end.Y - start.Y, dz = end.Z - start.Z;
             float length = MathF.Sqrt((dx * dx) + (dy * dy) + (dz * dz));
             if (length < 1e-4f)
@@ -325,6 +343,9 @@
                 float along = ((hit.X - a.X) * dx) + ((hit.Y - a.Y) * dy) + ((hit.Z - a.Z) * dz);
                 if (along >= best)
                     continue;
+                // Placement only needs a blocking witness when it is not collecting hit diagnostics.
+                if (firstHitOnly)
+                    return true;
 
                 best = along;
                 // Back onto the centre line, so an offset ray's contact stands for the sphere's.
@@ -340,8 +361,8 @@
             float nx = nl > 1e-6f ? bestNormal.X / nl : 0f;
             float ny = nl > 1e-6f ? bestNormal.Y / nl : 1f;
             float nz = nl > 1e-6f ? bestNormal.Z / nl : 0f;
-            normal = new AoVector3(nx, ny, nz);
-            rest = new AoVector3(bestHit.X + (nx * radius), bestHit.Y + (ny * radius), bestHit.Z + (nz * radius));
+            normal = new Vec3(nx, ny, nz);
+            rest = new Vec3(bestHit.X + (nx * radius), bestHit.Y + (ny * radius), bestHit.Z + (nz * radius));
             return true;
         }
 

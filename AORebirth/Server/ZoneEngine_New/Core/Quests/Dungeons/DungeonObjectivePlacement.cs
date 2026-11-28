@@ -3,6 +3,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using AORebirth.Core.GameData;
 using AORebirth.World.Collision;
 using ZoneEngine_New.Core.Logging;
@@ -77,7 +78,7 @@ public sealed class DungeonObjectivePlacement : IMissionDungeonObjectivePlacemen
         int[] distances = RoomDistances(dungeon, layout);
         string? reason = roomIndex < 0 || roomIndex >= distances.Length || distances[roomIndex] <= 0
             ? "room is not connected to the entrance"
-            : !Candidates(dungeon, districts, distances, roomIndex).Any(candidate => candidate.Position == position)
+            : !Candidates(dungeon, layout, districts, distances, roomIndex).Any(candidate => candidate.Position == position)
                 ? "position is not an exact retained district point"
                 : validatePoint(roomIndex, position);
         failure = reason == null ? string.Empty : FormattableString.Invariant(
@@ -87,17 +88,16 @@ public sealed class DungeonObjectivePlacement : IMissionDungeonObjectivePlacemen
 
     static IEnumerable<Candidate> Candidates(DungeonWorldLayout dungeon, DungeonLayout layout,
         PlayfieldDistrictsData? districts)
-        => Candidates(dungeon, districts, RoomDistances(dungeon, layout));
+        => Candidates(dungeon, layout, districts, RoomDistances(dungeon, layout));
 
-    static IEnumerable<Candidate> Candidates(DungeonWorldLayout dungeon, PlayfieldDistrictsData? districts,
-        int[] distances, int? selectedRoom = null)
+    static IEnumerable<Candidate> Candidates(DungeonWorldLayout dungeon, DungeonLayout layout,
+        PlayfieldDistrictsData? districts, int[] distances, int? selectedRoom = null)
     {
         if (districts?.Districts == null)
             yield break;
-        var byIndex = new Dictionary<int, PlayfieldDistrictEntry>();
-        foreach (var district in districts.Districts)
-            if (district != null)
-                byIndex[district.DistrictIndex] = district;
+        IReadOnlyDictionary<int, PlayfieldDistrictEntry>? retainedIndex = ReferenceEquals(districts, layout.Districts)
+            ? layout.DistrictByIndex : null;
+        IReadOnlyDictionary<int, PlayfieldDistrictEntry> byIndex = retainedIndex ?? IndexDistricts(districts.Districts);
         foreach (var placement in dungeon.Placements)
         {
             if (distances[placement.Index] <= 0 || (selectedRoom.HasValue && placement.Index != selectedRoom))
@@ -117,7 +117,27 @@ public sealed class DungeonObjectivePlacement : IMissionDungeonObjectivePlacemen
         }
     }
 
+    static Dictionary<int, PlayfieldDistrictEntry> IndexDistricts(IEnumerable<PlayfieldDistrictEntry> districts)
+    {
+        var byIndex = new Dictionary<int, PlayfieldDistrictEntry>();
+        foreach (var district in districts)
+            if (district != null)
+            {
+                byIndex[district.DistrictIndex] = district;
+            }
+        return byIndex;
+    }
+
+    // Both consumers read this graph, which describes one verified bound layout and its transitions.
+    static readonly ConditionalWeakTable<DungeonLayout, Lazy<int[]>> RetainedRoomDistances = new();
+
     internal static int[] RoomDistances(DungeonWorldLayout dungeon, DungeonLayout layout)
+        => layout.Content != null && ReferenceEquals(layout.Geometry, dungeon)
+            ? RetainedRoomDistances.GetValue(layout, static bound => new Lazy<int[]>(() =>
+                BuildRoomDistances(bound.Geometry!, bound))).Value
+            : BuildRoomDistances(dungeon, layout);
+
+    static int[] BuildRoomDistances(DungeonWorldLayout dungeon, DungeonLayout layout)
     {
         int count = dungeon.Placements.Count;
         var links = new List<int>[count];

@@ -19,6 +19,7 @@ internal sealed partial class AuthoredMissionTestDao : IMissionDao, IMissionDaoT
     internal Dictionary<int, long> Stats = [];
     internal CharacterQuestCompletionSnapshotData? CharacterQuest;
     internal int Calls;
+    internal int CharacterReads;
     internal Exception? Failure;
     internal bool UnknownCommit;
     internal Action<AuthoredMissionTestDao>? BeforeCommit;
@@ -52,7 +53,11 @@ internal sealed partial class AuthoredMissionTestDao : IMissionDao, IMissionDaoT
 
     public MissionStateData GetMission(MissionKeyData key) => Missions.GetValueOrDefault(key)?.Clone()!;
     public IList<MissionStateData> GetMissions(int characterId) => Missions.Values.Where(value => value.CharacterId == characterId).Select(value => value.Clone()).ToArray();
-    public MissionCharacterSnapshotData ReadCharacter(int characterId) => new(characterId, GetMissions(characterId), Objectives.Values, Flags.Values, Rewards.Values);
+    public MissionCharacterSnapshotData ReadCharacter(int characterId)
+    {
+        CharacterReads++;
+        return new(characterId, GetMissions(characterId), Objectives.Values, Flags.Values, Rewards.Values);
+    }
     public string ResolveCharacterAccountKey(int characterId) => characterId == 111 ? "account" : throw new InvalidOperationException();
     public MissionAccountFlagData GetAccountFlag(string accountKey, string flagKey) => AccountFlags.GetValueOrDefault(accountKey + "|" + flagKey)?.Clone()!;
     public IList<MissionAccountFlagData> GetAccountFlags(string accountKey) => AccountFlags.Values.Where(value => value.AccountKey == accountKey).Select(value => value.Clone()).ToArray();

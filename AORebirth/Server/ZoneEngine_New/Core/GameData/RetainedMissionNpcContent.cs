@@ -1,8 +1,6 @@
 namespace ZoneEngine_New.Core.GameData;
 
 using System;
-using System.Collections.Concurrent;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -20,28 +18,25 @@ internal sealed class RetainedMissionNpcContent(string gameDataRoot)
     internal const string IdentityHeader = "AORebirth dungeon NPC content v1\n";
     const int SchemaVersion = 1;
 
-    readonly ConcurrentDictionary<string, Lazy<NpcTemplateCatalog>> _catalogs = new(StringComparer.Ordinal);
+    // NPC catalogs are large. The style cache keeps only their identities so it cannot extend this bound.
+    const int MaxRetainedNpcCatalogs = 2;
+    readonly RetainedResourceCache<string, NpcTemplateCatalog> _catalogs = new(MaxRetainedNpcCatalogs);
 
     sealed record Reference(int SchemaVersion, string Sha256);
 
     internal NpcTemplateCatalog ResolveStyleDependency(ReadOnlySpan<byte> linkJson)
+        => Resolve(ReadStyleDependency(linkJson));
+
+    internal NpcTemplateCatalog Resolve(string identity) => _catalogs.Get(identity, Load);
+
+    internal static string ReadStyleDependency(ReadOnlySpan<byte> linkJson)
     {
         Reference? reference = JsonSerializer.Deserialize<Reference>(linkJson, RetainedDungeonContent.JsonOptions);
         if (reference is not { SchemaVersion: SchemaVersion, Sha256.Length: 64 }
             || reference.Sha256.Any(character => character is not (>= '0' and <= '9' or >= 'a' and <= 'f')))
             throw new InvalidDataException("The accepted dungeon has an invalid retained NPC catalog reference.");
 
-        string identity = reference.Sha256;
-        Lazy<NpcTemplateCatalog> candidate = _catalogs.GetOrAdd(identity, key => new(() => Load(key)));
-        try
-        {
-            return candidate.Value;
-        }
-        catch
-        {
-            _catalogs.TryRemove(new KeyValuePair<string, Lazy<NpcTemplateCatalog>>(identity, candidate));
-            throw;
-        }
+        return reference.Sha256;
     }
 
     NpcTemplateCatalog Load(string identity)

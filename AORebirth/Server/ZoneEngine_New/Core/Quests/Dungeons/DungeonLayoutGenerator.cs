@@ -31,6 +31,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
         public DungeonWorldLayout? Geometry { get; init; }
         public AORebirth.DungeonGenerator.StyleRoomSet? RoomSet { get; init; }
         public PlayfieldDistrictsData? Districts { get; init; }
+        internal IReadOnlyDictionary<int, PlayfieldDistrictEntry>? DistrictByIndex { get; init; }
         public CollisionSphereData? PlayerCollisionSphere { get; init; }
         internal NpcTemplateCatalog? NpcTemplates { get; init; }
         public DungeonFindItemPolicy? FindItemPolicy { get; init; }
@@ -263,13 +264,14 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
 
             try
             {
-                FrozenDungeonStyle? retained = parameters.Content is { } content ? _retained.Resolve(content) : null;
+                NpcTemplateCatalog? npcTemplates = null;
+                FrozenDungeonStyle? retained = parameters.Content is { } content ? _retained.Resolve(content, out npcTemplates) : null;
                 DungeonGenerationPolicy? policy = retained?.Policy ?? Policy;
                 if (retained != null)
                 {
                     DungeonGenerationProfile profile = FindProfile(retained.Policy, parameters.Quality, parameters.IsTeam)
                         ?? throw new InvalidDataException("The accepted dungeon has no matching retained profile.");
-                    if (retained.Reference.StyleId != plan.StyleId || retained.Policy.Population?.IsValid(retained.NpcTemplates.HasTemplate) != true
+                    if (retained.Reference.StyleId != plan.StyleId || retained.Policy.Population?.IsValid(npcTemplates!.HasTemplate) != true
                         || !MatchesProfile(plan, BuildPlan(SelectProfileChoices(parameters.Seed, profile),
                             retained.RoomSet, retained.Policy, profile)))
                         throw new InvalidDataException("The accepted dungeon plan or NPC references do not match retained content "
@@ -297,8 +299,8 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                     FloorTransitions = result.Transitions, BossRoomIndex = result.BossRoomIndex,
                     Population = Population(policy),
                     Content = retained?.Reference, ResourceRoot = retained?.Root ?? _legacyRoot, Geometry = geometry, Districts = retained?.Districts,
-                    RoomSet = retained?.RoomSet,
-                    PlayerCollisionSphere = retained?.PlayerSphere, NpcTemplates = retained?.NpcTemplates,
+                    RoomSet = retained?.RoomSet, DistrictByIndex = retained?.DistrictByIndex,
+                    PlayerCollisionSphere = retained?.PlayerSphere, NpcTemplates = npcTemplates,
                     FindItemPolicy = policy?.FindItem, ReturnItemPolicy = policy?.ReturnItem, RepairMachinePolicy = policy?.RepairMachine,
                     NpcObjectivePolicy = policy?.NpcObjectives, ChestPolicy = policy?.Chests?.Clone()
                 };

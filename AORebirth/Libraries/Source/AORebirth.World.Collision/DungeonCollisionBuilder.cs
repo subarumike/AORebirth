@@ -4,8 +4,6 @@ namespace AORebirth.World.Collision
     using System.Collections.Generic;
     using System.Globalization;
 
-    using AODB.Common.RDBObjects;
-
     using SmokeLounge.AOtomation.Messaging.GameData;
 
     using Vector3 = System.Numerics.Vector3;
@@ -343,13 +341,7 @@ namespace AORebirth.World.Collision
             if (catalog.Gnda.Length == 0 || catalog.Dcga.Length == 0)
                 return;
 
-            float yOffset = DungeonRoomPlacer.ComputeYOffset(
-                catalog.Gnda,
-                catalog.Dcga,
-                catalog.MapWidth,
-                catalog.MapHeight,
-                template,
-                catalog.HeightScale);
+            DungeonStyleCatalog.RoomCollision roomCollision = catalog.GetRoomCollision(template);
             CollisionTriangleMesh? ground = DungeonGroundMesher.TryBuild(
                 catalog.Gnda,
                 catalog.Dcga,
@@ -360,12 +352,13 @@ namespace AORebirth.World.Collision
                 facing,
                 catalog.TileSize,
                 catalog.HeightScale,
-                yOffset,
+                roomCollision.GroundOffset,
                 meshIndex);
             if (ground != null)
                 meshes.Add(ground);
 
-            AppendRoomSurfaces(catalog, template, placed, facing, meshIndex, meshes);
+            AppendRoomSurfaces(roomCollision.Surfaces, catalog.ReusesRoomCollision, template, placed,
+                facing, meshIndex, meshes);
         }
 
         static StyleRoomTemplate LookupTemplate(DungeonStyleCatalog catalog, ushort roomId)
@@ -388,30 +381,16 @@ namespace AORebirth.World.Collision
         }
 
         static void AppendRoomSurfaces(
-            DungeonStyleCatalog catalog,
+            IReadOnlyList<CollisionTriangleMesh> raw,
+            bool sharedSource,
             StyleRoomTemplate template,
             Vector3 placed,
             int facing,
             int roomIndex,
             List<CollisionTriangleMesh> meshes)
         {
-            if (!catalog.SurfacePayloads.TryGetValue(template.InstanceId, out byte[]? payload)
-                || payload == null
-                || payload.Length == 0)
+            if (raw.Count == 0)
                 return;
-
-            var raw = new List<CollisionTriangleMesh>();
-            try
-            {
-                SurfaceResource surface = RdbObjectDeserializer.Deserialize<SurfaceResource>(
-                    payload,
-                    "Surfaces.dat#room" + template.InstanceId.ToString(CultureInfo.InvariantCulture));
-                SurfaceResourceNormalizer.AppendMeshes(surface, template.InstanceId, raw);
-            }
-            catch
-            {
-                return;
-            }
 
             string source = "surface-room" + roomIndex.ToString(CultureInfo.InvariantCulture);
             for (int i = 0; i < raw.Count; i++)
@@ -427,7 +406,9 @@ namespace AORebirth.World.Collision
                         facing);
                 }
 
-                meshes.Add(new CollisionTriangleMesh(transformed, raw[i].Triangles, roomIndex, source));
+                // The placed mesh exposes mutable arrays. It must not expose a retained catalog's topology.
+                CollisionTriangle[] triangles = sharedSource ? (CollisionTriangle[])raw[i].Triangles.Clone() : raw[i].Triangles;
+                meshes.Add(new CollisionTriangleMesh(transformed, triangles, roomIndex, source));
             }
         }
 

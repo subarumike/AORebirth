@@ -8,6 +8,8 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 using System.Text.Json.Nodes;
+using System.Threading;
+using System.Threading.Tasks;
 using AORebirth.Core.GameData;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using ZoneEngine_New.Core.GameData;
@@ -90,6 +92,55 @@ public sealed class RetainedDungeonContentTests
         Assert.IsFalse(QuestDungeonParameters.TryParse(accepted.ToJson(), out _));
         accepted.Content = null;
         Assert.IsTrue(QuestDungeonParameters.TryParse(accepted.ToJson(), out _), "Unbound historical rows remain readable.");
+    }
+
+    [TestMethod]
+    public void RetainedResourceCacheSharesConcurrentReadsAndEvictsOldestWithoutCachingErrors()
+    {
+        var cache = new RetainedResourceCache<string, object>(2);
+        int loads = 0;
+        object Load(string _) { Interlocked.Increment(ref loads); return new object(); }
+
+        var readers = new object[12];
+        Parallel.For(0, readers.Length, index => readers[index] = cache.Get("one", Load));
+        Assert.AreEqual(1, loads);
+        foreach (object reader in readers)
+            Assert.AreSame(readers[0], reader);
+
+        object second = cache.Get("two", Load);
+        Assert.AreSame(readers[0], cache.Get("one", Load));
+        _ = cache.Get("three", Load);
+        Assert.AreSame(readers[0], cache.Get("one", Load));
+        Assert.AreNotSame(second, cache.Get("two", Load));
+        Assert.AreEqual(4, loads);
+
+        Assert.ThrowsException<InvalidDataException>(() => cache.Get("invalid", _ => throw new InvalidDataException()));
+        Assert.IsNotNull(cache.Get("invalid", Load));
+        Assert.AreEqual(5, loads);
+    }
+
+    [TestMethod]
+    public void RetainedRoomCollisionDoesNotSharePlacedMeshArraysBetweenDungeons()
+    {
+        using var fixture = new RetainedAssets();
+        fixture.Publish(doorOpenChance: 0);
+        var runtime = fixture.CreateGenerator();
+        QuestDungeonParameters accepted = fixture.Mission();
+        Assert.IsTrue(runtime.ConfigureNewDungeon(accepted, team: false));
+        Assert.IsTrue(runtime.TryGenerate(accepted, out var first));
+
+        var firstMesh = first.Geometry!.Collision.SurfaceMeshes.First(mesh => mesh.Source?.StartsWith("surface-room", StringComparison.Ordinal) == true);
+        var originalVertex = firstMesh.Vertices[0];
+        var originalTriangle = firstMesh.Triangles[0];
+        firstMesh.Vertices[0] = default;
+        firstMesh.Triangles[0] = default;
+
+        Assert.IsTrue(runtime.TryGenerate(accepted, out var second));
+        var secondMesh = second.Geometry!.Collision.SurfaceMeshes.First(mesh => mesh.Source?.StartsWith("surface-room", StringComparison.Ordinal) == true);
+        Assert.AreEqual(originalVertex, secondMesh.Vertices[0]);
+        Assert.AreEqual(originalTriangle, secondMesh.Triangles[0]);
+        Assert.AreNotSame(firstMesh.Vertices, secondMesh.Vertices);
+        Assert.AreNotSame(firstMesh.Triangles, secondMesh.Triangles);
     }
 
     sealed class RetainedAssets : IDisposable

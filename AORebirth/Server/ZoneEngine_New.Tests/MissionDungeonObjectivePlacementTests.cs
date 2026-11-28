@@ -137,6 +137,40 @@ public sealed class MissionDungeonObjectivePlacementTests
     }
 
     [TestMethod]
+    [DataRow(324, 1, 818302858, 12)]
+    [DataRow(341, 2, 34719395, 8)]
+    public void PlacementQueryResultsAgreeWithFullCollisionQueries(int style, int floors, int seed, int size)
+    {
+        var (layout, dungeon) = MissionChestPlacementTests.Build(style, floors, seed, size);
+        using var world = MissionChestPlacementTests.World(dungeon);
+        var random = new Random(seed);
+        var origin = new N3Lite.Vec3(layout.Spawn.xf, layout.Spawn.yf + 2f, layout.Spawn.zf);
+        float radius = MissionChestPlacementTests.Data.Value.PlayerCollisionSphere!.Radius;
+        int blocked = 0;
+        int clear = 0;
+        for (int i = 0; i < 48; i++)
+        {
+            var destination = new N3Lite.Vec3(origin.X + random.Next(-18, 19), origin.Y + random.Next(-8, 9),
+                origin.Z + random.Next(-18, 19));
+            bool full = world.TrySphereCast(origin, destination, radius, firstHitOnly: false, out _, out _);
+            bool early = world.TrySphereCast(origin, destination, radius, firstHitOnly: true, out _, out _);
+            Assert.AreEqual(full, early, $"Sweep {i}, style {style}");
+            if (full)
+                blocked++;
+            else
+                clear++;
+
+            var reference = new AoVector3(destination.X, destination.Y, destination.Z);
+            bool referenceFloor = world.TryRaycastDown(reference, 12f, out AoVector3 hit);
+            Assert.AreEqual(referenceFloor, world.TryRaycastDown(destination, 12f, out float height));
+            if (referenceFloor)
+                Assert.AreEqual(hit.yf, height);
+        }
+
+        Assert.IsTrue(blocked > 0 && clear > 0, "The real layout must exercise both sweep outcomes.");
+    }
+
+    [TestMethod]
     public void PhysicalValidatorRejectsMissingCollisionInsteadOfUsingUnverifiedPoint()
     {
         var module = new DungeonObjectivePlacement();

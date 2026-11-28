@@ -1,9 +1,13 @@
 namespace AORebirth.World.Collision
 {
     using System;
+    using System.Collections.Concurrent;
     using System.Collections.Generic;
+    using System.Globalization;
     using System.IO;
     using System.Text.Json;
+
+    using AODB.Common.RDBObjects;
 
     using AORebirth.Core.GameData;
 
@@ -20,14 +24,22 @@ namespace AORebirth.World.Collision
             PropertyNameCaseInsensitive = true
         };
 
+        // Only the loader for verified retained bytes enables this cache. Its keys come from this catalog's rooms.
+        readonly ConcurrentDictionary<StyleRoomTemplate, Lazy<RoomCollision>>? _roomCollision;
+
+        internal sealed record RoomCollision(float GroundOffset, IReadOnlyList<CollisionTriangleMesh> Surfaces);
+
         DungeonStyleCatalog(
             int styleId,
             PlayfieldMetaData meta,
             byte[] gnda,
             byte[] dcga,
             IReadOnlyList<StyleRoomTemplate> rooms,
-            IReadOnlyDictionary<int, byte[]> surfacePayloads)
+            IReadOnlyDictionary<int, byte[]> surfacePayloads,
+            bool verified = false)
         {
+            if (verified)
+                _roomCollision = new();
             StyleId = styleId;
             Meta = meta;
             Gnda = gnda;
@@ -55,6 +67,38 @@ namespace AORebirth.World.Collision
         public float TileSize => Meta.TileSize > 0f ? Meta.TileSize : 2f;
 
         public float HeightScale => Meta.HeightScale > 0f ? Meta.HeightScale : 1f;
+
+        internal bool ReusesRoomCollision => _roomCollision != null;
+
+        internal RoomCollision GetRoomCollision(StyleRoomTemplate room)
+        {
+            if (_roomCollision == null)
+                return PrepareRoomCollision(room);
+            return _roomCollision.GetOrAdd(room, static (template, catalog) =>
+                new Lazy<RoomCollision>(() => catalog.PrepareRoomCollision(template)), this).Value;
+        }
+
+        RoomCollision PrepareRoomCollision(StyleRoomTemplate room)
+        {
+            float offset = DungeonRoomPlacer.ComputeYOffset(
+                Gnda, Dcga, MapWidth, MapHeight, room, HeightScale);
+            if (!SurfacePayloads.TryGetValue(room.InstanceId, out byte[]? payload) || payload is not { Length: > 0 })
+                return new RoomCollision(offset, Array.Empty<CollisionTriangleMesh>());
+
+            var meshes = new List<CollisionTriangleMesh>();
+            try
+            {
+                SurfaceResource surface = RdbObjectDeserializer.Deserialize<SurfaceResource>(
+                    payload, "Surfaces.dat#room" + room.InstanceId.ToString(CultureInfo.InvariantCulture));
+                SurfaceResourceNormalizer.AppendMeshes(surface, room.InstanceId, meshes);
+            }
+            catch
+            {
+                // Preserve the existing loader behavior for unsupported room surfaces.
+                return new RoomCollision(offset, Array.Empty<CollisionTriangleMesh>());
+            }
+            return new RoomCollision(offset, meshes);
+        }
 
         public static DungeonStyleCatalog CreateForTest(
             int styleId,
@@ -135,7 +179,7 @@ namespace AORebirth.World.Collision
                 PlayfieldSurfacesDat.Parse(read(GameDataPaths.SurfacesFileName)));
             if (surfaces.Count == 0)
                 throw new InvalidDataException("No retained dungeon room surfaces for style " + styleId + ".");
-            return new DungeonStyleCatalog(styleId, meta, ground, occupancy, rooms, surfaces);
+            return new DungeonStyleCatalog(styleId, meta, ground, occupancy, rooms, surfaces, verified: true);
 
             byte[] ReadGrey(string name)
             {

@@ -1,8 +1,8 @@
 namespace ZoneEngine_New.Core.GameData;
 
 using System;
-using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -21,7 +21,8 @@ internal sealed class RetainedDungeonContent(string gameDataRoot)
     internal const string CurrentFile = Folder + "/Current.json";
     const string IdentityHeader = "AORebirth dungeon content v1\n";
 
-    readonly ConcurrentDictionary<DungeonContentReference, Lazy<FrozenDungeonStyle>> _retained = new();
+    const int MaxRetainedStyles = 16;
+    readonly RetainedResourceCache<DungeonContentReference, FrozenDungeonStyle> _retained = new(MaxRetainedStyles);
     readonly RetainedMissionNpcContent _npcs = new(gameDataRoot);
 
     internal static readonly JsonSerializerOptions JsonOptions = new()
@@ -30,23 +31,16 @@ internal sealed class RetainedDungeonContent(string gameDataRoot)
         PropertyNameCaseInsensitive = true
     };
 
-    internal FrozenDungeonStyle Resolve(DungeonContentReference reference)
+    internal FrozenDungeonStyle Resolve(DungeonContentReference reference) => Resolve(reference, out _);
+
+    internal FrozenDungeonStyle Resolve(DungeonContentReference reference, out NpcTemplateCatalog npcTemplates)
     {
         if (!reference.IsValid)
             throw new InvalidDataException("Invalid retained dungeon content reference.");
 
-        // A published snapshot owns parsed bytes for this specific content identity.
-        // Missing or invalid files do not become a cached successful or partial snapshot.
-        var candidate = _retained.GetOrAdd(reference, key => new(() => Load(key)));
-        try
-        {
-            return candidate.Value;
-        }
-        catch
-        {
-            _retained.TryRemove(new KeyValuePair<DungeonContentReference, Lazy<FrozenDungeonStyle>>(reference, candidate));
-            throw;
-        }
+        FrozenDungeonStyle style = _retained.Get(reference, Load);
+        npcTemplates = _npcs.Resolve(style.NpcContentIdentity);
+        return style;
     }
 
     FrozenDungeonStyle Load(DungeonContentReference reference)
@@ -100,7 +94,9 @@ internal sealed class RetainedDungeonContent(string gameDataRoot)
         DungeonStyleCatalog catalog = DungeonStyleCatalog.Load(style, name => bytes[styleFolder + name]);
         var entrances = DungeonEntranceMap.Parse(bytes[DungeonEntranceMap.FileName], style);
         return new(reference, Hash(generationBytes), Hash(doorBytes), Path.Combine(gameDataRoot, directory), policy, door,
-            catalog, StyleRoomSet.Load(catalog, entrances), districts, player, _npcs.ResolveStyleDependency(bytes["NpcCatalog.json"]));
+            catalog, StyleRoomSet.Load(catalog, entrances), districts,
+            districts.Districts.ToImmutableDictionary(district => district.DistrictIndex), player,
+            RetainedMissionNpcContent.ReadStyleDependency(bytes[RetainedMissionNpcContent.ReferenceFile]));
     }
 
     internal static string Hash(ReadOnlySpan<byte> bytes) => Convert.ToHexStringLower(SHA256.HashData(bytes));
@@ -108,4 +104,5 @@ internal sealed class RetainedDungeonContent(string gameDataRoot)
 
 internal sealed record FrozenDungeonStyle(DungeonContentReference Reference, string GenerationSha, string DoorSha,
     string Root, DungeonGenerationPolicy Policy, DungeonDoorStyle Doors, DungeonStyleCatalog Catalog,
-    StyleRoomSet RoomSet, PlayfieldDistrictsData Districts, CollisionSphereData PlayerSphere, NpcTemplateCatalog NpcTemplates);
+    StyleRoomSet RoomSet, PlayfieldDistrictsData Districts, ImmutableDictionary<int, PlayfieldDistrictEntry> DistrictByIndex,
+    CollisionSphereData PlayerSphere, string NpcContentIdentity);
