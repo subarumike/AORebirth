@@ -1691,7 +1691,7 @@
         {
             try
             {
-                playfield.GetService<Quests.Dungeons.QuestDungeonService>()?.TryEnter(
+                playfield.GetService<Quests.IGeneratedMissionLifecycleModule>()?.TryEnter(
                     player, new SmokeLounge.AOtomation.Messaging.GameData.Identity { Type = IdentityType.MissionEntrance, Instance = entrance.DynelInstance });
             }
             catch (Exception exception)

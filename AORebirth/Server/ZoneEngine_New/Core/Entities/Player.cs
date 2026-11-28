@@ -1763,7 +1763,7 @@ namespace ZoneEngine_New.Core.Entities
             SuppressionGas.Update(this, DateTime.UtcNow);
             if (QuestLog?.Quests.Values.Any(quest => quest.IsRewardPending
                 || quest.IsActive && quest.NpcObjectiveCommitPending) == true)
-                Playfield?.GetService<Quests.QuestService>()?.RetryPendingRewards(this);
+                Playfield?.GetService<Quests.IGeneratedMissionLifecycleModule>()?.RetryPendingRewards(this);
             if (!_respawnPending)
                 return;
 

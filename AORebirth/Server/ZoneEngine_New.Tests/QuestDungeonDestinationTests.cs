@@ -22,6 +22,7 @@ using ZoneEngine_New.Core.Data;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.GameData;
 using ZoneEngine_New.Core.Inventory;
+using ZoneEngine_New.Core.MessageHandlers;
 using ZoneEngine_New.Core.Metrics;
 using ZoneEngine_New.Core.Missions;
 using ZoneEngine_New.Core.Mobs;
@@ -138,6 +139,65 @@ public sealed class QuestDungeonDestinationTests
         Assert.AreEqual("That mission is no longer offered.", f.Accept());
         Assert.AreEqual(1, f.Store.AcceptCalls);
         Assert.AreEqual(1, f.Player.Inventory.Inventory.Content.Count);
+    }
+
+    [TestMethod]
+    public void AcceptancePacketDispatchesOnlyTheAuthenticatedOwnedOffer()
+    {
+        using var f = new Fixture();
+        var handler = new CreateQuestMessageHandler(new MissionAcceptanceModule(f.Service));
+        var message = new CreateQuestMessage
+        {
+            Identity = Identity.None,
+            QuestIdentity = new Identity { Type = IdentityType.Mission, Instance = f.Offer.OfferInstance }
+        };
+
+        handler.Handle(message, f.Session);
+        Assert.AreEqual(0, f.Store.AcceptCalls);
+        Assert.IsEmpty(f.Session.Sent);
+
+        message.Identity = f.Player.Identity;
+        handler.Handle((MessageBody)message, f.Session);
+        Assert.AreEqual(1, f.Store.AcceptCalls);
+        Assert.HasCount(1, f.Player.Inventory.Inventory.Content);
+        Assert.HasCount(1, f.Session.Sent.OfType<QuestFullUpdateMessage>().ToArray());
+
+        handler.Handle(message, f.Session);
+        Assert.AreEqual(1, f.Store.AcceptCalls);
+        Assert.AreEqual("That mission is no longer offered.", f.Session.Sent.OfType<ChatTextMessage>().Single().Text);
+    }
+
+    [TestMethod]
+    public void AcceptanceWithFullInventoryKeepsTheOfferAndGrantsNothing()
+    {
+        using var f = new Fixture();
+        TestWorld.FillInventory(f.Player);
+        Assert.AreEqual("Your inventory is full.", f.Accept());
+        Assert.AreEqual(GeneratedMissionState.Offered, f.Offer.State);
+        Assert.AreEqual(0, f.Store.AcceptCalls);
+        Assert.IsEmpty(f.Store.Keys);
+        Assert.IsEmpty(f.Session.Sent);
+    }
+
+    [TestMethod]
+    public void AcceptanceWithUnknownCommitQuarantinesBeforePublishing()
+    {
+        using var f = new Fixture();
+        f.Store.AfterAccept = () => throw new MissionCommitOutcomeUnknownException(new InvalidOperationException("Test commit acknowledgement lost."));
+        var message = new CreateQuestMessage
+        {
+            Identity = f.Player.Identity,
+            QuestIdentity = new Identity { Type = IdentityType.Mission, Instance = f.Offer.OfferInstance }
+        };
+        var handler = new CreateQuestMessageHandler(new MissionAcceptanceModule(f.Service));
+        handler.Handle(message, f.Session);
+        Assert.IsTrue(f.Player.IsPersistenceQuarantined);
+        Assert.AreEqual(SessionState.Closed, f.Session.State);
+        Assert.HasCount(1, f.Store.Keys);
+        Assert.IsEmpty(f.Player.Inventory.Inventory.Content);
+        Assert.IsEmpty(f.Session.Sent);
+        handler.Handle(message, f.Session);
+        Assert.AreEqual(1, f.Store.AcceptCalls);
     }
 
     [TestMethod]
@@ -303,7 +363,7 @@ public sealed class QuestDungeonDestinationTests
         Item duplicator = TestWorld.CreateItem(lowId: f.Keys.DuplicatorTemplateId, instanceId: 700000);
         f.Player.Inventory.Inventory.Add(duplicatorSlot, duplicator);
         f.Session.Sent.Clear();
-        Assert.IsTrue(f.Service.TryDuplicate(f.Player,
+        Assert.IsTrue(f.Lifecycle.TryDuplicateKey(f.Player,
             new Identity { Type = IdentityType.Inventory, Instance = key.Key },
             new Identity { Type = IdentityType.Inventory, Instance = duplicatorSlot }));
         Assert.AreEqual(2, f.Player.Inventory.Inventory.Content.Values.Count(item => item.LowId == f.Keys.KeyTemplateId));
@@ -311,10 +371,11 @@ public sealed class QuestDungeonDestinationTests
         Assert.AreEqual(2, f.Store.Links.Count);
         Assert.IsTrue(f.Store.Links.Values.All(id => id == f.Store.Generated!.QuestId));
         f.Session.Sent.Clear();
-        f.Service.RestoreKeys(f.Player);
+        f.Lifecycle.Restore(f.Player);
         var updates = f.Session.Sent.OfType<SimpleItemFullUpdateMessage>().ToArray();
         Assert.AreEqual(2, updates.Length);
         Assert.IsTrue(updates.All(update => update.Name == "Mission key to " + f.Entrance.DisplayName + '\0'));
+        Assert.IsInstanceOfType<QuestFullUpdateMessage>(f.Session.Sent[0]);
     }
 
     [TestMethod]
@@ -324,12 +385,42 @@ public sealed class QuestDungeonDestinationTests
         Assert.IsNull(f.Accept());
         f.RestartService();
         QuestDungeonParameters parameters = f.Parameters();
+        Assert.IsNull(f.Lifecycle.ResolveLogin(f.Player.Identity.Instance, f.Entrance.PlayfieldId),
+            "Ordinary playfields must stay on the normal login path without a mission lookup.");
         Assert.IsTrue(f.Service.TryGetEntrance(f.Store.Generated!.QuestId, out var resolved));
         Assert.AreSame(f.Entrance, resolved);
-        var login = f.Service.ResolveLogin(parameters.DungeonPlayfield);
+        var login = f.Lifecycle.ResolveLogin(f.Player.Identity.Instance, parameters.DungeonPlayfield)
+            ?? throw new AssertFailedException("Saved mission playfield was left to ordinary login.");
+        using var admission = login.Admission;
         Assert.IsInstanceOfType<QuestDungeonPlayfield>(login.Playfield);
-        Assert.AreSame(f.Entrance, ((QuestDungeonPlayfield)login.Playfield).Entrance);
+        Assert.AreSame(f.Entrance, ((QuestDungeonPlayfield)login.Playfield!).Entrance);
         Assert.IsNotNull(login.Position);
+    }
+
+    [TestMethod]
+    public void TransferredLinkedKeyAdmitsTheHolderWithoutAssigningTheMission()
+    {
+        using var f = new Fixture();
+        Assert.IsNull(f.Accept());
+        var originalSlot = f.Player.Inventory.Inventory.Content.Single().Key;
+        Item key = f.Player.Inventory.Inventory.Remove(originalSlot)
+            ?? throw new AssertFailedException("The accepted mission key was unavailable.");
+        var holder = TestWorld.CreatePlayer(88);
+        holder.Playfield = f.Player.Playfield;
+        holder.Position = f.Player.Position;
+        holder.Stats.Set(CharacterStat.Health, 100);
+        holder.Stats.Set(CharacterStat.MaxHealth, 100);
+        var session = new Session();
+        holder.Session = session;
+        session.BindPlayer(holder);
+        Assert.IsTrue(holder.Inventory.Inventory.Add(holder.Inventory.Inventory.FindFreeSlot(), key));
+
+        Assert.IsTrue(f.Lifecycle.TryEnter(holder, f.Target));
+
+        Assert.AreEqual(f.Parameters().DungeonPlayfield, session.Transfers.Single().World.Identity.Instance);
+        Assert.AreEqual(f.Player.Identity.Instance, f.Store.Character!.CharacterId);
+        Assert.AreEqual(f.Store.Generated!.QuestId, f.Store.Links[key.InstanceId]);
+        Assert.IsNull(holder.QuestLog);
     }
 
     [TestMethod]
@@ -359,11 +450,70 @@ public sealed class QuestDungeonDestinationTests
             Assert.AreEqual(0, f.Store.Links.Count);
             Assert.AreEqual(keyInstance, batch.Locations.Single().InstanceId);
         };
-        Assert.IsFalse(f.Service.TryEnter(f.Player, f.Target));
+        Assert.IsFalse(f.Lifecycle.TryEnter(f.Player, f.Target));
         Assert.AreEqual(0, f.Session.Transfers.Count);
         Assert.AreEqual(0, f.Player.Inventory.Inventory.Content.Count);
         Assert.IsTrue(f.Session.Sent.OfType<CharacterActionMessage>().Any(message => message.Action == CharacterActionType.DeleteItem));
         f.AssertNoErrors();
+    }
+
+    [TestMethod]
+    [DataRow(false)]
+    [DataRow(true)]
+    public void LifecycleRestoreExpiresOnlyUnearnedMissionsAfterReload(bool earned)
+    {
+        DateTime now = DateTime.UtcNow;
+        using var f = new Fixture(now: () => now);
+        Assert.IsNull(f.Accept());
+        var stored = f.Store.Character!;
+        if (earned)
+            stored.Progress = stored.RequiredCount;
+        int keyInstance = f.Player.Inventory.Inventory.Content.Values.Single().InstanceId;
+        f.Persistence.BeforeMutation = batch =>
+        {
+            Assert.IsFalse(earned);
+            var retirement = batch.Locations.Single();
+            Assert.AreEqual(keyInstance, retirement.InstanceId);
+            Assert.AreEqual((int)IdentityType.None, retirement.ContainerType);
+        };
+        now = new DateTime(f.Store.Generated!.ExpiresAtUtcTicks, DateTimeKind.Utc).AddSeconds(1);
+        f.Player.QuestLog = null;
+        f.RestartService();
+        f.Session.Sent.Clear();
+
+        f.Lifecycle.Restore(f.Player);
+
+        Assert.AreEqual((int)(earned ? QuestState.Active : QuestState.Expired), f.Store.Character!.State);
+        Assert.AreEqual(earned ? 1 : 0, f.Store.Links.Count);
+        Assert.AreEqual(earned ? 0 : 1, f.Store.RetiredKeys.Count);
+        Assert.AreEqual(earned ? 0 : 1, f.Persistence.MutationCalls);
+        Assert.AreEqual(earned, f.Session.Sent.OfType<QuestFullUpdateMessage>().Any());
+        Assert.AreEqual(!earned, f.Session.Sent.OfType<QuestMessage>().Any(message => message.Action == QuestAction.Delete));
+        f.AssertNoErrors();
+    }
+
+    [TestMethod]
+    [DataRow("no-delete")]
+    [DataRow("earned")]
+    public void LifecycleDeletionPreservesProtectedAssignment(string protection)
+    {
+        using var f = new Fixture();
+        Assert.IsNull(f.Accept());
+        var mission = f.Quests.GetLog(f.Player).Quests.Single().Value;
+        if (protection == "no-delete")
+            mission.Template.Flags = "NoDelete";
+        else
+            mission.Progress = mission.RequiredCount;
+        Identity journal = f.Session.Sent.OfType<QuestFullUpdateMessage>().Single().Quests.Single().QuestId;
+        f.Session.Sent.Clear();
+
+        Assert.IsTrue(f.Lifecycle.TryAbandon(f.Player, journal.Instance));
+
+        Assert.AreEqual(QuestState.Active, mission.State);
+        Assert.AreEqual((int)QuestState.Active, f.Store.Character!.State);
+        Assert.AreEqual(0, f.Store.EndKeysCalls);
+        Assert.HasCount(1, f.Store.Links);
+        Assert.IsFalse(f.Session.Sent.OfType<QuestMessage>().Any(message => message.Action == QuestAction.Delete));
     }
 
     [TestMethod]
@@ -759,7 +909,7 @@ public sealed class QuestDungeonDestinationTests
         QuestDungeonPlayfield world = f.CreateObjectiveWorld((_, item) => { attempts++; f.PublishObjective(item); return true; }, out var binding);
         f.Player.Playfield = world;
         f.Player.Position = new Vector3(binding.X, binding.Y, binding.Z);
-        var handler = new ZoneEngine_New.Core.MessageHandlers.ClientGetItemMessageHandler(f.Actions);
+        var handler = new ZoneEngine_New.Core.MessageHandlers.ClientGetItemMessageHandler(f.Actions, f.Quests.MissionObjectives);
         handler.Handle(new ClientGetItemMessage { Identity = Identity.None, Identity1 = binding.Identity }, f.Session);
         handler.Handle(new ClientGetItemMessage { Identity = f.Player.Identity, Identity1 = Identity.None }, f.Session);
         Assert.AreEqual(0, attempts);
@@ -788,6 +938,7 @@ public sealed class QuestDungeonDestinationTests
         internal readonly GeneratedMissionOffer Offer;
         internal readonly Persistence Persistence = new();
         internal QuestDungeonService Service = null!;
+        internal IGeneratedMissionLifecycleModule Lifecycle { get; private set; } = null!;
         readonly DiagnosticLogger _logger = new();
         readonly IItemBuilder _items;
         readonly IItemTemplateCatalog _templates;
@@ -872,7 +1023,7 @@ public sealed class QuestDungeonDestinationTests
         }
 
         internal Identity Target => new() { Type = (IdentityType)Entrance.IdentityType, Instance = unchecked((int)Entrance.IdentityInstance) };
-        internal bool Abandon(int journalInstance) => _quests.TryAbandon(Player, journalInstance);
+        internal bool Abandon(int journalInstance) => Lifecycle.TryAbandon(Player, journalInstance);
         internal void AssertNoErrors() => Assert.AreEqual(string.Empty, _logger.Errors);
         internal string? Accept()
         {
@@ -965,6 +1116,7 @@ public sealed class QuestDungeonDestinationTests
             Service = new QuestDungeonService(Store, _quests, Catalog.Value, Layouts, Offers, _items, _ids,
                 _flush, _actions, new Lazy<PlayfieldManager>(() => Manager), RuntimeData.Value, Keys, _logger,
                 new HashItemMinter(RuntimeData.Value, _templates, _items));
+            Lifecycle = new GeneratedMissionLifecycleModule(_quests, Service, Offers, new Lazy<PlayfieldManager>(() => Manager), _logger);
         }
         public void Dispose() { Service?.Dispose(); Manager.Dispose(); _flush.Dispose(); }
     }
@@ -1036,6 +1188,7 @@ public sealed class QuestDungeonDestinationTests
         internal readonly Dictionary<int, string> Links = [];
         internal readonly List<QuestDungeonKeyItemRow> Keys = [];
         internal Action? BeforeAccept;
+        internal Action? AfterAccept;
         internal Action<string>? BeforeEndKeys;
         internal int AcceptCalls;
         internal int EndKeysCalls;
@@ -1063,6 +1216,7 @@ public sealed class QuestDungeonDestinationTests
             {
                 SourceItems.Add(sourceItem);
             }
+            AfterAccept?.Invoke();
             return true;
         }
 
@@ -1101,10 +1255,15 @@ public sealed class QuestDungeonDestinationTests
         public void CloseCharacterQuests(string questId, int state, long nowUtcTicks) => throw new AssertFailedException();
     }
 
-    internal sealed class OfferDao : IGeneratedMissionDao
+    internal sealed class OfferDao : IGeneratedMissionOfferReader, IGeneratedMissionDao
     {
         internal GeneratedMissionOffer Offer = null!;
-        public IList<GeneratedMissionOffer> ReadOffers(int owner) => owner == Offer.OwnerId ? [Offer] : [];
+        public GeneratedMissionOffer ReadCurrentOffer(int owner, int type, int instance, long now)
+            => owner == Offer.OwnerId && type == Offer.OfferType && instance == Offer.OfferInstance
+                && Offer.State == GeneratedMissionState.Offered && Offer.ExpiresAtUtcTicks > now
+                ? Offer : null!;
+
+        public IList<GeneratedMissionOffer> ReadOffers(int owner) => throw new AssertFailedException("Acceptance must read the exact current offer.");
         public int ReserveIdentities(string sequence, int count) => throw new AssertFailedException();
         public GeneratedMissionResult PublishOffers(GeneratedMissionOfferBatch batch) => throw new AssertFailedException();
         public GeneratedMissionResult Accept(GeneratedMissionAcceptance acceptance) => throw new AssertFailedException();

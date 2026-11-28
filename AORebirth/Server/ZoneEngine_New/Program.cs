@@ -35,6 +35,7 @@ namespace ZoneEngine_New
     using ZoneEngine_New.Core.Organizations;
     using ZoneEngine_New.Core.Playfield;
     using ZoneEngine_New.Core.Playfield.Locality;
+    using ZoneEngine_New.Core.Quests;
     using ZoneEngine_New.Core.Quests.Dungeons;
     using ZoneEngine_New.Core.Trade;
     using ZoneEngine_New.Core.DebugMcp;
@@ -362,6 +363,7 @@ namespace ZoneEngine_New
             }));
             services.AddSingleton<IMissionDao>(provider => provider.GetRequiredService<MySqlMissionDao>());
             services.AddSingleton<IGeneratedMissionDao>(provider => provider.GetRequiredService<MySqlMissionDao>());
+            services.AddSingleton<IGeneratedMissionOfferReader>(provider => provider.GetRequiredService<MySqlMissionDao>());
             services.AddSingleton<GeneratedMissionService>();
             services.AddSingleton(_ => AuthoredQuestCatalog.Load(Path.Combine(AppContext.BaseDirectory, "Content")));
             services.AddSingleton<AuthoredQuestService>();
@@ -390,6 +392,9 @@ namespace ZoneEngine_New
             services.AddSingleton(_ => GeneratedMissionRollService.Shared);
             services.AddSingleton<IGeneratedMissionOfferGenerator>(provider => provider.GetRequiredService<GeneratedMissionRollService>());
             services.AddSingleton<IMissionTerminalModule, MissionTerminalModule>();
+            services.AddSingleton<IMissionAcceptanceModule, MissionAcceptanceModule>();
+            services.AddSingleton<IMissionObjectiveModule>(provider => provider.GetRequiredService<QuestService>().MissionObjectives);
+            services.AddSingleton<IGeneratedMissionLifecycleModule, GeneratedMissionLifecycleModule>();
             services.AddSingleton<ZoneEngine_New.Core.Quests.Dungeons.DungeonLayoutGenerator>();
             services.AddSingleton(provider =>
             {

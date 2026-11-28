@@ -35,6 +35,7 @@ namespace ZoneEngine_New.Core.Quests
         readonly AORebirth.Interfaces.Persistence.Missions.IMissionDao? _completionDao;
         readonly ZoneEngine_New.Core.Characters.CharacterSnapshotService? _snapshot;
         readonly QuestRewardTable? _rewards;
+        readonly MissionObjectiveModule _missionObjectives;
 
         public QuestService(
             QuestCatalog catalog,
@@ -69,9 +70,12 @@ namespace ZoneEngine_New.Core.Quests
             _completionDao = completionDao;
             _snapshot = snapshot;
             _rewards = rewards;
+            _missionObjectives = new MissionObjectiveModule(this, items, now);
         }
 
         public QuestCatalog Catalog => _catalog;
+
+        public IMissionObjectiveModule MissionObjectives => _missionObjectives;
 
         /// <summary>QuestRewards.json, when this zone loads it.</summary>
         public QuestRewardTable? Rewards => _rewards;
@@ -376,7 +380,7 @@ namespace ZoneEngine_New.Core.Quests
                 {
                     if (quest.IsActive && quest.Template.IsKill && RequiresBoundObjective(quest))
                     {
-                        TryEarnNpcObjective(player, quest, npc, inspected: false);
+                        _missionObjectives.AdvanceKill(player, quest, npc);
                         continue;
                     }
                     if (quest.IsActive && quest.Template.IsKill && Matches(npc, quest.Template.Objective.Npc))

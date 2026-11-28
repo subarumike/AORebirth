@@ -19,20 +19,23 @@ namespace ZoneEngine_New.Core.MessageHandlers
     using ZoneEngine_New.Core.Missions;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
+    using ZoneEngine_New.Core.Quests;
 
     public sealed class GenericCmdMessageHandler : IMessageHandler<GenericCmdMessage>
     {
         private readonly IInventoryRepository _inventoryRepository;
         private readonly IItemBuilder _items;
         private readonly AuthoredQuestService _quests;
-        private readonly Quests.Dungeons.QuestDungeonService? _dungeons;
+        private readonly IGeneratedMissionLifecycleModule? _missions;
+        private readonly IMissionObjectiveModule? _missionObjectives;
         private readonly Tradeskills.TradeskillService? _tradeskills;
 
         public GenericCmdMessageHandler(IInventoryRepository inventoryRepository, IItemBuilder items,
-            AuthoredQuestService quests, Quests.Dungeons.QuestDungeonService? dungeons = null,
-            Tradeskills.TradeskillService? tradeskills = null)
+            AuthoredQuestService quests, IGeneratedMissionLifecycleModule? missions = null,
+            Tradeskills.TradeskillService? tradeskills = null, IMissionObjectiveModule? missionObjectives = null)
         {
-            _dungeons = dungeons;
+            _missions = missions;
+            _missionObjectives = missionObjectives;
             _tradeskills = tradeskills;
             ArgumentNullException.ThrowIfNull(inventoryRepository);
             ArgumentNullException.ThrowIfNull(items);
@@ -126,9 +129,9 @@ namespace ZoneEngine_New.Core.MessageHandlers
                         Deny(session, message, player, "item used on itself");
                         break;
                     }
-                    if (message.Target is { Length: >= 2 } && _dungeons != null)
+                    if (message.Target is { Length: >= 2 } && _missionObjectives != null)
                     {
-                        bool committed = _dungeons.TryUseGeneratedMissionItem(player, message.Target[0], message.Target[1], out bool handled);
+                        bool committed = _missionObjectives.TryUseItem(player, message.Target[0], message.Target[1], out bool handled);
                         if (handled)
                         {
                             // Retail action 5 acknowledges the original source slot and exact target unchanged.
@@ -166,7 +169,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
                         }
                     }
                     else if (message.Target is { Length: >= 2 }
-                        && _dungeons?.TryDuplicate(player, message.Target[0], message.Target[1]) == true)
+                        && _missions?.TryDuplicateKey(player, message.Target[0], message.Target[1]) == true)
                         Acknowledge(session, message, message.Target[1]);
                     else if (message.Target is { Length: >= 2 }
                         && TryReloadFromDrop(player, message.Target[0], message.Target[1], out bool reloaded))
@@ -379,7 +382,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
             }
 
             // A carried mission key for a quest dungeon behind this entrance takes the use.
-            if (_dungeons?.TryEnter(player, target) == true)
+            if (_missions?.TryEnter(player, target) == true)
             {
                 Acknowledge(session, message, target);
                 return;

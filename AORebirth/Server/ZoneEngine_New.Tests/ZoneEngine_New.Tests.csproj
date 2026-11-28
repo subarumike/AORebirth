@@ -149,6 +149,7 @@
   <ItemGroup Condition="'$(RuntimeCatalogFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />
     <Compile Include="GameDataContentProviderTests.cs" />
+    <Compile Include="MissionModuleDispatchTests.cs" />
     <Compile Include="TestDoubles.cs" />
     <Compile Include="RuntimeCatalogTests.cs" />
     <Compile Include="RuntimeStartupTests.cs" />

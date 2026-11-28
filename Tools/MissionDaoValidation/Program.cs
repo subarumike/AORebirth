@@ -38,7 +38,9 @@ namespace AORebirth.Tools.MissionDaoValidation
         {
             bool generatedIdentityOnly = args.Length == 2 && args[1] == "--generated-identity-only";
             bool chestsOnly = args.Length == 2 && args[1] == "--chests-only";
-            if ((args.Length != 1 && !generatedIdentityOnly && !chestsOnly) || !string.Equals(args[0], "--run-disposable", StringComparison.Ordinal))
+            bool missionAcceptanceOnly = args.Length == 2 && args[1] == "--mission-acceptance-only";
+            if ((args.Length != 1 && !generatedIdentityOnly && !chestsOnly && !missionAcceptanceOnly)
+                || !string.Equals(args[0], "--run-disposable", StringComparison.Ordinal))
             {
                 Console.Error.WriteLine("REFUSED: exact --run-disposable argument required.");
                 return 2;
@@ -66,6 +68,15 @@ namespace AORebirth.Tools.MissionDaoValidation
                 }
 
                 var dao = new MySqlMissionDao(() => Open(disposable.ApplicationConnectionString));
+                if (missionAcceptanceOnly)
+                {
+                    ValidateActiveOfferAcceptance(dao, disposable.ApplicationConnectionString);
+                    ValidateCharacterQuestCompletion(dao, disposable.ApplicationConnectionString);
+                    Console.WriteLine("MISSION_DAO_TEST_MODE=ISOLATED_PRODUCTION_SOURCES");
+                    Console.WriteLine("MISSION_ACCEPTANCE_MYSQL=PASS");
+                    Console.WriteLine("MISSION_ACCEPTANCE_CHECKS=" + checks.ToString(CultureInfo.InvariantCulture));
+                    return 0;
+                }
                 if (chestsOnly)
                 {
                     ValidateChestPopulation(dao, disposable.ApplicationConnectionString);

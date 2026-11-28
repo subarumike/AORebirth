@@ -1134,34 +1134,7 @@ namespace ZoneEngine_New.Core.Playfield
                         player.Identity.Instance));
             }
 
-            try
-            {
-                _playfield.GetService<Quests.QuestService>()?.Restore(player);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(
-                    ex,
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "Quest restore failed character={0}; continuing with world visibility",
-                        player.Identity.Instance));
-            }
-
-            try
-            {
-                // The inventory list only carries the key template's name; each key's full name comes separately.
-                _playfield.GetService<Quests.Dungeons.QuestDungeonService>()?.RestoreKeys(player);
-            }
-            catch (Exception ex)
-            {
-                _logger.Error(
-                    ex,
-                    string.Format(
-                        CultureInfo.InvariantCulture,
-                        "Mission key restore failed character={0}; continuing with world visibility",
-                        player.Identity.Instance));
-            }
+            _playfield.GetService<Quests.IGeneratedMissionLifecycleModule>()?.Restore(player);
         }
 
         /// <summary>
