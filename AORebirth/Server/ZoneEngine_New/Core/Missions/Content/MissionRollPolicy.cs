@@ -1,7 +1,7 @@
 namespace ZoneEngine_New.Core.Missions;
 
 using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.IO;
 using System.Linq;
 using ZoneEngine.Core.Missions;
@@ -11,28 +11,28 @@ internal enum MissionRollType { Unknown = -1, KillPerson = 0, FindPerson = 1, Fi
 
 internal sealed class MissionRollPolicy
 {
-    internal static MissionRollPolicy Current { get; } = Load();
-    public PolicyProvenance Provenance { get; set; } = new();
+    internal static MissionRollPolicy Current => MissionContent.Shared.Value.Policy;
+    public PolicyProvenance Provenance { get; init; } = new();
     /// <summary>False turns mission terminal rolling off: a roll is refused before any credits are taken. Missing reads as on.</summary>
-    public bool Enabled { get; set; } = true;
-    public int OfferLifetimeSeconds { get; set; }
-    public int AcceptedLifetimeSeconds { get; set; }
-    public int MinimumRollFee { get; set; }
-    public int FeePerCharacterLevel { get; set; }
-    public RollTypeRule[] Types { get; set; } = [];
-    public string DefaultSliderEvidence { get; set; } = string.Empty;
-    public SliderEvidenceRule[] SliderProfiles { get; set; } = [];
-    public RollTravelPolicy Travel { get; set; } = new();
-    public RollRewardPolicy Rewards { get; set; } = new();
+    public bool Enabled { get; init; } = true;
+    public int OfferLifetimeSeconds { get; init; }
+    public int AcceptedLifetimeSeconds { get; init; }
+    public int MinimumRollFee { get; init; }
+    public int FeePerCharacterLevel { get; init; }
+    public ImmutableArray<RollTypeRule> Types { get; init; } = [];
+    public string DefaultSliderEvidence { get; init; } = string.Empty;
+    public ImmutableArray<SliderEvidenceRule> SliderProfiles { get; init; } = [];
+    public RollTravelPolicy Travel { get; init; } = new();
+    public RollRewardPolicy Rewards { get; init; } = new();
     internal MissionRollType TypeFromIcon(int icon) => Types.SingleOrDefault(t => t.Icon == icon)?.Type ?? MissionRollType.Unknown;
     internal int Icon(MissionRollType type) => Types.SingleOrDefault(t => t.Type == type)?.Icon ?? 0;
     internal int Action(MissionRollType type) => Types.SingleOrDefault(t => t.Type == type)?.Action ?? 0;
     internal int ObjectiveInteraction(MissionRollType type) => Types.SingleOrDefault(t => t.Type == type)?.ObjectiveInteraction ?? 0;
     internal string Title(MissionRollType type) => Types.Single(t => t.Type == type).Title;
     internal int Fee(int level) => Math.Max(MinimumRollFee, checked(level * FeePerCharacterLevel));
-    static MissionRollPolicy Load()
+    internal static MissionRollPolicy Parse(ReadOnlyMemory<byte> bytes)
     {
-        var policy = MissionContentJson.Read<MissionRollPolicy>("RollPolicy.json");
+        var policy = MissionContentJson.ParseImmutable<MissionRollPolicy>(bytes);
         policy.Validate();
         return policy;
     }
@@ -64,21 +64,21 @@ internal sealed class MissionRollPolicy
     }
 }
 
-internal sealed class PolicyProvenance { public string SourceRevision { get; set; } = string.Empty; public string[] SourcePaths { get; set; } = []; public string Basis { get; set; } = string.Empty; }
-internal sealed class RollTypeRule { public MissionRollType Type { get; set; } public int Icon { get; set; } public int Action { get; set; } public int ObjectiveInteraction { get; set; } public string Title { get; set; } = string.Empty; }
-internal sealed class SliderEvidenceRule { public string Name { get; set; } = string.Empty; public int[] Values { get; set; } = []; public string[] Preference { get; set; } = []; }
+internal sealed class PolicyProvenance { public string SourceRevision { get; init; } = string.Empty; public ImmutableArray<string> SourcePaths { get; init; } = []; public string Basis { get; init; } = string.Empty; }
+internal sealed class RollTypeRule { public MissionRollType Type { get; init; } public int Icon { get; init; } public int Action { get; init; } public int ObjectiveInteraction { get; init; } public string Title { get; init; } = string.Empty; }
+internal sealed class SliderEvidenceRule { public string Name { get; init; } = string.Empty; public ImmutableArray<int> Values { get; init; } = []; public ImmutableArray<string> Preference { get; init; } = []; }
 internal sealed class RollTravelPolicy
 {
-    public int DistinctPlayfieldsAboveLevel { get; set; }
-    public int DistinctAttempts { get; set; }
-    public int MinimumDistanceStartsAboveLevel { get; set; }
-    public double MinimumDistancePerLevel { get; set; }
-    public double MinimumDistanceOffset { get; set; }
-    public double MinimumDistanceFloor { get; set; }
-    public double MaximumDistancePerLevel { get; set; }
-    public double MaximumDistanceOffset { get; set; }
-    public RollTravelBand[] Bands { get; set; } = [];
+    public int DistinctPlayfieldsAboveLevel { get; init; }
+    public int DistinctAttempts { get; init; }
+    public int MinimumDistanceStartsAboveLevel { get; init; }
+    public double MinimumDistancePerLevel { get; init; }
+    public double MinimumDistanceOffset { get; init; }
+    public double MinimumDistanceFloor { get; init; }
+    public double MaximumDistancePerLevel { get; init; }
+    public double MaximumDistanceOffset { get; init; }
+    public ImmutableArray<RollTravelBand> Bands { get; init; } = [];
 }
-internal sealed class RollTravelBand { public int MaximumLevel { get; set; } public string[] Priority { get; set; } = []; }
-internal sealed class RollRewardPolicy { public int NanoQualityTolerance { get; set; } public string[] ExcludedNameFragments { get; set; } = []; public RollRewardFile[] Catalogs { get; set; } = []; }
-internal sealed class RollRewardFile { public string File { get; set; } = string.Empty; public bool FixedQuality { get; set; } }
+internal sealed class RollTravelBand { public int MaximumLevel { get; init; } public ImmutableArray<string> Priority { get; init; } = []; }
+internal sealed class RollRewardPolicy { public int NanoQualityTolerance { get; init; } public ImmutableArray<string> ExcludedNameFragments { get; init; } = []; public ImmutableArray<RollRewardFile> Catalogs { get; init; } = []; }
+internal sealed class RollRewardFile { public string File { get; init; } = string.Empty; public bool FixedQuality { get; init; } }

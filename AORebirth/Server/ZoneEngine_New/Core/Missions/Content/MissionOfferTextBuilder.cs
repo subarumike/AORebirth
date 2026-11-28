@@ -13,61 +13,27 @@ namespace ZoneEngine.Core.Missions
     /// </summary>
     internal static class MissionOfferTextBuilder
     {
-        internal sealed class Snapshot
-        {
-            internal int Icon;
-            internal int Quality;
-            internal int Cash;
-            internal int Experience;
-            internal int Playfield;
-            internal float X;
-            internal float Z;
-            internal int RewardLow;
-            internal int RewardHigh;
-            internal int RewardQuality;
-            internal Identity TerminalReferenceUnknown5;
-            internal Identity TerminalReferenceUnknown14;
-            internal Identity TerminalReferenceUnknown23;
-            internal Identity ObjectiveTerminalReference;
-        }
+        internal sealed record Snapshot(int Icon, int Quality, int Cash, int Experience,
+            int Playfield, float X, float Z, int RewardLow, int RewardHigh, int RewardQuality,
+            Identity TerminalReferenceUnknown5, Identity TerminalReferenceUnknown14,
+            Identity TerminalReferenceUnknown23, Identity ObjectiveTerminalReference);
 
         internal static Snapshot Capture(QuestInfo offer)
         {
-            var snapshot = new Snapshot();
-            if (offer == null)
-            {
-                return snapshot;
-            }
-
-            snapshot.Icon = offer.MissionIconId;
-            snapshot.Quality = offer.Quality;
-            snapshot.Cash = offer.CashReward;
-            snapshot.Experience = offer.ExperienceReward;
-            snapshot.TerminalReferenceUnknown5 = offer.Unknown5;
-            snapshot.TerminalReferenceUnknown14 = offer.Unknown14;
-            snapshot.TerminalReferenceUnknown23 = offer.Unknown23;
-            if (offer.QuestActions != null && offer.QuestActions.Length > 0 && offer.QuestActions[0] != null)
-            {
-                snapshot.Playfield = offer.QuestActions[0].Playfield.Instance;
-                snapshot.X = offer.QuestActions[0].X;
-                snapshot.Z = offer.QuestActions[0].Z;
-                snapshot.ObjectiveTerminalReference = offer.QuestActions[0].Unknown1;
-            }
-
-            if (offer.ItemRewards != null && offer.ItemRewards.Length > 0 && offer.ItemRewards[0] != null)
-            {
-                snapshot.RewardLow = offer.ItemRewards[0].LowId;
-                snapshot.RewardHigh = offer.ItemRewards[0].HighId;
-                snapshot.RewardQuality = offer.ItemRewards[0].Quality;
-            }
-
-            return snapshot;
+            var action = offer.QuestActions is { Length: > 0 } ? offer.QuestActions[0] : null;
+            var reward = offer.ItemRewards is { Length: > 0 } ? offer.ItemRewards[0] : null;
+            return new Snapshot(offer.MissionIconId, offer.Quality, offer.CashReward, offer.ExperienceReward,
+                action?.Playfield.Instance ?? 0, action?.X ?? 0, action?.Z ?? 0, reward?.LowId ?? 0,
+                reward?.HighId ?? 0, reward?.Quality ?? 0, offer.Unknown5, offer.Unknown14, offer.Unknown23,
+                action?.Unknown1 ?? default);
         }
 
         internal static void Apply(
             QuestInfo offer,
             MissionOfferDescriptor descriptor,
-            Snapshot original)
+            Snapshot original,
+            MissionTextContent? text = null,
+            MissionGeographyContent? geography = null)
         {
             if (offer == null || descriptor == null || original == null || !HasMaterialChange(offer, original))
             {
@@ -80,7 +46,7 @@ namespace ZoneEngine.Core.Missions
                 "{0:0.0}, {1:0.0} in {2}",
                 destination.X,
                 destination.Z,
-                LocationName(destination.Playfield.Instance));
+                LocationName(destination.Playfield.Instance, geography ?? MissionGeographyContent.Current));
             string target = string.IsNullOrEmpty(descriptor.TargetName)
                                 ? "the assigned target"
                                 : descriptor.TargetName.TrimEnd('\0');
@@ -90,7 +56,8 @@ namespace ZoneEngine.Core.Missions
                 target,
                 location,
                 offer.CashReward,
-                offer.ExperienceReward);
+                offer.ExperienceReward,
+                text ?? MissionTextContent.Current);
         }
 
         private static bool HasMaterialChange(QuestInfo offer, Snapshot original)
@@ -138,17 +105,17 @@ namespace ZoneEngine.Core.Missions
             string target,
             string location,
             int credits,
-            int experience)
+            int experience,
+            MissionTextContent templates)
         {
-            var templates = MissionTextContent.Current;
             if (!templates.Objectives.TryGetValue((int)type, out var objective)) throw new ArgumentOutOfRangeException(nameof(type));
             return string.Format(CultureInfo.InvariantCulture, templates.RewardFormat,
                 string.Format(CultureInfo.InvariantCulture, objective, location, target), experience, credits);
         }
 
-        private static string LocationName(int playfieldId)
+        private static string LocationName(int playfieldId, MissionGeographyContent geography)
         {
-            return MissionGeographyContent.Current.Names.TryGetValue(playfieldId, out var name) ? name : "playfield " + playfieldId.ToString(CultureInfo.InvariantCulture);
+            return geography.Names.TryGetValue(playfieldId, out var name) ? name : "playfield " + playfieldId.ToString(CultureInfo.InvariantCulture);
         }
     }
 }

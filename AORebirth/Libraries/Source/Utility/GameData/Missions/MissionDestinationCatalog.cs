@@ -124,8 +124,15 @@ namespace Utility.GameData.Missions
                 throw new ArgumentException("A GameData root is required.", nameof(gameDataRoot));
 
             string directory = Path.Combine(gameDataRoot, "Missions", "Destinations");
-            var placements = Read<PlacementCatalogData>(File.ReadAllBytes(Path.Combine(directory, PlacementFile)), PlacementFile);
-            var destinations = Read<MissionDestinationData>(File.ReadAllBytes(Path.Combine(directory, DestinationFile)), DestinationFile);
+            return Parse(File.ReadAllBytes(Path.Combine(directory, PlacementFile)),
+                File.ReadAllBytes(Path.Combine(directory, DestinationFile)));
+        }
+
+        /// <summary>Validates the exact placement and pool bytes selected by the content provider.</summary>
+        public static MissionDestinationCatalog Parse(byte[] placementBytes, byte[] destinationBytes)
+        {
+            var placements = Read<PlacementCatalogData>(placementBytes, PlacementFile);
+            var destinations = Read<MissionDestinationData>(destinationBytes, DestinationFile);
             Require(placements != null && placements.SchemaVersion == 2 && placements.CatalogKind == "MISSION_ENTRANCE_PLACEMENTS",
                 "Unsupported placement schema or catalog kind.");
             Require(destinations != null && destinations.SchemaVersion == 1 && destinations.CatalogKind == "MISSION_DESTINATIONS",

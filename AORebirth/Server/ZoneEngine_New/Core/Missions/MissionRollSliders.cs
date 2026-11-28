@@ -9,10 +9,11 @@ internal sealed class MissionRollSliders
 {
     readonly int[] _values;
     readonly SliderEvidenceRule _evidence;
-    MissionRollSliders(int[] values)
+    readonly MissionRollPolicy _policy;
+    MissionRollSliders(int[] values, MissionRollPolicy policy)
     {
         _values = values;
-        var policy = MissionRollPolicy.Current;
+        _policy = policy;
         var exact = policy.SliderProfiles.SingleOrDefault(p => p.Values.SequenceEqual(values));
         EvidenceProfile = exact?.Name ?? "Unresolved";
         _evidence = exact ?? policy.SliderProfiles.Single(p => p.Name == policy.DefaultSliderEvidence);
@@ -24,7 +25,7 @@ internal sealed class MissionRollSliders
     internal int HeadOnStealth => _values[4];
     internal int MoneyExperience => _values[5];
     internal string EvidenceProfile { get; }
-    internal static bool TryCreate(QuestAlternativeMessage? request, out MissionRollSliders profile, out string error)
+    internal static bool TryCreate(QuestAlternativeMessage? request, out MissionRollSliders profile, out string error, MissionRollPolicy? policy = null)
     {
         profile = null!;
         error = "Mission sliders must be signed-byte percentages from -100 through 100.";
@@ -33,7 +34,7 @@ internal sealed class MissionRollSliders
             request.PhysicalMysticalSlider, request.HeadOnStealthSlider, request.MoneyExperienceSlider];
         var values = wire.Select(value => (int)unchecked((sbyte)value)).ToArray();
         if (values.Any(value => !IsSupportedPercentage(value))) return false;
-        profile = new(values);
+        profile = new(values, policy ?? MissionRollPolicy.Current);
         error = string.Empty;
         return true;
     }
@@ -41,8 +42,8 @@ internal sealed class MissionRollSliders
     internal bool Matches(params int[] values) => _values.SequenceEqual(values);
     internal int SemanticDistance(params int[] values)
     {
-        string? category = MissionRollPolicy.Current.SliderProfiles.SingleOrDefault(p => p.Values.SequenceEqual(values))?.Name;
-        int rank = Array.IndexOf(_evidence.Preference, category);
+        string? category = _policy.SliderProfiles.SingleOrDefault(p => p.Values.SequenceEqual(values))?.Name;
+        int rank = _evidence.Preference.IndexOf(category!);
         return rank < 0 ? _evidence.Preference.Length : rank;
     }
 }

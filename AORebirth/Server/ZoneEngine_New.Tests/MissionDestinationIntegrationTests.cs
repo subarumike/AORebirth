@@ -639,7 +639,7 @@ public sealed class MissionDestinationIntegrationTests
         internal readonly RollSession Session = new();
         internal readonly RollDao Dao = new();
         readonly ServiceProvider _services;
-        readonly QuestAlternativeMessageHandler _handler;
+        readonly IMessageHandler _handler;
 
         internal RollFixture(int level, MissionDestinationCatalog? destinationCatalog = null)
         {
@@ -651,7 +651,17 @@ public sealed class MissionDestinationIntegrationTests
             var terminal = new MissionTerminal(LiveShadeRequest().MissionTerminalIdentity, new ItemTemplate());
             terminal.Playfield = playfield;
             registry.Register(terminal);
-            _services = new ServiceCollection().AddSingleton(registry).AddSingleton(new PlayfieldLocality(800, null)).BuildServiceProvider();
+            _services = new ServiceCollection()
+                .AddSingleton(registry)
+                .AddSingleton(new PlayfieldLocality(800, null))
+                .AddSingleton<IGeneratedMissionDao>(Dao)
+                .AddSingleton(new GeneratedMissionService(Dao, new StubLogger()))
+                .AddSingleton(destinationCatalog ?? catalog)
+                .AddSingleton(MissionContent.Shared)
+                .AddSingleton<IGeneratedMissionOfferGenerator>(GeneratedMissionRollService.Shared)
+                .AddSingleton<IMissionTerminalModule, MissionTerminalModule>()
+                .AddSingleton<IMessageHandler, QuestAlternativeMessageHandler>()
+                .BuildServiceProvider();
             typeof(Playfield).GetField("_serviceProvider", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(playfield, _services);
             Player.Playfield = playfield;
             Player.Position = terminal.Position;
@@ -662,7 +672,7 @@ public sealed class MissionDestinationIntegrationTests
             Player.Stats.Set(CharacterStat.Cash, 5000, StatDetail.Base);
             Player.Session = Session;
             Session.BindPlayer(Player);
-            _handler = new QuestAlternativeMessageHandler(Dao, new GeneratedMissionService(Dao, new StubLogger()), destinationCatalog ?? catalog);
+            _handler = _services.GetRequiredService<IMessageHandler>();
         }
         internal void Handle() => _handler.Handle(LiveShadeRequest(), Session);
         public void Dispose() => _services.Dispose();

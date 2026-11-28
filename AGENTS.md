@@ -359,6 +359,19 @@ Resolve references before use. Missing, invalid or unsupported definitions fail
 explicitly. Keep incomplete evidence coverage marked provisional, with its
 specific gap recorded alongside the affected policy.
 
+Register new gameplay catalogs with the existing GameData content provider.
+Declare each module's schema version, owned files, required or optional inputs,
+override policy and catalog dependencies. Publish a complete validated immutable
+snapshot and retain the previous snapshot after a rejected reload. Gameplay
+components consume validated definitions through their module contracts. Direct
+filesystem discovery, independent content authorities and unvalidated fallback
+catalogs fail the architecture check.
+
+Register remaining loader ownership and dependencies explicitly while migrating
+existing content. Compatibility adapters preserve their established source and
+validation semantics and have a documented conversion scope. Apply the guard
+to new behavior and retain existing findings.
+
 Give gameplay components independent responsibilities and typed contracts.
 Use existing item, persistence, combat and network services. Centralize
 immutable AO protocol identifiers in typed protocol definitions. Historical
@@ -369,6 +382,33 @@ offer generation uses validated typed definitions and reusable eligibility data.
 The [runtime data architecture check](docs/project/ARCHITECTURE.md#data-oriented-gameplay)
 runs against proposed changes in CI. A new violation blocks validation even when
 compilation succeeds. Inherited findings stay visible as open remediation work.
+
+## DAO and gameplay module boundaries
+
+The existing DAO contracts and implementations own persistence. Extend the
+appropriate existing interface when a new operation needs durable state.
+Keep SQL, connections and provider calls in the persistence owner. Preserve
+transaction scope, durable identity allocation and quarantine. Publish
+durable changes only after commit. Compose implementations at the engine boundary
+and inject interfaces into gameplay modules. A module must use the established
+transaction owner for each operation. Architecture changes alone do not justify
+schema changes or a second persistence framework.
+
+ZoneEngine owns transport, authentication, sessions, protocol dispatch,
+registration, dependency injection, lifecycle, scheduling and shared engine
+services. Handlers dispatch to narrow gameplay module interfaces. Keep
+mission, loot, combat, quest, inventory and NPC rules in their existing
+owning modules. Cross-module dependencies use the owning module's contract
+or an established shared service. Expand existing interfaces and owners
+before adding a new abstraction or runtime.
+
+Gameplay modules consume validated immutable GameData snapshots through the
+existing provider. New source must pass the architecture guard for database
+access, DAO construction, transaction ownership, handler orchestration,
+content authority and module dependencies. Add a mutation case when
+extending enforcement. Review indirect dependencies and transaction semantics
+alongside the guard output. See the
+[module and DAO boundaries](docs/project/ARCHITECTURE.md#gameplay-modules-and-dao-ownership).
 
 ## Development authority
 

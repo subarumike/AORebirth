@@ -10,11 +10,22 @@ namespace ZoneEngine.Core.Missions
     /// Exact five-offer type cohorts observed in the finalized roll captures. Selection is nearest-evidence
     /// and deterministic; it does not infer probability weights from how often a cohort happened to appear.
     /// </summary>
-    internal static class MissionRollEvidenceCatalog
+    internal sealed class MissionRollEvidenceCatalog
     {
-        private static readonly RollMixEvidence[] Mixes = MissionContentJson.Read<RollMixEvidence[]>("RollMixes.json");
+        private readonly RollMixEvidence[] Mixes;
 
-        internal static void ValidateCatalog()
+        private MissionRollEvidenceCatalog(RollMixEvidence[] mixes) => Mixes = mixes;
+
+        internal static MissionRollEvidenceCatalog Parse(ReadOnlyMemory<byte> bytes)
+        {
+            var catalog = new MissionRollEvidenceCatalog(MissionContentJson.Parse<RollMixEvidence[]>(MissionContentJson.Decode(bytes)));
+            catalog.Validate();
+            return catalog;
+        }
+
+        internal static void ValidateCatalog() => _ = MissionContent.Shared.Value.Cohorts;
+
+        private void Validate()
         {
             if (Mixes.Length == 0 || Mixes.Any(mix => mix is null || mix.CharacterLevel <= 0 || mix.MissionQuality <= 0
                 || !MissionLevelRuntime.TryDecodeDifficultySlider(mix.Difficulty, out _)
@@ -26,7 +37,7 @@ namespace ZoneEngine.Core.Missions
                 throw new InvalidDataException("Invalid mission roll cohort evidence.");
         }
 
-        internal static MissionRollType[] SelectTypeMix(
+        internal MissionRollType[] SelectTypeMix(
             int characterLevel,
             int difficultyWireValue,
             int missionQuality,
@@ -70,7 +81,7 @@ namespace ZoneEngine.Core.Missions
             return (MissionRollType[])selected.Types.Clone();
         }
 
-        internal static bool HasExactMix(
+        internal bool HasExactMix(
             int characterLevel,
             int difficultyWireValue,
             int missionQuality,

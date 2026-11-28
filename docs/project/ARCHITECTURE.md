@@ -43,6 +43,73 @@ combat and network services. Preserve hot-path costs by reusing validated data
 and eligibility indexes. Fail with a specific diagnostic when a required input
 is missing, invalid or unsupported.
 
+### Gameplay modules and DAO ownership
+
+ZoneEngine owns transport, authenticated sessions, dispatch, dependency
+injection, scheduling and communication with the other engines. The
+composition root binds existing implementations to contracts. Network handlers
+adapt messages and dispatch to the responsible module. The gameplay module
+owns action eligibility, mechanics and orchestration.
+
+| Boundary | Owner and contract |
+| --- | --- |
+| Terminal roll transport | `QuestAlternativeMessageHandler` dispatches `QuestAlternativeMessage` through `IMissionTerminalModule`. |
+| Terminal roll workflow | `MissionTerminalModule` validates the request and terminal interaction and coordinates the existing generator, persistence and response path. |
+| Selection and content | `IGeneratedMissionOfferGenerator` selects from the Phase 1 `MissionContent` snapshot and validated destination catalog. Existing mission content owners retain their registered providers and compatibility loaders. |
+| Economic transaction | `GeneratedMissionService.PublishOffers` retains the player persistence gate and commit-before-publication behavior. It uses `IGeneratedMissionDao.PublishOffers`. Durable offer identity allocation remains `IGeneratedMissionDao.ReserveIdentities`. |
+| SQL and durable state | Existing DAO implementations own connection use and SQL. Gameplay modules depend on their interfaces and the existing transaction services. |
+| Other mission lifecycle operations | `QuestService`, `QuestDungeonService` and `AuthoredQuestService` retain objective, acceptance, reconstruction and quest lifecycle ownership. |
+| Client wire | The shared AOtomation messages and serializers retain the original packet contract. The module uses the existing session gateway to send the same responses. |
+
+Terminal rolling is the controlled proof of this boundary. It uses the
+existing in-process dependency injection, mission generator and DAO. Future
+gameplay extraction proceeds through the owning module's narrow interface.
+Other consumers use that interface or approved shared infrastructure. Keep
+native engine-module contracts within their existing runtime; the external
+module host and plugin lifecycle continue to serve their existing role.
+
+The architecture guard compares the exact base and proposal to detect new
+raw database access, competing persistence abstractions, concrete DAO
+coupling, transaction-owner bypasses, handler gameplay and unauthorized
+module dependencies. Its existing GameData and content rules remain in
+force. Mutation tests exercise these boundaries, while the mission regression
+tests check actual selection, packets and transaction behavior. The static
+guard identifies recognized source patterns. Indirect calls, transaction
+semantics and new shared contracts also require source review.
+
+### GameData provider
+
+The Zone composition root uses the existing GameData root and override settings
+through one GameDataContentProvider. A content module declares its ID, schema
+version, owned paths, required inputs, permitted file overrides and dependencies.
+The provider resolves declared paths, hashes the exact bytes it passes to the
+validator and captures typed dependency snapshots. It rejects duplicate ownership
+and unresolved or cyclic dependencies. A slot publishes a complete immutable
+value and its metadata together. Readers keep the previous value until a reload
+has validated successfully.
+
+Snapshot identity binds module/schema, paths, source selection, file hashes and
+dependency identities. Repository/revision metadata is optional and requires a
+trusted input from composition. The runtime records bytes even when it lacks a
+trusted repository binding. An allowed override supersedes the base file when
+present. A bad selected file fails validation. Optional absence is represented
+explicitly, separately from a failed read or parse.
+
+MissionRoll owns the typed offers, roll policy, levels and level rules, type and
+reward observations, text, geography, and both destination files. MissionKeys
+owns the key policy and validates its roles against the existing item template
+catalog. Phase 1 keeps these two modules on the startup-selected root to
+preserve their existing override behavior. Startup reports both identities.
+Accepted mission definitions and their serialization remain owned by the
+existing persistence and protocol contracts.
+
+The registry also declares current ownership of dungeon profiles/room
+metadata, item and NPC templates, terminal item reward assets, authored quest
+packs, QuestRewards and RK chest loot. Their compatibility adapters retain the
+existing loaders, validation and source selection. Dependency metadata calls
+out a compatibility owner separately from a validated provider snapshot.
+Conversion of these adapters is outside the Phase 1 migration.
+
 Mission offer construction, destination selection, objective resolution, quest
 persistence and dungeon materialization have separate owners. Offers use the
 typed `Missions/MissionOffers.json` definitions and the existing AO serializers.

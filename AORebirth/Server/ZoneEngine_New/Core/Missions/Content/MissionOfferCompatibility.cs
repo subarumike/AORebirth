@@ -23,16 +23,16 @@ namespace ZoneEngine.Core.Missions
 
     internal sealed class MissionOfferDescriptor
     {
-        internal MissionRollType Type;
-        internal int IconId;
-        internal int ActionCode;
-        internal MissionObjectiveCategory Objective;
-        internal MissionRewardCategory Reward;
-        internal string TargetName;
-        internal string ShortInfo;
-        internal Identity ObjectiveIdentity;
-        internal Identity AuxiliaryObjectiveIdentity1;
-        internal Identity AuxiliaryObjectiveIdentity2;
+        internal MissionRollType Type { get; init; }
+        internal int IconId { get; init; }
+        internal int ActionCode { get; init; }
+        internal MissionObjectiveCategory Objective { get; init; }
+        internal MissionRewardCategory Reward { get; init; }
+        internal string TargetName { get; init; }
+        internal string ShortInfo { get; init; }
+        internal Identity ObjectiveIdentity { get; init; }
+        internal Identity AuxiliaryObjectiveIdentity1 { get; init; }
+        internal Identity AuxiliaryObjectiveIdentity2 { get; init; }
     }
 
     /// <summary>
@@ -45,8 +45,10 @@ namespace ZoneEngine.Core.Missions
         internal static bool TryDescribe(
             QuestInfo offer,
             out MissionOfferDescriptor descriptor,
-            out string error)
+            out string error,
+            MissionRollPolicy? policy = null)
         {
+            policy ??= MissionRollPolicy.Current;
             descriptor = null;
             error = null;
             if (offer == null)
@@ -55,14 +57,14 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
-            MissionRollType type = MissionRollPolicy.Current.TypeFromIcon(offer.MissionIconId);
+            MissionRollType type = policy.TypeFromIcon(offer.MissionIconId);
             if (type == MissionRollType.Unknown)
             {
                 error = "Unknown mission icon " + offer.MissionIconId + ".";
                 return false;
             }
 
-            if (MissionRollPolicy.Current.Icon(type) != offer.MissionIconId)
+            if (policy.Icon(type) != offer.MissionIconId)
             {
                 error = "Mission icon does not match its canonical type.";
                 return false;
@@ -75,14 +77,14 @@ namespace ZoneEngine.Core.Missions
             }
 
             int actionCode = offer.QuestActions[0].Version;
-            if (actionCode != MissionRollPolicy.Current.Action(type))
+            if (actionCode != policy.Action(type))
             {
                 error = "Mission action code "
                         + actionCode
                         + " does not match "
                         + type.ToString()
                         + " expected "
-                        + MissionRollPolicy.Current.Action(type)
+                        + policy.Action(type)
                         + ".";
                 return false;
             }
@@ -116,9 +118,10 @@ namespace ZoneEngine.Core.Missions
             QuestInfo offer,
             Identity capturedTerminal,
             out MissionOfferDescriptor descriptor,
-            out string error)
+            out string error,
+            MissionRollPolicy? policy = null)
         {
-            if (!TryDescribe(offer, out descriptor, out error))
+            if (!TryDescribe(offer, out descriptor, out error, policy))
             {
                 return false;
             }
@@ -176,10 +179,12 @@ namespace ZoneEngine.Core.Missions
             MissionRollSliders sliders,
             Identity issuingTerminal,
             out MissionOfferDescriptor generated,
-            out string error)
+            out string error,
+            MissionRollPolicy? policy = null,
+            MissionTextContent? text = null)
         {
             generated = null;
-            if (!TryDescribe(offer, out generated, out error))
+            if (!TryDescribe(offer, out generated, out error, policy))
             {
                 return false;
             }
@@ -239,7 +244,7 @@ namespace ZoneEngine.Core.Missions
                 return false;
             }
 
-            string requiredObjectiveText = RequiredObjectiveText(generated.Type);
+            string requiredObjectiveText = RequiredObjectiveText(generated.Type, text ?? MissionTextContent.Current);
             if (!description.Contains(requiredObjectiveText))
             {
                 error = "Generated description does not match objective/text family.";
@@ -306,10 +311,10 @@ namespace ZoneEngine.Core.Missions
             }
         }
 
-        private static string RequiredObjectiveText(MissionRollType type)
+        private static string RequiredObjectiveText(MissionRollType type, MissionTextContent text)
         {
-            return MissionTextContent.Current.RequiredObjectiveText.TryGetValue((int)type, out var text)
-                ? text : throw new ArgumentOutOfRangeException(nameof(type));
+            return text.RequiredObjectiveText.TryGetValue((int)type, out var objective)
+                ? objective : throw new ArgumentOutOfRangeException(nameof(type));
         }
 
         private static bool HasCapturedObjectiveShape(

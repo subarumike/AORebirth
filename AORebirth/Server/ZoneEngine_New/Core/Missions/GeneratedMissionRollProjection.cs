@@ -15,23 +15,24 @@ namespace ZoneEngine_New.Core.Missions
     {
         internal static GeneratedMissionOfferBatch Create(QuestAlternativeMessage request,
             QuestAlternativeMessage response, int playfield, int fee, int seed, int nonce, DateTime issuedUtc,
-            IReadOnlyList<MissionPlacementIdentity> selectedEntrances)
+            IReadOnlyList<MissionPlacementIdentity> selectedEntrances, MissionRollPolicy? policy = null)
         {
+            policy ??= MissionRollPolicy.Current;
             if (response.QuestInfos == null || response.QuestInfos.Length != 5)
                 throw new InvalidOperationException("The accepted mission generator must supply exactly five offers.");
             if (selectedEntrances == null || selectedEntrances.Count != response.QuestInfos.Length)
                 throw new InvalidOperationException("Every generated offer must retain its selected entrance identity.");
-            if (!MissionRollSliders.TryCreate(request, out var sliders, out string error))
+            if (!MissionRollSliders.TryCreate(request, out var sliders, out string error, policy))
                 throw new ArgumentException(error, nameof(request));
             byte[] wire = GeneratedMissionWire.Write(response);
             string wireHash = Convert.ToHexStringLower(SHA256.HashData(wire));
             string batchIdentity = Guid.NewGuid().ToString("N");
-            long expires = issuedUtc.AddSeconds(MissionRollPolicy.Current.OfferLifetimeSeconds).Ticks;
+            long expires = issuedUtc.AddSeconds(policy.OfferLifetimeSeconds).Ticks;
             var offers = new List<GeneratedMissionOffer>();
             for (int index = 0; index < response.QuestInfos.Length; index++)
             {
                 QuestInfo offer = response.QuestInfos[index];
-                if (!MissionOfferCompatibility.TryDescribe(offer, out var description, out string failure)
+                if (!MissionOfferCompatibility.TryDescribe(offer, out var description, out string failure, policy)
                     || offer.QuestActions == null || offer.QuestActions.Length != 1
                     || offer.QuestActions[0] == null || offer.ItemRewards?.Length > 1)
                     throw new InvalidOperationException("Unsupported generated offer projection: " + failure);

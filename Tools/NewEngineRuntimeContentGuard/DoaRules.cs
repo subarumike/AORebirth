@@ -25,8 +25,13 @@ internal static class DoaRules
         ["TemporaryLockedDoorChancePercent"] = 5
     };
 
-    internal static string SourceFingerprint(SyntaxNode node)
+    internal static string SourceFingerprint(SyntaxNode node, string rule)
     {
+        // Source dependencies identify exact operations within the same path and member.
+        // Moving an unchanged read into a validation call does not create another source.
+        if (rule == DoaContentBoundary.DirectSourceRule)
+            return Digest(Tokens(node));
+
         SyntaxNode context = node.AncestorsAndSelf().FirstOrDefault(ancestor => ancestor is StatementSyntax or EqualsValueClauseSyntax
             or SwitchExpressionArmSyntax or AttributeSyntax) ?? node;
         return Digest(Tokens(context) + "\n" + Tokens(node));
@@ -49,6 +54,11 @@ internal static class DoaRules
 
     internal static IEnumerable<(SyntaxNode Node, string Rule, string Basis)> SourceIssues(string path, SyntaxNode syntax)
     {
+        foreach (var issue in DoaContentBoundary.SourceIssues(path, syntax))
+            yield return issue;
+        foreach (var issue in DoaModuleBoundary.SourceIssues(path, syntax))
+            yield return issue;
+
         bool missions = path.StartsWith("AORebirth/Server/ZoneEngine_New/", StringComparison.Ordinal)
             && (path.Contains("/Missions/", StringComparison.Ordinal) || path.Contains("/Quests/", StringComparison.Ordinal));
         bool offerGeneration = path is "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionRollService.cs"

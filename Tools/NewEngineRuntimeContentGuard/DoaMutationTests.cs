@@ -37,9 +37,19 @@ internal static class DoaMutationTests
             ("offer wire reader boundary", CheckOfferWireReader),
             ("typed wire contract", () => Require(!Rules("enum WireCode { Quest = 0xDAC3 } class Test { int Read() => row.GetInt32(5); }").Any())),
             ("mission persistence boundary", () => Block("using MySqlConnector; class Test { object Open() => new MySqlConnection(); }", "DOA_MODULE_DEPENDENCY")),
+            ("direct database access boundary", CheckDatabaseAccess),
+            ("concrete DAO ownership", CheckConcreteDaoOwnership),
+            ("gameplay dispatch boundary", CheckGameplayDispatch),
+            ("competing persistence contract", CheckCompetingPersistence),
+            ("mission transaction service boundary", CheckTransactionBoundary),
+            ("internal module dependencies", CheckModuleDependencies),
             ("project dependency boundary", CheckProjects),
             ("unchanged and introduced findings", CheckDiff),
             ("versioned layout exception", () => CheckHistoricalLayout(root)),
+            ("direct catalog source dependencies", CheckDirectContentSources),
+            ("single runtime content authority", CheckContentAuthority),
+            ("unauthorized fallback catalogs", CheckCatalogFallback),
+            ("required content validation boundary", CheckContentValidation),
             ("provisional catalog validation", CheckCoverage),
             ("recorded payload field", CheckRecordedPayload),
             ("key catalog validation", CheckKeyCatalog),
@@ -91,12 +101,153 @@ internal static class DoaMutationTests
         Require(!DoaRules.IsForbiddenRuntimeProjectReference("AORebirth/Libraries/Source/AORebirth.Modules.Abstractions/AORebirth.Modules.Abstractions.csproj"));
     }
 
+    private static void CheckDatabaseAccess()
+    {
+        Block("""class Probe { object Load() => storage.Execute("SELECT * FROM MissionOffers"); }""", "DOA_DIRECT_DATABASE_ACCESS");
+        Block("""class Probe { string Write() => $"UPDATE MissionOffers SET Fee = {fee}"; }""", "DOA_DIRECT_DATABASE_ACCESS");
+        Block("class Probe { object Open() => Connector.GetConnection(); }", "DOA_DIRECT_DATABASE_ACCESS");
+        Block("class Probe { object Start() => connection.BeginTransaction(); }", "DOA_DIRECT_DATABASE_ACCESS");
+        Block("using Connection = Npgsql.NpgsqlConnection; class Probe { object Open() => new Connection(cs); }", "DOA_DIRECT_DATABASE_ACCESS");
+
+        const string dao = "AORebirth/Libraries/Source/AORebirth.Database/Domain/Missions/DaoProbe.cs";
+        Require(!DoaRules.SourceIssues(dao,
+            Parse("""using Dapper; class Probe { object Load() => connection.Query("SELECT * FROM MissionOffers"); }""")).Any());
+        Require(!Rules("class Probe { object Read() => world.Query<Cell>(key); }").Any());
+    }
+
+    private static void CheckConcreteDaoOwnership()
+    {
+        Block("class Probe { object Data() => new MySqlMissionDao(factory); }", "DOA_CONCRETE_DAO");
+        Block("class Probe(MySqlMissionDao dao) {}", "DOA_CONCRETE_DAO");
+        Block("using Data = AORebirth.Database.Domain.Missions.MySqlMissionDao; class Probe { Data dao = new(factory); }", "DOA_CONCRETE_DAO");
+        Require(!Rules("class Probe(IGeneratedMissionDao dao) { object Data() => dao.ReserveIdentities(sequence, count); }").Any());
+
+        const string composition = "AORebirth/Server/ZoneEngine_New/Program.cs";
+        Require(!DoaRules.SourceIssues(composition,
+            Parse("class Program { void BuildRootServices() { services.AddSingleton<IGeneratedMissionDao>(_ => new MySqlMissionDao(() => new MySqlConnection(settings))); } }")).Any());
+        Require(DoaRules.SourceIssues(composition,
+            Parse("""class Program { void BuildRootServices() { services.AddSingleton(_ => connection.Execute("DELETE FROM MissionOffers")); } }"""))
+            .Any(issue => issue.Rule == "DOA_DIRECT_DATABASE_ACCESS"));
+    }
+
+    private static void CheckGameplayDispatch()
+    {
+        const string handlers = "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/";
+        const string dispatch = "class Probe(IMissionTerminalModule module) { public void Handle(QuestAlternativeMessage message, IZoneSession session) => module.Roll(message, session); }";
+        Require(!DoaRules.SourceIssues(handlers + "QuestAlternativeMessageHandler.cs", Parse(dispatch)).Any());
+        string withPolicy = dispatch.Replace("=> module.Roll(message, session);", "{ if (Flag()) module.Roll(message, session); }", StringComparison.Ordinal);
+        Require(DoaRules.SourceIssues(handlers + "QuestAlternativeMessageHandler.cs", Parse(withPolicy))
+            .Any(issue => issue.Rule == "DOA_GAMEPLAY_IN_DISPATCH"));
+        Require(DoaRules.SourceIssues(handlers + "OtherHandler.cs", Parse("class Probe { void Handle() => player.ApplyDamage(amount); }"))
+            .Any(issue => issue.Rule == "DOA_GAMEPLAY_IN_DISPATCH"));
+        Require(DoaRules.SourceIssues("AORebirth/Server/ZoneEngine_New/Program.cs", Parse("class Program { void Run() => rewards.GrantReward(reward); }"))
+            .Any(issue => issue.Rule == "DOA_GAMEPLAY_IN_DISPATCH"));
+    }
+
+    private static void CheckCompetingPersistence()
+    {
+        Block("interface IMissionRepository { void Save(); }", "DOA_COMPETING_PERSISTENCE");
+        Block("interface ITerminalQuestSpareDao { void Save(); }", "DOA_COMPETING_PERSISTENCE");
+        Block("class AddedDbContext : DbContext {}", "DOA_COMPETING_PERSISTENCE");
+        Require(!Rules("interface IMissionTerminalModule { void Roll(); }").Any());
+    }
+
+    private static void CheckTransactionBoundary()
+    {
+        Block("class Probe(IGeneratedMissionDao dao) { object Run() => dao.PublishOffers(batch); }", "DOA_TRANSACTION_BYPASS");
+        Require(!Rules("class Probe(GeneratedMissionService missions) { object Run() => missions.PublishOffers(player, batch); }").Any());
+        const string owner = "AORebirth/Server/ZoneEngine_New/Core/Missions/GeneratedMissionService.cs";
+        Require(!DoaRules.SourceIssues(owner,
+            Parse("class GeneratedMissionService(IGeneratedMissionDao dao) { object PublishOffers() => dao.PublishOffers(batch); }")).Any());
+        Require(DoaRules.SourceIssues(owner,
+            Parse("class GeneratedMissionService(IGeneratedMissionDao dao) { object Bypass() => dao.PublishOffers(batch); }"))
+            .Any(issue => issue.Rule == "DOA_TRANSACTION_BYPASS"));
+        Block("class Probe(IInventoryMutationPersistence inventory) { void Run() => inventory.Persist(batch); }", "DOA_TRANSACTION_BYPASS");
+        Block("class Probe { void Run() => services.GetRequiredService<ITradePersistence>().Persist(batch); }", "DOA_TRANSACTION_BYPASS");
+        Require(!DoaRules.SourceIssues("AORebirth/Server/ZoneEngine_New/Core/Inventory/InventoryActionService.cs",
+            Parse("class InventoryActionService(IInventoryMutationPersistence persistence) { void TryCommit() => persistence.Persist(batch); }")).Any());
+        Require(!DoaRules.SourceIssues("AORebirth/Server/ZoneEngine_New/Core/Trade/TradeService.cs",
+            Parse("class TradeService { ITradePersistence persistence; void PersistPlan() => this.persistence.Persist(batch); }")).Any());
+        Require(!Rules("class Probe { void Run() => cache.Persist(snapshot); }").Any());
+    }
+
+    private static void CheckModuleDependencies()
+    {
+        Block("class Probe(InventoryModule inventory) {}", "DOA_UNAUTHORIZED_MODULE_DEPENDENCY");
+        Block("using InventoryOwner = ZoneEngine_New.Core.Inventory.InventoryModule; class Probe { object Run() => new InventoryOwner(); }",
+            "DOA_UNAUTHORIZED_MODULE_DEPENDENCY");
+        Block("using ZoneEngine_New.Core.Quests.Internal; class Probe {}", "DOA_UNAUTHORIZED_MODULE_DEPENDENCY");
+        Block("class Probe(QuestDungeonService quest) {}", "DOA_UNAUTHORIZED_MODULE_DEPENDENCY");
+        Require(!Rules("class Probe(IInventoryModule inventory, MissionTerminalModule ownModule, InventoryFlushService shared, IZoneSession session) {}").Any());
+    }
+
     private static void CheckDiff()
     {
         Finding old = DoaRules.DataFinding(MissionPath, "Probe", "EXAMPLE", "Open debt", "old");
         Finding changed = DoaRules.DataFinding(MissionPath, "Probe", "EXAMPLE", "Open debt", "changed");
         var result = DoaEnforcement.Compare([old], [old with { Line = 200 }, old, changed]);
         Require(result.Inherited.Length == 1 && result.Introduced.Length == 2);
+    }
+
+    private static void CheckDirectContentSources()
+    {
+        Block("class Probe { string Read() => File.ReadAllText(path); }", "DOA_DIRECT_CONTENT_SOURCE");
+        Block("class Probe { string Read() => GameDataPaths.ResolveRuntimeRoot(); }", "DOA_DIRECT_CONTENT_SOURCE");
+        Block("using Paths = AORebirth.Core.GameData.GameDataPaths; class Probe { string Read() => Paths.ResolveFile(root, name); }",
+            "DOA_DIRECT_CONTENT_SOURCE");
+        Block("using static System.IO.File; class Probe { string Read() => ReadAllText(path); }", "DOA_DIRECT_CONTENT_SOURCE");
+        Block("class Probe { object Scan() => Directory.EnumerateFiles(root); }", "DOA_DIRECT_CONTENT_SOURCE");
+        Block("class Probe { object Read() => new StreamReader(path); }", "DOA_DIRECT_CONTENT_SOURCE");
+        Block("""class Probe { string Read() => Environment.GetEnvironmentVariable("AO_REBIRTH_GAMEDATA_PATH"); }""",
+            "DOA_DIRECT_CONTENT_SOURCE");
+
+        const string otherGameplay = "AORebirth/Server/ZoneEngine_New/Core/Mobs/GuardProbe.cs";
+        Require(DoaRules.SourceIssues(otherGameplay, Parse("""class Probe { object Read() => File.OpenRead("Mobs.json"); }"""))
+            .Any(issue => issue.Rule == "DOA_DIRECT_CONTENT_SOURCE"));
+        const string combatModule = "AORebirth/Server/ZoneEngine_New/Core/Combat/GuardProbe.cs";
+        Require(DoaRules.SourceIssues(combatModule, Parse("class Probe { object Read(string path) => File.ReadAllText(path); }"))
+            .Any(issue => issue.Rule == "DOA_DIRECT_CONTENT_SOURCE"));
+        Require(!DoaRules.SourceIssues("AORebirth/Server/ZoneEngine_New/Core/Metrics/GuardProbe.cs",
+            Parse("""class Probe { object Read() => File.OpenRead("spawn.log"); }""")).Any());
+        Require(!Rules("class Probe { object Read() => new StreamReader(new MemoryStream(bytes)); }").Any());
+
+        string Fingerprint(string body) => DoaRules.SourceFingerprint(DoaRules.SourceIssues(MissionPath, Parse(body)).Single().Node,
+            DoaContentBoundary.DirectSourceRule);
+        Require(Fingerprint("class Probe { object Read() => File.ReadAllText(path); }")
+            == Fingerprint("class Probe { object Read() => Validate(File.ReadAllText(path)); }"));
+        Require(Fingerprint("class Probe { object Read() => File.ReadAllText(path); }")
+            != Fingerprint("class Probe { object Read() => File.ReadAllText(fallbackPath); }"));
+    }
+
+    private static void CheckContentAuthority()
+    {
+        Block("class Probe : IGameDataContentProvider {}", "DOA_DUPLICATE_CONTENT_AUTHORITY");
+        Block("class Probe { GameDataContentProvider Source = new(root); }", "DOA_DUPLICATE_CONTENT_AUTHORITY");
+        const string provider = "AORebirth/Server/ZoneEngine_New/Core/GameData/GameDataContentProvider.cs";
+        Require(!DoaRules.SourceIssues(provider, Parse("class GameDataContentProvider { object Open() => File.ReadAllBytes(root); }")).Any());
+        Require(DoaRules.SourceIssues(provider, Parse("class Other { object Build() => new GameDataContentProvider(root); }"))
+            .Any(issue => issue.Rule == "DOA_DUPLICATE_CONTENT_AUTHORITY"));
+    }
+
+    private static void CheckCatalogFallback()
+    {
+        Block("""class Probe { string PathFor() => File.Exists(approved) ? approved : Path.Combine(packaged, "Offers.json"); }""",
+            "DOA_UNAUTHORIZED_CATALOG_FALLBACK");
+        Block("""class Probe { object Read() { if (File.Exists(approved)) return Read(approved); else return Read("Offers.json"); } }""",
+            "DOA_UNAUTHORIZED_CATALOG_FALLBACK");
+        Block("""class Probe { string PathFor() => Path.Combine(Environment.CurrentDirectory, "Offers.json"); }""",
+            "DOA_UNAUTHORIZED_CATALOG_FALLBACK");
+    }
+
+    private static void CheckContentValidation()
+    {
+        Block("class Probe { object Build() => new ContentSnapshot<Offers>(data); }", "DOA_CONTENT_VALIDATION_BYPASS");
+        Block("class Probe { object Build(ContentInputs input) { try { return Parse(input.Required(offerFile)); } catch { return new Offers(); } } }",
+            "DOA_CONTENT_VALIDATION_BYPASS");
+        Block("class Probe { object Build(ContentInputs input) { try { return input.RequireDependency<Keys>(keysId); } catch { return new Keys(); } } }",
+            "DOA_CONTENT_VALIDATION_BYPASS");
+        Require(!Rules("class Probe { object Build(ContentInputs input) => Validate(Parse(input.Required(offerFile))); }").Any());
+        Require(!Rules("class Probe { object Current(ContentSlot<Offers> slot) => slot.Current; }").Any());
     }
 
     private static void CheckHistoricalLayout(string root)
