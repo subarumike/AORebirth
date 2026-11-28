@@ -33,5 +33,5 @@ Set `PORK_DEBUG_HEARTBEAT=1` to log the cost of every pass.
 - `export/` (see `PORK_EXPORT_PATH`): the folder served over HTTP by the web server.
 - `state/`: watermarks (`state.json`) and quarantined files. Keep it outside the served folder.
 - `web/apache.htaccess`: local test configuration. Copy it to `<PORK_EXPORT_PATH>\.htaccess` so that `bio.xml?data_type=json` serves `bio.json`. The production web server is configured by the server owner.
-- `web/org.php`: organization directory modeled on the retail `orgs.html` page. Copy it to the root of `<PORK_EXPORT_PATH>` and serve it with PHP. `org.php?l=b&dim=10` lists the organizations starting with B, `l=others` the other names. It reads only the published `basicstats.json` files. The dimensions it lists are the `DIMENSIONS` constant at the top of the file.
+- `web/org.php`: organization directory modeled on the retail `orgs.html` page. Copy it into `<PORK_EXPORT_PATH>/org/` and serve it with PHP. `org.php?l=b&dim=10` lists the organizations starting with B, `l=others` the other names. It reads only the published `basicstats.json` files. The dimensions it lists are the `DIMENSIONS` constant at the top of the file.
 - Linux service files are handled outside this repository.

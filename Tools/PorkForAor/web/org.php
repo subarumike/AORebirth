@@ -30,7 +30,7 @@ function letterOf(string $name): string
  */
 function organizations(int $dim): ?array
 {
-	$root = __DIR__ . '/org/stats/d/' . $dim . '/name';
+	$root = __DIR__ . '/stats/d/' . $dim . '/name';
 	if (!is_dir($root)) {
 		return null;
 	}
