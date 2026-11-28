@@ -93,7 +93,8 @@ namespace ZoneEngine_New.Core.Playfield
             ZoneEngine_New.Core.NpcScripts.NpcScriptCatalog? npcScripts = null,
             ZoneEngine_New.Core.Organizations.OrgMembershipService? orgMembership = null,
             ZoneEngine_New.Core.Characters.CharacterPlayedClock? playedClock = null,
-            ZoneEngine_New.Core.Organizations.OrgTaxTickService? orgTax = null)
+            ZoneEngine_New.Core.Organizations.OrgTaxTickService? orgTax = null,
+            Quests.IGeneratedMissionLifecycleModule? missionLifecycle = null)
         {
             World = world;
             _crossInstance = crossInstance;
@@ -103,6 +104,7 @@ namespace ZoneEngine_New.Core.Playfield
             OrgTax = orgTax;
             PlayedClock = playedClock;
             QuestDungeons = questDungeons;
+            MissionLifecycle = missionLifecycle;
             Knubot = knubot;
             Gameplay = gameplay;
             ModuleEvents = modules?.Count > 0 ? modules.Events : null;
@@ -183,6 +185,9 @@ namespace ZoneEngine_New.Core.Playfield
 
         /// <summary>Root quest dungeon service, forwarded into every playfield container.</summary>
         public ZoneEngine_New.Core.Quests.Dungeons.QuestDungeonService? QuestDungeons { get; }
+
+        /// <summary>Root generated mission lifecycle, shared by playfield services.</summary>
+        public Quests.IGeneratedMissionLifecycleModule? MissionLifecycle { get; }
 
         /// <summary>Root Gameplay.json settings, forwarded into every playfield container.</summary>
         public ZoneEngine_New.Core.Configuration.GameplaySettings? Gameplay { get; }

@@ -264,7 +264,7 @@ namespace AORebirth.Database.Domain.Quests
                 if (sourceItem != null)
                     InsertQuestItem(c, t, sourceItem);
                 return true;
-            });
+            }, reportUnknownCommit: true);
         }
 
         /// <summary>
@@ -717,13 +717,20 @@ namespace AORebirth.Database.Domain.Quests
         }
 
         /// <summary>Runs <paramref name="action"/> in one transaction; it commits unless the action throws.</summary>
-        T Transaction<T>(Func<IDbConnection, IDbTransaction, T> action)
+        T Transaction<T>(Func<IDbConnection, IDbTransaction, T> action, bool reportUnknownCommit = false)
         {
             using (IDbConnection connection = Open())
             using (IDbTransaction transaction = connection.BeginTransaction(IsolationLevel.ReadCommitted))
             {
                 T result = action(connection, transaction);
-                transaction.Commit();
+                try
+                {
+                    transaction.Commit();
+                }
+                catch (Exception exception) when (reportUnknownCommit)
+                {
+                    throw new MissionCommitOutcomeUnknownException(exception);
+                }
                 return result;
             }
         }

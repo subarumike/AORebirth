@@ -4,9 +4,8 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Security.Cryptography;
-using System.Text;
 using System.Text.Json;
+using System.Threading;
 using AORebirth.Enums;
 using AORebirth.Interfaces.Persistence.Missions;
 using SmokeLounge.AOtomation.Messaging.GameData;
@@ -16,137 +15,20 @@ using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.Helpers;
 using ZoneEngine_New.Core.Inventory;
 using ZoneEngine_New.Core.Missions;
-using ZoneEngine_New.Core.Modules;
 using ZoneEngine_New.Core.Network;
 using ZoneEngine_New.Core.Quests.Dungeons;
+using ZoneEngine_New.Core.Playfield;
 
 public sealed partial class QuestService
 {
-    static bool RequiresBoundObjective(PlayerQuest quest) => quest.Source == QuestSource.Generated
-        && (quest.Template.IsFindItem || quest.Template.IsReturnItem || quest.Template.IsRepair
-            || QuestDungeonParameters.TryParse(quest.AcgBuildingGeneratorJson, out var parameters)
-                && parameters.ObjectiveNpc != null);
+    static bool RequiresBoundObjective(PlayerQuest quest) => MissionObjectiveModule.RequiresBoundObjective(quest);
 
-    /// <summary>Retail Find Person completes on inspection of the accepted actor, not ordinary targeting.</summary>
-    public void OnNpcInspected(Player player, NpcCharacter npc)
+    internal bool CanProgressObjective(Player player) => _completionDao != null && CanDeliver(player);
+
+    internal bool TryEarnBoundObjective(Player player, PlayerQuest quest, QuestDungeonParameters parameters, MissionItemInstanceData? removal)
     {
-        foreach (var quest in GetLog(player).Quests.Values)
-            if (quest.IsActive && quest.Template.Action == QuestTemplate.TargetNpcAction && RequiresBoundObjective(quest))
-                TryEarnNpcObjective(player, quest, npc, inspected: true);
-    }
-
-    void TryEarnNpcObjective(Player player, PlayerQuest quest, NpcCharacter npc, bool inspected)
-    {
-        lock (player.PersistenceGate)
-        {
-            if (!CanDeliver(player) || _completionDao == null || !quest.IsActive || quest.IsRewardPending
-                || !QuestDungeonParameters.TryParse(quest.AcgBuildingGeneratorJson, out var parameters)
-                || parameters.ObjectiveNpc is not { IsValid: true } binding
-                || binding.MissionType != (inspected ? 1 : 0) || binding.OwnerId != player.Identity.Instance
-                || binding.QuestId != quest.QuestId || npc.Identity != binding.Identity
-                || npc.Playfield is not ZoneEngine_New.Core.Playfield.QuestDungeonPlayfield world
-                || !ReferenceEquals(player.Playfield, world) || world.Identity.Instance != parameters.DungeonPlayfield
-                || world.QuestId != quest.QuestId
-                || !world.GetRequiredService<ZoneEngine_New.Core.Playfield.DynelRegistry>().TryGet(npc.Identity, out var registered)
-                || !ReferenceEquals(registered, npc)
-                || inspected && (player.GetEdgeDistanceTo(npc) > LootableDynel.OpenRange || !player.HasLineOfSightTo(npc)))
-                return;
-            if (!TryEarnBoundObjective(player, quest, parameters, null) && !inspected && !player.IsPersistenceQuarantined)
-            {
-                quest.NpcObjectiveCommitPending = true;
-                quest.NextRewardRetryUtcTicks = _now().AddSeconds(5).Ticks;
-            }
-        }
-    }
-
-    /// <summary>Claims mission-owned item interactions before generic item spells can handle them.</summary>
-    public bool TryUseGeneratedMissionItem(Player player, Identity sourceSlot, Identity target, out bool handled)
-    {
-        handled = false;
-        lock (player.PersistenceGate)
-        {
-            // A mission machine never falls through to its ordinary item-template spells,
-            // including when a key holder has no ownership of this mission.
-            if (player.Playfield is { } currentWorld
-                && currentWorld.GetRequiredService<ZoneEngine_New.Core.Playfield.DynelRegistry>()
-                    .TryGet(target, out var registeredTarget) && registeredTarget is MissionObjectiveItem)
-                handled = true;
-            if (!CanDeliver(player) || _completionDao == null)
-                return false;
-            player.Inventory.TryGetUseItem(sourceSlot, out Item source);
-            foreach (var quest in GetLog(player).Quests.Values)
-            {
-                if (quest.Source != QuestSource.Generated
-                    || !QuestDungeonParameters.TryParse(quest.AcgBuildingGeneratorJson, out var parameters))
-                    continue;
-                MissionItemObjectiveBinding? binding = quest.Template.IsRepair ? parameters.ObjectiveTool
-                    : quest.Template.IsReturnItem ? parameters.ObjectiveItem : null;
-                bool ownsTarget = quest.Template.IsRepair && parameters.ObjectiveItem?.Identity == target;
-                if (binding?.IsValid != true || (source?.Identity != binding.Identity && !ownsTarget))
-                    continue;
-                handled = true;
-                if (!quest.IsActive || quest.IsRewardPending || source == null || source.Locked || !source.IsPersisted
-                    || binding.OwnerId != player.Identity.Instance || binding.QuestId != quest.QuestId
-                    || source.Identity != binding.Identity || source.InstanceId != binding.Instance
-                    || source.LowId != binding.LowId || source.HighId != binding.HighId || source.Quality != binding.Quality
-                    || source.StackCount != 1)
-                    return false;
-                var world = player.Playfield!;
-                if (!world.GetRequiredService<ZoneEngine_New.Core.Playfield.DynelRegistry>().TryGet(target, out var destination))
-                    return false;
-                if (quest.Template.IsRepair)
-                {
-                    if (world is not ZoneEngine_New.Core.Playfield.QuestDungeonPlayfield dungeon
-                        || dungeon.QuestId != quest.QuestId || dungeon.Identity.Instance != parameters.DungeonPlayfield
-                        || destination is not MissionObjectiveItem machine
-                        || parameters.ObjectiveItem?.SameAs(machine.Binding) != true
-                        || player.GetEdgeDistanceTo(machine) > LootableDynel.OpenRange)
-                        return false;
-                }
-                else if (quest.Progress != 1 || parameters.OriginPlayfield != world.Identity.Instance
-                    || parameters.OriginTerminal != target || destination is not MissionTerminal terminal
-                    || player.GetEdgeDistanceTo(terminal) > LootableDynel.OpenRange)
-                    return false;
-
-                if (sourceSlot.Type != IdentityType.Inventory)
-                {
-                    ClientFeedback.Send(player, "Move the mission item into your main inventory before using it.");
-                    return false;
-                }
-                Container page = player.Inventory.Inventory;
-                int placement = sourceSlot.Instance;
-                if (!TryEarnBoundObjective(player, quest, parameters, ToMissionItem(source.ToRecord(page.Identity, placement, source.StackCount))))
-                    return false;
-                try
-                {
-                    if (!ReferenceEquals(page.Remove(placement), source))
-                        throw new InvalidOperationException("Committed mission source changed before publication.");
-                    ModuleHooks.ItemMoved(player, source, ModuleHooks.Place(AORebirth.Modules.Events.ItemPlaceKind.Inventory),
-                        ModuleHooks.Place(AORebirth.Modules.Events.ItemPlaceKind.Destroyed));
-                    player.Session?.Send(new TemplateActionMessage
-                    {
-                        Identity = player.Identity, ItemLowId = source.LowId, ItemHighId = source.HighId,
-                        Quality = source.Quality, Placement = sourceSlot, Count = 1,
-                        Action = TemplateActionType.Use, Unknown3 = (int)player.Identity.Type, Unknown4 = player.Identity.Instance
-                    });
-                    player.Session?.Send(new CharacterActionMessage
-                    {
-                        Identity = player.Identity, Action = CharacterActionType.DeleteItem, Target = sourceSlot
-                    });
-                    return true;
-                }
-                catch (Exception exception)
-                {
-                    CompletionFailure(player, exception, committed: true);
-                    return false;
-                }
-            }
-            return false;
-        }
-    }
-
-    bool TryEarnBoundObjective(Player player, PlayerQuest quest, QuestDungeonParameters parameters, MissionItemInstanceData? removal)
-    {
+        if (!Monitor.IsEntered(player.PersistenceGate))
+            throw new InvalidOperationException("Mission objective earning requires the player's persistence gate.");
         bool committed = false;
         try
         {
@@ -184,78 +66,41 @@ public sealed partial class QuestService
         }
     }
 
-    /// <summary>Only the registered owner-bound world objective can call this collection path.</summary>
-    internal bool TryCollectFindItem(Player player, MissionObjectiveItem objective)
+    internal bool TryCommitObjectivePickup(Player player, PlayerQuest quest, QuestDungeonPlayfield world,
+        MissionItemObjectiveBinding binding, InventoryGrantPlan grant)
     {
-        lock (player.PersistenceGate)
+        if (!Monitor.IsEntered(player.PersistenceGate))
+            throw new InvalidOperationException("Mission objective collection requires the player's persistence gate.");
+        bool isReturn = quest.Template.IsReturnItem;
+        _flush.HardFlush(player);
+        var result = _completionDao!.Execute(player.Identity.Instance, null!, tx =>
         {
-            if (!CanDeliver(player) || _completionDao == null
-                || objective.Playfield is not ZoneEngine_New.Core.Playfield.QuestDungeonPlayfield world
-                || !ReferenceEquals(player.Playfield, world)
-                || player.Identity.Instance != objective.Binding.OwnerId
-                || !GetLog(player).Quests.TryGetValue(objective.Binding.QuestId, out PlayerQuest? quest)
-                || !quest.IsActive || quest.IsRewardPending || !(quest.Template.IsFindItem || quest.Template.IsReturnItem)
-                || quest.Progress != 0
-                || !QuestDungeonParameters.TryParse(quest.AcgBuildingGeneratorJson, out var parameters)
-                || parameters.DungeonPlayfield != world.Identity.Instance
-                || parameters.ObjectiveItem?.SameAs(objective.Binding) != true
-                || player.GetEdgeDistanceTo(objective) > LootableDynel.OpenRange
-                || !world.GetRequiredService<ZoneEngine_New.Core.Playfield.DynelRegistry>().TryGet(objective.Identity, out var current)
-                || !ReferenceEquals(current, objective))
-                return false;
-
-            bool committed = false;
-            try
+            var completion = RequireCompletion(tx);
+            var stored = completion.ReadCharacterQuest(quest.QuestId);
+            RequireCurrent(stored, quest, player);
+            if (stored.Source != (int)QuestSource.Generated || stored.OwnerId != player.Identity.Instance
+                || !QuestDungeonParameters.TryParse(stored.AcgBuildingGeneratorJson, out var durable)
+                || durable.ObjectiveItem?.SameAs(binding) != true
+                || durable.DungeonPlayfield != world.Identity.Instance)
+                throw new InvalidOperationException("Objective does not match the accepted mission.");
+            var request = new CharacterQuestEarnRequest
             {
-                Item item = _items.Create(objective.LowId, objective.HighId, objective.Quality,
-                    ItemSource.Quest, 1, objective.Identity.Instance, objective.Identity);
-                if (!InventoryGrantPlan.TryCreate(player, [item], out var grant))
-                {
-                    ClientFeedback.Send(player, "Make inventory space before picking up the mission item.");
-                    return false;
-                }
-                _flush.HardFlush(player);
-                var result = _completionDao.Execute(player.Identity.Instance, null!, tx =>
-                {
-                    var completion = RequireCompletion(tx);
-                    var stored = completion.ReadCharacterQuest(quest.QuestId);
-                    RequireCurrent(stored, quest, player);
-                    if (stored.Source != (int)QuestSource.Generated || stored.OwnerId != player.Identity.Instance
-                        || !QuestDungeonParameters.TryParse(stored.AcgBuildingGeneratorJson, out var durable)
-                        || durable.ObjectiveItem?.SameAs(objective.Binding) != true
-                        || durable.DungeonPlayfield != world.Identity.Instance)
-                        throw new InvalidOperationException("Objective does not match the accepted mission.");
-                    var request = new CharacterQuestEarnRequest
-                    {
-                        QuestId = quest.QuestId, AssignedAtUtcTicks = stored.AssignedAtUtcTicks,
-                        ExpectedDefinitionJson = stored.DefinitionJson,
-                        ExpectedAcgBuildingGeneratorJson = stored.AcgBuildingGeneratorJson,
-                        NowUtcTicks = _now().Ticks, Grants = grant.Rows.Select(ToMissionItem).ToArray()
-                    };
-                    return quest.Template.IsReturnItem
-                        ? (tx as ICharacterQuestObjectiveCollectionTransaction
-                            ?? throw new InvalidOperationException("Mission DAO cannot persist partial objective collection."))
-                            .TryCollectCharacterQuestItem(request)
-                        : EarnWithToken(tx, completion, player, quest, request);
-                });
-                if (result.Status != (quest.Template.IsReturnItem ? CharacterQuestCompletionStatus.Collected : CharacterQuestCompletionStatus.Earned))
-                    return false;
-                committed = true;
-                grant.PublishAfterCommit(notify: false,
-                    from: ModuleHooks.Place(AORebirth.Modules.Events.ItemPlaceKind.World, objective.Identity));
-                quest.Progress = quest.Template.IsReturnItem ? 1 : quest.RequiredCount;
-                quest.NextRewardRetryUtcTicks = 0;
-                // The objective dynel publishes the captured pickup acknowledgement first.
-                // The player's next tick then delivers the independent terminal rewards.
-                return true;
-            }
-            catch (Exception exception)
-            {
-                CompletionFailure(player, exception, committed);
-                return false;
-            }
-        }
+                QuestId = quest.QuestId, AssignedAtUtcTicks = stored.AssignedAtUtcTicks,
+                ExpectedDefinitionJson = stored.DefinitionJson,
+                ExpectedAcgBuildingGeneratorJson = stored.AcgBuildingGeneratorJson,
+                NowUtcTicks = _now().Ticks, Grants = grant.Rows.Select(ToMissionItem).ToArray()
+            };
+            return isReturn
+                ? (tx as ICharacterQuestObjectiveCollectionTransaction
+                    ?? throw new InvalidOperationException("Mission DAO cannot persist partial objective collection."))
+                    .TryCollectCharacterQuestItem(request)
+                : EarnWithToken(tx, completion, player, quest, request);
+        });
+        return result.Status == (isReturn ? CharacterQuestCompletionStatus.Collected : CharacterQuestCompletionStatus.Earned);
     }
+
+    internal bool TryCollectFindItem(Player player, MissionObjectiveItem objective)
+        => _missionObjectives.TryCollectItem(player, objective);
 
     public void RetryPendingRewards(Player player, bool force = false)
     {
@@ -265,15 +110,7 @@ public sealed partial class QuestService
         long now = _now().Ticks;
         foreach (var quest in log.Quests.Values.Where(q => q.IsActive && q.NpcObjectiveCommitPending
             && (force || q.NextRewardRetryUtcTicks <= now)).ToArray())
-        {
-            lock (player.PersistenceGate)
-            {
-                quest.NextRewardRetryUtcTicks = _now().AddSeconds(5).Ticks;
-                if (QuestDungeonParameters.TryParse(quest.AcgBuildingGeneratorJson, out var parameters)
-                    && parameters.ObjectiveNpc is { IsValid: true, MissionType: 0 })
-                    TryEarnBoundObjective(player, quest, parameters, null);
-            }
-        }
+            _missionObjectives.RetryPendingKill(player, quest);
         foreach (var quest in log.Quests.Values.Where(q => q.IsRewardPending
             && (force || q.NextRewardRetryUtcTicks <= now)).ToArray())
             Complete(player, quest);
@@ -530,14 +367,14 @@ public sealed partial class QuestService
             throw new InvalidOperationException("Accepted quest authority changed.");
     }
 
-    static MissionItemInstanceData ToMissionItem(ItemInstanceRecord row) => new()
+    internal static MissionItemInstanceData ToMissionItem(ItemInstanceRecord row) => new()
     {
         InstanceId = row.InstanceId, ContainerType = row.ContainerType, ContainerInstance = row.ContainerInstance,
         ContainerPlacement = row.ContainerPlacement, ItemType = row.ItemType, LowId = row.LowId, HighId = row.HighId,
         Quality = row.Quality, StackCount = row.StackCount, Source = (byte)row.Source
     };
 
-    void CompletionFailure(Player player, Exception exception, bool committed)
+    internal void CompletionFailure(Player player, Exception exception, bool committed)
     {
         if (committed || exception is MissionCommitOutcomeUnknownException or DatabaseCommitOutcomeUnknownException
             || player.IsPersistenceQuarantined)

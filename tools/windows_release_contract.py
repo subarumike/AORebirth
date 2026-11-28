@@ -2008,7 +2008,7 @@ def feature_command(root, child):
         wrapper = os.path.normcase(os.path.normpath(child[3]))
         dao_wrapper = checked(root, "Tools/run_mission_dao_validation.cmd")
         connected_wrapper = checked(root, "Tools/run_newengine_connected_acceptance.cmd")
-        if wrapper == os.path.normcase(str(dao_wrapper)) and child[4:] == ["--chests-only"]:
+        if wrapper == os.path.normcase(str(dao_wrapper)) and child[4:] in (["--chests-only"], ["--mission-acceptance-only"]):
             return checked(root, "Tools/MissionDaoValidation/MissionDaoValidation.csproj")
         if wrapper == os.path.normcase(str(connected_wrapper)) and len(child) == 11 and (
                 child[4], child[6], child[8], child[9]) == ("--engine", "--login-engine", "--chests-only", "--world-engine"):

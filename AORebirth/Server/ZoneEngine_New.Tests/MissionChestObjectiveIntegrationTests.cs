@@ -20,11 +20,13 @@ using ZoneEngine_New.Core.Data;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.GameData;
 using ZoneEngine_New.Core.Inventory;
+using ZoneEngine_New.Core.MessageHandlers;
 using ZoneEngine_New.Core.Missions;
 using ZoneEngine_New.Core.Playfield;
 using ZoneEngine_New.Core.Playfield.Locality;
 using ZoneEngine_New.Core.Quests;
 using ZoneEngine_New.Core.Quests.Dungeons;
+using ZoneEngine_New.Core.Teams;
 using AoVector3 = AORebirth.Core.Vector.Vector3;
 using Fixture = QuestDungeonDestinationTests.Fixture;
 
@@ -155,15 +157,44 @@ public sealed class MissionChestObjectiveIntegrationTests
         other.Position = npc.Position;
         int calls = run.Dao.Calls;
 
-        f.Quests.OnNpcInspected(other, npc);
-        Assert.AreEqual(0, run.Dao.CharacterQuest!.Progress);
-        Assert.AreEqual(calls, run.Dao.Calls, "Another owner must be rejected before objective persistence.");
-        Assert.IsTrue(registry.UnregisterExact(npc));
-        f.Quests.OnNpcInspected(f.Player, npc);
-        Assert.AreEqual(0, run.Dao.CharacterQuest.Progress);
-        registry.Register(npc);
+        Assert.IsTrue(OnWorld(run.World, () =>
+        {
+            var locality = run.World.GetRequiredService<PlayfieldLocality>();
+            locality.RegisterDynel(other);
+            locality.RegisterDynel(f.Player);
+            try
+            {
+                locality.ActivatePlayerVisibility(other);
+                locality.ActivatePlayerVisibility(f.Player);
+                Assert.IsTrue(locality.IsVisibleTo(npc, other));
+                Assert.IsTrue(locality.IsVisibleTo(npc, f.Player));
+                f.Quests.MissionObjectives.InspectNpc(other, npc);
+                Assert.AreEqual(0, run.Dao.CharacterQuest!.Progress);
+                Assert.AreEqual(calls, run.Dao.Calls, "Another owner must be rejected before objective persistence.");
+                f.Quests.OnNpcTargeted(f.Player, npc);
+                Assert.AreEqual(calls, run.Dao.Calls, "Selection must not complete the frozen Find Person objective.");
 
-        f.Quests.OnNpcInspected(f.Player, npc);
+                Assert.IsTrue(registry.UnregisterExact(npc));
+                f.Quests.MissionObjectives.InspectNpc(f.Player, npc);
+                Assert.AreEqual(0, run.Dao.CharacterQuest.Progress);
+                registry.Register(npc);
+
+                var handler = new CharacterActionMessageHandler(f.Actions, new TeamService(),
+                    missionObjectives: f.Quests.MissionObjectives);
+                handler.Handle(new CharacterActionMessage
+                {
+                    Action = CharacterActionType.InfoRequest, Identity = f.Player.Identity, Target = npc.Identity
+                }, f.Session);
+                Assert.IsTrue(f.Session.Sent.OfType<InfoPacketMessage>().Any());
+
+                return true;
+            }
+            finally
+            {
+                locality.UnregisterDynel(f.Player);
+                locality.UnregisterDynel(other);
+            }
+        }));
 
         Assert.AreEqual(run.Quest.RequiredCount, run.Dao.CharacterQuest.Progress);
         Assert.IsTrue(run.Quest.IsRewardPending);
@@ -188,15 +219,15 @@ public sealed class MissionChestObjectiveIntegrationTests
         Identity otherSlot = new() { Type = IdentityType.Inventory, Instance = other.Inventory.Inventory.Offset };
         int calls = run.Dao.Calls;
 
-        Assert.IsFalse(f.Quests.TryUseGeneratedMissionItem(other, otherSlot, target.Identity, out bool otherHandled));
+        Assert.IsFalse(f.Quests.MissionObjectives.TryUseItem(other, otherSlot, target.Identity, out bool otherHandled));
         Assert.IsTrue(otherHandled);
-        Assert.IsFalse(f.Quests.TryUseGeneratedMissionItem(f.Player, slot, Identity.None, out bool wrongTargetHandled));
+        Assert.IsFalse(f.Quests.MissionObjectives.TryUseItem(f.Player, slot, Identity.None, out bool wrongTargetHandled));
         Assert.IsTrue(wrongTargetHandled);
         Assert.AreEqual(calls, run.Dao.Calls);
         Assert.AreEqual(0, run.Dao.CharacterQuest!.Progress);
         Assert.AreEqual((int)IdentityType.Inventory, run.Dao.Items[tool.Instance].ContainerType);
 
-        Assert.IsTrue(f.Quests.TryUseGeneratedMissionItem(f.Player, slot, target.Identity, out bool handled));
+        Assert.IsTrue(f.Quests.MissionObjectives.TryUseItem(f.Player, slot, target.Identity, out bool handled));
 
         Assert.IsTrue(handled);
         Assert.AreEqual(run.Quest.RequiredCount, run.Dao.CharacterQuest.Progress);
@@ -235,14 +266,14 @@ public sealed class MissionChestObjectiveIntegrationTests
         Identity otherSlot = new() { Type = IdentityType.Inventory, Instance = other.Inventory.Inventory.Offset };
         int calls = run.Dao.Calls;
 
-        Assert.IsFalse(f.Quests.TryUseGeneratedMissionItem(other, otherSlot, parameters.OriginTerminal, out bool otherHandled));
+        Assert.IsFalse(f.Quests.MissionObjectives.TryUseItem(other, otherSlot, parameters.OriginTerminal, out bool otherHandled));
         Assert.IsTrue(otherHandled);
-        Assert.IsFalse(f.Quests.TryUseGeneratedMissionItem(f.Player, slot, Identity.None, out bool wrongTerminalHandled));
+        Assert.IsFalse(f.Quests.MissionObjectives.TryUseItem(f.Player, slot, Identity.None, out bool wrongTerminalHandled));
         Assert.IsTrue(wrongTerminalHandled);
         Assert.AreEqual(calls, run.Dao.Calls);
         Assert.AreEqual(1, run.Dao.CharacterQuest.Progress);
 
-        Assert.IsTrue(f.Quests.TryUseGeneratedMissionItem(f.Player, slot, parameters.OriginTerminal, out bool handled));
+        Assert.IsTrue(f.Quests.MissionObjectives.TryUseItem(f.Player, slot, parameters.OriginTerminal, out bool handled));
 
         Assert.IsTrue(handled);
         Assert.AreEqual(2, run.Dao.CharacterQuest.Progress);
@@ -300,7 +331,18 @@ public sealed class MissionChestObjectiveIntegrationTests
                 }
                 else
                 {
-                    f.Quests.OnNpcInspected(player, npc);
+                    var locality = world.GetRequiredService<PlayfieldLocality>();
+                    locality.RegisterDynel(player);
+                    try
+                    {
+                        locality.ActivatePlayerVisibility(player);
+                        Assert.IsTrue(locality.IsVisibleTo(npc, player));
+                        f.Quests.MissionObjectives.InspectNpc(player, npc);
+                    }
+                    finally
+                    {
+                        locality.UnregisterDynel(player);
+                    }
                 }
             }
             else
@@ -311,7 +353,7 @@ public sealed class MissionChestObjectiveIntegrationTests
                 player.Position = item.Position;
                 if (accepted.ObjectiveTool is { } tool)
                 {
-                    Assert.IsTrue(f.Quests.TryUseGeneratedMissionItem(player, HeldSlot(player, tool.Identity), item.Identity, out bool handled));
+                    Assert.IsTrue(f.Quests.MissionObjectives.TryUseItem(player, HeldSlot(player, tool.Identity), item.Identity, out bool handled));
                     Assert.IsTrue(handled);
                     Assert.AreEqual(0, run.Dao.Items[tool.Instance].ContainerType);
                 }
@@ -330,7 +372,7 @@ public sealed class MissionChestObjectiveIntegrationTests
             f.SetExteriorIdentity(accepted.OriginPlayfield);
             player.Playfield = run.Exterior;
             player.Position = run.Terminal.Position;
-            Assert.IsTrue(f.Quests.TryUseGeneratedMissionItem(player, HeldSlot(player, accepted.ObjectiveItem!.Identity),
+            Assert.IsTrue(f.Quests.MissionObjectives.TryUseItem(player, HeldSlot(player, accepted.ObjectiveItem!.Identity),
                 accepted.OriginTerminal, out bool handled));
             Assert.IsTrue(handled);
             Assert.AreEqual(0, run.Dao.Items[accepted.ObjectiveItem.Instance].ContainerType);

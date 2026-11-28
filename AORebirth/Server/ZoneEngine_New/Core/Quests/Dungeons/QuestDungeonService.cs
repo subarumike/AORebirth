@@ -76,7 +76,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
         readonly QuestService _quests;
         readonly MissionDestinationCatalog _entrances;
         readonly DungeonLayoutGenerator _layouts;
-        readonly IGeneratedMissionDao _offers;
+        readonly IGeneratedMissionOfferReader _offers;
         readonly IItemBuilder _items;
         readonly IItemInstanceIdAllocator _ids;
         readonly InventoryFlushService _flush;
@@ -99,7 +99,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
         int _sweeping;
 
         public QuestDungeonService(ICharacterQuestStore store, QuestService quests, MissionDestinationCatalog entrances,
-            DungeonLayoutGenerator layouts, IGeneratedMissionDao offers, IItemBuilder items, IItemInstanceIdAllocator ids,
+            DungeonLayoutGenerator layouts, IGeneratedMissionOfferReader offers, IItemBuilder items, IItemInstanceIdAllocator ids,
             InventoryFlushService flush, InventoryActionService inventoryActions, Lazy<PlayfieldManager> playfields,
             IGameData gameData, MissionKeyPolicy keys, IZoneLogger logger, HashItemMinter? hashItems = null,
             ZoneEngine_New.Core.World.WorldLink? world = null, ZoneEngine_New.Core.World.WorldCommands? commands = null)
@@ -149,10 +149,16 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
 
                 DateTime now = DateTime.UtcNow;
                 GeneratedMissionOffer? offer;
-                using (ZoneEngine_New.Core.Metrics.TickStallWatch.Enter("mission.accept.read-offers", player.Identity.Instance))
-                    offer = _offers.ReadOffers(player.Identity.Instance).FirstOrDefault(value =>
-                        value.OfferType == (int)offerIdentity.Type && value.OfferInstance == offerIdentity.Instance
-                        && value.State == GeneratedMissionState.Offered && value.ExpiresAtUtcTicks > now.Ticks);
+                try
+                {
+                    using (ZoneEngine_New.Core.Metrics.TickStallWatch.Enter("mission.accept.read-offer", player.Identity.Instance))
+                        offer = _offers.ReadCurrentOffer(player.Identity.Instance, (int)offerIdentity.Type, offerIdentity.Instance, now.Ticks);
+                }
+                catch (ArgumentException exception)
+                {
+                    _logger.Error(exception, $"Invalid stored mission offer {offerIdentity.Type}:{offerIdentity.Instance} for character {player.Identity.Instance}");
+                    return "That mission is no longer offered.";
+                }
                 if (offer == null)
                     return "That mission is no longer offered.";
 
@@ -287,7 +293,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                         player.Identity.Instance, questId, offer.OfferType, offer.OfferInstance, parameters.EntranceInstance, entrance.DisplayName, dungeonPlayfield));
                     return null;
                 }
-                catch (DatabaseCommitOutcomeUnknownException exception)
+                catch (Exception exception) when (exception is DatabaseCommitOutcomeUnknownException or MissionCommitOutcomeUnknownException)
                 {
                     Quarantine(player, exception);
                     return "Mission acceptance needs to be reconciled; please reconnect.";
@@ -1022,9 +1028,6 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
 
         bool TryCollectObjective(Player player, MissionObjectiveItem objective)
             => _quests.TryCollectFindItem(player, objective);
-
-        public bool TryUseGeneratedMissionItem(Player player, Identity sourceSlot, Identity target, out bool handled)
-            => _quests.TryUseGeneratedMissionItem(player, sourceSlot, target, out handled);
 
         /// <summary>Keys the player carries: main inventory and bags opened from it.</summary>
         List<Item> CarriedKeys(Player player)

@@ -40,8 +40,11 @@ internal static class DoaMutationTests
             ("direct database access boundary", CheckDatabaseAccess),
             ("concrete DAO ownership", CheckConcreteDaoOwnership),
             ("gameplay dispatch boundary", CheckGameplayDispatch),
+            ("mission acceptance and journal dispatch", CheckMissionDispatch),
             ("competing persistence contract", CheckCompetingPersistence),
             ("mission transaction service boundary", CheckTransactionBoundary),
+            ("mission acceptance and objective transaction owners", CheckMissionTransactionOwners),
+            ("mission module access boundaries", CheckMissionModuleAccess),
             ("internal module dependencies", CheckModuleDependencies),
             ("project dependency boundary", CheckProjects),
             ("unchanged and introduced findings", CheckDiff),
@@ -152,6 +155,123 @@ internal static class DoaMutationTests
         Require(!Rules("interface IMissionTerminalModule { void Roll(); }").Any());
     }
 
+    private static void CheckMissionDispatch()
+    {
+        const string handlers = "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/";
+        const string acceptance = handlers + "CreateQuestMessageHandler.cs";
+        const string typed = """
+            class Probe(IMissionAcceptanceModule missions) {
+                void Handle(MessageBody body, IZoneSession session) => Handle((CreateQuestMessage)body, session);
+                void Handle(CreateQuestMessage message, IZoneSession session) => missions.Accept(message, session);
+            }
+            """;
+        Require(!DoaRules.SourceIssues(acceptance, Parse(typed)).Any());
+        Require(DoaRules.SourceIssues(acceptance, Parse(typed.Replace("=> missions.Accept(message, session);",
+            "{ if (player.Level > 9) missions.Accept(message, session); }", StringComparison.Ordinal)))
+            .Any(issue => issue.Rule == "DOA_GAMEPLAY_IN_DISPATCH"));
+        Require(DoaRules.SourceIssues(acceptance, Parse(typed.Replace("IMissionAcceptanceModule", "QuestDungeonService",
+            StringComparison.Ordinal))).Any(issue => issue.Rule == "DOA_GAMEPLAY_IN_DISPATCH"));
+
+        const string journalHandler = handlers + "QuestMessageHandler.cs";
+        const string journal = """
+            class Probe(IGeneratedMissionLifecycleModule lifecycle) {
+                void Handle(QuestMessage message, IZoneSession session) {
+                    var player = session.Player;
+                    if (player == null) return;
+                    lifecycle.TryAbandon(player, message.Mission.Instance);
+                }
+            }
+            """;
+        Require(!DoaRules.SourceIssues(journalHandler, Parse(journal)).Any());
+        Require(DoaRules.SourceIssues(journalHandler, Parse(journal.Replace("IGeneratedMissionLifecycleModule", "QuestService",
+            StringComparison.Ordinal))).Any(issue => issue.Rule == "DOA_GAMEPLAY_IN_DISPATCH"));
+        Require(DoaRules.SourceIssues(journalHandler, Parse(journal.Replace("lifecycle.TryAbandon(player, message.Mission.Instance);",
+            "return;", StringComparison.Ordinal))).Any(issue => issue.Rule == "DOA_GAMEPLAY_IN_DISPATCH"));
+        Require(DoaRules.SourceIssues(handlers + "CharacterActionMessageHandler.cs",
+            Parse("class Probe(QuestService quests) { void Handle() => quests.OnNpcInspected(player, npc); }"))
+            .Any(issue => issue.Rule == "DOA_GAMEPLAY_IN_DISPATCH"));
+    }
+
+    private static void CheckMissionTransactionOwners()
+    {
+        Block("class Probe(IGeneratedMissionOfferReader offers) { object Run() => offers.ReadCurrentOffer(request); }",
+            "DOA_TRANSACTION_BYPASS");
+        Block("class Probe(ICharacterQuestStore quests) { void Run() => quests.TryAcceptOfferQuest(request); }",
+            "DOA_TRANSACTION_BYPASS");
+        Block("class Probe(ICharacterQuestCompletionTransaction tx) { void Run() => tx.TryEarnCharacterQuest(request); }",
+            "DOA_TRANSACTION_BYPASS");
+        Block("class Probe(QuestDungeonService dungeons) { void Run() => dungeons.AcceptOffer(player, offer); }",
+            "DOA_TRANSACTION_BYPASS");
+
+        const string owner = "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs";
+        const string gated = """
+            class QuestDungeonService(IGeneratedMissionOfferReader offers, ICharacterQuestStore quests) {
+                void AcceptOffer() {
+                    lock (player.PersistenceGate) {
+                        var offer = offers.ReadCurrentOffer(request);
+                        quests.TryAcceptOfferQuest(offer);
+                    }
+                }
+            }
+            """;
+        Require(!DoaRules.SourceIssues(owner, Parse(gated)).Any());
+        Require(DoaRules.SourceIssues(owner, Parse(gated.Replace("lock (player.PersistenceGate)", "", StringComparison.Ordinal)))
+            .Count(issue => issue.Rule == "DOA_TRANSACTION_BYPASS") == 2);
+        Require(DoaRules.SourceIssues(owner, Parse(gated.Replace("ReadCurrentOffer", "ReadOffers", StringComparison.Ordinal)))
+            .Any(issue => issue.Rule == "DOA_TRANSACTION_BYPASS"));
+
+        const string completionOwner = "AORebirth/Server/ZoneEngine_New/Core/Quests/QuestService.Completion.cs";
+        const string completion = """
+            class QuestService(IMissionDao? dao) {
+                void Complete() {
+                    lock (player.PersistenceGate)
+                        dao.Execute(owner, tx => completion.TryCompleteCharacterQuest(request));
+                }
+            }
+            """;
+        Require(!DoaRules.SourceIssues(completionOwner, Parse(completion)).Any());
+        Require(DoaRules.SourceIssues(completionOwner, Parse(completion.Replace("IMissionDao?", "OtherService", StringComparison.Ordinal)))
+            .Any(issue => issue.Rule == "DOA_TRANSACTION_BYPASS"));
+
+        const string collection = """
+            class QuestService(IMissionDao? dao) {
+                void TryCommitObjectivePickup() {
+                    if (!Monitor.IsEntered(player.PersistenceGate))
+                        throw new InvalidOperationException();
+                    dao!.Execute(owner, tx => collection.TryCollectCharacterQuestItem(request));
+                }
+            }
+            """;
+        Require(!DoaRules.SourceIssues(completionOwner, Parse(collection)).Any());
+        Require(DoaRules.SourceIssues(completionOwner, Parse(collection.Replace("throw new InvalidOperationException();", "Skip();",
+            StringComparison.Ordinal))).Any(issue => issue.Rule == "DOA_TRANSACTION_BYPASS"));
+        string partialCollection = collection.Replace("class QuestService(IMissionDao? dao)", "partial class QuestService",
+            StringComparison.Ordinal).Replace("dao!.Execute", "_completionDao!.Execute", StringComparison.Ordinal);
+        Require(!DoaRules.SourceIssues(completionOwner, Parse(partialCollection)).Any());
+        Require(DoaRules.SourceIssues(completionOwner, Parse(partialCollection.Replace("_completionDao", "_otherDao", StringComparison.Ordinal)))
+            .Any(issue => issue.Rule == "DOA_TRANSACTION_BYPASS"));
+        Require(DoaRules.SourceIssues(completionOwner, Parse(partialCollection.Replace("partial class QuestService",
+            "partial class QuestService(OtherService _completionDao)", StringComparison.Ordinal)))
+            .Any(issue => issue.Rule == "DOA_TRANSACTION_BYPASS"));
+        Block("class Probe(QuestService quests) { void Run() => quests.TryCommitObjectivePickup(request); }", "DOA_TRANSACTION_BYPASS");
+    }
+
+    private static void CheckMissionModuleAccess()
+    {
+        const string module = "AORebirth/Server/ZoneEngine_New/Core/Quests/MissionObjectiveModule.cs";
+        foreach (var (source, rule) in new[]
+        {
+            ("class Probe { object Load() => File.ReadAllText(path); }", "DOA_DIRECT_CONTENT_SOURCE"),
+            ("""class Probe { string Save() => "UPDATE characterquests SET Progress = 1"; }""", "DOA_DIRECT_DATABASE_ACCESS"),
+            ("interface IAlternateMissionPersistence { void Save(); }", "DOA_COMPETING_PERSISTENCE"),
+            ("class Probe(CombatModule combat) {}", "DOA_UNAUTHORIZED_MODULE_DEPENDENCY"),
+            ("class Probe { const int ObjectiveItemLowId = 3210; }", "DOA_LITERAL_CONTENT_IDENTITY")
+        })
+            Require(DoaRules.SourceIssues(module, Parse(source)).Any(issue => issue.Rule == rule));
+        Require(!DoaRules.SourceIssues(module, Parse("class Probe(IMissionAcceptanceModule missions) {}")).Any());
+        Block("class Probe(MissionObjectiveModule objectives) {}", "DOA_UNAUTHORIZED_MODULE_DEPENDENCY");
+    }
+
     private static void CheckTransactionBoundary()
     {
         Block("class Probe(IGeneratedMissionDao dao) { object Run() => dao.PublishOffers(batch); }", "DOA_TRANSACTION_BYPASS");
@@ -185,8 +305,10 @@ internal static class DoaMutationTests
     {
         Finding old = DoaRules.DataFinding(MissionPath, "Probe", "EXAMPLE", "Open debt", "old");
         Finding changed = DoaRules.DataFinding(MissionPath, "Probe", "EXAMPLE", "Open debt", "changed");
-        var result = DoaEnforcement.Compare([old], [old with { Line = 200 }, old, changed]);
+        Finding resolved = DoaRules.DataFinding(MissionPath, "Probe", "EXAMPLE", "Open debt", "resolved");
+        var result = DoaEnforcement.Compare([old, resolved], [old with { Line = 200 }, old, changed]);
         Require(result.Inherited.Length == 1 && result.Introduced.Length == 2);
+        Require(result.Resolved.SequenceEqual([resolved]));
     }
 
     private static void CheckDirectContentSources()

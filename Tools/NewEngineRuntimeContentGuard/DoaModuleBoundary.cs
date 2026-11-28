@@ -9,6 +9,11 @@ internal static class DoaModuleBoundary
     private const string Database = "AORebirth/Libraries/Source/AORebirth.Database/";
     private const string Persistence = "AORebirth/Libraries/Source/AORebirth.Interfaces/Persistence/";
     private const string TerminalHandler = Core + "MessageHandlers/QuestAlternativeMessageHandler.cs";
+    private const string AcceptanceHandler = Core + "MessageHandlers/CreateQuestMessageHandler.cs";
+    private const string JournalHandler = Core + "MessageHandlers/QuestMessageHandler.cs";
+    private const string DungeonService = Core + "Quests/Dungeons/QuestDungeonService.cs";
+    private const string AcceptanceModule = Core + "Quests/MissionAcceptanceModule.cs";
+    private const string ObjectiveModule = Core + "Quests/MissionObjectiveModule.cs";
 
     private static readonly string[] ProviderNamespaces =
         ["Dapper", "MySqlConnector", "MySql.Data.MySqlClient", "Microsoft.Data.SqlClient", "System.Data.SqlClient",
@@ -20,7 +25,8 @@ internal static class DoaModuleBoundary
 
     private static readonly string[] GameplayOperations =
         ["ReserveIdentities", "PublishOffers", "RollMission", "AcceptMission", "GenerateMission", "GrantReward", "AwardReward",
-         "RollLoot", "GenerateLoot", "ApplyDamage", "ResolveAttack", "GrantItem", "MintItem", "SpawnNpc", "TryEquipItem"];
+         "RollLoot", "GenerateLoot", "ApplyDamage", "ResolveAttack", "GrantItem", "MintItem", "SpawnNpc", "TryEquipItem",
+         "OnNpcInspected", "TryUseGeneratedMissionItem", "TryEarnCharacterQuest", "TryCompleteCharacterQuest"];
 
     private static readonly (string Module, string[] Prefixes)[] ModuleOwners =
     [
@@ -38,6 +44,9 @@ internal static class DoaModuleBoundary
     {
         ["GeneratedMissionService"] = "Mission",
         ["QuestDungeonService"] = "Quest",
+        ["MissionAcceptanceModule"] = "Quest",
+        ["MissionObjectiveModule"] = "Quest",
+        ["GeneratedMissionLifecycleModule"] = "Quest",
         ["InventoryActionService"] = "Inventory",
         ["TradeService"] = "Trade"
     };
@@ -137,6 +146,14 @@ internal static class DoaModuleBoundary
             if ((handlers || composition) && GameplayOperations.Contains(method, StringComparer.Ordinal))
                 yield return (call, "DOA_GAMEPLAY_IN_DISPATCH", "Delegate gameplay operations to the owning module from a handler or composition root.");
 
+            if (zone && MissionWorkflowIssue(path, call, method) is string reason)
+                yield return (call, "DOA_TRANSACTION_BYPASS", reason);
+
+            if ((handlers || composition) && method == "TryAbandon"
+                && (call.Expression is not MemberAccessExpressionSyntax journal
+                    || !IsType(ReceiverType(call, journal.Expression) ?? "", type => type == "IGeneratedMissionLifecycleModule")))
+                yield return (call, "DOA_GAMEPLAY_IN_DISPATCH", "Dispatch journal abandonment through IGeneratedMissionLifecycleModule.");
+
             // The single-argument DAO operation must pass through the service that coordinates
             // the player's persistence gate, commit outcome and in-memory cash update.
             if (zone && method == "PublishOffers" && call.ArgumentList.Arguments.Count == 1
@@ -155,18 +172,100 @@ internal static class DoaModuleBoundary
             }
         }
 
-        if (path == TerminalHandler)
+        if (path is TerminalHandler or AcceptanceHandler)
         {
+            var (contract, action, packet) = path == TerminalHandler
+                ? ("IMissionTerminalModule", "Roll", "QuestAlternativeMessage")
+                : ("IMissionAcceptanceModule", "Accept", "CreateQuestMessage");
             foreach (var method in syntax.DescendantNodes().OfType<MethodDeclarationSyntax>().Where(method => method.Identifier.ValueText == "Handle"))
-                if (!IsTerminalDispatch(method))
-                    yield return (method, "DOA_GAMEPLAY_IN_DISPATCH", "The terminal handler forwards the decoded message and session to IMissionTerminalModule.");
+                if (!IsPacketDispatch(method, contract, action, packet))
+                    yield return (method, "DOA_GAMEPLAY_IN_DISPATCH", "Forward the decoded message and session to " + contract + ".");
+        }
+
+        if (path == JournalHandler)
+        {
+            foreach (var method in syntax.DescendantNodes().OfType<MethodDeclarationSyntax>()
+                .Where(method => method.Identifier.ValueText == "Handle"
+                    && method.ParameterList.Parameters.FirstOrDefault()?.Type is TypeSyntax packet && Name(packet) == "QuestMessage"))
+                if (!method.DescendantNodes().OfType<InvocationExpressionSyntax>().Any(call =>
+                    call.Expression is MemberAccessExpressionSyntax receiver && Name(receiver) == "TryAbandon"
+                    && IsType(ReceiverType(call, receiver.Expression) ?? "", type => type == "IGeneratedMissionLifecycleModule")))
+                    yield return (method, "DOA_GAMEPLAY_IN_DISPATCH", "The journal handler must dispatch abandonment to its lifecycle module.");
         }
 
         bool IsType(string type, Func<string, bool> predicate) => predicate(type)
             || aliases.TryGetValue(type, out string[]? targets) && targets.Any(predicate);
     }
 
-    private static bool IsTerminalDispatch(MethodDeclarationSyntax method)
+    private static string? MissionWorkflowIssue(string path, InvocationExpressionSyntax call, string method)
+    {
+        switch (method)
+        {
+            case "AcceptOffer":
+                return path == AcceptanceModule && IsMember(call, "MissionAcceptanceModule", "Accept")
+                    ? null : "Accept offers through IMissionAcceptanceModule and the established dungeon transaction owner.";
+            case "ReadCurrentOffer":
+                return path == DungeonService && IsMember(call, "QuestDungeonService", "AcceptOffer") && HoldsPlayerGate(call)
+                    ? null : "Read the exact current offer within the gated acceptance workflow.";
+            case "ReadOffers" when path == DungeonService && IsMember(call, "QuestDungeonService", "AcceptOffer"):
+                return "Read the exact current offer instead of traversing offer history during acceptance.";
+            case "TryAcceptOfferQuest":
+                if (path == DungeonService && IsMember(call, "QuestDungeonService", "AcceptOffer") && HoldsPlayerGate(call)
+                    || path == Core + "Data/CharacterQuestStore.cs" && IsMember(call, "MySqlCharacterQuestStore", method)
+                    || path == Core + "Data/CharacterQuestStore.cs" && IsMember(call, "ICharacterQuestStore", method))
+                    return null;
+                return "Persist accepted missions only through the existing character-quest store and gated acceptance workflow.";
+            case "TryEarnCharacterQuest":
+                return path == Core + "Quests/QuestService.Tokens.cs" && IsMember(call, "QuestService", "EarnWithToken")
+                    ? null : "Earn mission completion through the existing transaction and token-freeze owner.";
+            case "TryEarnBoundObjective":
+            case "TryCommitObjectivePickup":
+                return path == ObjectiveModule
+                    && call.Ancestors().OfType<TypeDeclarationSyntax>().FirstOrDefault()?.Identifier.ValueText == "MissionObjectiveModule"
+                    ? null : "Only the mission objective module submits an authorized objective to QuestService for persistence.";
+            case "TryCollectCharacterQuestItem":
+            case "TryCompleteCharacterQuest":
+                return path == Core + "Quests/QuestService.Completion.cs"
+                    && (HoldsPlayerGate(call) || RequiresHeldPlayerGate(call))
+                    && call.Ancestors().OfType<InvocationExpressionSyntax>().Any(IsMissionCompletionTransaction)
+                    ? null : "Use the existing mission DAO transaction under the player persistence gate.";
+            default:
+                return null;
+        }
+    }
+
+    private static bool HoldsPlayerGate(SyntaxNode node)
+        => node.Ancestors().OfType<LockStatementSyntax>().Any(scope => scope.Expression
+            is MemberAccessExpressionSyntax access && Name(access) == "PersistenceGate");
+
+    private static bool IsMissionCompletionTransaction(InvocationExpressionSyntax call)
+    {
+        if (call.Expression is not MemberAccessExpressionSyntax execute || Name(execute) != "Execute")
+            return false;
+        if (ReceiverType(call, execute.Expression, unwrapNullable: true) is string type)
+            return type == "IMissionDao";
+
+        // The other QuestService partial declares this field. The caller has already checked the completion file.
+        ExpressionSyntax receiver = execute.Expression is PostfixUnaryExpressionSyntax suppression
+            && suppression.OperatorToken.ValueText == "!" ? suppression.Operand : execute.Expression;
+        return receiver is IdentifierNameSyntax name && name.Identifier.ValueText == "_completionDao"
+            && call.Ancestors().OfType<TypeDeclarationSyntax>().FirstOrDefault()?.Identifier.ValueText == "QuestService";
+    }
+
+    private static bool RequiresHeldPlayerGate(InvocationExpressionSyntax call)
+        => call.Ancestors().OfType<MethodDeclarationSyntax>().FirstOrDefault()?.Body?.Statements.FirstOrDefault() is
+            IfStatementSyntax
+            {
+                Condition: PrefixUnaryExpressionSyntax { Operand: InvocationExpressionSyntax check } negation,
+                Statement: ThrowStatementSyntax,
+                Else: null
+            }
+        && negation.OperatorToken.ValueText == "!"
+        && check.Expression is MemberAccessExpressionSyntax member && Name(member) == "IsEntered" && Name(member.Expression) == "Monitor"
+        && check.ArgumentList.Arguments is [ArgumentSyntax { Expression: MemberAccessExpressionSyntax gate }]
+        && Name(gate) == "PersistenceGate";
+
+    private static bool IsPacketDispatch(MethodDeclarationSyntax method, string contract, string action, string packet)
     {
         var parameters = method.ParameterList.Parameters;
         ExpressionSyntax? expression = method.ExpressionBody?.Expression;
@@ -180,17 +279,17 @@ internal static class DoaModuleBoundary
         ExpressionSyntax message = call.ArgumentList.Arguments[0].Expression;
         if (parameters[0].Type != null && Name(parameters[0].Type!) == "MessageBody")
             return call.Expression is IdentifierNameSyntax target && Name(target) == "Handle"
-                && message is CastExpressionSyntax cast && Name(cast.Type) == "QuestAlternativeMessage"
+                && message is CastExpressionSyntax cast && Name(cast.Type) == packet
                 && cast.Expression is IdentifierNameSyntax argument && Name(argument) == input;
 
         if (call.Expression is not MemberAccessExpressionSyntax { Expression: IdentifierNameSyntax receiver } member
-            || Name(member) != "Roll" || message is not IdentifierNameSyntax request || Name(request) != input
+            || Name(member) != action || message is not IdentifierNameSyntax request || Name(request) != input
             || method.Parent is not ClassDeclarationSyntax handler)
             return false;
 
         return handler.ParameterList?.Parameters.Any(parameter => parameter.Type != null
-            && Name(parameter.Type) == "IMissionTerminalModule" && parameter.Identifier.ValueText == Name(receiver)) == true
-            || handler.Members.OfType<FieldDeclarationSyntax>().Any(field => Name(field.Declaration.Type) == "IMissionTerminalModule"
+            && Name(parameter.Type) == contract && parameter.Identifier.ValueText == Name(receiver)) == true
+            || handler.Members.OfType<FieldDeclarationSyntax>().Any(field => Name(field.Declaration.Type) == contract
                 && field.Declaration.Variables.Any(variable => variable.Identifier.ValueText == Name(receiver)));
     }
 
@@ -207,16 +306,20 @@ internal static class DoaModuleBoundary
                     || receiver.Contains("connection", StringComparison.OrdinalIgnoreCase) || receiver == "SqlMapper"));
     }
 
-    private static string? ReceiverType(InvocationExpressionSyntax call, ExpressionSyntax receiver)
+    private static string? ReceiverType(InvocationExpressionSyntax call, ExpressionSyntax receiver, bool unwrapNullable = false)
     {
+        string TypeName(TypeSyntax type) => Name(unwrapNullable && type is NullableTypeSyntax nullable ? nullable.ElementType : type);
+
         while (receiver is ParenthesizedExpressionSyntax parentheses) receiver = parentheses.Expression;
-        if (receiver is CastExpressionSyntax cast) return Name(cast.Type);
+        if (unwrapNullable && receiver is PostfixUnaryExpressionSyntax suppression && suppression.OperatorToken.ValueText == "!")
+            receiver = suppression.Operand;
+        if (receiver is CastExpressionSyntax cast) return TypeName(cast.Type);
         if (receiver is InvocationExpressionSyntax
             {
                 Expression: MemberAccessExpressionSyntax { Name: GenericNameSyntax resolver }
             } && resolver.Identifier.ValueText is "GetService" or "GetRequiredService"
             && resolver.TypeArgumentList.Arguments is [TypeSyntax type])
-            return Name(type);
+            return TypeName(type);
 
         if (receiver is not (IdentifierNameSyntax or MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax }))
             return null;
@@ -226,15 +329,15 @@ internal static class DoaModuleBoundary
         var owner = call.Ancestors().OfType<TypeDeclarationSyntax>().FirstOrDefault();
         var parameter = method?.ParameterList.Parameters.FirstOrDefault(parameter => parameter.Identifier.ValueText == identifier)
             ?? owner?.ParameterList?.Parameters.FirstOrDefault(parameter => parameter.Identifier.ValueText == identifier);
-        if (parameter?.Type is TypeSyntax declared) return Name(declared);
+        if (parameter?.Type is TypeSyntax declared) return TypeName(declared);
         var local = method?.DescendantNodes().OfType<VariableDeclarationSyntax>()
             .FirstOrDefault(declaration => declaration.Variables.Any(variable => variable.Identifier.ValueText == identifier)
                 && declaration.Parent is LocalDeclarationStatementSyntax statement
                 && statement.SpanStart < call.SpanStart && call.Ancestors().Contains(statement.Parent));
-        if (local != null) return Name(local.Type);
+        if (local != null) return TypeName(local.Type);
         var field = owner?.Members.OfType<FieldDeclarationSyntax>().FirstOrDefault(declaration =>
             declaration.Declaration.Variables.Any(variable => variable.Identifier.ValueText == identifier));
-        return field == null ? null : Name(field.Declaration.Type);
+        return field == null ? null : TypeName(field.Declaration.Type);
     }
 
     private static bool IsDatabaseObject(string type) => type is "DbConnection" or "DbCommand" or "DbContext" or "TransactionScope"

@@ -40,7 +40,7 @@ internal static class DoaEnforcement
             using JsonDocument after = JsonDocument.Parse(File.ReadAllText(proposedPath));
             Finding[] baselineFindings = ReadFindings(before.RootElement);
             Finding[] proposedFindings = ReadFindings(after.RootElement);
-            (Finding[] inherited, Finding[] introduced) = Compare(baselineFindings, proposedFindings);
+            (Finding[] inherited, Finding[] introduced, Finding[] resolved) = Compare(baselineFindings, proposedFindings);
             string[] baselineUnresolved = ReadUnresolved(before.RootElement);
             string[] unresolved = ReadUnresolved(after.RootElement);
             string[] introducedProjectInputs = unresolved.Except(baselineUnresolved, StringComparer.Ordinal).ToArray();
@@ -54,6 +54,7 @@ internal static class DoaEnforcement
                 runtimeCSharpFilesAudited = after.RootElement.GetProperty("runtimeCSharpFilesAudited").GetInt32(),
                 authoritativeGameDataChecked = catalogRoot != null,
                 inheritedOpenFindings = inherited,
+                resolvedBaselineFindings = resolved,
                 introducedFindings = introduced,
                 unresolvedProjectInputs = unresolved,
                 introducedProjectInputs,
@@ -66,6 +67,7 @@ internal static class DoaEnforcement
             }
             Console.WriteLine($"DOA_BASELINE={baseline}");
             Console.WriteLine($"DOA_INHERITED_OPEN_FINDINGS={inherited.Length}");
+            Console.WriteLine($"DOA_RESOLVED_BASELINE_FINDINGS={resolved.Length}");
             Console.WriteLine($"DOA_INTRODUCED_FINDINGS={introduced.Length}");
             Console.WriteLine($"DOA_AUTHORITATIVE_GAMEDATA={(catalogRoot == null ? "NOT_SUPPLIED" : "CHECKED")}");
             foreach (Finding finding in inherited)
@@ -89,7 +91,7 @@ internal static class DoaEnforcement
         }
     }
 
-    internal static (Finding[] Inherited, Finding[] Introduced) Compare(IEnumerable<Finding> baseline, IEnumerable<Finding> proposed)
+    internal static (Finding[] Inherited, Finding[] Introduced, Finding[] Resolved) Compare(Finding[] baseline, IEnumerable<Finding> proposed)
     {
         static (string, string, string, string?) Key(Finding finding)
             => (finding.Path, finding.Rule, finding.Symbol, finding.Fingerprint);
@@ -105,7 +107,8 @@ internal static class DoaEnforcement
             }
             else introduced.Add(finding);
         }
-        return (inherited.ToArray(), introduced.ToArray());
+        var resolved = baseline.GroupBy(Key).SelectMany(group => group.TakeLast(remaining[group.Key])).ToArray();
+        return (inherited.ToArray(), introduced.ToArray(), resolved);
     }
 
     private static Finding[] ReadFindings(JsonElement report)

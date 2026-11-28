@@ -8,6 +8,7 @@ using ZoneEngine_New.Core.Inventory;
 using ZoneEngine_New.Core.Logging;
 using ZoneEngine_New.Core.Network;
 using ZoneEngine_New.Core.Playfield;
+using ZoneEngine_New.Core.Quests;
 
 /// <summary>
 /// Retail world-item pickup. An accepted mission objective owns its own eligibility and atomic transfer; any other world
@@ -16,10 +17,12 @@ using ZoneEngine_New.Core.Playfield;
 public sealed class ClientGetItemMessageHandler : IMessageHandler<ClientGetItemMessage>
 {
     readonly InventoryActionService _inventoryActions;
+    readonly IMissionObjectiveModule _missionObjectives;
 
-    public ClientGetItemMessageHandler(InventoryActionService inventoryActions)
+    public ClientGetItemMessageHandler(InventoryActionService inventoryActions, IMissionObjectiveModule missionObjectives)
     {
         _inventoryActions = inventoryActions ?? throw new ArgumentNullException(nameof(inventoryActions));
+        _missionObjectives = missionObjectives ?? throw new ArgumentNullException(nameof(missionObjectives));
     }
 
     public Type MessageBodyType => typeof(ClientGetItemMessage);
@@ -45,9 +48,7 @@ public sealed class ClientGetItemMessageHandler : IMessageHandler<ClientGetItemM
 
         if (dynel is MissionObjectiveItem objective)
         {
-            double distance = objective.GetEdgeDistanceTo(player);
-            bool collected = playfield is QuestDungeonPlayfield && objective.TryPickup(player);
-            logger?.Info($"Mission pickup actor={message.Identity} target={message.Identity1} quest={objective.Binding.QuestId} edgeDistance={distance} collected={collected}");
+            _missionObjectives.TryPickup(player, objective);
             return;
         }
 

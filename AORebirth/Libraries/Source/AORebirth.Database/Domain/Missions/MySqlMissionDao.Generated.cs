@@ -9,9 +9,10 @@ namespace AORebirth.Database.Domain.Missions
     using AORebirth.Enums;
     using AORebirth.Interfaces.Persistence.Missions;
     using Dapper;
+    using SmokeLounge.AOtomation.Messaging.GameData;
 
     /// <summary>Generated missions share the existing DAO connection factory and reward ledger.</summary>
-    public sealed partial class MySqlMissionDao : IGeneratedMissionDao
+    public sealed partial class MySqlMissionDao : IGeneratedMissionDao, IGeneratedMissionOfferReader
     {
         private const string OfferColumns = "OwnerId,BatchIdentity,OfferIndex,OfferType,OfferInstance,MissionType,Quality,DestinationType,DestinationInstance,DestinationPlayfield,DestinationX,DestinationY,DestinationZ,EntranceType,EntranceInstance,EntranceLow,EntranceHigh,CashReward,ExperienceReward,RewardLowId,RewardHighId,RewardQuality,RewardCount,Title,Description,FrozenWireBody,FrozenWireSha256,State,OfferedAtUtcTicks,ExpiresAtUtcTicks,Version";
         private const string BindingColumns = "OwnerId,OfferType,OfferInstance,QuestType,QuestInstance,TeamType,TeamInstance,KeyInstance,BundleId,BundleSha256,BuildingType,BuildingInstance,LivePlayfield,ObjectiveType,ObjectiveInstance,ObjectiveTemplateId,ObjectiveInteraction,RequiredCount,Progress,State,CleanupCheckpoints,TokenProgressPercent,TokenClaimLevel,TokenClaimSide,TokenDisposition,TokenCount,CompletionFrozenAtUtcTicks,AcceptedAtUtcTicks,ExpiresAtUtcTicks,CompletedAtUtcTicks,UpdatedAtUtcTicks,Version";
@@ -113,6 +114,23 @@ namespace AORebirth.Database.Domain.Missions
                 var offers = connection.Query<GeneratedMissionOffer>(OfferReadSql + " WHERE o.OwnerId=@ownerId ORDER BY o.OfferedAtUtcTicks,o.OfferIndex", new { ownerId }).ToList();
                 foreach (var offer in offers) ValidateFrozenOffer(offer);
                 return offers;
+            }
+        }
+
+        public GeneratedMissionOffer ReadCurrentOffer(int ownerId, int offerType, int offerInstance, long nowUtcTicks)
+        {
+            if (ownerId <= 0 || offerType != (int)IdentityType.Mission || offerInstance <= 0 || nowUtcTicks <= 0)
+                return null;
+
+            using (var connection = OpenConnection())
+            {
+                var offer = connection.QuerySingleOrDefault<GeneratedMissionOffer>(OfferReadSql
+                    + " WHERE o.OwnerId=@ownerId AND o.OfferType=@offerType AND o.OfferInstance=@offerInstance"
+                    + " AND o.State=@state AND o.ExpiresAtUtcTicks>@nowUtcTicks",
+                    new { ownerId, offerType, offerInstance, state = (int)GeneratedMissionState.Offered, nowUtcTicks });
+                if (offer != null)
+                    ValidateFrozenOffer(offer);
+                return offer;
             }
         }
 

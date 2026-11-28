@@ -33,16 +33,18 @@ namespace ZoneEngine_New.Core.MessageHandlers
         private readonly Tradeskills.TradeskillService? _tradeskills;
         private readonly Lazy<DailyLogin.DailyLoginClaimBridge>? _dailyLogin;
         private readonly CharacterPlayedClock? _playedClock;
+        private readonly IMissionObjectiveModule? _missionObjectives;
 
         public CharacterActionMessageHandler(InventoryActionService inventoryActions, TeamService teams,
             Tradeskills.TradeskillService? tradeskills = null, Lazy<DailyLogin.DailyLoginClaimBridge>? dailyLogin = null,
-            CharacterPlayedClock? playedClock = null)
+            CharacterPlayedClock? playedClock = null, IMissionObjectiveModule? missionObjectives = null)
         {
             _inventoryActions = inventoryActions;
             _teams = teams;
             _tradeskills = tradeskills;
             _dailyLogin = dailyLogin;
             _playedClock = playedClock;
+            _missionObjectives = missionObjectives;
         }
 
         public Type MessageBodyType => typeof(CharacterActionMessage);
@@ -326,10 +328,8 @@ namespace ZoneEngine_New.Core.MessageHandlers
 
                     session.Send(target.BuildInfoPacket());
                     // Retail Find Person completion follows inspection of the exact, visible objective NPC.
-                    if (target is NpcCharacter npc
-                        && playfield.GetRequiredService<PlayfieldLocality>().IsVisibleTo(npc, player)
-                        && playfield.GetService<QuestService>() is QuestService quests)
-                        quests.OnNpcInspected(player, npc);
+                    if (target is NpcCharacter npc)
+                        _missionObjectives?.InspectNpc(player, npc);
                     break;
                 }
 

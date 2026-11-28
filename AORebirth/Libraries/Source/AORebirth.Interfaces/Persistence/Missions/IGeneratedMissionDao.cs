@@ -36,6 +36,13 @@ namespace AORebirth.Interfaces.Persistence.Missions
         GeneratedMissionResult ClaimCorpseCredits(int ownerId, int questType, int questInstance, int runtimeNpcInstance, int currentCash, long nowUtcTicks);
     }
 
+    /// <summary>Acceptance lookup on the existing mission DAO. The owning transaction still claims the offer.</summary>
+    public interface IGeneratedMissionOfferReader
+    {
+        /// <summary>Reads the exact owned, unexpired offer, or returns null when it is no longer offered.</summary>
+        GeneratedMissionOffer ReadCurrentOffer(int ownerId, int offerType, int offerInstance, long nowUtcTicks);
+    }
+
     public sealed class GeneratedMissionOfferBatch
     {
         public int OwnerType { get; set; }

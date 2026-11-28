@@ -58,12 +58,16 @@ owns action eligibility, mechanics and orchestration.
 | Selection and content | `IGeneratedMissionOfferGenerator` selects from the Phase 1 `MissionContent` snapshot and validated destination catalog. Existing mission content owners retain their registered providers and compatibility loaders. |
 | Economic transaction | `GeneratedMissionService.PublishOffers` retains the player persistence gate and commit-before-publication behavior. It uses `IGeneratedMissionDao.PublishOffers`. Durable offer identity allocation remains `IGeneratedMissionDao.ReserveIdentities`. |
 | SQL and durable state | Existing DAO implementations own connection use and SQL. Gameplay modules depend on their interfaces and the existing transaction services. |
-| Other mission lifecycle operations | `QuestService`, `QuestDungeonService` and `AuthoredQuestService` retain objective, acceptance, reconstruction and quest lifecycle ownership. |
+| Mission acceptance | `CreateQuestMessageHandler` dispatches through `IMissionAcceptanceModule`. `QuestDungeonService` holds the player persistence gate and uses the existing quest store to atomically claim the selected offer and persist the accepted dungeon and items. |
+| Generated mission objectives | `IMissionObjectiveModule` routes the five mission objectives using the accepted frozen bindings. `QuestService` retains the log and the existing DAO-backed objective and completion transactions. |
+| Generated mission lifecycle | `IGeneratedMissionLifecycleModule` coordinates journal deletion, reward retry, dungeon entry, key copying and login restoration. `QuestService` retains lifecycle transitions and `QuestDungeonService` handles the existing end event, key retirement, expiry sweeps and world cleanup. |
+| Authored quests | `AuthoredQuestService` retains its existing authored action and quest lifecycle ownership. |
 | Client wire | The shared AOtomation messages and serializers retain the original packet contract. The module uses the existing session gateway to send the same responses. |
 
-Terminal rolling is the controlled proof of this boundary. It uses the
-existing in-process dependency injection, mission generator and DAO. Future
-gameplay extraction proceeds through the owning module's narrow interface.
+The mission modules use the existing in-process dependency injection, mission
+generator and DAO. The same objective and lifecycle instances are available
+to zone message dispatch and playfield services. Future gameplay extraction
+proceeds through the owning module's narrow interface.
 Other consumers use that interface or approved shared infrastructure. Keep
 native engine-module contracts within their existing runtime; the external
 module host and plugin lifecycle continue to serve their existing role.

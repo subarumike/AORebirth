@@ -942,9 +942,14 @@ namespace ZoneEngine_New.Core.Playfield
             if (_playfieldManager.Vicinity != null)
                 services.AddSingleton(_playfieldManager.Vicinity);
             if (_playfieldManager.Quests != null)
+            {
                 services.AddSingleton(_playfieldManager.Quests);
+                services.AddSingleton<Quests.IMissionObjectiveModule>(_playfieldManager.Quests.MissionObjectives);
+            }
             if (_playfieldManager.QuestDungeons != null)
                 services.AddSingleton(_playfieldManager.QuestDungeons);
+            if (_playfieldManager.MissionLifecycle != null)
+                services.AddSingleton(_playfieldManager.MissionLifecycle);
             if (_playfieldManager.Knubot != null)
                 services.AddSingleton(_playfieldManager.Knubot.Catalog);
             if (_playfieldManager.NpcScripts != null)
