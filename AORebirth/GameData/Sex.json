@@ -1,7 +1,8 @@
 {
   "Sex": {
-    "0": { "Name": "Neuter"},
-    "1": { "Name": "Male"},
-    "2": { "Name": "Female"}
+    "0": { "Name": "Unknown"},
+    "1": { "Name": "Neuter"},
+    "2": { "Name": "Male"},
+    "3": { "Name": "Female"}
   }
 }
