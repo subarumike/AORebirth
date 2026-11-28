@@ -124,10 +124,10 @@ namespace AORebirth.Database.Domain.Missions
 
             using (var connection = OpenConnection())
             {
-                var offer = connection.QuerySingleOrDefault<GeneratedMissionOffer>(OfferReadSql
+                var offer = connection.Query<GeneratedMissionOffer>(OfferReadSql
                     + " WHERE o.OwnerId=@ownerId AND o.OfferType=@offerType AND o.OfferInstance=@offerInstance"
                     + " AND o.State=@state AND o.ExpiresAtUtcTicks>@nowUtcTicks",
-                    new { ownerId, offerType, offerInstance, state = (int)GeneratedMissionState.Offered, nowUtcTicks });
+                    new { ownerId, offerType, offerInstance, state = (int)GeneratedMissionState.Offered, nowUtcTicks }).SingleOrDefault();
                 if (offer != null)
                     ValidateFrozenOffer(offer);
                 return offer;
