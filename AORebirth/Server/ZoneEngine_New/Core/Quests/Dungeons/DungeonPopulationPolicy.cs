@@ -11,9 +11,11 @@ public sealed class DungeonPopulationPolicy
 
     public string[] RegularNpcHashes { get; set; } = [];
 
-    internal bool IsValid(IGameData gameData)
+    internal bool IsValid(IGameData gameData) => IsValid(gameData.HasMobTemplate);
+
+    internal bool IsValid(Func<string, bool> hasMobTemplate)
         => SpawnPointChancePercent is >= 0 and <= 100
             && RegularNpcHashes is { Length: > 0 }
             && RegularNpcHashes.Distinct(StringComparer.Ordinal).Count() == RegularNpcHashes.Length
-            && RegularNpcHashes.All(hash => !string.IsNullOrWhiteSpace(hash) && gameData.HasMobTemplate(hash));
+            && RegularNpcHashes.All(hash => !string.IsNullOrWhiteSpace(hash) && hasMobTemplate(hash));
 }

@@ -58,8 +58,18 @@ namespace AORebirth.World.Collision
         public static DungeonWorldLayout BuildLayout(string gameDataRoot, AcgBuildingGeneratorData generator)
         {
             ArgumentNullException.ThrowIfNull(generator);
+            return BuildLayout(DungeonStyleCatalog.Load(gameDataRoot, generator.Style), generator);
+        }
+
+        public static DungeonWorldLayout BuildLayout(DungeonStyleCatalog style, AcgBuildingGeneratorData generator)
+        {
+            ArgumentNullException.ThrowIfNull(style);
+            ArgumentNullException.ThrowIfNull(generator);
+            if (generator.Style != style.StyleId)
+                throw new ArgumentException("Generator style does not match the collision catalog.", nameof(generator));
+
             return BuildLayout(
-                DungeonStyleCatalog.Load(gameDataRoot, generator.Style),
+                style,
                 MapRooms(generator.Rooms),
                 generator.Width,
                 generator.Height,

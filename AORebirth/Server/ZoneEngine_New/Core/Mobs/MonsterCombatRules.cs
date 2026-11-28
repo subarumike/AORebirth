@@ -155,12 +155,21 @@ namespace ZoneEngine_New.Core.Mobs
 
         static MonsterCombatRulesCatalog Load(string root)
         {
-            var rules = new Dictionary<string, MonsterCombatRules>(StringComparer.OrdinalIgnoreCase);
             string path = AORebirth.Core.GameData.GameDataPaths.ResolveFile(root, FileName);
             Dictionary<string, MonsterCombatRules>? file = File.Exists(path)
                 ? JsonSerializer.Deserialize<Dictionary<string, MonsterCombatRules>>(File.ReadAllText(path), JsonOptions)
                     ?? throw new InvalidDataException($"{FileName}: expected a combat rule object.")
                 : null;
+            return new MonsterCombatRulesCatalog(ValidateRules(file, path), NpcPetSummonProfile.LoadOptional(root));
+        }
+
+        internal static Dictionary<string, MonsterCombatRules> ParseRetainedRules(ReadOnlySpan<byte> bytes)
+            => ValidateRules(JsonSerializer.Deserialize<Dictionary<string, MonsterCombatRules>>(bytes, JsonOptions)
+                ?? throw new InvalidDataException($"{FileName}: expected a combat rule object."), FileName);
+
+        static Dictionary<string, MonsterCombatRules> ValidateRules(Dictionary<string, MonsterCombatRules>? file, string path)
+        {
+            var rules = new Dictionary<string, MonsterCombatRules>(StringComparer.OrdinalIgnoreCase);
             foreach (KeyValuePair<string, MonsterCombatRules> entry in file ?? new())
             {
                 if (string.IsNullOrWhiteSpace(entry.Key) || entry.Value == null || !rules.TryAdd(entry.Key.Trim(), entry.Value))
@@ -188,7 +197,7 @@ namespace ZoneEngine_New.Core.Mobs
                 }
             }
 
-            return new MonsterCombatRulesCatalog(rules, NpcPetSummonProfile.LoadOptional(root));
+            return rules;
         }
 
         /// <summary>One root's current rules; the reference is swapped whole.</summary>

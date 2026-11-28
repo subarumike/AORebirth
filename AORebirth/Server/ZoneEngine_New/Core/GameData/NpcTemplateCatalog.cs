@@ -72,15 +72,17 @@ namespace ZoneEngine_New.Core.GameData
         }
 
         public static NpcTemplateCatalog Parse(string? json, Random? random = null)
+            => Create(string.IsNullOrWhiteSpace(json) ? null
+                : JsonSerializer.Deserialize<Dictionary<string, NpcHashDto>>(json, JsonOptions), random);
+
+        internal static NpcTemplateCatalog ParseUtf8(ReadOnlySpan<byte> json)
+            => Create(JsonSerializer.Deserialize<Dictionary<string, NpcHashDto>>(json, JsonOptions), random: null);
+
+        static NpcTemplateCatalog Create(Dictionary<string, NpcHashDto>? records, Random? random)
         {
             var families = new Dictionary<string, string[]>(StringComparer.Ordinal);
             var leaves = new Dictionary<string, NpcLeaf>(StringComparer.Ordinal);
             var spawnAll = new HashSet<string>(StringComparer.Ordinal);
-            if (string.IsNullOrWhiteSpace(json))
-                return new NpcTemplateCatalog(families, leaves, random, spawnAll);
-
-            Dictionary<string, NpcHashDto>? records =
-                JsonSerializer.Deserialize<Dictionary<string, NpcHashDto>>(json, JsonOptions);
             if (records == null)
                 return new NpcTemplateCatalog(families, leaves, random, spawnAll);
 
@@ -214,13 +216,16 @@ namespace ZoneEngine_New.Core.GameData
         /// An unknown hash contributes the placeholder fallback when that leaf exists.
         /// </summary>
         public void CollectSpawns(string hash, int? level, List<MobTemplate> into)
+            => CollectSpawns(hash, level, into, random: null);
+
+        internal void CollectSpawns(string hash, int? level, List<MobTemplate> into, Random? random)
         {
             ArgumentNullException.ThrowIfNull(into);
             if (string.IsNullOrEmpty(hash))
                 return;
 
             int start = into.Count;
-            CollectSpawns(hash, level, into, new HashSet<string>(StringComparer.Ordinal));
+            CollectSpawns(hash, level, into, new HashSet<string>(StringComparer.Ordinal), random ?? _random);
             if (into.Count != start)
                 return;
 
@@ -228,7 +233,7 @@ namespace ZoneEngine_New.Core.GameData
                 into.Add(Materialize(fallback, level, RuleFeatures?.Invoke(fallback.Hash)));
         }
 
-        void CollectSpawns(string hash, int? level, List<MobTemplate> into, HashSet<string> trail)
+        void CollectSpawns(string hash, int? level, List<MobTemplate> into, HashSet<string> trail, Random random)
         {
             if (string.IsNullOrEmpty(hash) || !trail.Add(hash))
                 return;
@@ -240,13 +245,13 @@ namespace ZoneEngine_New.Core.GameData
                     if (_spawnAll.Contains(hash))
                     {
                         for (int i = 0; i < children.Length; i++)
-                            CollectSpawns(children[i], level, into, trail);
+                            CollectSpawns(children[i], level, into, trail, random);
                         return;
                     }
 
-                    string? pick = PickChild(children, level);
+                    string? pick = PickChild(children, level, random);
                     if (!string.IsNullOrEmpty(pick))
-                        CollectSpawns(pick, level, into, trail);
+                        CollectSpawns(pick, level, into, trail, random);
                     return;
                 }
 
@@ -263,10 +268,11 @@ namespace ZoneEngine_New.Core.GameData
         /// Random child. With a requested level, only children whose template range covers it are
         /// eligible; when none do, the children whose range lies closest to the level are used instead.
         /// </summary>
-        string? PickChild(string[] children, int? level)
+        string? PickChild(string[] children, int? level, Random? random = null)
         {
+            random ??= _random;
             if (level is not > 0)
-                return PickAny(children);
+                return PickAny(children, random);
 
             var eligible = new List<string>(children.Length);
             int bestDistance = int.MaxValue;
@@ -293,12 +299,12 @@ namespace ZoneEngine_New.Core.GameData
             }
 
             if (eligible.Count == 0)
-                return PickAny(children);
+                return PickAny(children, random);
 
-            return eligible[_random.Next(eligible.Count)];
+            return eligible[random.Next(eligible.Count)];
         }
 
-        string? PickAny(string[] children)
+        static string? PickAny(string[] children, Random random)
         {
             int viable = 0;
             for (int i = 0; i < children.Length; i++)
@@ -310,7 +316,7 @@ namespace ZoneEngine_New.Core.GameData
             if (viable == 0)
                 return null;
 
-            int index = _random.Next(viable);
+            int index = random.Next(viable);
             for (int i = 0; i < children.Length; i++)
             {
                 if (string.IsNullOrEmpty(children[i]))

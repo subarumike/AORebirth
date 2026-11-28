@@ -12,6 +12,8 @@ internal static class DoaModuleBoundary
     private const string AcceptanceHandler = Core + "MessageHandlers/CreateQuestMessageHandler.cs";
     private const string JournalHandler = Core + "MessageHandlers/QuestMessageHandler.cs";
     private const string DungeonService = Core + "Quests/Dungeons/QuestDungeonService.cs";
+    private const string DungeonGeneratorModule = Core + "Quests/Dungeons/DungeonLayoutGenerator.cs";
+    private const string DungeonPlayfield = Core + "Playfield/QuestDungeonPlayfield.cs";
     private const string AcceptanceModule = Core + "Quests/MissionAcceptanceModule.cs";
     private const string ObjectiveModule = Core + "Quests/MissionObjectiveModule.cs";
 
@@ -47,6 +49,9 @@ internal static class DoaModuleBoundary
         ["MissionAcceptanceModule"] = "Quest",
         ["MissionObjectiveModule"] = "Quest",
         ["GeneratedMissionLifecycleModule"] = "Quest",
+        ["MissionDungeonPopulationModule"] = "Quest",
+        ["DungeonObjectivePlacement"] = "Quest",
+        ["DungeonLayoutGenerator"] = "Quest",
         ["InventoryActionService"] = "Inventory",
         ["TradeService"] = "Trade"
     };
@@ -93,6 +98,9 @@ internal static class DoaModuleBoundary
             foreach (var creation in syntax.DescendantNodes().OfType<BaseObjectCreationExpressionSyntax>())
             {
                 string type = CreatedType(creation);
+                if (zone && !composition && path != DungeonGeneratorModule
+                    && IsType(type, candidate => candidate is "DungeonGenerator" or "DungeonLayoutGenerator"))
+                    yield return (creation, "DOA_COMPETING_DUNGEON_GENERATION", "Inject IMissionDungeonGenerator in mission consumers.");
                 if (IsType(type, IsDatabaseObject) && !IsConnectorFactory(path, creation))
                     yield return (creation, "DOA_DIRECT_DATABASE_ACCESS", "Construct provider database objects only in their authorized persistence owner.");
                 if (IsType(type, IsConcreteDao) && !IsCompositionWiring(path, creation))
@@ -105,6 +113,8 @@ internal static class DoaModuleBoundary
             foreach (var declaration in syntax.DescendantNodes().OfType<TypeDeclarationSyntax>())
             {
                 string type = declaration.Identifier.ValueText;
+                if (zone && path != DungeonGeneratorModule && type is "DungeonGenerator" or "DungeonLayoutGenerator")
+                    yield return (declaration, "DOA_COMPETING_DUNGEON_GENERATION", "Use the existing mission dungeon generation module and AO generator.");
                 if (IsPersistenceContract(type))
                     yield return (declaration, "DOA_COMPETING_PERSISTENCE", "Extend the existing persistence contract instead of adding a separate persistence abstraction.");
             }
@@ -145,6 +155,11 @@ internal static class DoaModuleBoundary
 
             if ((handlers || composition) && GameplayOperations.Contains(method, StringComparer.Ordinal))
                 yield return (call, "DOA_GAMEPLAY_IN_DISPATCH", "Delegate gameplay operations to the owning module from a handler or composition root.");
+
+            if (path is DungeonService or DungeonPlayfield && method is "BuildLayout" or "LoadStyle"
+                && call.Expression is MemberAccessExpressionSyntax receiverOfLayout
+                && Name(receiverOfLayout.Expression) is "DungeonCollisionBuilder" or "DungeonStyleCatalog" or "DungeonGenerator")
+                yield return (call, "DOA_UNVERSIONED_DUNGEON_INPUT", "Use the layout returned by the mission dungeon module.");
 
             if (zone && MissionWorkflowIssue(path, call, method) is string reason)
                 yield return (call, "DOA_TRANSACTION_BYPASS", reason);

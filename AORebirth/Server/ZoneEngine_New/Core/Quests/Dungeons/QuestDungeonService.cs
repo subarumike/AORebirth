@@ -4,6 +4,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
     using System.Collections.Concurrent;
     using System.Collections.Generic;
     using System.Globalization;
+    using System.IO;
     using System.Linq;
     using System.Security.Cryptography;
     using System.Threading;
@@ -26,6 +27,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
     using ZoneEngine_New.Core.Mobs;
     using ZoneEngine_New.Core.Network;
     using ZoneEngine_New.Core.Playfield;
+    using ZoneEngine_New.Core.WorldSimulation;
 
     using Quaternion = AORebirth.Core.Vector.Quaternion;
     using Vector3 = AORebirth.Core.Vector.Vector3;
@@ -75,7 +77,8 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
         readonly ICharacterQuestStore _store;
         readonly QuestService _quests;
         readonly MissionDestinationCatalog _entrances;
-        readonly DungeonLayoutGenerator _layouts;
+        readonly IMissionDungeonGenerator _layouts;
+        readonly IMissionDungeonObjectivePlacement _objectivePlacement;
         readonly IGeneratedMissionOfferReader _offers;
         readonly IItemBuilder _items;
         readonly IItemInstanceIdAllocator _ids;
@@ -99,10 +102,11 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
         int _sweeping;
 
         public QuestDungeonService(ICharacterQuestStore store, QuestService quests, MissionDestinationCatalog entrances,
-            DungeonLayoutGenerator layouts, IGeneratedMissionOfferReader offers, IItemBuilder items, IItemInstanceIdAllocator ids,
+            IMissionDungeonGenerator layouts, IGeneratedMissionOfferReader offers, IItemBuilder items, IItemInstanceIdAllocator ids,
             InventoryFlushService flush, InventoryActionService inventoryActions, Lazy<PlayfieldManager> playfields,
             IGameData gameData, MissionKeyPolicy keys, IZoneLogger logger, HashItemMinter? hashItems = null,
-            ZoneEngine_New.Core.World.WorldLink? world = null, ZoneEngine_New.Core.World.WorldCommands? commands = null)
+            ZoneEngine_New.Core.World.WorldLink? world = null, ZoneEngine_New.Core.World.WorldCommands? commands = null,
+            IMissionDungeonObjectivePlacement? objectivePlacement = null)
         {
             _keys = keys ?? throw new ArgumentNullException(nameof(keys));
             _world = world;
@@ -112,6 +116,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
             _quests = quests ?? throw new ArgumentNullException(nameof(quests));
             _entrances = entrances ?? throw new ArgumentNullException(nameof(entrances));
             _layouts = layouts ?? throw new ArgumentNullException(nameof(layouts));
+            _objectivePlacement = objectivePlacement ?? new DungeonObjectivePlacement();
             _offers = offers ?? throw new ArgumentNullException(nameof(offers));
             _items = items ?? throw new ArgumentNullException(nameof(items));
             _ids = ids ?? throw new ArgumentNullException(nameof(ids));
@@ -204,36 +209,10 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                 }
 
                 QuestTemplate template = BuildTemplate(questId, offer);
-                if (template.IsFindItem || template.IsReturnItem)
-                {
-                    DungeonFindItemPolicy? policy = template.IsReturnItem ? _layouts.ReturnItemPolicy : _layouts.FindItemPolicy;
-                    if (!TryPrepareObjective(player, questId, acceptedLayout, policy, offer.MissionType, false,
-                            out var objective, out string objectiveHash))
-                        return "Mission item objective data is unavailable; this offer was not accepted.";
-                    parameters.ObjectiveItem = objective;
-                    template.Objective.WorldItem = objectiveHash;
-                }
-                else if (template.IsRepair)
-                {
-                    if (!TryPrepareObjective(player, questId, acceptedLayout, _layouts.RepairMachinePolicy?.Target, 3, false,
-                            out var objective, out string objectiveHash)
-                        || !TryPrepareObjective(player, questId, acceptedLayout, _layouts.RepairMachinePolicy?.Source, 3, true,
-                            out var tool, out string toolHash))
-                        return "Mission repair objective data is unavailable; this offer was not accepted.";
-                    parameters.ObjectiveItem = objective;
-                    parameters.ObjectiveTool = tool;
-                    template.Objective.WorldItem = objectiveHash;
-                    template.Objective.SpecItem = toolHash;
-                }
-                else if (offer.MissionType is 0 or 1)
-                {
-                    if (!TryPrepareNpc(player, questId, acceptedLayout, offer.MissionType, offer.Quality, out var objective))
-                        return "Mission NPC objective data is unavailable; this offer was not accepted.";
-                    parameters.ObjectiveNpc = objective;
-                    template.Objective.Npc = objective.NpcHash;
-                }
-                else
-                    return "That mission objective is unavailable; this offer was not accepted.";
+                string? objectiveError = PrepareObjectives(player, questId, offer, parameters, acceptedLayout, template);
+                if (objectiveError != null)
+                    return objectiveError;
+
                 DateTime expires = now.AddSeconds(MissionRollPolicy.Current.AcceptedLifetimeSeconds);
                 string parametersJson = parameters.ToJson();
 
@@ -419,13 +398,19 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                         world = _playfields.Value.GetOrCreateQuestDungeon(dungeon.Parameters.DungeonPlayfield, questId, layout, entrance,
                             dungeon.TargetHash, dungeon.Parameters.Quality, UncollectedObjective(dungeon.Parameters), TryCollectObjective,
                             tokenProgress == null ? unfinishedNpc : dungeon.Parameters.ObjectiveNpc, tokenProgress,
-                            spawnNpcObjective: unfinishedNpc != null, chestPopulation: CreateChestPopulation(questId, dungeon));
+                            spawnNpcObjective: unfinishedNpc != null, chestPopulation: CreateChestPopulation(questId, dungeon, layout), acceptedParameters: dungeon.Parameters);
                     }
                     catch (ZoneEngine_New.Core.World.PlayfieldHostedElsewhereException)
                     {
                         // The dungeon already runs on another zone instance (a teammate went in there): join it.
                         return _playfields.Value.CrossInstance?.Start(player, dungeon.Parameters.DungeonPlayfield, layout.Spawn,
                             player.Rotation, AORebirth.World.Contracts.V1.ArrivalKind.ArrivalDungeon) == true;
+                    }
+                    catch (InvalidDataException exception) when (layout.Content != null)
+                    {
+                        _logger.Error(exception, $"Mission {questId} dungeon reconstruction failed");
+                        SendText(player, "This mission's accepted dungeon could not be restored.");
+                        return false;
                     }
 
                     return session.TransferToPlayfield(world, layout.Spawn);
@@ -531,11 +516,15 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                         return (playfields.GetOrCreateQuestDungeon(storedPlayfield, questId, layout, entrance, dungeon.TargetHash,
                             dungeon.Parameters.Quality, UncollectedObjective(dungeon.Parameters), TryCollectObjective,
                             tokenProgress == null ? unfinishedNpc : dungeon.Parameters.ObjectiveNpc, tokenProgress,
-                            spawnNpcObjective: unfinishedNpc != null, chestPopulation: CreateChestPopulation(questId, dungeon)), layout.Spawn, null);
+                            spawnNpcObjective: unfinishedNpc != null, chestPopulation: CreateChestPopulation(questId, dungeon, layout), acceptedParameters: dungeon.Parameters), layout.Spawn, null);
                     }
                     catch (ZoneEngine_New.Core.World.PlayfieldHostedElsewhereException)
                     {
                         throw new ZoneEngine_New.Core.World.LoginRelocationException(storedPlayfield, layout.Spawn);
+                    }
+                    catch (InvalidDataException exception) when (layout.Content != null)
+                    {
+                        _logger.Error(exception, $"Mission {questId} login dungeon reconstruction failed");
                     }
                 }
 
@@ -931,16 +920,69 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
         MissionTokenProgress? CreateTokenProgress(string questId, CachedDungeon dungeon)
             => _quests.CreateTokenProgress(dungeon.OwnerId, questId, dungeon.AssignedAtUtcTicks, dungeon.Parameters.TokenReward);
 
-        MissionChestPopulation? CreateChestPopulation(string questId, CachedDungeon dungeon)
+        MissionChestPopulation? CreateChestPopulation(string questId, CachedDungeon dungeon, DungeonLayout layout)
             => _quests.CreateChestPopulation(dungeon.OwnerId, questId, dungeon.AssignedAtUtcTicks,
-                dungeon.FrozenJson, dungeon.Parameters, _layouts.ChestPolicy);
+                dungeon.FrozenJson, dungeon.Parameters, layout.Content == null ? _layouts.ChestPolicy : layout.ChestPolicy);
+
+        string? PrepareObjectives(Player player, string questId, GeneratedMissionOffer offer,
+            QuestDungeonParameters parameters, DungeonLayout layout, QuestTemplate template)
+        {
+            using PlayfieldWorldSimulation? simulation = layout.Geometry is { } geometry
+                ? PlayfieldWorldSimulation.Create(parameters.DungeonPlayfield,
+                    new PlayfieldGeometryData { Collision = geometry.Collision }, null,
+                    DestinationsCatalog.Instance, _gameData, _logger)
+                : null;
+            Func<int, System.Numerics.Vector3, string?>? validatePoint = null;
+            if (layout.Content != null)
+            {
+                if (layout.Geometry == null || simulation == null)
+                    return "Mission objective placement is unavailable; this offer was not accepted.";
+                validatePoint = _objectivePlacement.CreatePhysicalValidator(layout.Geometry, layout,
+                    layout.Districts, simulation, layout.PlayerCollisionSphere, layout.ChestPolicy?.Placement);
+            }
+
+            if (template.IsFindItem || template.IsReturnItem)
+            {
+                DungeonFindItemPolicy? policy = layout.Content == null
+                    ? (template.IsReturnItem ? _layouts.ReturnItemPolicy : _layouts.FindItemPolicy)
+                    : (template.IsReturnItem ? layout.ReturnItemPolicy : layout.FindItemPolicy);
+                if (!TryPrepareObjective(player, questId, layout, policy, offer.MissionType, false, validatePoint,
+                        out var objective, out string objectiveHash))
+                    return "Mission item objective data is unavailable; this offer was not accepted.";
+                parameters.ObjectiveItem = objective;
+                template.Objective.WorldItem = objectiveHash;
+            }
+            else if (template.IsRepair)
+            {
+                DungeonRepairMachinePolicy? policy = layout.Content == null ? _layouts.RepairMachinePolicy : layout.RepairMachinePolicy;
+                if (!TryPrepareObjective(player, questId, layout, policy?.Target, 3, false, validatePoint,
+                        out var objective, out string objectiveHash)
+                    || !TryPrepareObjective(player, questId, layout, policy?.Source, 3, true, validatePoint,
+                        out var tool, out string toolHash))
+                    return "Mission repair objective data is unavailable; this offer was not accepted.";
+                parameters.ObjectiveItem = objective;
+                parameters.ObjectiveTool = tool;
+                template.Objective.WorldItem = objectiveHash;
+                template.Objective.SpecItem = toolHash;
+            }
+            else if (offer.MissionType is 0 or 1)
+            {
+                if (!TryPrepareNpc(player, questId, layout, offer.MissionType, offer.Quality, validatePoint, out var objective))
+                    return "Mission NPC objective data is unavailable; this offer was not accepted.";
+                parameters.ObjectiveNpc = objective;
+                template.Objective.Npc = objective.NpcHash;
+            }
+            else
+                return "That mission objective is unavailable; this offer was not accepted.";
+            return null;
+        }
 
         /// <summary>The NPC hash a kill quest wants, or null for other quests.</summary>
         static string? KillTarget(QuestTemplate? template)
             => template != null && template.IsKill && !string.IsNullOrWhiteSpace(template.Objective?.Npc) ? template.Objective.Npc : null;
 
         bool TryPrepareObjective(Player player, string questId, DungeonLayout layout, DungeonFindItemPolicy? policy,
-            int missionType, bool sourceItem,
+            int missionType, bool sourceItem, Func<int, System.Numerics.Vector3, string?>? validatePoint,
             out MissionItemObjectiveBinding objective, out string objectiveHash)
         {
             objective = null!;
@@ -950,7 +992,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                 return false;
             int room = 0;
             Vector3 point = new();
-            if (!sourceItem && !DungeonObjectivePlacement.TrySelect(_gameData.RootPath, layout, _logger, out room, out point))
+            if (!sourceItem && !TrySelectObjectivePoint(layout, validatePoint, out room, out point))
                 return false;
             var candidates = new List<(string Hash, int Low, int High, int Quality)>();
             foreach (string hash in policy.ItemHashes.Distinct(StringComparer.Ordinal))
@@ -977,21 +1019,26 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
         }
 
         bool TryPrepareNpc(Player player, string questId, DungeonLayout layout, int missionType, int quality,
-            out MissionNpcObjectiveBinding objective)
+            Func<int, System.Numerics.Vector3, string?>? validatePoint, out MissionNpcObjectiveBinding objective)
         {
             objective = null!;
-            DungeonNpcObjectivePolicy? policy = _layouts.NpcObjectivePolicy;
+            DungeonNpcObjectivePolicy? policy = layout.Content == null ? _layouts.NpcObjectivePolicy : layout.NpcObjectivePolicy;
             string[]? hashes = missionType == (int)MissionRollType.FindPerson ? policy?.FindPersonNpcHashes : policy?.NpcHashes;
             int? scalePercent = missionType == (int)MissionRollType.KillPerson ? policy?.KillPersonScalePercent : null;
             if (quality <= 0 || scalePercent is <= 0 || hashes is not { Length: > 0 }
                 || hashes.Any(string.IsNullOrWhiteSpace)
-                || !DungeonObjectivePlacement.TrySelect(_gameData.RootPath, layout, _logger, out int room, out Vector3 point))
+                || !TrySelectObjectivePoint(layout, validatePoint, out int room, out Vector3 point))
                 return false;
             var candidates = new List<MobTemplate>();
             foreach (string hash in hashes.Distinct(StringComparer.Ordinal))
             {
-                if (!_gameData.HasMobTemplate(hash) || !_gameData.TryResolveMobTemplate(hash, quality, out MobTemplate template)
-                    || template.UnresolvedPlaceholder || !NpcTemplateValidation.CanSpawn(template)
+                MobTemplate template;
+                bool resolved;
+                if (layout.NpcTemplates is { } retained)
+                    resolved = retained.TryResolve(hash, quality, out template);
+                else
+                    resolved = _gameData.TryResolveMobTemplate(hash, quality, out template);
+                if (!resolved || template.UnresolvedPlaceholder || !NpcTemplateValidation.CanSpawn(template)
                     || missionType == 0 && template.Has(NpcFeature.NoCombat))
                     return false;
                 candidates.Add(template);
@@ -1004,6 +1051,18 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                 X = point.xf, Y = point.yf, Z = point.zf, MissionType = missionType
             };
             return objective.IsValid;
+        }
+
+        bool TrySelectObjectivePoint(DungeonLayout layout, Func<int, System.Numerics.Vector3, string?>? validatePoint,
+            out int room, out Vector3 point)
+        {
+            if (layout.Geometry is { } geometry)
+                return _objectivePlacement.TrySelect(geometry, layout, layout.Districts, out room, out point, validatePoint);
+            if (layout.Content == null && layout.ResourceRoot is { } historicalRoot)
+                return DungeonObjectivePlacement.TrySelect(historicalRoot, layout, _logger, out room, out point);
+            room = -1;
+            point = new Vector3();
+            return false;
         }
 
         MissionItemObjectiveBinding? UncollectedObjective(QuestDungeonParameters parameters)

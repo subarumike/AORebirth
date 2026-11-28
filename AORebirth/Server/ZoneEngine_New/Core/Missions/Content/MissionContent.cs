@@ -77,9 +77,7 @@ internal sealed record MissionContent(MissionRollPolicy Policy, MissionLevelData
         provider.RegisterCompatibility(new(ItemCatalog, nameof(ItemTemplateCatalog) + " / " + nameof(GameDataStore), null,
             ["items.dat", "ItemBehavior.json", "ItemTemplates.json"], []));
         provider.RegisterCompatibility(new("NpcTemplates", "NpcTemplateCatalog", null, ["NpcTemplates.json"], []));
-        provider.RegisterCompatibility(new("MissionDungeons", nameof(DungeonLayoutGenerator), null,
-            [DungeonLayoutGenerator.GenerationFileName, DungeonLayoutGenerator.DoorStylesFileName, "DungeonEntrances.json"],
-            [Id, ItemCatalog, "NpcTemplates"]));
+        DungeonGenerationContent.Register(provider);
         provider.RegisterCompatibility(new("TerminalItemRewards", nameof(MissionRollRewardItems), null,
             ["XML Data/MissionRewards"], [Id, ItemCatalog]));
         provider.RegisterCompatibility(new("AuthoredMissions", nameof(AuthoredQuestCatalog), null,

@@ -2,6 +2,7 @@ namespace ZoneEngine_New.Core.Quests.Dungeons;
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Numerics;
 
@@ -163,7 +164,9 @@ public static class MissionChestPlacement
             || gameData.PlayerCollisionSphere is not { Radius: > 0, CenterY: > 0 } player
             || !float.IsFinite(player.Radius) || !float.IsFinite(player.CenterY))
             return [];
-        StyleRoomSet styles = StyleRoomSet.Load(gameData.RootPath, layout.Generator.Style);
+        string? historicalRoot = layout.Content == null ? gameData.RootPath : null;
+        StyleRoomSet styles = historicalRoot != null ? StyleRoomSet.Load(historicalRoot, layout.Generator.Style)
+            : layout.RoomSet ?? throw new InvalidDataException("Accepted dungeon room resources are unavailable.");
         var shapes = styles.All.ToDictionary(shape => shape.RoomId);
         var transitions = layout.FloorTransitions.SelectMany(link => new[] { link.From.RoomIndex, link.To.RoomIndex }).ToHashSet();
         var eligible = dungeon.Placements.Where(placed => shapes.TryGetValue(placed.Template.InstanceId, out RoomShape? shape)
@@ -180,10 +183,13 @@ public static class MissionChestPlacement
         }
         if (wanted == 0)
             return [];
+        var districts = historicalRoot != null
+            ? QuestDungeonPlayfield.LoadStyleDistricts(historicalRoot, layout.Generator.Style, new NLogZoneLogger())
+            : layout.Districts ?? throw new InvalidDataException("Accepted dungeon chest placement districts are unavailable.");
         var searchDetails = diagnostics == null ? null : new List<MissionChestSearchPass>();
         MissionChestPlacementDiagnostics? primaryDiagnostics = diagnostics == null ? null
             : new() { CaptureRouteWitnesses = diagnostics.CaptureRouteWitnesses, CaptureFailureDetails = diagnostics.CaptureFailureDetails };
-        var primary = new PlacementRun(dungeon, layout, simulation, gameData, exclusions, policy.Placement,
+        var primary = new PlacementRun(dungeon, layout, simulation, districts, exclusions, policy.Placement,
             chest, player, random, eligible, primaryDiagnostics, coverSections: false).Select(wanted);
         if (primaryDiagnostics != null)
         {
@@ -200,7 +206,7 @@ public static class MissionChestPlacement
             // Keep one complete validated population; never combine unchecked positions or reroll the count.
             MissionChestPlacementDiagnostics? fallbackDiagnostics = diagnostics == null ? null
                 : new() { CaptureRouteWitnesses = diagnostics.CaptureRouteWitnesses, CaptureFailureDetails = diagnostics.CaptureFailureDetails };
-            var fallback = new PlacementRun(dungeon, layout, simulation, gameData, exclusions, policy.Placement,
+            var fallback = new PlacementRun(dungeon, layout, simulation, districts, exclusions, policy.Placement,
                 chest, player, random, eligible, fallbackDiagnostics, coverSections: true).Select(wanted);
             fallbackCount = fallback.Count;
             if (fallbackDiagnostics != null)
@@ -219,7 +225,7 @@ public static class MissionChestPlacement
             // validated result and stop as soon as this recovery finds a reachable chest.
             MissionChestPlacementDiagnostics? recoveryDiagnostics = diagnostics == null ? null
                 : new() { CaptureRouteWitnesses = diagnostics.CaptureRouteWitnesses, CaptureFailureDetails = diagnostics.CaptureFailureDetails };
-            var recovery = new PlacementRun(dungeon, layout, simulation, gameData, exclusions, policy.Placement,
+            var recovery = new PlacementRun(dungeon, layout, simulation, districts, exclusions, policy.Placement,
                 chest, player, random, eligible, recoveryDiagnostics, coverSections: false).Select(wanted);
             recoveryPrimaryCount = recovery.Count;
             if (recoveryDiagnostics != null)
@@ -230,7 +236,7 @@ public static class MissionChestPlacement
             {
                 recoveryDiagnostics = diagnostics == null ? null
                     : new() { CaptureRouteWitnesses = diagnostics.CaptureRouteWitnesses, CaptureFailureDetails = diagnostics.CaptureFailureDetails };
-                recovery = new PlacementRun(dungeon, layout, simulation, gameData, exclusions, policy.Placement,
+                recovery = new PlacementRun(dungeon, layout, simulation, districts, exclusions, policy.Placement,
                     chest, player, random, eligible, recoveryDiagnostics, coverSections: true).Select(wanted);
                 recoveryFallbackCount = recovery.Count;
                 if (recoveryDiagnostics != null)
@@ -283,12 +289,35 @@ public static class MissionChestPlacement
         return true;
     }
 
+    internal static Func<int, Vector3, string?> CreateObjectiveValidator(DungeonWorldLayout dungeon,
+        DungeonLayout layout, PlayfieldDistrictsData? districts, PlayfieldWorldSimulation simulation,
+        CollisionSphereData? player, MissionChestPlacementPolicy? policy)
+    {
+        if (simulation.Surface == null || policy?.IsValid != true
+            || player is not { Radius: > 0, CenterY: > 0 }
+            || !float.IsFinite(player.Radius) || !float.IsFinite(player.CenterY))
+            return (_, _) => "collision data or placement policy is unavailable";
+
+        var route = new Lazy<(PlacementRun Run, bool[] Reachable)>(() =>
+        {
+            // Use the existing walking simulation without placing or reserving a chest.
+            var run = new PlacementRun(dungeon, layout, simulation, districts, [], policy, player, player,
+                new Random(layout.Seed), [], diagnostics: null, coverSections: true);
+            return (run, run.BuildObjectiveRoutes());
+        });
+        return (room, point) =>
+        {
+            (PlacementRun run, bool[] reachable) = route.Value;
+            return run.ObjectiveFailure(room, point, reachable);
+        };
+    }
+
     sealed class PlacementRun
     {
         readonly DungeonWorldLayout _dungeon;
         readonly DungeonLayout _layout;
         readonly PlayfieldWorldSimulation _world;
-        readonly IGameData _data;
+        readonly PlayfieldDistrictsData? _districts;
         readonly IReadOnlyList<Vector3> _exclusions;
         readonly MissionChestPlacementPolicy _policy;
         readonly CollisionSphereData _chest;
@@ -314,11 +343,11 @@ public static class MissionChestPlacement
         const int MaximumGraphCuts = 64;
 
         internal PlacementRun(DungeonWorldLayout dungeon, DungeonLayout layout, PlayfieldWorldSimulation world,
-            IGameData data, IReadOnlyList<Vector3> exclusions, MissionChestPlacementPolicy policy,
+            PlayfieldDistrictsData? districts, IReadOnlyList<Vector3> exclusions, MissionChestPlacementPolicy policy,
             CollisionSphereData chest, CollisionSphereData player, Random random, HashSet<int> eligible,
             MissionChestPlacementDiagnostics? diagnostics, bool coverSections)
         {
-            _dungeon = dungeon; _layout = layout; _world = world; _data = data; _exclusions = exclusions;
+            _dungeon = dungeon; _layout = layout; _world = world; _districts = districts; _exclusions = exclusions;
             _policy = policy; _chest = chest; _player = player; _random = random;
             _eligible = eligible; _diagnostics = diagnostics;
             _coverSections = coverSections;
@@ -517,6 +546,68 @@ public static class MissionChestPlacement
             return distances;
         }
 
+        internal bool[] BuildObjectiveRoutes()
+        {
+            AddAnchors();
+            if (_start < 0)
+                return [];
+            AddWalkAnchors();
+            return Flood();
+        }
+
+        internal string? ObjectiveFailure(int room, Vector3 point, bool[] reachable)
+        {
+            if ((uint)room >= (uint)_dungeon.Rooms.Count)
+                return "room geometry is missing";
+            if (!Project(point, out Vector3 floor))
+                return "position has no collision floor within the placement probe";
+            if (!OwnFloor(room, floor) || !_dungeon.Rooms[room].Contains(floor))
+                return "collision floor does not belong to the retained room";
+            if (!AtSupportedHeight(point.Y, floor.Y))
+                return "position height is outside the supported floor step";
+            if (!Allowed(point))
+                return "position occupies entrance, doorway or floor-transition clearance";
+            if (!Occupies(floor, _player))
+                return "objective position has insufficient player collision clearance";
+            if (reachable.Length == 0)
+                return "dungeon entrance has no supported walking anchor";
+            if (!_rooms.TryGetValue(room, out var nodes))
+                return "room has no walking anchors";
+
+            float separation = _player.Radius + _policy.CollisionPadding;
+            Vector3 target = point + Vector3.UnitY * _player.CenterY;
+            foreach (int node in nodes)
+                if (reachable[node] && IsObjectiveApproach(_nodes[node].Point))
+                    return null;
+
+            // Reuse the same floor, sweep and room-link checks for short approaches that fall between graph anchors.
+            foreach (Vector3 direction in new[] { Vector3.UnitX, -Vector3.UnitX, Vector3.UnitZ, -Vector3.UnitZ })
+            {
+                Vector3 sample = floor + direction * (separation + _player.Radius);
+                if (!Project(sample, out Vector3 approach) || !IsObjectiveApproach(approach)
+                    || !Occupies(approach, _player))
+                    continue;
+                foreach (int node in nodes)
+                    if (reachable[node] && CanWalkPoints(_nodes[node].Point, approach, room))
+                        return null;
+            }
+            return "no physically connected approach within interaction range";
+
+            bool IsObjectiveApproach(Vector3 approach)
+            {
+                Vector2 offset = new(point.X - approach.X, point.Z - approach.Z);
+                return offset.LengthSquared() >= separation * separation
+                    && AtSupportedHeight(approach.Y, floor.Y)
+                    && Vector3.Distance(point, approach) <= LootableDynel.OpenRange
+                    && OwnFloor(room, approach)
+                    && _world.HasLineOfSight(ToAo(approach + Vector3.UnitY * _player.CenterY), ToAo(target));
+            }
+        }
+
+        // Compare rounded world-coordinate bounds so subtraction cannot reject a point exactly at the authored step.
+        bool AtSupportedHeight(float height, float support)
+            => height >= support - _policy.MaxWalkStep && height <= support + _policy.MaxWalkStep;
+
         void AddAnchors()
         {
             _start = Add(0, ToNumerics(_layout.Spawn));
@@ -524,7 +615,7 @@ public static class MissionChestPlacement
             {
                 _requiredAnchorGroups.Add([_start]);
             }
-            var districts = QuestDungeonPlayfield.LoadStyleDistricts(_data.RootPath, _layout.Generator.Style, new NLogZoneLogger());
+            var districts = _districts;
             if (districts?.Districts != null)
             {
                 var byIndex = districts.Districts.Where(value => value != null).ToDictionary(value => value.DistrictIndex);

@@ -244,6 +244,8 @@
     <Compile Include="FindItemRewardTests.cs" />
     <Compile Include="QuestDungeonDestinationTests.cs" />
     <Compile Include="ProceduralDungeonFoundationTests.cs" />
+    <Compile Include="MissionDungeon*.cs" />
+    <Compile Include="RetainedDungeonContentTests.cs" />
     <Compile Include="HistoricalMissionV1Replay.cs" />
     <Compile Include="MissionDestinationIntegrationTests.cs" />
     <Compile Include="MissionOfferCatalogTests.cs" />

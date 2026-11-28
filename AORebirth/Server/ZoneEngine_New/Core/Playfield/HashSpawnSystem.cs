@@ -172,6 +172,9 @@ namespace ZoneEngine_New.Core.Playfield
 
         internal Func<int, bool>? IsBranchKilled { get; init; }
 
+        /// <summary>Optional mission seed for repeatable radius and heading rolls, independent of surviving branches.</summary>
+        internal int? InitialTransformSeed { get; init; }
+
         /// <summary>A one-shot point whose NPC was killed.</summary>
         internal bool Retired { get; set; }
 
@@ -593,14 +596,15 @@ namespace ZoneEngine_New.Core.Playfield
         /// </summary>
         internal bool AddPlacedDistrictPoint(string hash, PlayfieldDistrictEntry district, Vector3 centre, float radius,
             bool useDistrictLevels, bool respawns, int? requestedLevel = null, MobTemplate[]? frozenTemplates = null,
-            Action<NpcCharacter, int>? onBranchSpawned = null, Func<int, bool>? isBranchKilled = null)
+            Action<NpcCharacter, int>? onBranchSpawned = null, Func<int, bool>? isBranchKilled = null,
+            int? initialTransformSeed = null, bool useRetainedTemplates = false)
         {
             ArgumentNullException.ThrowIfNull(district);
             if (requestedLevel is <= 0)
                 throw new ArgumentOutOfRangeException(nameof(requestedLevel));
             if (frozenTemplates != null && respawns)
                 throw new ArgumentException("Frozen mission branches must be one-shot points.", nameof(respawns));
-            if (frozenTemplates == null && (onBranchSpawned != null || isBranchKilled != null))
+            if (frozenTemplates == null && (onBranchSpawned != null || isBranchKilled != null || useRetainedTemplates))
                 throw new ArgumentException("Mission branch callbacks require frozen templates.", nameof(frozenTemplates));
             if (string.IsNullOrEmpty(hash))
                 return false;
@@ -610,7 +614,7 @@ namespace ZoneEngine_New.Core.Playfield
 
             int minLevel = requestedLevel ?? (useDistrictLevels ? district.NpcMinLevel : 0);
             int maxLevel = requestedLevel ?? (useDistrictLevels ? district.NpcMaxLevel : 0);
-            bool isStatic = _gameData.IsStaticSpawnHash(hash);
+            bool isStatic = !useRetainedTemplates && _gameData.IsStaticSpawnHash(hash);
             if (frozenTemplates != null)
             {
                 if (isStatic || frozenTemplates.Length == 0)
@@ -652,7 +656,8 @@ namespace ZoneEngine_New.Core.Playfield
                 RespawnsAfterDeath = respawns,
                 FrozenTemplates = frozenTemplates == null ? null : (MobTemplate[])frozenTemplates.Clone(),
                 OnBranchSpawned = onBranchSpawned,
-                IsBranchKilled = isBranchKilled
+                IsBranchKilled = isBranchKilled,
+                InitialTransformSeed = initialTransformSeed
             };
             if (AllFrozenBranchesKilled(point))
             {
@@ -958,20 +963,22 @@ namespace ZoneEngine_New.Core.Playfield
         private static void PickSpawnTransform(
             HashSpawnPoint point,
             out Vector3 position,
-            out Quaternion heading)
+            out Quaternion heading,
+            Random? random = null)
         {
-            SpawnSite site = point.Sites[Random.Shared.Next(point.Sites.Length)];
+            random ??= Random.Shared;
+            SpawnSite site = point.Sites[random.Next(point.Sites.Length)];
             heading = SpawnHeading.Sample(
                 site.FacingDegrees,
                 site.WidthDegrees,
-                Random.Shared.NextDouble());
+                random.NextDouble());
             position = site.Centre;
             if (site.Radius <= 0f)
                 return;
 
             // Uniform disk on XZ; Y stays at the site centre.
-            double angle = Random.Shared.NextDouble() * (Math.PI * 2.0);
-            double distance = Math.Sqrt(Random.Shared.NextDouble()) * site.Radius;
+            double angle = random.NextDouble() * (Math.PI * 2.0);
+            double distance = Math.Sqrt(random.NextDouble()) * site.Radius;
             position = new Vector3(
                 site.Centre.xf + (float)(Math.Cos(angle) * distance),
                 site.Centre.yf,
@@ -1018,7 +1025,8 @@ namespace ZoneEngine_New.Core.Playfield
                     continue;
 
                 Metrics.TickStallWatch.Stage("spawn.place", point.CellId);
-                PickSpawnTransform(point, out Vector3 position, out Quaternion heading);
+                Random? transformRoll = point.InitialTransformSeed is int seed ? new Random(unchecked((seed * 397) ^ i)) : null;
+                PickSpawnTransform(point, out Vector3 position, out Quaternion heading, transformRoll);
                 Action<NpcCharacter>? configure = null;
                 GameplayWander? wander = point.Wanders ? _playfield.GetService<GameplaySettings>()?.Wander : null;
                 // A body that cannot move (plants, towers, turrets) stays exactly on its point.

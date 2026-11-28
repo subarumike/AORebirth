@@ -115,6 +115,38 @@ namespace AORebirth.World.Collision
             return true;
         }
 
+        /// <summary>Loads the original room data from a verified immutable asset reader.</summary>
+        public static DungeonStyleCatalog Load(int styleId, Func<string, byte[]> read)
+        {
+            ArgumentNullException.ThrowIfNull(read);
+            PlayfieldMetaData? meta = JsonSerializer.Deserialize<PlayfieldMetaData>(
+                read(GameDataPaths.MetadataFileName), MetaDataJsonOptions);
+            if (meta == null || !meta.IsValid(out _))
+                throw new InvalidDataException("Invalid retained dungeon style metadata for " + styleId + ".");
+            PlayfieldRoomsData? data = JsonSerializer.Deserialize<PlayfieldRoomsData>(
+                read(GameDataPaths.RoomsFileName), MetaDataJsonOptions);
+            IReadOnlyList<StyleRoomTemplate> rooms = MapRoomEntries(data?.Rooms ?? []);
+            if (rooms.Count == 0)
+                throw new InvalidDataException("No retained dungeon rooms for style " + styleId + ".");
+
+            byte[] ground = ReadGrey("GNDA.png");
+            byte[] occupancy = ReadGrey("DCGA.png");
+            IReadOnlyDictionary<int, byte[]> surfaces = MapSurfaceEntries(
+                PlayfieldSurfacesDat.Parse(read(GameDataPaths.SurfacesFileName)));
+            if (surfaces.Count == 0)
+                throw new InvalidDataException("No retained dungeon room surfaces for style " + styleId + ".");
+            return new DungeonStyleCatalog(styleId, meta, ground, occupancy, rooms, surfaces);
+
+            byte[] ReadGrey(string name)
+            {
+                using var stream = new MemoryStream(read(name), writable: false);
+                ImageResult image = ImageResult.FromStream(stream, ColorComponents.Grey);
+                if (image.Width != meta.Width || image.Height != meta.Height)
+                    throw new InvalidDataException("Retained dungeon image dimensions do not match style metadata: " + name);
+                return image.Data;
+            }
+        }
+
         static bool TryReadMetaData(string gameDataRoot, int styleId, out PlayfieldMetaData? meta)
         {
             meta = null;
@@ -208,6 +240,12 @@ namespace AORebirth.World.Collision
                 return map;
             }
 
+            return MapSurfaceEntries(entries);
+        }
+
+        static IReadOnlyDictionary<int, byte[]> MapSurfaceEntries(List<PlayfieldSurfaceEntry> entries)
+        {
+            var map = new Dictionary<int, byte[]>();
             for (int i = 0; i < entries.Count; i++)
             {
                 if (entries[i].Payload == null || entries[i].Payload.Length == 0)

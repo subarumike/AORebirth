@@ -68,7 +68,7 @@ public sealed class ProceduralDungeonFoundationTests
     {
         string path = Path.Combine(RepositoryRoot(), "AORebirth", "Server", "ZoneEngine_New.Tests", "Fixtures", "ProceduralDungeonV2Golden.json");
         using JsonDocument evidence = JsonDocument.Parse(File.ReadAllText(path));
-        var generator = new DungeonLayoutGenerator(RuntimeData.Value, new StubLogger());
+        var generator = new DungeonLayoutGenerator(RuntimeData.Value, new StubLogger(), requireRetainedContent: false);
         foreach (JsonElement row in evidence.RootElement.GetProperty("Layouts").EnumerateArray())
         {
             Assert.IsTrue(generator.TryGenerate(row.GetProperty("Seed").GetInt32(), 2,
@@ -91,7 +91,7 @@ public sealed class ProceduralDungeonFoundationTests
     [DataRow(250, true)]
     public void RuntimeFreezesSoloOrTeamPlanAndRecreatesItsExactLayout(int quality, bool team)
     {
-        var generator = new DungeonLayoutGenerator(RuntimeData.Value, new StubLogger());
+        var generator = new DungeonLayoutGenerator(RuntimeData.Value, new StubLogger(), requireRetainedContent: false);
         var parameters = new QuestDungeonParameters
         {
             Seed = 12345, Quality = quality, EntranceInstance = unchecked((int)0xC00001F9),
@@ -105,7 +105,7 @@ public sealed class ProceduralDungeonFoundationTests
         Assert.IsTrue(generator.TryGenerate(parameters, out DungeonLayout original));
         Assert.IsTrue(QuestDungeonParameters.TryParse(frozen, out QuestDungeonParameters restored));
         Assert.AreEqual(frozen, restored.ToJson());
-        Assert.IsTrue(new DungeonLayoutGenerator(RuntimeData.Value, new StubLogger()).TryGenerate(restored, out DungeonLayout replay));
+        Assert.IsTrue(new DungeonLayoutGenerator(RuntimeData.Value, new StubLogger(), requireRetainedContent: false).TryGenerate(restored, out DungeonLayout replay));
         CollectionAssert.AreEqual(original.GeneratorPayload, replay.GeneratorPayload);
         Assert.AreEqual(original.BossRoomIndex, replay.BossRoomIndex);
         Assert.AreEqual(original.FloorTransitions.Count, replay.FloorTransitions.Count);
@@ -131,7 +131,7 @@ public sealed class ProceduralDungeonFoundationTests
     [DataRow("scopeMismatch")]
     public void V3StoredParametersRejectInvalidOrMismatchedPlans(string invalid)
     {
-        var generator = new DungeonLayoutGenerator(RuntimeData.Value, new StubLogger());
+        var generator = new DungeonLayoutGenerator(RuntimeData.Value, new StubLogger(), requireRetainedContent: false);
         var parameters = new QuestDungeonParameters
         {
             Seed = 42, Quality = 2, EntranceInstance = unchecked((int)0xC00001F9),
@@ -156,7 +156,7 @@ public sealed class ProceduralDungeonFoundationTests
             + (QuestDungeonIds.FirstPlayfield + 101) + ",\"EntranceInstance\":-1073741319}";
         Assert.IsTrue(QuestDungeonParameters.TryParse(historical, out QuestDungeonParameters parameters));
         Assert.IsNull(parameters.LayoutPlan);
-        var generator = new DungeonLayoutGenerator(RuntimeData.Value, new StubLogger());
+        var generator = new DungeonLayoutGenerator(RuntimeData.Value, new StubLogger(), requireRetainedContent: false);
         Assert.IsTrue(generator.TryGenerate(parameters, out DungeonLayout restored));
         Assert.IsTrue(generator.TryGenerate(42, 2, parameters.EntranceInstance, out DungeonLayout original));
         CollectionAssert.AreEqual(original.GeneratorPayload, restored.GeneratorPayload);
@@ -169,7 +169,7 @@ public sealed class ProceduralDungeonFoundationTests
             + (QuestDungeonIds.FirstPlayfield + 101) + ",\"EntranceInstance\":-1073741319}";
         Assert.IsTrue(QuestDungeonParameters.TryParse(stored, out QuestDungeonParameters parameters));
         string normalized = parameters.ToJson();
-        var generator = new DungeonLayoutGenerator(RuntimeData.Value, new StubLogger());
+        var generator = new DungeonLayoutGenerator(RuntimeData.Value, new StubLogger(), requireRetainedContent: false);
         Assert.IsFalse(generator.TryGenerate(parameters, out DungeonLayout layout));
         Assert.IsNull(layout);
         Assert.IsFalse(generator.TryGenerate(parameters.Seed, parameters.GeneratorVersion, parameters.EntranceInstance, out _));

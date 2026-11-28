@@ -18,6 +18,10 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
 
         public DungeonLayoutPlan? LayoutPlan { get; set; }
 
+        /// <summary>Absent on older V3 records. New missions use the exact retained resources for their selected style.</summary>
+        [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+        public DungeonContentReference? Content { get; set; }
+
         /// <summary>The exact Find Item instance and placement selected before acceptance commits.</summary>
         public MissionItemObjectiveBinding? ObjectiveItem { get; set; }
 
@@ -89,6 +93,10 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                 QuestDungeonParameters? parsed = JsonSerializer.Deserialize<QuestDungeonParameters>(json, JsonOptions);
                 if (parsed == null || parsed.GeneratorVersion <= 0 || !QuestDungeonIds.IsDungeonPlayfield(parsed.DungeonPlayfield)
                     || parsed.EntranceType != (int)IdentityType.MissionEntrance
+                    || (parsed.Content != null && (!parsed.Content.IsValid
+                        || parsed.GeneratorVersion != DungeonLayoutGenerator.CurrentVersion
+                        || parsed.Content.StyleId != parsed.LayoutPlan?.StyleId
+                        || !parsed.HasFrozenObjectiveBindings()))
                     || (parsed.ObjectiveItem != null && !parsed.ObjectiveItem.IsValid)
                     || (parsed.ObjectiveTool != null && (!parsed.ObjectiveTool.IsValid || !parsed.ObjectiveTool.IsSourceItem))
                     || (parsed.ObjectiveNpc != null && !parsed.ObjectiveNpc.IsValid)
@@ -108,5 +116,15 @@ namespace ZoneEngine_New.Core.Quests.Dungeons
                 return false;
             }
         }
+
+        bool HasFrozenObjectiveBindings() => MissionType switch
+        {
+            0 or 1 => ObjectiveNpc != null && ObjectiveItem == null && ObjectiveTool == null,
+            2 or 4 => ObjectiveNpc == null && ObjectiveItem is { IsSourceItem: false } && ObjectiveTool == null,
+            3 => ObjectiveNpc == null && ObjectiveItem is { IsSourceItem: false } && ObjectiveTool is { IsSourceItem: true }
+                && ObjectiveItem.OwnerId == ObjectiveTool.OwnerId && ObjectiveItem.Instance != ObjectiveTool.Instance
+                && string.Equals(ObjectiveItem.QuestId, ObjectiveTool.QuestId, System.StringComparison.Ordinal),
+            _ => false
+        };
     }
 }

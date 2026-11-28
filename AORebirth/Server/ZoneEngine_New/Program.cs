@@ -395,7 +395,9 @@ namespace ZoneEngine_New
             services.AddSingleton<IMissionAcceptanceModule, MissionAcceptanceModule>();
             services.AddSingleton<IMissionObjectiveModule>(provider => provider.GetRequiredService<QuestService>().MissionObjectives);
             services.AddSingleton<IGeneratedMissionLifecycleModule, GeneratedMissionLifecycleModule>();
-            services.AddSingleton<ZoneEngine_New.Core.Quests.Dungeons.DungeonLayoutGenerator>();
+            services.AddSingleton<IMissionDungeonGenerator, DungeonLayoutGenerator>();
+            services.AddSingleton<IMissionDungeonPopulationModule>(_ => MissionDungeonPopulationModule.Shared);
+            services.AddSingleton<IMissionDungeonObjectivePlacement, DungeonObjectivePlacement>();
             services.AddSingleton(provider =>
             {
                 _ = provider.GetRequiredService<ContentSnapshot<MissionContent>>();

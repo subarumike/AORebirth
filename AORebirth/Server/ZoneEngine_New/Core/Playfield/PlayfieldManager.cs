@@ -23,6 +23,7 @@ namespace ZoneEngine_New.Core.Playfield
     using ZoneEngine_New.Core.Trade;
     using ZoneEngine_New.Core.Teams;
     using ZoneEngine_New.Core.Missions;
+    using ZoneEngine_New.Core.Quests.Dungeons;
     using ZoneEngine_New.Core.WorldSimulation;
     using ZoneEngine.Core.Missions;
     using AORebirth.Interfaces.Persistence.Missions;
@@ -61,6 +62,8 @@ namespace ZoneEngine_New.Core.Playfield
         private readonly CharacterSnapshotService _characterSnapshot;
         private readonly IPlayfieldMetricsRegistry _metricsRegistry;
         private readonly IShopDao _shopDao;
+        private readonly IMissionDungeonPopulationModule _dungeonPopulation;
+        private readonly IMissionDungeonObjectivePlacement _dungeonObjectives;
         private readonly ZoneEngine_New.Core.World.CrossInstanceTransfer? _crossInstance;
         private bool _disposed;
 
@@ -94,7 +97,9 @@ namespace ZoneEngine_New.Core.Playfield
             ZoneEngine_New.Core.Organizations.OrgMembershipService? orgMembership = null,
             ZoneEngine_New.Core.Characters.CharacterPlayedClock? playedClock = null,
             ZoneEngine_New.Core.Organizations.OrgTaxTickService? orgTax = null,
-            Quests.IGeneratedMissionLifecycleModule? missionLifecycle = null)
+            Quests.IGeneratedMissionLifecycleModule? missionLifecycle = null,
+            IMissionDungeonPopulationModule? dungeonPopulation = null,
+            IMissionDungeonObjectivePlacement? dungeonObjectives = null)
         {
             World = world;
             _crossInstance = crossInstance;
@@ -105,6 +110,8 @@ namespace ZoneEngine_New.Core.Playfield
             PlayedClock = playedClock;
             QuestDungeons = questDungeons;
             MissionLifecycle = missionLifecycle;
+            _dungeonPopulation = dungeonPopulation ?? MissionDungeonPopulationModule.Shared;
+            _dungeonObjectives = dungeonObjectives ?? new DungeonObjectivePlacement();
             Knubot = knubot;
             Gameplay = gameplay;
             ModuleEvents = modules?.Count > 0 ? modules.Events : null;
@@ -682,7 +689,8 @@ namespace ZoneEngine_New.Core.Playfield
             Func<Player, MissionObjectiveItem, bool>? collectObjective = null,
             ZoneEngine_New.Core.Quests.Dungeons.MissionNpcObjectiveBinding? npcObjective = null,
             ZoneEngine_New.Core.Quests.Dungeons.MissionTokenProgress? tokenProgress = null, bool spawnNpcObjective = true,
-            ZoneEngine_New.Core.Quests.Dungeons.MissionChestPopulation? chestPopulation = null)
+            ZoneEngine_New.Core.Quests.Dungeons.MissionChestPopulation? chestPopulation = null,
+            QuestDungeonParameters? acceptedParameters = null)
         {
             ArgumentNullException.ThrowIfNull(questId);
             ArgumentNullException.ThrowIfNull(layout);
@@ -704,7 +712,7 @@ namespace ZoneEngine_New.Core.Playfield
             QuestDungeonPlayfield created = new(playfieldId, questId, layout, entrance, targetHash, quality, _logger.CreateForPlayfield(playfieldId),
                 _router, this, _playerHydrator, _gameData, _items, _hashItems, _inventoryRepository, _instanceIds,
                 _inventoryMoves, _inventoryFlush, _trades, _characterSnapshot, _metricsRegistry, _shopDao, objectiveItem, collectObjective, npcObjective,
-                tokenProgress, spawnNpcObjective, chestPopulation);
+                tokenProgress, spawnNpcObjective, chestPopulation, _dungeonPopulation, _dungeonObjectives, acceptedParameters);
             try
             {
                 created.Build();

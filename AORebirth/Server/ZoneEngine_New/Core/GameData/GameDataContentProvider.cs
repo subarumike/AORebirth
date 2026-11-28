@@ -239,6 +239,24 @@ internal sealed class GameDataContentProvider
         return new(null, new(file.RelativePath, ContentFileSource.Missing, null));
     }
 
+    internal static GameDataContentProvider ForBaseRoot(string path)
+    {
+        string root = Path.GetFullPath(path);
+        GameDataContentProvider provider = Runtime;
+        return string.Equals(provider._root, root, PathComparison) ? provider : new GameDataContentProvider(root);
+    }
+
+    static StringComparison PathComparison => OperatingSystem.IsWindows()
+        ? StringComparison.OrdinalIgnoreCase : StringComparison.Ordinal;
+
+    internal static byte[]? ReadCanonicalFile(string root, string relativePath)
+    {
+        if (!IsRelative(relativePath))
+            throw new InvalidDataException("Invalid canonical GameData path: " + relativePath);
+
+        return Read(root, relativePath);
+    }
+
     static byte[]? Read(string root, string relativePath)
     {
         string current = root;

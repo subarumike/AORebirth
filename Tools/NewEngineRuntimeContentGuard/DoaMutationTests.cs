@@ -45,6 +45,7 @@ internal static class DoaMutationTests
             ("mission transaction service boundary", CheckTransactionBoundary),
             ("mission acceptance and objective transaction owners", CheckMissionTransactionOwners),
             ("mission module access boundaries", CheckMissionModuleAccess),
+            ("dungeon generation and reconstruction ownership", CheckDungeonModuleBoundaries),
             ("internal module dependencies", CheckModuleDependencies),
             ("project dependency boundary", CheckProjects),
             ("unchanged and introduced findings", CheckDiff),
@@ -153,6 +154,23 @@ internal static class DoaMutationTests
         Block("interface ITerminalQuestSpareDao { void Save(); }", "DOA_COMPETING_PERSISTENCE");
         Block("class AddedDbContext : DbContext {}", "DOA_COMPETING_PERSISTENCE");
         Require(!Rules("interface IMissionTerminalModule { void Roll(); }").Any());
+    }
+
+    private static void CheckDungeonModuleBoundaries()
+    {
+        const string service = "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/QuestDungeonService.cs";
+        const string world = "AORebirth/Server/ZoneEngine_New/Core/Playfield/QuestDungeonPlayfield.cs";
+        const string implementation = "AORebirth/Server/ZoneEngine_New/Core/Quests/Dungeons/DungeonLayoutGenerator.cs";
+        Require(DoaRules.SourceIssues(service, Parse("using Builder = DungeonGenerator; class Probe { Builder Open() => new Builder(root); }"))
+            .Any(issue => issue.Rule == "DOA_COMPETING_DUNGEON_GENERATION"));
+        Require(DoaRules.SourceIssues(world, Parse("class Probe { object Restore() => DungeonCollisionBuilder.BuildLayout(currentRoot, generator); }"))
+            .Any(issue => issue.Rule == "DOA_UNVERSIONED_DUNGEON_INPUT"));
+        Require(DoaRules.SourceIssues(service, Parse("class DungeonLayoutGenerator {}"))
+            .Any(issue => issue.Rule == "DOA_COMPETING_DUNGEON_GENERATION"));
+        Require(!DoaRules.SourceIssues(implementation, Parse("class DungeonLayoutGenerator { object Open() => new DungeonGenerator(assets); }"))
+            .Any(issue => issue.Rule == "DOA_COMPETING_DUNGEON_GENERATION"));
+        Require(!DoaRules.SourceIssues(service, Parse("class Probe(IMissionDungeonGenerator generator) { bool Open() => generator.TryGenerate(accepted, out _); }"))
+            .Any());
     }
 
     private static void CheckMissionDispatch()

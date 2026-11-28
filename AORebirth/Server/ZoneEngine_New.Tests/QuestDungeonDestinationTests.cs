@@ -933,7 +933,7 @@ public sealed class QuestDungeonDestinationTests
         internal readonly Session Session = new();
         internal readonly QuestStore Store = new();
         internal readonly OfferDao Offers = new();
-        internal readonly DungeonLayoutGenerator Layouts;
+        internal DungeonLayoutGenerator Layouts { get; private set; }
         internal readonly PlayfieldManager Manager;
         internal readonly GeneratedMissionOffer Offer;
         internal readonly Persistence Persistence = new();
@@ -946,6 +946,9 @@ public sealed class QuestDungeonDestinationTests
         readonly InventoryFlushService _flush;
         readonly InventoryActionService _actions;
         readonly QuestService _quests;
+        readonly bool _enableMissionPopulationPersistence;
+        internal Action<DungeonLayoutPlan>? ConfigureTestPlan { get; set; }
+        internal int? TestSeed { get; set; }
         internal QuestService Quests => _quests;
         internal IItemBuilder Items => _items;
         internal IReadOnlyList<string> Information => _logger.Information;
@@ -957,8 +960,10 @@ public sealed class QuestDungeonDestinationTests
         internal Fixture(IMissionDao? completionDao = null, IItemBuilder? items = null, Func<DateTime>? now = null,
             CharacterSnapshotService? snapshots = null, IItemTemplateCatalog? templates = null,
             IInventoryRepository? inventory = null, IItemInstanceIdAllocator? ids = null, int playerId = 77,
-            bool enableMissionPopulationPersistence = false, GeneratedMissionOffer? rolledOffer = null)
+            bool enableMissionPopulationPersistence = false, GeneratedMissionOffer? rolledOffer = null,
+            DungeonLayoutGenerator? layouts = null)
         {
+            _enableMissionPopulationPersistence = enableMissionPopulationPersistence;
             Player = TestWorld.CreatePlayer(playerId);
             _templates = templates ?? new StubCatalog();
             _ids = ids ?? new StubInstanceIdAllocator();
@@ -992,17 +997,8 @@ public sealed class QuestDungeonDestinationTests
             _actions = new InventoryActionService(Persistence, _flush, _ids, _logger);
             _quests = new QuestService(new QuestCatalog(RuntimeData.Value, _logger), Store, _items, _flush, _logger,
                 now ?? (() => DateTime.UtcNow), completionDao, snapshots);
-            Layouts = new DungeonLayoutGenerator(RuntimeData.Value, _logger);
+            Layouts = layouts ?? new DungeonLayoutGenerator(RuntimeData.Value, _logger, requireRetainedContent: false);
             Assert.IsTrue(Layouts.IsAvailable, "Existing runtime GameData must contain the configured procedural styles. Root=" + RuntimeData.Value.RootPath + "; " + _logger.Errors);
-            if (!enableMissionPopulationPersistence)
-            {
-                // Destination and independent reward fixtures do not own persisted NPC/chest populations.
-                // Integrated objective fixtures opt into the configured population owners explicitly.
-                object policy = typeof(DungeonLayoutGenerator).GetField("_policy", BindingFlags.Instance | BindingFlags.NonPublic)!
-                    .GetValue(Layouts)!;
-                policy.GetType().GetProperty("TokenReward")!.SetValue(policy, null);
-                policy.GetType().GetProperty("Chests")!.SetValue(policy, null);
-            }
             var minter = new HashItemMinter(RuntimeData.Value, _templates, _items);
             var authored = new AuthoredQuestService(null!, _flush, _items, _templates, _ids,
                 new AuthoredQuestCatalog(new InteractionContent()), _logger);
@@ -1110,14 +1106,43 @@ public sealed class QuestDungeonDestinationTests
             }
         }
 
-        internal void RestartService()
+        internal void RestartService(DungeonLayoutGenerator? layouts = null)
         {
             Service?.Dispose();
-            Service = new QuestDungeonService(Store, _quests, Catalog.Value, Layouts, Offers, _items, _ids,
+            if (layouts != null)
+                Layouts = layouts;
+            Service = new QuestDungeonService(Store, _quests, Catalog.Value, new TestDungeonGenerator(this), Offers, _items, _ids,
                 _flush, _actions, new Lazy<PlayfieldManager>(() => Manager), RuntimeData.Value, Keys, _logger,
                 new HashItemMinter(RuntimeData.Value, _templates, _items));
             Lifecycle = new GeneratedMissionLifecycleModule(_quests, Service, Offers, new Lazy<PlayfieldManager>(() => Manager), _logger);
         }
+        // Test-only adjustments are made to the accepted plan. A shared provider snapshot is never mutated.
+        sealed class TestDungeonGenerator(Fixture fixture) : IMissionDungeonGenerator
+        {
+            public bool IsAvailable => fixture.Layouts.IsAvailable;
+            public DungeonFindItemPolicy? FindItemPolicy => fixture.Layouts.FindItemPolicy;
+            public DungeonFindItemPolicy? ReturnItemPolicy => fixture.Layouts.ReturnItemPolicy;
+            public DungeonRepairMachinePolicy? RepairMachinePolicy => fixture.Layouts.RepairMachinePolicy;
+            public DungeonNpcObjectivePolicy? NpcObjectivePolicy => fixture.Layouts.NpcObjectivePolicy;
+            public MissionChestPolicy? ChestPolicy => fixture._enableMissionPopulationPersistence ? fixture.Layouts.ChestPolicy : null;
+
+            public bool ConfigureNewDungeon(QuestDungeonParameters parameters, bool team)
+            {
+                if (fixture.TestSeed is int seed)
+                    parameters.Seed = seed;
+                if (!fixture.Layouts.ConfigureNewDungeon(parameters, team))
+                    return false;
+                if (!fixture._enableMissionPopulationPersistence)
+                    parameters.TokenReward = null;
+                if (!team && parameters.LayoutPlan is { } plan)
+                    fixture.ConfigureTestPlan?.Invoke(plan);
+                return true;
+            }
+
+            public bool TryGenerate(QuestDungeonParameters parameters, out DungeonLayout layout)
+                => fixture.Layouts.TryGenerate(parameters, out layout);
+        }
+
         public void Dispose() { Service?.Dispose(); Manager.Dispose(); _flush.Dispose(); }
     }
 

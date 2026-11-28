@@ -71,14 +71,22 @@ namespace AORebirth.DungeonGenerator
         {
             ArgumentException.ThrowIfNullOrWhiteSpace(gameDataRoot);
             string path = Path.Combine(gameDataRoot, FileName);
+            if (!File.Exists(path))
+                return new DungeonEntranceMap(new Dictionary<int, int>(), new HashSet<int>());
+
+            return Parse(JsonSerializer.Deserialize<EntrancesFile>(File.ReadAllText(path), JsonOptions), styleId);
+        }
+
+        static readonly JsonSerializerOptions JsonOptions = new() { PropertyNameCaseInsensitive = true };
+
+        public static DungeonEntranceMap Parse(ReadOnlySpan<byte> data, int styleId)
+            => Parse(JsonSerializer.Deserialize<EntrancesFile>(data, JsonOptions), styleId);
+
+        static DungeonEntranceMap Parse(EntrancesFile? file, int styleId)
+        {
             var exits = new Dictionary<int, int>();
             var mainHalls = new HashSet<int>();
             DungeonTransitionMap? transitions = null;
-            if (!File.Exists(path))
-                return new DungeonEntranceMap(exits, mainHalls);
-
-            EntrancesFile? file = JsonSerializer.Deserialize<EntrancesFile>(File.ReadAllText(path),
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
             foreach (StyleRow style in file?.Styles ?? [])
             {
                 if (style?.Style != styleId)

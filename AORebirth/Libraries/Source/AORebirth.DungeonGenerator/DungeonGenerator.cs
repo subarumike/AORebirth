@@ -135,6 +135,21 @@ namespace AORebirth.DungeonGenerator
         public DungeonGenerationResult Generate(DungeonGenerationRequest request)
         {
             ArgumentNullException.ThrowIfNull(request);
+            return Generate(request, () => LoadStyle(request.StyleId));
+        }
+
+        public static DungeonGenerationResult Generate(DungeonGenerationRequest request, StyleRoomSet style)
+        {
+            ArgumentNullException.ThrowIfNull(request);
+            ArgumentNullException.ThrowIfNull(style);
+            if (request.StyleId != style.StyleId)
+                throw new ArgumentException("Dungeon request and retained style do not match.", nameof(style));
+
+            return Generate(request, () => style);
+        }
+
+        static DungeonGenerationResult Generate(DungeonGenerationRequest request, Func<StyleRoomSet> loadStyle)
+        {
             if (request.FloorHeight < 0 || request.FloorHeight > ushort.MaxValue)
                 throw new ArgumentOutOfRangeException(nameof(request.FloorHeight));
             if (request.BossFloor && (!request.UseFloorTransitions || request.FloorCount < 2))
@@ -144,7 +159,7 @@ namespace AORebirth.DungeonGenerator
             int floors = Math.Clamp(request.FloorCount, 1, MaxFloors);
             int floorSize = Math.Clamp(request.FloorSize, MinFloorSize, MaxFloorSize);
             int grid = GridSize(floorSize);
-            StyleRoomSet style = LoadStyle(request.StyleId);
+            StyleRoomSet style = loadStyle();
             if (request.UseFloorTransitions && floors > 1)
                 style.ValidateTransitionRoles(floors, request.BossFloor);
 
@@ -728,7 +743,14 @@ namespace AORebirth.DungeonGenerator
         public static StyleRoomSet Load(string gameDataRoot, int styleId)
         {
             DungeonStyleCatalog catalog = DungeonStyleCatalog.Load(gameDataRoot, styleId);
-            DungeonEntranceMap map = DungeonEntranceMap.Load(gameDataRoot, styleId);
+            return Load(catalog, DungeonEntranceMap.Load(gameDataRoot, styleId));
+        }
+
+        public static StyleRoomSet Load(DungeonStyleCatalog catalog, DungeonEntranceMap map)
+        {
+            ArgumentNullException.ThrowIfNull(catalog);
+            ArgumentNullException.ThrowIfNull(map);
+            int styleId = catalog.StyleId;
             var shapes = catalog.Rooms
                 .Select(room => RoomShape.FromTemplate(room, catalog.Dcga, catalog.MapWidth, catalog.MapHeight).WithEntranceMap(map.ExitDoors))
                 .ToList();

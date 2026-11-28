@@ -30,7 +30,7 @@ public sealed class MissionTokenProgress
     readonly string _questId;
     readonly long _assignedAtTicks;
     readonly MissionTokenRewardPolicy _policy;
-    readonly Dictionary<string, PopulationBranch> _storedBranches = new(StringComparer.Ordinal);
+    readonly Dictionary<string, PopulationBranch[]> _storedPoints;
     readonly Dictionary<string, PopulationBranch> _census = new(StringComparer.Ordinal);
     readonly Dictionary<string, SpawnPoint> _points = new(StringComparer.Ordinal);
     readonly HashSet<string> _killed = new(StringComparer.Ordinal);
@@ -43,6 +43,7 @@ public sealed class MissionTokenProgress
     bool _excludeObjectiveFromChance;
 
     public bool RequiresReconstruction { get; private set; }
+    internal bool HasStoredCensus => _hasStoredCensus;
 
     sealed class PopulationBranch
     {
@@ -81,6 +82,7 @@ public sealed class MissionTokenProgress
         MissionCharacterSnapshotData snapshot = _dao.ReadCharacter(ownerId);
         string prefix = RunPrefix(assignedAtTicks);
         _hasStoredCensus = snapshot.Flags.Any(flag => flag.QuestId == questId && flag.FlagKey == prefix + "sealed");
+        var storedBranches = new Dictionary<string, PopulationBranch>(StringComparer.Ordinal);
         foreach (MissionFlagData flag in snapshot.Flags.Where(flag => flag.QuestId == questId))
         {
             if (flag.FlagKey.StartsWith(prefix + "spawn:", StringComparison.Ordinal))
@@ -90,17 +92,26 @@ public sealed class MissionTokenProgress
                     || string.IsNullOrEmpty(branch.Hash) || string.IsNullOrEmpty(branch.FamilyHash)
                     || flag.FlagKey != prefix + "spawn:" + branch.Slot)
                     throw new InvalidDataException("The accepted mission population has an invalid branch.");
-                _storedBranches.Add(branch.Slot, branch);
+                storedBranches.Add(branch.Slot, branch);
             }
             else if (flag.FlagKey.StartsWith(prefix + "dead:", StringComparison.Ordinal) && flag.Value == "1")
             {
                 _killed.Add(flag.FlagKey[(prefix.Length + "dead:".Length)..]);
             }
         }
-        if (!_hasStoredCensus && (_storedBranches.Count != 0 || _killed.Count != 0))
+        if (!_hasStoredCensus && (storedBranches.Count != 0 || _killed.Count != 0))
             throw new InvalidDataException("The accepted mission population was not sealed.");
-        if (_killed.Any(slot => !_storedBranches.ContainsKey(slot)))
+        if (_killed.Any(slot => !storedBranches.ContainsKey(slot)))
             throw new InvalidDataException("The accepted mission has a kill outside its frozen population.");
+        if (_hasStoredCensus)
+        {
+            MissionObjectiveProgressData? progress = snapshot.Objectives.FirstOrDefault(row =>
+                row.QuestId == questId && row.ObjectiveId == prefix + "population");
+            if (progress == null || progress.RequiredCount != storedBranches.Count || progress.Progress != _killed.Count)
+                throw new InvalidDataException("The accepted mission kill counters do not match its frozen population and kill markers.");
+        }
+        _storedPoints = storedBranches.Values.GroupBy(branch => branch.Point, StringComparer.Ordinal)
+            .ToDictionary(group => group.Key, group => group.OrderBy(branch => branch.Ordinal).ToArray(), StringComparer.Ordinal);
     }
 
     internal void Attach(QuestDungeonPlayfield world, IZoneLogger logger)
@@ -111,7 +122,8 @@ public sealed class MissionTokenProgress
         _logger = logger;
     }
 
-    internal SpawnPoint? ResolvePoint(string key, string familyHash, int level, IGameData gameData)
+    internal SpawnPoint? ResolvePoint(string key, string familyHash, int level, IGameData gameData,
+        NpcTemplateCatalog? retainedTemplates = null, int? selectionSeed = null)
     {
         if (_sealed)
             throw new InvalidOperationException("The mission population is already sealed.");
@@ -121,9 +133,7 @@ public sealed class MissionTokenProgress
         MobTemplate[] templates;
         if (_hasStoredCensus)
         {
-            PopulationBranch[] branches = _storedBranches.Values.Where(branch => branch.Point == key)
-                .OrderBy(branch => branch.Ordinal).ToArray();
-            if (branches.Length == 0)
+            if (!_storedPoints.TryGetValue(key, out PopulationBranch[]? branches))
                 return null;
             familyHash = branches[0].FamilyHash;
             level = branches[0].Level;
@@ -131,8 +141,10 @@ public sealed class MissionTokenProgress
             for (int i = 0; i < branches.Length; i++)
             {
                 PopulationBranch branch = branches[i];
-                if (branch.Ordinal != i || branch.Level != level || branch.FamilyHash != familyHash
-                    || !gameData.TryResolveMobTemplate(branch.Hash, level, out MobTemplate template)
+                bool resolved = retainedTemplates == null
+                    ? gameData.TryResolveMobTemplate(branch.Hash, level, out MobTemplate template)
+                    : retainedTemplates.TryResolve(branch.Hash, level, out template);
+                if (branch.Ordinal != i || branch.Level != level || branch.FamilyHash != familyHash || !resolved
                     || template.Hash != branch.Hash || template.UnresolvedPlaceholder || !NpcTemplateValidation.CanSpawn(template))
                     throw new InvalidDataException("A frozen mission NPC branch is unavailable.");
                 templates[i] = template;
@@ -141,7 +153,14 @@ public sealed class MissionTokenProgress
         else
         {
             var resolved = new List<MobTemplate>();
-            gameData.CollectMobSpawns(familyHash, level, resolved);
+            if (retainedTemplates == null)
+            {
+                gameData.CollectMobSpawns(familyHash, level, resolved);
+            }
+            else
+            {
+                retainedTemplates.CollectSpawns(familyHash, level, resolved, selectionSeed is int seed ? new Random(seed) : null);
+            }
             templates = resolved.Where(template => !template.UnresolvedPlaceholder && NpcTemplateValidation.CanSpawn(template)).ToArray();
             if (templates.Length == 0)
                 return null;
@@ -164,11 +183,11 @@ public sealed class MissionTokenProgress
         }
     }
 
-    internal void RegisterObjective(MissionNpcObjectiveBinding binding, IGameData gameData)
+    internal void RegisterObjective(MissionNpcObjectiveBinding binding, IGameData gameData, NpcTemplateCatalog? retainedTemplates = null)
     {
         if (!binding.IsValid || binding.OwnerId != _ownerId || binding.QuestId != _questId)
             throw new InvalidDataException("The mission population's objective binding is invalid.");
-        SpawnPoint? point = ResolvePoint("objective", binding.NpcHash, binding.Quality, gameData);
+        SpawnPoint? point = ResolvePoint("objective", binding.NpcHash, binding.Quality, gameData, retainedTemplates);
         if (point == null || point.Templates.Length != 1 || point.Templates[0].Hash != binding.NpcHash
             || point.Level != binding.Quality)
             throw new InvalidDataException("The exact accepted mission objective NPC is unavailable.");
@@ -209,6 +228,8 @@ public sealed class MissionTokenProgress
                 (int killed, int total) = ReadCounts(tx, _questId, _assignedAtTicks);
                 if (sealedFlag.Value != fingerprint || total != _census.Count)
                     throw new InvalidDataException("The rebuilt mission population differs from its frozen census.");
+                if (killed != _killed.Count)
+                    throw new InvalidDataException("The accepted mission recorded a kill during population reconstruction. Retry entry to restore current progress.");
                 return true;
             }
             if (quest.State != (int)QuestState.Active || quest.Progress >= quest.RequiredCount || quest.ExpiresAtUtcTicks <= DateTime.UtcNow.Ticks)

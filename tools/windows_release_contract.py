@@ -182,6 +182,19 @@ def runtime_content_path(value):
     if value in RUNTIME_ROOT_CATALOGS or value in PRIVATE_CHEST_CATALOGS or value == "Teams/LevelEligibility.json":
         return True
     if parts[0] == "Missions":
+        if parts[1:2] == ("DungeonContent",):
+            if parts[2:] == ("Current.json",):
+                return True
+            if parts[2:3] == ("NpcCatalog",):
+                return (len(parts) == 5 and re.fullmatch(r"[0-9a-f]{64}", parts[3]) is not None
+                        and parts[4] in {"NpcTemplates.json", "MonsterCombatRules.json"})
+            if len(parts) < 4 or not re.fullmatch(r"[0-9a-f]{64}", parts[2]):
+                return False
+            if len(parts) == 4:
+                return parts[3] in {"DungeonGeneration.json", "DungeonDoorStyles.json",
+                                    "DungeonEntrances.json", "DynelCollision.json", "NpcCatalog.json"}
+            return (len(parts) == 6 and parts[3] == "Playfields" and re.fullmatch(r"[1-9][0-9]*", parts[4])
+                    and parts[5] in {"metadata.json", "Rooms.json", "Districts.json", "Surfaces.dat", "DCGA.png", "GNDA.png"})
         return "/".join(parts[1:]) in RUNTIME_MISSION_FILES
     if parts[0] in ("Knubot", "NpcScripts"):
         return len(parts) >= 2 and parts[-1].endswith(".json")

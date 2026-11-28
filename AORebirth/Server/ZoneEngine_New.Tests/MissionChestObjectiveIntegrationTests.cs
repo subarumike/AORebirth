@@ -3,12 +3,14 @@ namespace ZoneEngine_New.Tests;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using AORebirth.Core.GameData;
 using AORebirth.Enums;
 using AORebirth.Interfaces.Persistence.Missions;
 using SmokeLounge.AOtomation.Messaging.GameData;
@@ -289,8 +291,30 @@ public sealed class MissionChestObjectiveIntegrationTests
     [DataRow(3)]
     [DataRow(4)]
     public void RolledObjectiveCompletesFromActualContentAndPaysOnceBeforeCleanup(int missionType)
+        => VerifyRolledObjectiveLifecycle(missionType);
+
+    [TestMethod]
+    [TestCategory("MissionRetainedObjectiveLifecycle")]
+    [DataRow(0)]
+    [DataRow(1)]
+    [DataRow(2)]
+    [DataRow(3)]
+    [DataRow(4)]
+    public void RolledObjectiveRestoresFromRetainedContentBeforeCompletingAcrossRevisions(int missionType)
     {
-        using var run = new ObjectiveRun(missionType, fromRoll: true);
+        string? root = Environment.GetEnvironmentVariable("AO_REBIRTH_DUNGEON_TEST_ROOT");
+        string? restart = Environment.GetEnvironmentVariable("AO_REBIRTH_DUNGEON_TEST_RESTART_ROOT");
+        if (string.IsNullOrWhiteSpace(root) || string.IsNullOrWhiteSpace(restart))
+            Assert.Inconclusive("The retained objective cohort requires both staged private GameData revisions.");
+
+        Assert.AreNotEqual(Path.GetFullPath(root!), Path.GetFullPath(restart!));
+        VerifyRolledObjectiveLifecycle(missionType, CreateRetainedGenerator(root!), CreateRetainedGenerator(restart!));
+    }
+
+    void VerifyRolledObjectiveLifecycle(int missionType, DungeonLayoutGenerator? originalGenerator = null,
+        DungeonLayoutGenerator? restartGenerator = null)
+    {
+        using var run = new ObjectiveRun(missionType, fromRoll: true, retainedLayouts: originalGenerator);
         var f = run.Fixture;
         var quest = run.Quest;
         var accepted = f.Parameters();
@@ -302,7 +326,7 @@ public sealed class MissionChestObjectiveIntegrationTests
 
         int key = f.Store.Links.Single().Key;
         var player = f.Player;
-        var world = run.World;
+        var world = restartGenerator == null ? run.World : RestoreObjectiveAcrossRevisions(run, accepted, restartGenerator);
         var registry = world.GetRequiredService<DynelRegistry>();
         if (!quest.Template.IsReturnItem)
         {
@@ -425,6 +449,64 @@ public sealed class MissionChestObjectiveIntegrationTests
         TestContext.WriteLine($"MISSION_OBJECTIVE_FULL_LIFECYCLE type={missionType} destination={accepted.EntrancePlayfield} quality={accepted.Quality} objective={quest.Template.Objective.Npc ?? quest.Template.Objective.WorldItem} reward={f.Offer.RewardLowId}/{f.Offer.RewardHighId}QL{f.Offer.RewardQuality} completion=APPLIED keyCleanup=APPLIED persistence=IN_MEMORY");
     }
 
+    static DungeonLayoutGenerator CreateRetainedGenerator(string root)
+    {
+        // The archive-only root supplies policy and retained original geometry for the generator. The fixture's
+        // other services still use complete canonical GameData for normal item/NPC/mission interactions.
+        var policy = DungeonGenerationContent.Register(GameDataContentProvider.ForBaseRoot(root)).Current.Value.Policy;
+        Assert.IsNotNull(policy?.Population);
+        GameDataStore runtimeData = MissionChestPlacementTests.Data.Value;
+        var mobs = policy.Population.RegularNpcHashes.ToDictionary(hash => hash, hash =>
+        {
+            Assert.IsTrue(runtimeData.HasMobTemplate(hash), "Canonical NPC catalog is missing " + hash);
+            Assert.IsTrue(runtimeData.TryResolveMobTemplate(hash, RollLevel, out var template));
+            return template;
+        }, StringComparer.Ordinal);
+        return new DungeonLayoutGenerator(new StubGameData(HashItemCatalog.Parse("{}"), rootPath: root, mobs: mobs),
+            new StubLogger());
+    }
+
+    static QuestDungeonPlayfield RestoreObjectiveAcrossRevisions(ObjectiveRun run, QuestDungeonParameters accepted,
+        DungeonLayoutGenerator current)
+    {
+        Assert.IsNotNull(accepted.Content);
+        var currentOffer = new QuestDungeonParameters
+        {
+            Seed = accepted.Seed, Quality = accepted.Quality, DungeonPlayfield = accepted.DungeonPlayfield,
+            EntranceInstance = accepted.EntranceInstance
+        };
+        Assert.IsTrue(current.ConfigureNewDungeon(currentOffer, team: false));
+        Assert.IsNotNull(currentOffer.Content);
+        Assert.AreNotEqual(accepted.Content, currentOffer.Content, "The active content revision must actually change.");
+        Assert.IsTrue(current.TryGenerate(currentOffer, out var updatedLayout));
+        Assert.AreNotEqual(run.World.Layout.Doors?.OpenChancePercent, updatedLayout.Doors?.OpenChancePercent);
+
+        var f = run.Fixture;
+        string frozen = f.Store.Generated!.AcgBuildingGeneratorJson;
+        int persistedItems = run.Dao.Items.Count;
+        byte[][] originalChests = ChestBodies(run.World);
+        byte[] originalGenerator = run.World.Layout.GeneratorPayload;
+        Assert.IsTrue(f.Manager.TryReleaseQuestDungeon(accepted.DungeonPlayfield, run.Quest.QuestId));
+        f.RestartService(current);
+        var destination = f.Service.ResolveLogin(accepted.DungeonPlayfield);
+        Assert.IsInstanceOfType<QuestDungeonPlayfield>(destination.Playfield);
+        var restored = (QuestDungeonPlayfield)destination.Playfield;
+        f.Player.Playfield = restored;
+
+        Assert.AreNotSame(run.World, restored);
+        Assert.AreEqual(accepted.Content, restored.Layout.Content);
+        Assert.AreEqual(run.World.Layout.Doors?.OpenChancePercent, restored.Layout.Doors?.OpenChancePercent);
+        Assert.AreEqual(frozen, f.Store.Generated!.AcgBuildingGeneratorJson);
+        Assert.AreEqual(persistedItems, run.Dao.Items.Count);
+        CollectionAssert.AreEqual(originalGenerator, restored.Layout.GeneratorPayload);
+        AssertObjectiveBinding(restored, f.Parameters());
+        byte[][] replayChests = ChestBodies(restored);
+        Assert.AreEqual(originalChests.Length, replayChests.Length);
+        for (int i = 0; i < originalChests.Length; i++)
+            CollectionAssert.AreEqual(originalChests[i], replayChests[i]);
+        return restored;
+    }
+
     static Identity HeldSlot(Player player, Identity item)
         => new() { Type = IdentityType.Inventory, Instance = player.Inventory.Inventory.Content.Single(pair => pair.Value.Identity == item).Key };
 
@@ -543,21 +625,14 @@ public sealed class MissionChestObjectiveIntegrationTests
             .Select(message => message.Identity.Instance).Distinct().ToArray();
     }
 
-    static void ConfigureRepresentativeSoloProfile(DungeonLayoutGenerator generator)
+    static void ConfigureRepresentativeSoloProfile(QuestDungeonDestinationTests.Fixture fixture)
     {
-        object policy = typeof(DungeonLayoutGenerator).GetField("_policy", BindingFlags.Instance | BindingFlags.NonPublic)!
-            .GetValue(generator)!;
-        var profiles = (System.Collections.IEnumerable)policy.GetType().GetProperty("Profiles")!.GetValue(policy)!;
-        foreach (object profile in profiles)
+        // Keep this coexistence test on one supported room style/size. Cave coverage remains separate.
+        fixture.ConfigureTestPlan = plan =>
         {
-            Type type = profile.GetType();
-            if ((bool)type.GetProperty("Team")!.GetValue(profile)!)
-                continue;
-            // Keep this coexistence test on one supported room style/size. Cave/zero coverage remains separate.
-            type.GetProperty("Styles")!.SetValue(profile, new[] { 324 });
-            type.GetProperty("MinFloorSize")!.SetValue(profile, 12);
-            type.GetProperty("MaxFloorSize")!.SetValue(profile, 12);
-        }
+            plan.StyleId = 324;
+            plan.FloorSize = 12;
+        };
     }
 
     static byte[][] ChestBodies(QuestDungeonPlayfield world)
@@ -599,7 +674,7 @@ public sealed class MissionChestObjectiveIntegrationTests
         readonly CharacterSnapshotService? _snapshots;
         internal PlayerQuest Quest => Fixture.Quests.GetLog(Fixture.Player).Quests[Fixture.Store.Generated!.QuestId];
 
-        internal ObjectiveRun(int missionType, bool fromRoll = false)
+        internal ObjectiveRun(int missionType, bool fromRoll = false, DungeonLayoutGenerator? retainedLayouts = null)
         {
             var ids = new StubInstanceIdAllocator();
             IItemTemplateCatalog templates = MissionChestPlacementTests.Templates.Value;
@@ -611,9 +686,12 @@ public sealed class MissionChestObjectiveIntegrationTests
             }
             Fixture = new Fixture(Dao, new ItemBuilder(templates, ids, new StubLogger()),
                 snapshots: _snapshots, templates: templates, inventory: new ObjectiveInventory(Dao), ids: ids, playerId: RolledOwner,
-                enableMissionPopulationPersistence: true, rolledOffer: roll?.Offer);
+                enableMissionPopulationPersistence: true, rolledOffer: roll?.Offer, layouts: retainedLayouts);
             Assert.IsTrue(Fixture.Layouts.ChestPolicy?.RoomDensity > 0);
-            ConfigureRepresentativeSoloProfile(Fixture.Layouts);
+            if (retainedLayouts == null)
+                ConfigureRepresentativeSoloProfile(Fixture);
+            else
+                Fixture.TestSeed = 9;
             Exterior = Fixture.Player.Playfield!;
             if (roll is { } fromCatalog)
             {
