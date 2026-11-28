@@ -2,8 +2,10 @@ namespace ZoneEngine_New.Core.Knubot;
 
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
+using AORebirth.Core.GameData;
 using AORebirth.Enums;
 using AORebirth.Modules.Events;
 
@@ -13,8 +15,15 @@ using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.Inventory;
 using ZoneEngine_New.Core.Modules;
+using ZoneEngine_New.Core.Network;
 using ZoneEngine_New.Core.Quests;
 using ZoneEngine_New.Core.Trade;
+using ZoneEngine_New.Core.World;
+using ZoneEngine_New.Core.WorldSimulation;
+
+using PlayfieldInstance = ZoneEngine_New.Core.Playfield.Playfield;
+using PlayfieldManager = ZoneEngine_New.Core.Playfield.PlayfieldManager;
+using Vector3 = AORebirth.Core.Vector.Vector3;
 
 /// <summary>Services a line's effects are applied through.</summary>
 public sealed class KnubotEffectServices(QuestService quests, HashItemMinter minter, InventoryFlushService flush, TradeService trades,
@@ -53,6 +62,12 @@ public abstract record KnubotEffect
 
     public abstract void Apply(KnubotContext context, KnubotEffectServices services);
 
+    protected virtual bool ApplyChecked(KnubotContext context, KnubotEffectServices services)
+    {
+        Apply(context, services);
+        return true;
+    }
+
     public static bool CanApplyAll(KnubotEffect[] effects, KnubotContext context, KnubotEffectServices services)
     {
         if (effects.Length == 0)
@@ -78,8 +93,7 @@ public abstract record KnubotEffect
         if (!CanApplyAll([effect], context, services))
             return false;
 
-        effect.Apply(context, services);
-        return true;
+        return effect.ApplyChecked(context, services);
     }
 }
 
@@ -254,6 +268,75 @@ public sealed record KnubotUseItem(int ItemId) : KnubotEffect
         Item item = items.Create(ItemId, ItemId, 1, ItemSource.Quest);
         item.Definition.ExecuteOnUseSpells(context.Player, playfield.GetRequiredService<Data.IInventoryRepository>(), items, source: context.Player);
         context.Player.FlushDirtyStats();
+    }
+}
+
+/// <summary>An authored one-way destination, dispatched through the existing playfield transfer path.</summary>
+public sealed record KnubotTeleport(int PlayfieldId, float X, float Y, float Z) : KnubotEffect
+{
+    internal static bool AuthoredPlayfieldExists(string root, int playfieldId)
+        => playfieldId > 0 && File.Exists(Path.Combine(root,
+            GameDataPaths.PlayfieldRelativeDirectory(playfieldId), GameDataPaths.MetadataFileName));
+
+    public override bool Check(KnubotContext context, KnubotPlan plan, KnubotEffectServices services)
+        => float.IsFinite(X) && float.IsFinite(Y) && float.IsFinite(Z)
+            && context.Player.Playfield is PlayfieldInstance source && context.Player.Session is IZoneSession session
+            && Current(context.Player, source, session)
+            && AuthoredPlayfieldExists(source.GetRequiredService<GameData.IGameData>().RootPath, PlayfieldId);
+
+    public override void Apply(KnubotContext context, KnubotEffectServices services)
+        => ApplyChecked(context, services);
+
+    protected override bool ApplyChecked(KnubotContext context, KnubotEffectServices services)
+    {
+        Player player = context.Player;
+        if (player.Playfield is not PlayfieldInstance source || player.Session is not IZoneSession session
+            || !Current(player, source, session))
+            return false;
+
+        var landing = new Vector3(X, Y, Z);
+        if (source.Identity.Instance == PlayfieldId)
+        {
+            player.TeleportWithinPlayfield(source.SnapFeetToFloor(landing));
+            ForgetReturn(source, player);
+            return true;
+        }
+
+        bool called = false;
+        bool accepted = false;
+        bool queued = source.GetRequiredService<PlayfieldManager>().WithPlayfield(PlayfieldId, player, destination =>
+        {
+            called = true;
+            if (!Current(player, source, session))
+                return;
+
+            accepted = session.TransferToPlayfield(destination, destination.SnapFeetToFloor(landing));
+            if (accepted)
+                ForgetReturn(source, player);
+        }, new RemoteArrival(landing, Kind: AORebirth.World.Contracts.V1.ArrivalKind.ArrivalTeleport, Prepare: () =>
+        {
+            if (!Current(player, source, session))
+                return false;
+
+            ForgetReturn(source, player);
+            return true;
+        }));
+
+        // A queued load/resolve is an accepted request, not a successful arrival. Existing transfer recovery owns failures.
+        return queued && (!called || accepted);
+    }
+
+    static bool Current(Player player, PlayfieldInstance source, IZoneSession session)
+        => !source.IsDisposed && ReferenceEquals(player.Playfield, source) && ReferenceEquals(player.Session, session)
+            && ReferenceEquals(session.Player, player) && session.State == SessionState.InPlay && !session.IsTransferring
+            && !player.IsDead && !player.IsPersistenceQuarantined && player.Inventory.IsHydrated
+            && source.IsAuthoritativePlayer(player);
+
+    static void ForgetReturn(PlayfieldInstance source, Player player)
+    {
+        player.Stats.Set(CharacterStat.ExternalPlayfieldInstance, 0, StatDetail.Base, dirty: true);
+        player.Stats.Set(CharacterStat.ExternalDoorInstance, 0, StatDetail.Base, dirty: true);
+        source.GetService<WorldSimulationAccess>()?.Instance?.ForgetCharacterTriggers(player.Identity.Instance);
     }
 }
 

@@ -609,6 +609,13 @@ public sealed class KnubotService(KnubotCatalog catalog, KnubotEffectServices ef
                 conversation.Packets.Clear();
                 Fail(conversation, next.Line, next.Chain);
             }
+            else if (next.Effect is KnubotTeleport)
+            {
+                // The move may still be loading. Drop the rest of this line instead of sending stale replies after zoning.
+                Remove(conversation);
+                conversation.Transport.Send(CloseMessage(conversation, 0));
+                return;
+            }
         }
     }
 

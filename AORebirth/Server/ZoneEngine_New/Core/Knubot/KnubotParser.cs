@@ -11,7 +11,7 @@ using ZoneEngine_New.Core.Inventory;
 /// <summary>
 /// Turns line text into ordered pieces and effects. Tags:
 /// text <c>{name}</c> <c>{npc}</c> <c>{itemref LOW HIGH QL}</c> <c>{emote}…{/emote}</c> <c>{delay SECONDS}</c>;
-/// effects (applied when the text reaches them) <c>{givequest HASH}</c> <c>{completequest HASH}</c> <c>{spawn ITEMHASH QL|level [count]}</c> <c>{take ITEMHASH [count]}</c> <c>{shop}</c> <c>{opentrade}</c> <c>{givebuff NANOID}</c> <c>{useitem ITEMID}</c>; flow <c>{goto LINE}</c> <c>{close [SECONDS]}</c>.
+/// effects (applied when the text reaches them) <c>{givequest HASH}</c> <c>{completequest HASH}</c> <c>{spawn ITEMHASH QL|level [count]}</c> <c>{take ITEMHASH [count]}</c> <c>{shop}</c> <c>{opentrade}</c> <c>{givebuff NANOID}</c> <c>{useitem ITEMID}</c> <c>{teleport PLAYFIELD X Y Z}</c>; flow <c>{goto LINE}</c> <c>{close [SECONDS]}</c>.
 /// <c>{{</c> and <c>}}</c> write literal braces. Reply text allows only the text tags without delay.
 /// </summary>
 public static class KnubotParser
@@ -225,6 +225,20 @@ public static class KnubotParser
                     }
 
                     Effect(new KnubotUseItem(useItemId));
+                    break;
+
+                case "teleport":
+                    if (words.Length != 5 || !KnubotCondition.TryPositive(words[1], out int playfieldId)
+                        || !float.TryParse(words[2], NumberStyles.Float, CultureInfo.InvariantCulture, out float x) || !float.IsFinite(x)
+                        || !float.TryParse(words[3], NumberStyles.Float, CultureInfo.InvariantCulture, out float y) || !float.IsFinite(y)
+                        || !float.TryParse(words[4], NumberStyles.Float, CultureInfo.InvariantCulture, out float z) || !float.IsFinite(z)
+                        || !KnubotTeleport.AuthoredPlayfieldExists(load.GameData.RootPath, playfieldId))
+                    {
+                        errors.Add("expected {teleport PLAYFIELD X Y Z} with an authored playfield and finite coordinates: {" + body + "}");
+                        break;
+                    }
+
+                    Effect(new KnubotTeleport(playfieldId, x, y, z));
                     break;
 
                 case "goto":
