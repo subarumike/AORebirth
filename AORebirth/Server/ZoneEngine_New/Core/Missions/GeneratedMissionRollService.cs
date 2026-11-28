@@ -7,6 +7,7 @@ using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using Utility.GameData.Missions;
 using ZoneEngine.Core.Missions;
 using ZoneEngine_New.Core.Entities;
+using ZoneEngine_New.Core.Inventory;
 
 internal interface IGeneratedMissionOfferGenerator
 {
@@ -16,13 +17,17 @@ internal interface IGeneratedMissionOfferGenerator
 }
 
 /// <summary>Composes validated mission content before the DAO publishes and charges the roll.</summary>
-internal sealed class GeneratedMissionRollService(MissionOfferCatalog offers) : IGeneratedMissionOfferGenerator
+internal sealed class GeneratedMissionRollService(MissionContent content) : IGeneratedMissionOfferGenerator
 {
-    static readonly Lazy<GeneratedMissionRollService> Current = new(() => new(MissionOfferCatalog.Load(MissionContentJson.RootPath)));
+    static readonly Lazy<GeneratedMissionRollService> Current = new(() => new(MissionContent.Shared.Value));
 
     internal static GeneratedMissionRollService Shared => Current.Value;
 
-    internal MissionOfferCatalog OfferCatalog => offers;
+    readonly MissionRollRewardItems _rewardItems = new(content);
+
+    internal MissionOfferCatalog OfferCatalog => content.Offers;
+
+    internal void ValidateItemRewards(IItemTemplateCatalog items) => _rewardItems.Validate(items);
 
     internal static QuestAlternativeMessage Generate(QuestAlternativeMessage request, Identity character, int characterLevel,
         int terminalPlayfield, float terminalX, float terminalZ, MissionLocationSide side,
@@ -40,17 +45,17 @@ internal sealed class GeneratedMissionRollService(MissionOfferCatalog offers) : 
         ArgumentNullException.ThrowIfNull(request);
         ArgumentNullException.ThrowIfNull(durableIds);
         ArgumentNullException.ThrowIfNull(destinations);
-        if (!MissionRollSliders.TryCreate(request, out var sliders, out var error)) throw new ArgumentException(error, nameof(request));
-        int level = MissionLevelRuntime.ClampCharacterLevel(characterLevel);
-        int quality = MissionLevelRuntime.GetMissionQuality(characterLevel, request.LevelSlider);
+        if (!MissionRollSliders.TryCreate(request, out var sliders, out var error, content.Policy)) throw new ArgumentException(error, nameof(request));
+        int level = content.Levels.Clamp(characterLevel);
+        int quality = content.Levels.Quality(characterLevel, request.LevelSlider);
         // The catalog owns exact-QL selection and the optional nearest-QL origin policy.
         // The selected pool never changes mission QL; fallback eligibility is provisional.
         if (!destinations.TryGetDestinations(terminalPlayfield, quality, out var destinationPool, out _) || destinationPool.Count == 0)
             throw new NotSupportedException("No configured mission destinations are available at expected QL " + quality + ".");
         var random = new Random(seed);
-        var policy = MissionRollPolicy.Current;
-        var response = offers.CreateResponse(nonce, character, request.MissionTerminalIdentity);
-        var types = MissionRollEvidenceCatalog.SelectTypeMix(level, request.LevelSlider, quality, sliders, random);
+        var policy = content.Policy;
+        var response = content.Offers.CreateResponse(nonce, character, request.MissionTerminalIdentity);
+        var types = content.Cohorts.SelectTypeMix(level, request.LevelSlider, quality, sliders, random);
         if (types.Length != MissionOfferCatalog.OfferCount)
             throw new InvalidOperationException("A mission offer cohort must contain five entries.");
         var identities = new HashSet<int>();
@@ -59,7 +64,7 @@ internal sealed class GeneratedMissionRollService(MissionOfferCatalog offers) : 
         for (int index = 0; index < types.Length; index++)
         {
             var type = types[index];
-            var eligible = offers.Select(type, random);
+            var eligible = content.Offers.Select(type, random);
             var offer = eligible.Definition.Create();
             int identity = durableIds();
             if (identity <= 0 || !identities.Add(identity)) throw new InvalidOperationException("Durable mission identities must be positive and unique.");
@@ -82,12 +87,12 @@ internal sealed class GeneratedMissionRollService(MissionOfferCatalog offers) : 
             action.X = destination.LocalX; action.Y = destination.LocalY; action.Z = destination.LocalZ;
             action.Unknown18 = worldPosition.WorldOffsetX; action.Unknown19 = worldPosition.WorldOffsetZ;
             offer.Quality = quality;
-            MissionRewardEvidenceModel.Apply(offer, type, level, request.LevelSlider, quality, sliders, destination.PlayfieldId, random);
-            var reward = MissionRollRewardItems.Select(quality, random);
+            content.NumericRewards.Apply(offer, type, level, request.LevelSlider, quality, sliders, destination.PlayfieldId, random);
+            var reward = _rewardItems.Select(quality, random);
             reward.Unknown1 = offer.ItemRewards[0].Unknown1;
             offer.ItemRewards[0] = reward;
-            MissionOfferTextBuilder.Apply(offer, eligible.Descriptor, eligible.Text);
-            if (!MissionOfferCompatibility.TryValidateGenerated(offer, eligible.Descriptor, sliders, request.MissionTerminalIdentity, out var descriptor, out var failure)
+            MissionOfferTextBuilder.Apply(offer, eligible.Descriptor, eligible.Text, content.Text, content.Geography);
+            if (!MissionOfferCompatibility.TryValidateGenerated(offer, eligible.Descriptor, sliders, request.MissionTerminalIdentity, out var descriptor, out var failure, policy, content.Text)
                 || descriptor.Type != type) throw new InvalidOperationException("Invalid composed mission: " + failure);
             if (offer.Info is { } text && !text.EndsWith('\0')) offer.Info = text + '\0';
             response.QuestInfos[index] = offer;

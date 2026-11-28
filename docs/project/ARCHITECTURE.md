@@ -43,6 +43,39 @@ combat and network services. Preserve hot-path costs by reusing validated data
 and eligibility indexes. Fail with a specific diagnostic when a required input
 is missing, invalid or unsupported.
 
+### GameData provider
+
+The Zone composition root uses the existing GameData root and override settings
+through one GameDataContentProvider. A content module declares its ID, schema
+version, owned paths, required inputs, permitted file overrides and dependencies.
+The provider resolves declared paths, hashes the exact bytes it passes to the
+validator and captures typed dependency snapshots. It rejects duplicate ownership
+and unresolved or cyclic dependencies. A slot publishes a complete immutable
+value and its metadata together. Readers keep the previous value until a reload
+has validated successfully.
+
+Snapshot identity binds module/schema, paths, source selection, file hashes and
+dependency identities. Repository/revision metadata is optional and requires a
+trusted input from composition. The runtime records bytes even when it lacks a
+trusted repository binding. An allowed override supersedes the base file when
+present. A bad selected file fails validation. Optional absence is represented
+explicitly, separately from a failed read or parse.
+
+MissionRoll owns the typed offers, roll policy, levels and level rules, type and
+reward observations, text, geography, and both destination files. MissionKeys
+owns the key policy and validates its roles against the existing item template
+catalog. Phase 1 keeps these two modules on the startup-selected root to
+preserve their existing override behavior. Startup reports both identities.
+Accepted mission definitions and their serialization remain owned by the
+existing persistence and protocol contracts.
+
+The registry also declares current ownership of dungeon profiles/room
+metadata, item and NPC templates, terminal item reward assets, authored quest
+packs, QuestRewards and RK chest loot. Their compatibility adapters retain the
+existing loaders, validation and source selection. Dependency metadata calls
+out a compatibility owner separately from a validated provider snapshot.
+Conversion of these adapters is outside the Phase 1 migration.
+
 Mission offer construction, destination selection, objective resolution, quest
 persistence and dungeon materialization have separate owners. Offers use the
 typed `Missions/MissionOffers.json` definitions and the existing AO serializers.

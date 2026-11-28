@@ -40,6 +40,10 @@ internal static class DoaMutationTests
             ("project dependency boundary", CheckProjects),
             ("unchanged and introduced findings", CheckDiff),
             ("versioned layout exception", () => CheckHistoricalLayout(root)),
+            ("direct catalog source dependencies", CheckDirectContentSources),
+            ("single runtime content authority", CheckContentAuthority),
+            ("unauthorized fallback catalogs", CheckCatalogFallback),
+            ("required content validation boundary", CheckContentValidation),
             ("provisional catalog validation", CheckCoverage),
             ("recorded payload field", CheckRecordedPayload),
             ("key catalog validation", CheckKeyCatalog),
@@ -97,6 +101,63 @@ internal static class DoaMutationTests
         Finding changed = DoaRules.DataFinding(MissionPath, "Probe", "EXAMPLE", "Open debt", "changed");
         var result = DoaEnforcement.Compare([old], [old with { Line = 200 }, old, changed]);
         Require(result.Inherited.Length == 1 && result.Introduced.Length == 2);
+    }
+
+    private static void CheckDirectContentSources()
+    {
+        Block("class Probe { string Read() => File.ReadAllText(path); }", "DOA_DIRECT_CONTENT_SOURCE");
+        Block("class Probe { string Read() => GameDataPaths.ResolveRuntimeRoot(); }", "DOA_DIRECT_CONTENT_SOURCE");
+        Block("using Paths = AORebirth.Core.GameData.GameDataPaths; class Probe { string Read() => Paths.ResolveFile(root, name); }",
+            "DOA_DIRECT_CONTENT_SOURCE");
+        Block("using static System.IO.File; class Probe { string Read() => ReadAllText(path); }", "DOA_DIRECT_CONTENT_SOURCE");
+        Block("class Probe { object Scan() => Directory.EnumerateFiles(root); }", "DOA_DIRECT_CONTENT_SOURCE");
+        Block("class Probe { object Read() => new StreamReader(path); }", "DOA_DIRECT_CONTENT_SOURCE");
+        Block("""class Probe { string Read() => Environment.GetEnvironmentVariable("AO_REBIRTH_GAMEDATA_PATH"); }""",
+            "DOA_DIRECT_CONTENT_SOURCE");
+
+        const string otherGameplay = "AORebirth/Server/ZoneEngine_New/Core/Mobs/GuardProbe.cs";
+        Require(DoaRules.SourceIssues(otherGameplay, Parse("""class Probe { object Read() => File.OpenRead("Mobs.json"); }"""))
+            .Any(issue => issue.Rule == "DOA_DIRECT_CONTENT_SOURCE"));
+        Require(!DoaRules.SourceIssues(otherGameplay, Parse("""class Probe { object Read() => File.OpenRead("spawn.log"); }""")).Any());
+        Require(!Rules("class Probe { object Read() => new StreamReader(new MemoryStream(bytes)); }").Any());
+
+        string Fingerprint(string body) => DoaRules.SourceFingerprint(DoaRules.SourceIssues(MissionPath, Parse(body)).Single().Node,
+            DoaContentBoundary.DirectSourceRule);
+        Require(Fingerprint("class Probe { object Read() => File.ReadAllText(path); }")
+            == Fingerprint("class Probe { object Read() => Validate(File.ReadAllText(path)); }"));
+        Require(Fingerprint("class Probe { object Read() => File.ReadAllText(path); }")
+            != Fingerprint("class Probe { object Read() => File.ReadAllText(fallbackPath); }"));
+    }
+
+    private static void CheckContentAuthority()
+    {
+        Block("class Probe : IGameDataContentProvider {}", "DOA_DUPLICATE_CONTENT_AUTHORITY");
+        Block("class Probe { GameDataContentProvider Source = new(root); }", "DOA_DUPLICATE_CONTENT_AUTHORITY");
+        const string provider = "AORebirth/Server/ZoneEngine_New/Core/GameData/GameDataContentProvider.cs";
+        Require(!DoaRules.SourceIssues(provider, Parse("class GameDataContentProvider { object Open() => File.ReadAllBytes(root); }")).Any());
+        Require(DoaRules.SourceIssues(provider, Parse("class Other { object Build() => new GameDataContentProvider(root); }"))
+            .Any(issue => issue.Rule == "DOA_DUPLICATE_CONTENT_AUTHORITY"));
+    }
+
+    private static void CheckCatalogFallback()
+    {
+        Block("""class Probe { string PathFor() => File.Exists(approved) ? approved : Path.Combine(packaged, "Offers.json"); }""",
+            "DOA_UNAUTHORIZED_CATALOG_FALLBACK");
+        Block("""class Probe { object Read() { if (File.Exists(approved)) return Read(approved); else return Read("Offers.json"); } }""",
+            "DOA_UNAUTHORIZED_CATALOG_FALLBACK");
+        Block("""class Probe { string PathFor() => Path.Combine(Environment.CurrentDirectory, "Offers.json"); }""",
+            "DOA_UNAUTHORIZED_CATALOG_FALLBACK");
+    }
+
+    private static void CheckContentValidation()
+    {
+        Block("class Probe { object Build() => new ContentSnapshot<Offers>(data); }", "DOA_CONTENT_VALIDATION_BYPASS");
+        Block("class Probe { object Build(ContentInputs input) { try { return Parse(input.Required(offerFile)); } catch { return new Offers(); } } }",
+            "DOA_CONTENT_VALIDATION_BYPASS");
+        Block("class Probe { object Build(ContentInputs input) { try { return input.RequireDependency<Keys>(keysId); } catch { return new Keys(); } } }",
+            "DOA_CONTENT_VALIDATION_BYPASS");
+        Require(!Rules("class Probe { object Build(ContentInputs input) => Validate(Parse(input.Required(offerFile))); }").Any());
+        Require(!Rules("class Probe { object Current(ContentSlot<Offers> slot) => slot.Current; }").Any());
     }
 
     private static void CheckHistoricalLayout(string root)

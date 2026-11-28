@@ -181,7 +181,7 @@ foreach (string file in sourceFiles.Where(IsSource))
             : found.Any(f => f.Line == line && f.Rule == rule)) return;
         string excerpt = node.ToString().Replace("\r", " ").Replace("\n", " ");
         found.Add(new(file, line, symbol, Category(file + " " + symbol + " " + node), rule, basis,
-            excerpt[..Math.Min(180, excerpt.Length)], doaInventory ? DoaRules.SourceFingerprint(node) : null));
+            excerpt[..Math.Min(180, excerpt.Length)], doaInventory ? DoaRules.SourceFingerprint(node, rule) : null));
     }
     if (doaInventory)
         foreach (var issue in DoaRules.SourceIssues(file, syntax))

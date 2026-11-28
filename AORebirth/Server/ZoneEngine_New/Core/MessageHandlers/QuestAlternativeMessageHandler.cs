@@ -19,16 +19,18 @@ namespace ZoneEngine_New.Core.MessageHandlers
         private readonly GeneratedMissionService _missions;
         private readonly MissionDestinationCatalog _destinations;
         private readonly IGeneratedMissionOfferGenerator _rolls;
+        private readonly MissionContent _content;
         public QuestAlternativeMessageHandler(IGeneratedMissionDao dao, GeneratedMissionService missions, MissionDestinationCatalog destinations)
             : this(dao, missions, destinations, GeneratedMissionRollService.Shared) { }
 
         internal QuestAlternativeMessageHandler(IGeneratedMissionDao dao, GeneratedMissionService missions,
-            MissionDestinationCatalog destinations, IGeneratedMissionOfferGenerator rolls)
+            MissionDestinationCatalog destinations, IGeneratedMissionOfferGenerator rolls, MissionContent? content = null)
         {
             _dao = dao;
             _missions = missions;
             _destinations = destinations;
             _rolls = rolls;
+            _content = content ?? MissionContent.Shared.Value;
         }
         public Type MessageBodyType => typeof(QuestAlternativeMessage);
         public void Handle(MessageBody body, IZoneSession session) => Handle((QuestAlternativeMessage)body, session);
@@ -43,7 +45,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
                 || !playfield.GetRequiredService<DynelRegistry>().TryGet(message.MissionTerminalIdentity, out var dynel)
                 || dynel is not MissionTerminal terminal || terminal.GetEdgeDistanceTo(player) > LootableDynel.OpenRange)
                 return;
-            if (!MissionRollPolicy.Current.Enabled)
+            if (!_content.Policy.Enabled)
             { Feedback(session, player, "Mission terminals are disabled. No credits were deducted."); return; }
             if (session is not IGameTimeSession { GameTimeSynchronizedAtUtc: not null } clock)
             { Feedback(session, player, "The mission clock has not synchronized. No credits were deducted."); return; }
@@ -51,9 +53,10 @@ namespace ZoneEngine_New.Core.MessageHandlers
             var side = MissionLocationPool.ResolveCharacterSide(player.Stats.Get(CharacterStat.Side));
             if (!MissionLocationPool.CanCharacterRollAtTerminal(side, playfield.Identity.Instance))
             { Feedback(session, player, "This mission terminal is not available to your side. No credits were deducted."); return; }
-            if (!MissionLevelRuntime.TryGetMissionQuality(level, message.LevelSlider, out int quality)
-                || !MissionRollSliders.TryCreate(message, out _, out _))
+            if (!MissionLevelRuntime.TryDecodeDifficultySlider(message.LevelSlider, out _)
+                || !MissionRollSliders.TryCreate(message, out _, out _, _content.Policy))
             { Feedback(session, player, "The mission terminal rejected unsupported slider settings. No credits were deducted."); return; }
+            int quality = _content.Levels.Quality(level, message.LevelSlider);
             int breed = player.Stats.Get(CharacterStat.Breed);
             int profession = player.Stats.Get(CharacterStat.Profession);
             bool supported = _destinations.TryGetDestinations(playfield.Identity.Instance, quality,
@@ -90,7 +93,7 @@ namespace ZoneEngine_New.Core.MessageHandlers
                         return;
                     }
                     batch = GeneratedMissionRollProjection.Create(message, response, playfield.Identity.Instance,
-                        MissionRollPolicy.Current.Fee(level), seed, nonce, now, selectedEntrances);
+                        _content.Policy.Fee(level), seed, nonce, now, selectedEntrances, _content.Policy);
                 }
                 var committing = ZoneEngine_New.Core.Metrics.TickStallWatch.Enter("mission.roll.commit", player.Identity.Instance);
                 var result = _missions.PublishOffers(player, batch);

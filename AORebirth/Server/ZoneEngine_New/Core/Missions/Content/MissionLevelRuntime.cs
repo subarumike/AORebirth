@@ -10,8 +10,7 @@ using System.Linq;
 internal static class MissionLevelRuntime
 {
     internal const int SliderPositions = 11; // Terminal protocol detents, sent one-based.
-    static readonly Lazy<MissionLevelData> Current = new(() => MissionLevelData.Load(
-        Path.Combine(MissionContentJson.RootPath, "Source", "MissionLevels.csv")));
+    static MissionLevelData Current => ZoneEngine_New.Core.Missions.MissionContent.Shared.Value.Levels;
 
     internal static bool TryDecodeDifficultySlider(int wire, out int index)
     { index = wire - 1; return index >= 0 && index < SliderPositions; }
@@ -20,7 +19,7 @@ internal static class MissionLevelRuntime
     {
         quality = 0;
         if (!TryDecodeDifficultySlider(wire, out _)) return false;
-        try { quality = Current.Value.Quality(level, wire); return true; }
+        try { quality = Current.Quality(level, wire); return true; }
         catch (Exception error) when (error is IOException or InvalidDataException or UnauthorizedAccessException or FormatException or OverflowException)
         { return false; }
     }
@@ -29,8 +28,8 @@ internal static class MissionLevelRuntime
         => TryGetMissionQuality(level, wire, out int quality) ? quality
             : throw new InvalidOperationException("Mission level content is unavailable or the difficulty is invalid.");
 
-    internal static int ClampCharacterLevel(int level) => Current.Value.Clamp(level);
-    internal static IReadOnlyList<int> SupportedQualities => Current.Value.SupportedQualities;
+    internal static int ClampCharacterLevel(int level) => Current.Clamp(level);
+    internal static IReadOnlyList<int> SupportedQualities => Current.SupportedQualities;
 
     internal static int GetTokenReward(int level)
         => TryGetTokenReward(level, out int tokens, out _) ? tokens : 0;
@@ -39,7 +38,7 @@ internal static class MissionLevelRuntime
     {
         tokens = 0;
         reason = string.Empty;
-        try { tokens = Current.Value.Tokens(level); return true; }
+        try { tokens = Current.Tokens(level); return true; }
         catch (Exception error) when (error is IOException or InvalidDataException or UnauthorizedAccessException or FormatException or OverflowException)
         { reason = error.Message; return false; }
     }
@@ -58,13 +57,25 @@ internal sealed class MissionLevelData
     }
 
     internal static MissionLevelData Load(string path)
+        => Parse(File.ReadAllLines(path), MissionContentJson.Read<MissionLevelRules>("Source/MissionLevelRules.json"));
+
+    internal static MissionLevelData Parse(string csv, MissionLevelRules rules)
     {
-        var rules = MissionContentJson.Read<MissionLevelRules>("Source/MissionLevelRules.json");
+        var lines = new List<string>();
+        using (var reader = new StringReader(csv))
+        {
+            while (reader.ReadLine() is { } line)
+                lines.Add(line);
+        }
+        return Parse(lines, rules);
+    }
+
+    static MissionLevelData Parse(IReadOnlyList<string> lines, MissionLevelRules rules)
+    {
         rules.Validate();
-        var lines = File.ReadAllLines(path);
         var header = new[] { "Level" }.Concat(Enumerable.Range(0, MissionLevelRuntime.SliderPositions)
             .Select(index => "Q" + index.ToString(CultureInfo.InvariantCulture))).Append("Tokens");
-        if (lines.Length < 2 || !lines[0].Split(',').SequenceEqual(header))
+        if (lines.Count < 2 || !lines[0].Split(',').SequenceEqual(header))
             throw new InvalidDataException("Invalid mission level columns or empty table.");
         int Cell(string text)
         {

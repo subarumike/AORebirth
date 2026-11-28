@@ -35,12 +35,18 @@ public sealed class MissionKeyPolicy
         if (!File.Exists(path))
             throw new InvalidDataException("Required mission key policy is missing: " + path);
 
+        return Parse(File.ReadAllText(path), items, path);
+    }
+
+    internal static MissionKeyPolicy Parse(string json, IItemTemplateCatalog items, string path = RelativePath)
+    {
         PolicyData? data;
         try
         {
-            data = JsonSerializer.Deserialize<PolicyData>(File.ReadAllText(path), new JsonSerializerOptions
+            data = JsonSerializer.Deserialize<PolicyData>(json, new JsonSerializerOptions
             {
-                UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow
+                UnmappedMemberHandling = JsonUnmappedMemberHandling.Disallow,
+                AllowDuplicateProperties = false
             });
         }
         catch (JsonException exception)

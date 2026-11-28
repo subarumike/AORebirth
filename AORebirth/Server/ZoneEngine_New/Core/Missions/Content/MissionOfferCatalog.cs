@@ -36,7 +36,7 @@ internal sealed class MissionOfferCatalog
     internal int ResponseCount => _responses.Length;
     internal int DefinitionCount { get; }
 
-    MissionOfferCatalog(MissionOfferContent content, string sha256)
+    MissionOfferCatalog(MissionOfferContent content, string sha256, MissionRollPolicy policy)
     {
         if (content.FormatVersion != 1 || content.Responses.IsDefaultOrEmpty
             || content.Provenance is not { } provenance || !IsHex(provenance.InputSha256, 64)
@@ -71,7 +71,7 @@ internal sealed class MissionOfferCatalog
                     throw new InvalidDataException($"Incomplete mission offer definition for evidence {response.BodySha256}.");
 
                 var offer = definition.Create();
-                if (!MissionOfferCompatibility.TryDescribeCaptured(offer, terminal, out var descriptor, out string failure))
+                if (!MissionOfferCompatibility.TryDescribeCaptured(offer, terminal, out var descriptor, out string failure, policy))
                     throw new InvalidDataException($"Invalid mission offer definition for evidence {response.BodySha256}: {failure}");
 
                 offers.Add(new EligibleOffer(definition, terminal, descriptor, MissionOfferTextBuilder.Capture(offer)));
@@ -88,9 +88,14 @@ internal sealed class MissionOfferCatalog
     internal static MissionOfferCatalog Load(string root)
     {
         byte[] data = File.ReadAllBytes(Path.Combine(root, FileName));
+        return Parse(data, Convert.ToHexStringLower(SHA256.HashData(data)), MissionRollPolicy.Current);
+    }
+
+    internal static MissionOfferCatalog Parse(ReadOnlySpan<byte> data, string sha256, MissionRollPolicy policy)
+    {
         var content = JsonSerializer.Deserialize<MissionOfferContent>(data, JsonOptions)
             ?? throw new InvalidDataException("Missing mission offer content.");
-        return new MissionOfferCatalog(content, Convert.ToHexStringLower(SHA256.HashData(data)));
+        return new MissionOfferCatalog(content, sha256, policy);
     }
 
     internal QuestAlternativeMessage CreateResponse(int nonce, Identity character, Identity terminal)

@@ -6,7 +6,9 @@ using System.Text.Json;
 using AORebirth.Enums;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SmokeLounge.AOtomation.Messaging.GameData;
+using ZoneEngine_New.Core.GameData;
 using ZoneEngine_New.Core.Inventory;
+using ZoneEngine_New.Core.Missions;
 using ZoneEngine_New.Core.Quests.Dungeons;
 
 [TestClass]
@@ -22,7 +24,9 @@ public sealed class MissionKeyPolicyTests
         try
         {
             WritePolicy(root.FullName);
-            MissionKeyPolicy policy = MissionKeyPolicy.Load(root.FullName, new Catalog());
+            var snapshot = Load(root.FullName, new Catalog());
+            MissionKeyPolicy policy = snapshot.Value;
+            Assert.AreEqual("ItemTemplates", snapshot.Dependencies[0].ModuleId);
             Assert.AreEqual(FixtureKey, policy.KeyTemplateId);
             Assert.AreEqual(FixtureDuplicator, policy.DuplicatorTemplateId);
             Assert.AreEqual(4, policy.KeyQuality);
@@ -49,12 +53,19 @@ public sealed class MissionKeyPolicyTests
         {
             if (failure != "missing-policy")
                 WritePolicy(root.FullName);
-            Assert.ThrowsExactly<InvalidDataException>(() => MissionKeyPolicy.Load(root.FullName, new Catalog(failure)));
+            Assert.ThrowsExactly<InvalidDataException>(() => Load(root.FullName, new Catalog(failure)));
         }
         finally
         {
             root.Delete(recursive: true);
         }
+    }
+
+    static ContentSnapshot<MissionKeyPolicy> Load(string root, IItemTemplateCatalog items)
+    {
+        var provider = new GameDataContentProvider(root);
+        MissionContent.RegisterCompatibility(provider);
+        return MissionContent.RegisterKeys(provider, items).Current;
     }
 
     static void WritePolicy(string root)

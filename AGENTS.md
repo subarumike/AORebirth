@@ -359,6 +359,19 @@ Resolve references before use. Missing, invalid or unsupported definitions fail
 explicitly. Keep incomplete evidence coverage marked provisional, with its
 specific gap recorded alongside the affected policy.
 
+Register new gameplay catalogs with the existing GameData content provider.
+Declare each module's schema version, owned files, required or optional inputs,
+override policy and catalog dependencies. Publish a complete validated immutable
+snapshot and retain the previous snapshot after a rejected reload. Gameplay
+components consume validated definitions through their module contracts. Direct
+filesystem discovery, independent content authorities and unvalidated fallback
+catalogs fail the architecture check.
+
+Register remaining loader ownership and dependencies explicitly while migrating
+existing content. Compatibility adapters preserve their established source and
+validation semantics and have a documented conversion scope. Apply the guard
+to new behavior and retain existing findings.
+
 Give gameplay components independent responsibilities and typed contracts.
 Use existing item, persistence, combat and network services. Centralize
 immutable AO protocol identifiers in typed protocol definitions. Historical

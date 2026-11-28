@@ -7,6 +7,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 using AORebirth.Core.GameData;
 
 /// <summary>Editable GameData adapter for the existing immutable mission records.
@@ -17,11 +18,34 @@ internal static class MissionContentJson
     internal static string RootPath => Path.Combine(GameDataPaths.ResolveRuntimeRoot(), "Missions");
     internal static T Read<T>(string filename) => Read<T>(RootPath, filename);
     internal static T Read<T>(string root, string filename)
+        => Parse<T>(File.ReadAllText(Path.Combine(root, filename)));
+
+    internal static string Decode(ReadOnlyMemory<byte> bytes)
     {
-        using var document = JsonDocument.Parse(File.ReadAllText(Path.Combine(root, filename)),
+        using var stream = new MemoryStream(bytes.ToArray(), writable: false);
+        using var reader = new StreamReader(stream);
+        return reader.ReadToEnd();
+    }
+
+    internal static T Parse<T>(string text)
+    {
+        using var document = JsonDocument.Parse(text,
             new JsonDocumentOptions { CommentHandling = JsonCommentHandling.Skip, AllowTrailingCommas = true });
         return (T)ReadValue(document.RootElement, typeof(T))!;
     }
+
+    static readonly JsonSerializerOptions ImmutableOptions = new()
+    {
+        AllowDuplicateProperties = false,
+        AllowTrailingCommas = true,
+        PropertyNameCaseInsensitive = true,
+        ReadCommentHandling = JsonCommentHandling.Skip,
+        Converters = { new JsonStringEnumConverter() }
+    };
+
+    internal static T ParseImmutable<T>(ReadOnlyMemory<byte> bytes) where T : class
+        => JsonSerializer.Deserialize<T>(Decode(bytes), ImmutableOptions)
+            ?? throw new InvalidDataException("Expected a " + typeof(T).Name + " definition.");
 
     static object? ReadValue(JsonElement node, Type type)
     {

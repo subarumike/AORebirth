@@ -11,13 +11,19 @@ using ZoneEngine.Core.Missions;
 using ZoneEngine_New.Core.Inventory;
 
 /// <summary>Queryable reward rows from packaged item content, with roll eligibility supplied by policy.</summary>
-internal static class MissionRollRewardItems
+internal sealed class MissionRollRewardItems
 {
     sealed record Item(int LowId, int HighId, int LowQl, int HighQl, bool Fixed);
     sealed record RewardCatalog(FrozenDictionary<int, Item[]> ChoicesByQuality, int[] TemplateIds);
-    static readonly Lazy<RewardCatalog> Catalog = new(Load);
+    readonly Lazy<RewardCatalog> Catalog;
+
+    internal MissionRollRewardItems(MissionContent mission)
+        => Catalog = new(() => Load(mission.Policy.Rewards, mission.Levels.SupportedQualities));
 
     internal static void ValidateCatalog(IItemTemplateCatalog templates)
+        => GeneratedMissionRollService.Shared.ValidateItemRewards(templates);
+
+    internal void Validate(IItemTemplateCatalog templates)
     {
         ArgumentNullException.ThrowIfNull(templates);
         foreach (int id in Catalog.Value.TemplateIds)
@@ -27,7 +33,7 @@ internal static class MissionRollRewardItems
         }
     }
 
-    internal static QuestItemShort Select(int quality, Random random)
+    internal QuestItemShort Select(int quality, Random random)
     {
         if (quality <= 0) throw new ArgumentOutOfRangeException(nameof(quality));
         ArgumentNullException.ThrowIfNull(random);
@@ -36,9 +42,8 @@ internal static class MissionRollRewardItems
         var selected = eligible[random.Next(eligible.Length)];
         return new() { LowId = selected.LowId, HighId = selected.HighId, Quality = selected.Fixed ? selected.LowQl : quality };
     }
-    static RewardCatalog Load()
+    static RewardCatalog Load(RollRewardPolicy policy, IReadOnlyList<int> qualities)
     {
-        var policy = MissionRollPolicy.Current.Rewards;
         var rows = new List<Item>();
         var fixedFamilies = new HashSet<(int, int)>();
         string[] roots = [Path.Combine(AppContext.BaseDirectory, "XML Data", "MissionRewards"),
@@ -65,7 +70,7 @@ internal static class MissionRollRewardItems
         }
 
         var index = new Dictionary<int, Item[]>();
-        foreach (int quality in MissionLevelRuntime.SupportedQualities)
+        foreach (int quality in qualities)
         {
             // Preserve the authored catalog order and fixed-quality fallback policy.
             var eligible = rows.Where(row => !row.Fixed && row.LowQl <= quality && quality <= row.HighQl).ToArray();

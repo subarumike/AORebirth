@@ -111,15 +111,11 @@ namespace ZoneEngine_New
                 MonsterCombatRulesCatalog.For(gameData.RootPath).ValidateEncounterReferences(itemTemplates, gameData);
                 // NPC scripts compile now, so a bad program is reported at startup rather than at the first spawn.
                 rootServices.GetRequiredService<ZoneEngine_New.Core.NpcScripts.NpcScriptCatalog>();
-                var missionOffers = rootServices.GetRequiredService<GeneratedMissionRollService>().OfferCatalog;
-                _ = rootServices.GetRequiredService<Utility.GameData.Missions.MissionDestinationCatalog>();
-                _ = MissionLevelRuntime.SupportedQualities;
-                MissionRollEvidenceCatalog.ValidateCatalog();
-                MissionRewardEvidenceModel.ValidateCatalog();
-                MissionRollRewardItems.ValidateCatalog(itemTemplates);
-                _ = rootServices.GetRequiredService<MissionKeyPolicy>();
-                _ = MissionTextContent.Current;
-                _ = MissionGeographyContent.Current;
+                var mission = rootServices.GetRequiredService<ContentSnapshot<MissionContent>>();
+                var missionOffers = mission.Value.Offers;
+                var missionKeys = rootServices.GetRequiredService<ContentSnapshot<MissionKeyPolicy>>();
+                rootServices.GetRequiredService<GeneratedMissionRollService>().ValidateItemRewards(itemTemplates);
+                logger.Info($"Mission content ready roll={mission.Identity} keys={missionKeys.Identity}");
                 logger.Info($"Mission offers ready sha256={missionOffers.Sha256} sourceSha256={missionOffers.SourceSha256} responses={missionOffers.ResponseCount} definitions={missionOffers.DefinitionCount}");
                 // External modules load before any playfield or connection can raise into them, and before World
                 // registration, which says whether a module's handoff hook decides on logins to this zone.
@@ -388,13 +384,19 @@ namespace ZoneEngine_New
             services.AddSingleton<ZoneEngine_New.Core.Quests.QuestRewardTable>();
             services.AddSingleton<ICharacterQuestStore, MySqlCharacterQuestStore>();
             services.AddSingleton<ZoneEngine_New.Core.Quests.QuestService>();
-            services.AddSingleton(_ => Utility.GameData.Missions.MissionDestinationCatalog.Load(
-                AORebirth.Core.GameData.GameDataPaths.ResolveRuntimeRoot()));
+            services.AddSingleton(_ => GameDataContentProvider.Runtime);
+            services.AddSingleton(_ => MissionContent.Shared);
+            services.AddSingleton(provider => provider.GetRequiredService<ContentSnapshot<MissionContent>>().Value.Destinations);
             services.AddSingleton(_ => GeneratedMissionRollService.Shared);
             services.AddSingleton<IGeneratedMissionOfferGenerator>(provider => provider.GetRequiredService<GeneratedMissionRollService>());
             services.AddSingleton<ZoneEngine_New.Core.Quests.Dungeons.DungeonLayoutGenerator>();
-            services.AddSingleton(provider => ZoneEngine_New.Core.Quests.Dungeons.MissionKeyPolicy.Load(
-                provider.GetRequiredService<IGameData>().RootPath, provider.GetRequiredService<IItemTemplateCatalog>()));
+            services.AddSingleton(provider =>
+            {
+                _ = provider.GetRequiredService<ContentSnapshot<MissionContent>>();
+                return MissionContent.RegisterKeys(provider.GetRequiredService<GameDataContentProvider>(),
+                    provider.GetRequiredService<IItemTemplateCatalog>()).Current;
+            });
+            services.AddSingleton(provider => provider.GetRequiredService<ContentSnapshot<MissionKeyPolicy>>().Value);
             services.AddSingleton<ZoneEngine_New.Core.Quests.Dungeons.QuestDungeonService>();
 
             //NPC scripts (GameData/NpcScripts)
@@ -474,7 +476,8 @@ namespace ZoneEngine_New
             services.AddSingleton<IMessageHandler>(provider => new QuestAlternativeMessageHandler(
                 provider.GetRequiredService<IGeneratedMissionDao>(), provider.GetRequiredService<GeneratedMissionService>(),
                 provider.GetRequiredService<Utility.GameData.Missions.MissionDestinationCatalog>(),
-                provider.GetRequiredService<IGeneratedMissionOfferGenerator>()));
+                provider.GetRequiredService<IGeneratedMissionOfferGenerator>(),
+                provider.GetRequiredService<ContentSnapshot<MissionContent>>().Value));
             AddMessageHandler<CreateQuestMessageHandler>(services);
             AddMessageHandler<QuestMessageHandler>(services);
             AddMessageHandler<PetCommandMessageHandler>(services);

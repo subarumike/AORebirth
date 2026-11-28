@@ -148,6 +148,7 @@
   </ItemGroup>
   <ItemGroup Condition="'$(RuntimeCatalogFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />
+    <Compile Include="GameDataContentProviderTests.cs" />
     <Compile Include="TestDoubles.cs" />
     <Compile Include="RuntimeCatalogTests.cs" />
     <Compile Include="RuntimeStartupTests.cs" />
@@ -220,6 +221,8 @@
   </ItemGroup>
   <ItemGroup Condition="'$(MissionChestFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />
+    <Compile Include="GameDataContentProviderTests.cs" />
+    <Compile Include="MissionContentSnapshotTests.cs" />
     <Compile Include="TestDoubles.cs" />
     <Compile Include="InventoryActionTests.cs" />
     <Compile Include="ChestCombatTests.cs" />

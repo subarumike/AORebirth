@@ -12,13 +12,24 @@ namespace ZoneEngine.Core.Missions
     /// Exact cash/XP pairs from the finalized mission-roll captures. Selection uses nearest captured
     /// evidence only; it does not calculate, scale, or interpolate rewards.
     /// </summary>
-    internal static class MissionRewardEvidenceModel
+    internal sealed class MissionRewardEvidenceModel
     {
         // 115 captured offers collapse to 108 unique records on the full evidence key. Repeated rolls and
         // same-key offers are deliberately not retained as probability weights.
-        private static readonly RewardEvidence[] Evidence = MissionContentJson.Read<RewardEvidence[]>("RewardObservations.json");
+        private readonly RewardEvidence[] Evidence;
 
-        internal static void ValidateCatalog()
+        private MissionRewardEvidenceModel(RewardEvidence[] evidence) => Evidence = evidence;
+
+        internal static MissionRewardEvidenceModel Parse(ReadOnlyMemory<byte> bytes)
+        {
+            var catalog = new MissionRewardEvidenceModel(MissionContentJson.Parse<RewardEvidence[]>(MissionContentJson.Decode(bytes)));
+            catalog.Validate();
+            return catalog;
+        }
+
+        internal static void ValidateCatalog() => _ = MissionContent.Shared.Value.NumericRewards;
+
+        private void Validate()
         {
             if (Evidence.Length == 0 || Evidence.Any(reward => reward is null || reward.CharacterLevel <= 0 || reward.MissionQl <= 0
                 || !MissionLevelRuntime.TryDecodeDifficultySlider(reward.DifficultyWire, out _)
@@ -31,7 +42,7 @@ namespace ZoneEngine.Core.Missions
                 throw new InvalidDataException("Invalid or incomplete mission numeric reward evidence.");
         }
 
-        internal static void Apply(
+        internal void Apply(
             QuestInfo offer,
             MissionRollType type,
             int characterLevel,
@@ -66,6 +77,7 @@ namespace ZoneEngine.Core.Missions
             MissionRollSliders sliders,
             int playfieldId)
         {
+            var Evidence = MissionContent.Shared.Value.NumericRewards.Evidence;
             if (sliders == null)
             {
                 return false;
@@ -92,6 +104,7 @@ namespace ZoneEngine.Core.Missions
             int missionQl,
             MissionRollSliders sliders)
         {
+            var Evidence = MissionContent.Shared.Value.NumericRewards.Evidence;
             if (sliders == null)
             {
                 return false;
@@ -120,6 +133,7 @@ namespace ZoneEngine.Core.Missions
             int cashReward,
             int experienceReward)
         {
+            var Evidence = MissionContent.Shared.Value.NumericRewards.Evidence;
             if (sliders == null)
             {
                 return false;
@@ -150,6 +164,7 @@ namespace ZoneEngine.Core.Missions
             int cashReward,
             int experienceReward)
         {
+            var Evidence = MissionContent.Shared.Value.NumericRewards.Evidence;
             if (sliders == null)
             {
                 return false;
@@ -172,6 +187,7 @@ namespace ZoneEngine.Core.Missions
 
         internal static bool IsCapturedPair(int cashReward, int experienceReward)
         {
+            var Evidence = MissionContent.Shared.Value.NumericRewards.Evidence;
             for (int i = 0; i < Evidence.Length; i++)
             {
                 if (Evidence[i].CashReward == cashReward
@@ -184,7 +200,7 @@ namespace ZoneEngine.Core.Missions
             return false;
         }
 
-        private static RewardEvidence Select(
+        private RewardEvidence Select(
             MissionRollType type,
             int characterLevel,
             int difficultyWire,
