@@ -56,6 +56,8 @@ internal static class DoaRules
     {
         foreach (var issue in DoaContentBoundary.SourceIssues(path, syntax))
             yield return issue;
+        foreach (var issue in DoaModuleBoundary.SourceIssues(path, syntax))
+            yield return issue;
 
         bool missions = path.StartsWith("AORebirth/Server/ZoneEngine_New/", StringComparison.Ordinal)
             && (path.Contains("/Missions/", StringComparison.Ordinal) || path.Contains("/Quests/", StringComparison.Ordinal));

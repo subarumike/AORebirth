@@ -43,6 +43,40 @@ combat and network services. Preserve hot-path costs by reusing validated data
 and eligibility indexes. Fail with a specific diagnostic when a required input
 is missing, invalid or unsupported.
 
+### Gameplay modules and DAO ownership
+
+ZoneEngine owns transport, authenticated sessions, dispatch, dependency
+injection, scheduling and communication with the other engines. The
+composition root binds existing implementations to contracts. Network handlers
+adapt messages and dispatch to the responsible module. The gameplay module
+owns action eligibility, mechanics and orchestration.
+
+| Boundary | Owner and contract |
+| --- | --- |
+| Terminal roll transport | `QuestAlternativeMessageHandler` dispatches `QuestAlternativeMessage` through `IMissionTerminalModule`. |
+| Terminal roll workflow | `MissionTerminalModule` validates the request and terminal interaction and coordinates the existing generator, persistence and response path. |
+| Selection and content | `IGeneratedMissionOfferGenerator` selects from the Phase 1 `MissionContent` snapshot and validated destination catalog. Existing mission content owners retain their registered providers and compatibility loaders. |
+| Economic transaction | `GeneratedMissionService.PublishOffers` retains the player persistence gate and commit-before-publication behavior. It uses `IGeneratedMissionDao.PublishOffers`. Durable offer identity allocation remains `IGeneratedMissionDao.ReserveIdentities`. |
+| SQL and durable state | Existing DAO implementations own connection use and SQL. Gameplay modules depend on their interfaces and the existing transaction services. |
+| Other mission lifecycle operations | `QuestService`, `QuestDungeonService` and `AuthoredQuestService` retain objective, acceptance, reconstruction and quest lifecycle ownership. |
+| Client wire | The shared AOtomation messages and serializers retain the original packet contract. The module uses the existing session gateway to send the same responses. |
+
+Terminal rolling is the controlled proof of this boundary. It uses the
+existing in-process dependency injection, mission generator and DAO. Future
+gameplay extraction proceeds through the owning module's narrow interface.
+Other consumers use that interface or approved shared infrastructure. Keep
+native engine-module contracts within their existing runtime; the external
+module host and plugin lifecycle continue to serve their existing role.
+
+The architecture guard compares the exact base and proposal to detect new
+raw database access, competing persistence abstractions, concrete DAO
+coupling, transaction-owner bypasses, handler gameplay and unauthorized
+module dependencies. Its existing GameData and content rules remain in
+force. Mutation tests exercise these boundaries, while the mission regression
+tests check actual selection, packets and transaction behavior. The static
+guard identifies recognized source patterns. Indirect calls, transaction
+semantics and new shared contracts also require source review.
+
 ### GameData provider
 
 The Zone composition root uses the existing GameData root and override settings

@@ -389,6 +389,7 @@ namespace ZoneEngine_New
             services.AddSingleton(provider => provider.GetRequiredService<ContentSnapshot<MissionContent>>().Value.Destinations);
             services.AddSingleton(_ => GeneratedMissionRollService.Shared);
             services.AddSingleton<IGeneratedMissionOfferGenerator>(provider => provider.GetRequiredService<GeneratedMissionRollService>());
+            services.AddSingleton<IMissionTerminalModule, MissionTerminalModule>();
             services.AddSingleton<ZoneEngine_New.Core.Quests.Dungeons.DungeonLayoutGenerator>();
             services.AddSingleton(provider =>
             {
@@ -473,11 +474,7 @@ namespace ZoneEngine_New
             AddMessageHandler<RaidCmdMessageHandler>(services);
             AddMessageHandler<OrgClientMessageHandler>(services);
             AddMessageHandler<TeamChatMessageHandler>(services);
-            services.AddSingleton<IMessageHandler>(provider => new QuestAlternativeMessageHandler(
-                provider.GetRequiredService<IGeneratedMissionDao>(), provider.GetRequiredService<GeneratedMissionService>(),
-                provider.GetRequiredService<Utility.GameData.Missions.MissionDestinationCatalog>(),
-                provider.GetRequiredService<IGeneratedMissionOfferGenerator>(),
-                provider.GetRequiredService<ContentSnapshot<MissionContent>>().Value));
+            AddMessageHandler<QuestAlternativeMessageHandler>(services);
             AddMessageHandler<CreateQuestMessageHandler>(services);
             AddMessageHandler<QuestMessageHandler>(services);
             AddMessageHandler<PetCommandMessageHandler>(services);

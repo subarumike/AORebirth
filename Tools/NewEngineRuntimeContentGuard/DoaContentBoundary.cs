@@ -24,7 +24,7 @@ internal static class DoaContentBoundary
             yield break;
 
         bool mission = path.Contains("/Missions/", StringComparison.Ordinal) || path.Contains("/Quests/", StringComparison.Ordinal);
-        bool catalogFile = mission || syntax.DescendantNodes().Any(node => node switch
+        bool catalogFile = mission || DoaModuleBoundary.IsGameplayOwner(path) || syntax.DescendantNodes().Any(node => node switch
         {
             LiteralExpressionSyntax literal => IsCatalogPath(literal),
             SimpleNameSyntax name => name.Identifier.ValueText is "ContentInputs" or "ContentModule",
