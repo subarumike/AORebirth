@@ -1,5 +1,9 @@
 # Mission Phase 3 modular dungeon architecture
 
+## Phase 3B follow-up
+
+[The Phase 3B performance and content approval report](MISSION_DUNGEON_PERFORMANCE_AND_CONTENT_APPROVAL.md) records the optimized construction, exact before-and-after measurements, identical saved-state replays in separate test hosts and the private archive approval decision. The measurements below remain the original Phase 3 evidence.
+
 ## Source and scope
 
 | Input | Revision |
