@@ -387,6 +387,8 @@ message TransferEnvelope {
   int32 exit_proxy_door = 12;
   // The team as the source mirrored it, so the arrival's first packets carry it; World's own state follows.
   TeamState team = 13;
+  // A one-way transport clears the previous return door on destination admission.
+  bool clear_return_door = 14;
 }
 
 // A pet re-summoned beside its owner on arrival: same template, level and remaining lifetime.
