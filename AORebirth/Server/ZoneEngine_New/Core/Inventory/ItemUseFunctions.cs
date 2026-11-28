@@ -932,7 +932,7 @@ namespace ZoneEngine_New.Core.Inventory
         }
 
 
-        static bool SystemText(Player player, ItemSpell spell)
+        internal static bool SystemText(Player player, ItemSpell spell)
         {
             if (player.Session == null || !spell.TryReadString(0, out string text) || text.Length == 0)
                 return false;

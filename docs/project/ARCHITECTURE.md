@@ -59,6 +59,7 @@ owns action eligibility, mechanics and orchestration.
 | Economic transaction | `GeneratedMissionService.PublishOffers` retains the player persistence gate and commit-before-publication behavior. It uses `IGeneratedMissionDao.PublishOffers`. Durable offer identity allocation remains `IGeneratedMissionDao.ReserveIdentities`. |
 | SQL and durable state | Existing DAO implementations own connection use and SQL. Gameplay modules depend on their interfaces and the existing transaction services. |
 | Other mission lifecycle operations | `QuestService`, `QuestDungeonService` and `AuthoredQuestService` retain objective, acceptance, reconstruction and quest lifecycle ownership. |
+| Quest rewards | `IRewardExecutionModule` projects the earned reward and submits it to the existing `IMissionDao` completion transaction. The quest owner retains the player persistence gate and publishes inventory, cleanup and journal events after commit. |
 | Client wire | The shared AOtomation messages and serializers retain the original packet contract. The module uses the existing session gateway to send the same responses. |
 
 Terminal rolling is the controlled proof of this boundary. It uses the
@@ -76,6 +77,15 @@ force. Mutation tests exercise these boundaries, while the mission regression
 tests check actual selection, packets and transaction behavior. The static
 guard identifies recognized source patterns. Indirect calls, transaction
 semantics and new shared contracts also require source review.
+
+Quest completion uses the assignment identity in the existing reward ledger.
+Its durable stats, items, supported virtual stat writes and research mutation
+share the completion transaction. Follow-up quest assignment consumes a pending
+stage from that same ledger in the transaction that assigns the child and
+grants its starter items. Transient notifications follow a known commit.
+Uncertain outcomes require authoritative reload. Keep other virtual OnUse
+actions on the existing immediate path until their owning services can provide
+transactional or idempotent execution.
 
 ### GameData provider
 

@@ -802,6 +802,40 @@ namespace AORebirth.Database.Domain.Characters
             });
         }
 
+        /// <summary>Apply one expected research change inside the caller's character-owned reward transaction.</summary>
+        internal static void ApplyRewardResearch(IDbConnection connection, IDbTransaction transaction, int characterId,
+            int researchId, int? expectedRemainingXp, int remainingXp)
+        {
+            if (characterId <= 0 || researchId <= 0 || remainingXp < 0
+                || expectedRemainingXp.HasValue && (expectedRemainingXp.Value <= 0 || remainingXp >= expectedRemainingXp.Value))
+                throw new ArgumentException("Invalid research reward projection.");
+
+            int? stored = QueryWithin<int?>(connection, transaction,
+                "SELECT RemainingXp FROM characterresearch WHERE CharacterId=@Id AND ResearchId=@Research FOR UPDATE",
+                row => row.GetInt32(0), "@Id", characterId, "@Research", researchId).SingleOrDefault();
+            if (stored != expectedRemainingXp || QueryWithin(connection, transaction,
+                    "SELECT PacketId FROM charactersperks WHERE CharacterId=@Id AND PacketId=@Research LIMIT 1 FOR UPDATE",
+                    row => row.GetInt32(0), "@Id", characterId, "@Research", researchId).Count != 0)
+                throw new InvalidOperationException("The durable research tier changed before reward completion.");
+
+            if (remainingXp > 0)
+            {
+                Execute(connection, transaction,
+                    "INSERT INTO characterresearch (CharacterId,ResearchId,RemainingXp) VALUES (@Id,@Research,@Remaining) "
+                    + "ON DUPLICATE KEY UPDATE RemainingXp=@Remaining",
+                    "@Id", characterId, "@Research", researchId, "@Remaining", remainingXp);
+                return;
+            }
+
+            Execute(connection, transaction, "INSERT INTO charactersperks (CharacterId,PacketId) VALUES (@Id,@Research)",
+                "@Id", characterId, "@Research", researchId);
+            if (stored.HasValue)
+            {
+                Execute(connection, transaction, "DELETE FROM characterresearch WHERE CharacterId=@Id AND ResearchId=@Research",
+                    "@Id", characterId, "@Research", researchId);
+            }
+        }
+
         public void SaveLocation(CharacterStateData character, int online)
         {
             ValidateCharacter(character);

@@ -38,7 +38,10 @@ namespace AORebirth.Tools.MissionDaoValidation
         {
             bool generatedIdentityOnly = args.Length == 2 && args[1] == "--generated-identity-only";
             bool chestsOnly = args.Length == 2 && args[1] == "--chests-only";
-            if ((args.Length != 1 && !generatedIdentityOnly && !chestsOnly) || !string.Equals(args[0], "--run-disposable", StringComparison.Ordinal))
+            bool rewardsOnly = args.Length == 2 && args[1] == "--rewards-only";
+            bool rewardWorker = args.Length == 3 && args[1] == "--reward-worker";
+            if ((args.Length != 1 && !generatedIdentityOnly && !chestsOnly && !rewardsOnly && !rewardWorker)
+                || !string.Equals(args[0], "--run-disposable", StringComparison.Ordinal))
             {
                 Console.Error.WriteLine("REFUSED: exact --run-disposable argument required.");
                 return 2;
@@ -54,6 +57,9 @@ namespace AORebirth.Tools.MissionDaoValidation
                 return 2;
             }
 
+            if (rewardWorker)
+                return RunRewardWorker(args[2]);
+
             DisposableMySql disposable = null;
             try
             {
@@ -66,6 +72,18 @@ namespace AORebirth.Tools.MissionDaoValidation
                 }
 
                 var dao = new MySqlMissionDao(() => Open(disposable.ApplicationConnectionString));
+                if (rewardsOnly)
+                {
+                    ValidateLifecycleAndNulls(dao);
+                    ValidateRewards(dao);
+                    ValidateCharacterQuestCompletion(dao, disposable.ApplicationConnectionString);
+                    ValidateQuestFollowUpRecovery(dao, disposable.ApplicationConnectionString);
+                    ValidateRewardResearchDurability(dao, disposable.ApplicationConnectionString);
+                    ValidateRewardProcessRecovery(dao, disposable.ApplicationConnectionString);
+                    Console.WriteLine("MISSION_REWARD_MYSQL=PASS");
+                    Console.WriteLine("MISSION_REWARD_CHECKS=" + checks.ToString(CultureInfo.InvariantCulture));
+                    return 0;
+                }
                 if (chestsOnly)
                 {
                     ValidateChestPopulation(dao, disposable.ApplicationConnectionString);
@@ -339,6 +357,12 @@ namespace AORebirth.Tools.MissionDaoValidation
                     43));
             Require(statReward.Status == MissionAtomicRewardStatus.Applied, "atomic-stat-reward");
             Require(statReward.StatValues.Single().Value == 25, "atomic-stat-value");
+
+            var replay = dao.Execute(101, transaction => transaction.TryApplyCharacterStatReward(
+                new MissionRewardKeyData(new MissionKeyData(101, "dao.lifecycle"), "cash-stat"), "cash",
+                new[] { CompletionStat(SmokeLounge.AOtomation.Messaging.GameData.CharacterStat.Cash, 100) }, null, 44));
+            Require(replay.Status == MissionAtomicRewardStatus.AlreadyApplied
+                && replay.StatValues.Single().Value == 25, "authored-reward-replay-reuses-original-stat");
         }
 
         private static void ValidateRollFeeConcurrency(IMissionDao dao, string rootConnectionString)
@@ -413,7 +437,9 @@ namespace AORebirth.Tools.MissionDaoValidation
                          "generatedmissionartifacts.sql",
                          "characterquests.sql",
                          "generatedquests.sql",
-                         "questdungeonkeys.sql"
+                         "questdungeonkeys.sql",
+                         "characterresearch.sql",
+                         "charactersperks.sql"
                      })
             {
                 using (var command = new MySqlCommand(File.ReadAllText(Path.Combine(directory, name)), connection))

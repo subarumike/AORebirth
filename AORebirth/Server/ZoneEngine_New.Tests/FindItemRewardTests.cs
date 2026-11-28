@@ -609,6 +609,8 @@ public sealed class FindItemRewardTests
         public void UpsertForCharacter(int characterId, IReadOnlyList<StatRecord> stats) => throw new NotSupportedException();
         public MissionStateData GetMission(MissionKeyData key) => throw new NotSupportedException();
         public IList<MissionStateData> GetMissions(int characterId) => throw new NotSupportedException();
+        public CharacterQuestCompletionResult TryApplyCharacterQuestFollowUp(CharacterQuestFollowUpRequest request)
+            => throw new NotSupportedException();
         public MissionCharacterSnapshotData ReadCharacter(int characterId)
         {
             Assert.AreEqual(CharacterId, characterId);

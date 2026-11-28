@@ -14,6 +14,7 @@ using ZoneEngine_New.Core.Helpers;
 using ZoneEngine_New.Core.Inventory;
 using ZoneEngine_New.Core.Logging;
 using ZoneEngine_New.Core.Network;
+using ZoneEngine_New.Core.Quests;
 using DaoState = AORebirth.Interfaces.Persistence.Missions.MissionLifecycleState;
 
 /// <summary>Generic editable authored actions; inventory, rewards and mission transitions commit together.</summary>
@@ -27,13 +28,16 @@ public sealed partial class AuthoredQuestService
     readonly AuthoredQuestCatalog _catalog;
     readonly IZoneLogger _logger;
     readonly Func<DateTime> _now;
+    readonly IRewardExecutionModule _rewardExecution;
     public InteractionContent Content => _catalog.Content;
     public AuthoredQuestService(IMissionDao dao, InventoryFlushService flush, IItemBuilder items,
-        IItemTemplateCatalog templates, IItemInstanceIdAllocator ids, AuthoredQuestCatalog catalog, IZoneLogger logger)
-        : this(dao, flush, items, templates, ids, catalog, logger, () => DateTime.UtcNow) { }
+        IItemTemplateCatalog templates, IItemInstanceIdAllocator ids, AuthoredQuestCatalog catalog, IZoneLogger logger, IRewardExecutionModule rewardExecution)
+        : this(dao, flush, items, templates, ids, catalog, logger, () => DateTime.UtcNow, rewardExecution) { }
     public AuthoredQuestService(IMissionDao dao, InventoryFlushService flush, IItemBuilder items,
-        IItemTemplateCatalog templates, IItemInstanceIdAllocator ids, AuthoredQuestCatalog catalog, IZoneLogger logger, Func<DateTime> now)
-    { _dao = dao; _flush = flush; _items = items; _templates = templates; _ids = ids; _catalog = catalog; _logger = logger; _now = now; }
+        IItemTemplateCatalog templates, IItemInstanceIdAllocator ids, AuthoredQuestCatalog catalog, IZoneLogger logger,
+        Func<DateTime> now, IRewardExecutionModule rewardExecution)
+    { _dao = dao; _flush = flush; _items = items; _templates = templates; _ids = ids; _catalog = catalog; _logger = logger; _now = now;
+        _rewardExecution = rewardExecution ?? throw new ArgumentNullException(nameof(rewardExecution)); }
 
     public bool IsAuthoredItem(Item item) => Content.Actions.Values.Any(x => x.DirectItemUse
         && (x.ItemIds.Contains(item.LowId) || x.ItemIds.Contains(item.HighId)))
@@ -82,7 +86,7 @@ public sealed partial class AuthoredQuestService
                 foreach (var completion in entry.Complete) CompleteIfPresent(tx, completion.Quest,
                     completion.Objective, completion.Observation, completion.Event);
                 foreach (var quest in entry.Accept) Accept(tx, quest);
-                if (entry.StatReward is { } reward) stats.AddRange(ApplyStatReward(tx, player, reward.Quest, reward.Key, reward.Xp, reward.Cash,
+                if (entry.StatReward is { } reward) stats.AddRange(_rewardExecution.ApplyAuthoredStats(tx, player, reward.Quest, reward.Key, reward.Xp, reward.Cash,
                     string.IsNullOrWhiteSpace(reward.EffectReference) ? "content-action:" + reward.Quest + ":" + reward.Key : reward.EffectReference, _now().Ticks));
             }
             if (action.Consume) ApplyRows(tx, plan, player, slot, item!);
@@ -93,6 +97,12 @@ public sealed partial class AuthoredQuestService
             }
             return () =>
             {
+                if (stats.Count > 0)
+                    player.SaveState.MarkCommitted(player.SaveState.NextSequence(), stats.Select(stat => new StatRecord
+                    {
+                        StatId = stat.StatId,
+                        StatValue = unchecked((int)(uint)Math.Clamp(stat.Value, 0, uint.MaxValue))
+                    }).ToArray(), location: null);
                 plan.PublishAfterCommit(false);
                 var notifications = grantPairs.Where(x => granted.Any(y => ReferenceEquals(y.Item, x.Item)) || x.Definition.NotifyIfCarried).ToArray();
                 if (action.AcknowledgementBeforeConsumption) acknowledge?.Invoke();
@@ -216,22 +226,6 @@ public sealed partial class AuthoredQuestService
         var definition = Definition(quest);
         if (state.State == DaoState.Offered) AuthoredMissionProgression.Accept(tx, definition, _now().Ticks);
         AuthoredMissionProgression.Complete(tx, definition, objective, observationKey, eventType, string.Empty, string.Empty, _now().Ticks);
-    }
-
-    static IList<MissionStatValueData> ApplyStatReward(IMissionDaoTransaction tx, Player player, string quest, string rewardKey, int xp, int cash, string evidence, long now)
-    {
-        // Use the owner-gated live values, not potentially older snapshot rows. The accepted
-        // AddClamped arithmetic is unchanged; its final values join the same ledger transaction.
-        var mutations = new[] { (StatIds.cash, cash), (StatIds.xp, xp), (StatIds.unsavedxp, xp), (StatIds.lastxp, xp) }
-            .Select(value => new MissionStatMutationData { StatIdentityType = (int)player.Identity.Type, StatId = (int)value.Item1,
-                Kind = AORebirth.Interfaces.Persistence.Missions.MissionStatMutationKind.Set,
-                Value = value.Item1 == StatIds.lastxp ? value.Item2 : Math.Min(uint.MaxValue,
-                    (long)unchecked((uint)player.Stats.GetOrZero((CharacterStat)value.Item1, StatDetail.Base)) + value.Item2),
-                MinimumValue = 0, MaximumValue = uint.MaxValue }).ToArray();
-        var result = tx.TryApplyCharacterStatReward(new(new(player.Identity.Instance, quest), rewardKey), "character-stats", mutations, evidence, now);
-        if (result.Status is not (AORebirth.Interfaces.Persistence.Missions.MissionAtomicRewardStatus.Applied
-            or AORebirth.Interfaces.Persistence.Missions.MissionAtomicRewardStatus.AlreadyApplied)) throw new InvalidOperationException(result.Message);
-        return result.StatValues;
     }
 
     static void PublishStats(Player player, IEnumerable<MissionStatValueData> stats)

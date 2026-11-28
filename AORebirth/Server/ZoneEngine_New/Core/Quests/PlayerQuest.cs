@@ -2,6 +2,7 @@ namespace ZoneEngine_New.Core.Quests
 {
     using System;
     using System.Collections.Generic;
+    using AORebirth.Interfaces.Persistence.Missions;
 
     public enum QuestSource
     {
@@ -72,5 +73,8 @@ namespace ZoneEngine_New.Core.Quests
     public sealed class QuestLog
     {
         public Dictionary<string, PlayerQuest> Quests { get; } = new(StringComparer.Ordinal);
+        internal List<MissionRewardStageData> PendingFollowUps { get; } = [];
+        internal bool FollowUpsLoaded { get; set; }
+        internal long NextFollowUpRetryUtcTicks { get; set; }
     }
 }

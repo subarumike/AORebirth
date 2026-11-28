@@ -382,6 +382,7 @@ namespace ZoneEngine_New
             //Quests
             services.AddSingleton<ZoneEngine_New.Core.Quests.QuestCatalog>();
             services.AddSingleton<ZoneEngine_New.Core.Quests.QuestRewardTable>();
+            services.AddSingleton<ZoneEngine_New.Core.Quests.IRewardExecutionModule, ZoneEngine_New.Core.Quests.RewardExecutionModule>();
             services.AddSingleton<ICharacterQuestStore, MySqlCharacterQuestStore>();
             services.AddSingleton<ZoneEngine_New.Core.Quests.QuestService>();
             services.AddSingleton(_ => GameDataContentProvider.Runtime);

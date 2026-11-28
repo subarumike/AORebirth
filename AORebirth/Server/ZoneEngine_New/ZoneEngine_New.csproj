@@ -90,6 +90,7 @@
     <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Inventory.cs" Link="SharedGameplay/Missions/MySqlMissionDao.Inventory.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.Chests.cs" Link="SharedGameplay/Missions/MySqlMissionDao.Chests.cs" />
     <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.CharacterQuests.cs" Link="SharedGameplay/Missions/MySqlMissionDao.CharacterQuests.cs" />
+    <Compile Include="../../Libraries/Source/AORebirth.Database/Domain/Missions/MySqlMissionDao.QuestFollowUps.cs" Link="SharedGameplay/Missions/MySqlMissionDao.QuestFollowUps.cs" />
     <Compile Include="$(AORebirthRepositoryRoot)/SharedBuild/Compatibility/JavaScriptSerializer.Portable.cs" Link="Compatibility/JavaScriptSerializer.cs" />
     <Compile Include="..\..\SolutionAssemblyInfo.cs">
       <Link>Properties\SolutionAssemblyInfo.cs</Link>

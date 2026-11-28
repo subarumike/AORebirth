@@ -149,6 +149,8 @@
   <ItemGroup Condition="'$(RuntimeCatalogFocusedTests)' == 'true'">
     <Compile Remove="@(Compile)" />
     <Compile Include="GameDataContentProviderTests.cs" />
+    <Compile Include="RewardExecutionModuleTests.cs" />
+    <Compile Include="RewardExecutionModuleTests.Starters.cs" />
     <Compile Include="TestDoubles.cs" />
     <Compile Include="RuntimeCatalogTests.cs" />
     <Compile Include="RuntimeStartupTests.cs" />
@@ -223,6 +225,9 @@
     <Compile Remove="@(Compile)" />
     <Compile Include="GameDataContentProviderTests.cs" />
     <Compile Include="MissionContentSnapshotTests.cs" />
+    <Compile Include="RewardExecutionModuleTests.cs" />
+    <Compile Include="RewardExecutionModuleTests.Starters.cs" />
+    <Compile Include="RewardXpDurabilityTests.cs" />
     <Compile Include="TestDoubles.cs" />
     <Compile Include="InventoryActionTests.cs" />
     <Compile Include="ChestCombatTests.cs" />
@@ -237,6 +242,7 @@
     <Compile Include="MissionChestObjectiveIntegrationTests.cs" />
     <Compile Include="MissionKeyPolicyTests.cs" />
     <Compile Include="AuthoredMissionTestDao.cs" />
+    <Compile Include="AuthoredRewardModuleTests.cs" />
     <Compile Include="PlayerInventoryOverflowTests.cs" />
     <Compile Include="ReconnectVisibilityTests.cs" />
     <Compile Include="ExactSpawnVisibilityTests.cs" />

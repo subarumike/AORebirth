@@ -184,7 +184,13 @@ namespace AORebirth.Database.Domain.Quests
                             throw new InvalidOperationException("An earned pending quest must be paid atomically before its state or assigned run can change.");
                     }
                 }
-                return Execute(c, t,
+                return UpsertCharacterQuest(c, t, row);
+            });
+        }
+
+        internal static int UpsertCharacterQuest(IDbConnection connection, IDbTransaction transaction, CharacterQuestRow row)
+        {
+            return Execute(connection, transaction,
                 "INSERT INTO characterquests (" + CharacterColumns + ") VALUES "
                 + "(@CharacterId,@QuestId,@Source,@State,@Progress,@RequiredCount,@Assigned,@Updated) "
                 + "ON DUPLICATE KEY UPDATE Source=VALUES(Source),State=VALUES(State),Progress=VALUES(Progress),"
@@ -198,7 +204,6 @@ namespace AORebirth.Database.Domain.Quests
                 "@RequiredCount", row.RequiredCount,
                 "@Assigned", row.AssignedAtUtcTicks,
                 "@Updated", row.UpdatedAtUtcTicks);
-            });
         }
 
         /// <summary>Inserts the generated quest or replaces the stored one with the same id.</summary>

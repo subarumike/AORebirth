@@ -35,6 +35,7 @@ namespace ZoneEngine_New.Core.Quests
         readonly AORebirth.Interfaces.Persistence.Missions.IMissionDao? _completionDao;
         readonly ZoneEngine_New.Core.Characters.CharacterSnapshotService? _snapshot;
         readonly QuestRewardTable? _rewards;
+        readonly IRewardExecutionModule _rewardExecution;
 
         public QuestService(
             QuestCatalog catalog,
@@ -44,8 +45,9 @@ namespace ZoneEngine_New.Core.Quests
             IZoneLogger logger,
             AORebirth.Interfaces.Persistence.Missions.IMissionDao? completionDao = null,
             ZoneEngine_New.Core.Characters.CharacterSnapshotService? snapshot = null,
-            QuestRewardTable? rewards = null)
-            : this(catalog, store, items, flush, logger, () => DateTime.UtcNow, completionDao, snapshot, rewards)
+            QuestRewardTable? rewards = null,
+            IRewardExecutionModule? rewardExecution = null)
+            : this(catalog, store, items, flush, logger, () => DateTime.UtcNow, completionDao, snapshot, rewards, rewardExecution)
         {
         }
 
@@ -58,7 +60,8 @@ namespace ZoneEngine_New.Core.Quests
             Func<DateTime> now,
             AORebirth.Interfaces.Persistence.Missions.IMissionDao? completionDao = null,
             ZoneEngine_New.Core.Characters.CharacterSnapshotService? snapshot = null,
-            QuestRewardTable? rewards = null)
+            QuestRewardTable? rewards = null,
+            IRewardExecutionModule? rewardExecution = null)
         {
             _catalog = catalog ?? throw new ArgumentNullException(nameof(catalog));
             _store = store ?? throw new ArgumentNullException(nameof(store));
@@ -69,6 +72,7 @@ namespace ZoneEngine_New.Core.Quests
             _completionDao = completionDao;
             _snapshot = snapshot;
             _rewards = rewards;
+            _rewardExecution = rewardExecution ?? new RewardExecutionModule(completionDao, items, logger, rewards, catalog);
         }
 
         public QuestCatalog Catalog => _catalog;
@@ -192,7 +196,7 @@ namespace ZoneEngine_New.Core.Quests
         public void Restore(Player player)
         {
             ArgumentNullException.ThrowIfNull(player);
-            RetryPendingRewards(player, force: true);
+            RetryPendingRewards(player, force: true, recoverFollowUps: false);
             foreach (PlayerQuest quest in GetLog(player).Quests.Values)
             {
                 if (quest.IsActive)
@@ -201,6 +205,7 @@ namespace ZoneEngine_New.Core.Quests
                     // A crash/uncertain commit may have paid the quest before its keys were retired.
                     QuestEnded?.Invoke(player, quest);
             }
+            RetryQuestFollowUps(player, force: true);
         }
 
         /// <summary>

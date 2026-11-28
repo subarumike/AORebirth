@@ -42,6 +42,10 @@ internal static class DoaMutationTests
             ("gameplay dispatch boundary", CheckGameplayDispatch),
             ("competing persistence contract", CheckCompetingPersistence),
             ("mission transaction service boundary", CheckTransactionBoundary),
+            ("reward dispatch and recovery boundary", CheckRewardEffects),
+            ("reward transaction and applied marker boundary", CheckRewardTransactions),
+            ("single reward ledger and execution module", CheckRewardOwner),
+            ("reward GameData authority and values", CheckRewardContent),
             ("internal module dependencies", CheckModuleDependencies),
             ("project dependency boundary", CheckProjects),
             ("unchanged and introduced findings", CheckDiff),
@@ -169,6 +173,74 @@ internal static class DoaMutationTests
         Require(!DoaRules.SourceIssues("AORebirth/Server/ZoneEngine_New/Core/Trade/TradeService.cs",
             Parse("class TradeService { ITradePersistence persistence; void PersistPlan() => this.persistence.Persist(batch); }")).Any());
         Require(!Rules("class Probe { void Run() => cache.Persist(snapshot); }").Any());
+    }
+
+    private static void CheckRewardEffects()
+    {
+        const string handler = "AORebirth/Server/ZoneEngine_New/Core/MessageHandlers/RewardHandler.cs";
+        Require(DoaRules.SourceIssues(handler, Parse("class Probe { void Run() => player?.AwardXp(amount); }"))
+            .Any(issue => issue.Rule == "DOA_GAMEPLAY_IN_DISPATCH"));
+        Require(!DoaRules.SourceIssues(handler,
+            Parse("class Probe(IRewardExecutionModule rewards) { void Run() => rewards.Execute(request); }")).Any());
+
+        string[] unsafeCalls =
+        [
+            "player.ApplyResearchXp(plan.ResearchXp)", "player.AddToDeathXpPool(plan.PooledXp)",
+            "item.Definition.ExecuteOnUseSpells(player, inventory, builder)", "quest.TryAssignTemplate(player, next, out _)"
+        ];
+        foreach (string call in unsafeCalls)
+            Require(DoaRules.SourceIssues(DoaRewardBoundary.ModulePath,
+                Parse($"class RewardExecutionModule {{ void Run() => {call}; }}"))
+                .Any(issue => issue.Rule == "DOA_UNTRACKED_REWARD_EFFECT"));
+    }
+
+    private static void CheckRewardTransactions()
+    {
+        Block("class Probe(ICharacterQuestCompletionTransaction tx) { object Run() => tx.TryCompleteCharacterQuest(request); }",
+            "DOA_REWARD_TRANSACTION_BYPASS");
+        Block("class Probe(IMissionDaoTransaction tx) { object Run() => tx.TryApplyCharacterStatRewardWithResearch(plan); }",
+            "DOA_REWARD_TRANSACTION_BYPASS");
+        Block("class Probe(IMissionDaoTransaction tx) { void Run() { var mark = tx.TryMarkRewardApplied; mark(key); } }",
+            "DOA_REWARD_TRANSACTION_BYPASS");
+        Block("class Probe(IMissionDaoTransaction tx) { void Run() => tx.TryClaimReward(key); }", "DOA_REWARD_TRANSACTION_BYPASS");
+        Block("class Probe(ICharacterQuestCompletionTransaction tx) { void Run() => tx.TryApplyCharacterQuestFollowUp(request); }",
+            "DOA_REWARD_TRANSACTION_BYPASS");
+
+        const string coordinated = "class RewardExecutionModule(IMissionDao? dao) { object Run() => dao.Execute(owner, account, tx => Complete(tx).TryCompleteCharacterQuest(request)); }";
+        Require(!DoaRules.SourceIssues(DoaRewardBoundary.ModulePath, Parse(coordinated)).Any());
+        Require(DoaRules.SourceIssues(DoaRewardBoundary.ModulePath,
+            Parse(coordinated.Replace("IMissionDao? dao", "OtherRunner dao", StringComparison.Ordinal)))
+            .Any(issue => issue.Rule == "DOA_REWARD_TRANSACTION_BYPASS"));
+        Require(!DoaRules.SourceIssues(DoaRewardBoundary.FollowUpPath, Parse(
+            "class QuestService { object TryApplyQuestFollowUp() => _completionDao!.Execute(owner, tx => Complete(tx).TryApplyCharacterQuestFollowUp(request)); }")).Any());
+    }
+
+    private static void CheckRewardOwner()
+    {
+        Block("interface IAlternateRewardLedger { void Write(); }", "DOA_COMPETING_REWARD_LEDGER");
+        Block("class LocalCompletion : ICharacterQuestCompletionTransaction {}", "DOA_COMPETING_REWARD_LEDGER");
+        Block("class AlternateExecution : IRewardExecutionModule {}", "DOA_DUPLICATE_REWARD_EXECUTION");
+        Block("interface IRewardExecutionModule {}", "DOA_DUPLICATE_REWARD_EXECUTION");
+        Require(!DoaRules.SourceIssues(DoaRewardBoundary.ModulePath,
+            Parse("interface IRewardExecutionModule {} class RewardExecutionModule : IRewardExecutionModule {}")).Any());
+        Require(DoaRules.SourceIssues(DoaRewardBoundary.ModulePath,
+            Parse("class RewardExecutionModule(MySqlMissionDao dao) { void Run() {} }"))
+            .Any(issue => issue.Rule == "DOA_CONCRETE_DAO"));
+        Require(DoaRules.SourceIssues(DoaRewardBoundary.ModulePath,
+            Parse("""class RewardExecutionModule { void Run() => db.Execute("UPDATE characters SET Cash = 1"); }"""))
+            .Any(issue => issue.Rule == "DOA_DIRECT_DATABASE_ACCESS"));
+    }
+
+    private static void CheckRewardContent()
+    {
+        Block("class Probe { object Run() => new QuestReward { Credits = 150, Xp = -10 }; }", "DOA_FIXED_REWARD_VALUE");
+        Block("class Probe { object Run() => new QuestRewardItem { Id = 1500 }; }", "DOA_FIXED_REWARD_VALUE");
+        Block("class Probe { QuestRewardItem item = new() { Quality = 5 }; }", "DOA_FIXED_REWARD_VALUE");
+        Block("class Probe { object Run() => DirectXpRewardPlan.CreateQuestReward(player, 500); }", "DOA_FIXED_REWARD_VALUE");
+        Block("class Probe { int Run() => data?.RewardXp ?? 500; }", "DOA_FIXED_REWARD_VALUE");
+        Block("class Probe { const double RewardWeight = 0.2; }", "DOA_FIXED_REWARD_VALUE");
+        Block("""class Probe { object Load() => File.ReadAllText("Rewards.json"); }""", "DOA_DIRECT_CONTENT_SOURCE");
+        Require(!Rules("class Probe { object Run() => new QuestReward { Credits = reward.Credits, Xp = plan.Xp }; }").Any());
     }
 
     private static void CheckModuleDependencies()

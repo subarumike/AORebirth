@@ -21,6 +21,7 @@ using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.Inventory;
 using ZoneEngine_New.Core.MessageHandlers;
 using ZoneEngine_New.Core.Missions;
+using ZoneEngine_New.Core.Quests;
 using ZoneEngine_New.Core.Mobs;
 using ZoneEngine_New.Core.Playfield.Locality;
 using ZoneEngine_New.Core.Network;
@@ -431,7 +432,9 @@ public sealed class AuthoredQuestTests
             typeof(PlayfieldManager).GetField("_sync", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(manager, new Lock());
             typeof(PlayfieldManager).GetField("_playersByCharacterId", BindingFlags.Instance | BindingFlags.NonPublic)!.SetValue(manager, new Dictionary<int, Player>());
             _flush = new(new Lazy<PlayfieldManager>(() => manager), new NoIndependentFlush(), new StubLogger());
-            Service = new(Dao, _flush, new StubItemBuilder(), new TemplateCatalog(), new Ids(), Catalog, Logger, () => Now);
+            var items = new StubItemBuilder();
+            Service = new(Dao, _flush, items, new TemplateCatalog(), new Ids(), Catalog, Logger, () => Now,
+                new RewardExecutionModule(Dao, items, Logger));
         }
         internal void Activate(string quest)
         {

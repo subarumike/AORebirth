@@ -7,6 +7,7 @@ using AORebirth.Interfaces.Persistence.Missions;
 using SmokeLounge.AOtomation.Messaging.GameData;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
 using ZoneEngine.Core.Missions;
+using ZoneEngine_New.Core.Data;
 using ZoneEngine_New.Core.Entities;
 using ZoneEngine_New.Core.Helpers;
 using ZoneEngine_New.Core.Inventory;
@@ -136,16 +137,25 @@ public sealed partial class AuthoredQuestService
                         Value = tokens, MinimumValue = 0, MaximumValue = int.MaxValue }],
                     ProgressionRewardRules.CreateSideTokenEffectReference(snapshot.SideTokenStatId, snapshot.SideTokenReward), _now().Ticks));
             }
-            // The stat-reward API needs a mutation to record its idempotent ledger stage. XP-off records
-            // the plan's unchanged XP without normalizing progression or discarding the independent rewards.
-            MissionStatMutationData[] xpMutations = progression.NormalXpSuppressed
+            // A zero-XP plan still needs a stat operation to record the timed reward's existing ledger stage.
+            MissionStatMutationData[] xpMutations = progression.Stats.Count == 0
                 ? [new() { StatIdentityType = (int)player.Identity.Type, StatId = (int)CharacterStat.XP,
                     Kind = AORebirth.Interfaces.Persistence.Missions.MissionStatMutationKind.Set,
                     Value = progression.ExperienceAfter, MinimumValue = 0, MaximumValue = int.MaxValue }]
                 : progression.Stats.Select(value => new MissionStatMutationData { StatIdentityType = (int)player.Identity.Type, StatId = (int)value.Key,
                     Kind = AORebirth.Interfaces.Persistence.Missions.MissionStatMutationKind.Set, Value = value.Value, MinimumValue = 0, MaximumValue = int.MaxValue }).ToArray();
-            RequireNewReward(tx.TryApplyCharacterStatReward(new(new(player.Identity.Instance, rule.Quest), rule.XpRewardKey), "character-stats", xpMutations,
-                ProgressionRewardRules.CreateFullLevelXpEffectReference(snapshot.LevelBefore, snapshot.XpReward), _now().Ticks));
+            var xpKey = new MissionRewardKeyData(new(player.Identity.Instance, rule.Quest), rule.XpRewardKey);
+            string xpReference = ProgressionRewardRules.CreateFullLevelXpEffectReference(snapshot.LevelBefore, snapshot.XpReward);
+            long now = _now().Ticks;
+            if (progression.ResearchMutation is { } research)
+            {
+                if (tx is not IMissionRewardResearchTransaction researchTransaction)
+                    throw new InvalidOperationException("Mission DAO does not support atomic timed reward research.");
+                RequireNewReward(researchTransaction.TryApplyCharacterStatRewardWithResearch(
+                    xpKey, "character-stats", xpMutations, xpReference, now, research));
+            }
+            else
+                RequireNewReward(tx.TryApplyCharacterStatReward(xpKey, "character-stats", xpMutations, xpReference, now));
             Accept(tx, rule.CooldownQuest);
             string until = _now().AddSeconds(rule.CooldownSeconds).ToString("o", CultureInfo.InvariantCulture);
             AuthoredMissionProgression.SetFlag(tx, Definition(rule.CooldownQuest), rule.CooldownFlag, until, _now().Ticks);
@@ -155,6 +165,11 @@ public sealed partial class AuthoredQuestService
             ApplyRows(tx, Plan(player, []), player, slot, chip);
             return () =>
             {
+                var committedStats = xpMutations.Where(mutation => !StatCollection.IsRuntimeOnly((CharacterStat)mutation.StatId))
+                    .Select(mutation => new StatRecord { StatId = mutation.StatId, StatValue = checked((int)mutation.Value) }).ToList();
+                if (snapshot.SideTokenReward > 0)
+                    committedStats.Add(new StatRecord { StatId = snapshot.SideTokenStatId, StatValue = (int)tokens });
+                player.SaveState.MarkCommitted(player.SaveState.NextSequence(), committedStats, location: null);
                 publishAcceptedTrade();
                 player.Inventory.Inventory.Content.Remove(slot.Instance);
                 player.Session?.Send(new CharacterActionMessage { Identity = player.Identity, Action = CharacterActionType.DeleteItem, Target = slot });

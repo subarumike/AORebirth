@@ -3,12 +3,14 @@ namespace AORebirth.Database.Domain.Missions
     using System;
     using System.Globalization;
     using System.Linq;
+    using AORebirth.Database.Domain.Characters;
     using AORebirth.Interfaces.Persistence.Missions;
     using Dapper;
 
     public sealed partial class MySqlMissionDao
     {
-        private sealed partial class MySqlMissionDaoTransaction : ICharacterQuestCompletionTransaction, ICharacterQuestObjectiveCollectionTransaction
+        private sealed partial class MySqlMissionDaoTransaction : ICharacterQuestCompletionTransaction,
+            ICharacterQuestObjectiveCollectionTransaction, IMissionRewardResearchTransaction
         {
             private const string CharacterQuestRewardType = "CharacterQuestCompletion";
 
@@ -122,6 +124,26 @@ namespace AORebirth.Database.Domain.Missions
                 catch { this.failed = true; throw; }
             }
 
+            public MissionAtomicStatRewardResultData TryApplyCharacterStatRewardWithResearch(MissionRewardKeyData key,
+                string rewardType, System.Collections.Generic.IList<MissionStatMutationData> mutations, string effectReference,
+                long appliedAtUtcTicks, MissionResearchMutationData research)
+            {
+                this.EnsureActive();
+                try
+                {
+                    if (research == null) throw new ArgumentNullException(nameof(research));
+                    var reward = this.ApplyCharacterStatReward(key, rewardType, mutations, effectReference, appliedAtUtcTicks);
+                    if (reward.Status == MissionAtomicRewardStatus.Applied)
+                        this.ApplyRewardResearch(research);
+                    return reward;
+                }
+                catch { this.failed = true; throw; }
+            }
+
+            private void ApplyRewardResearch(MissionResearchMutationData research)
+                => MySqlCharacterPersistenceDao.ApplyRewardResearch(this.connection, this.transaction, this.CharacterId,
+                    research.ResearchId, research.ExpectedRemainingXp, research.RemainingXp);
+
             private CharacterQuestCompletionResult CompleteCharacterQuest(CharacterQuestCompletionRequest request)
             {
                 if (request == null) throw new ArgumentNullException(nameof(request));
@@ -155,13 +177,15 @@ namespace AORebirth.Database.Domain.Missions
                         return QuestCompletionResult(CharacterQuestCompletionStatus.Rejected, quest, "The durable character stats changed before completion.");
                 }
 
-                this.ApplyInventoryMutationCore(request.Grants, new MissionItemInstanceData[0]);
+                this.ApplyInventoryMutationCore(request.Grants, new MissionItemInstanceData[0], allowOverflowGrants: true);
                 // Only this private path can authorize the shared ledger/stat primitive from characterquests.
                 MissionAtomicStatRewardResultData reward = this.ApplyCharacterStatReward(key, CharacterQuestRewardType,
                     request.StatMutations, "characterquest:" + quest.QuestId + ":" + quest.AssignedAtUtcTicks.ToString(CultureInfo.InvariantCulture),
                     request.NowUtcTicks, validatedCharacterQuestCompletion: true);
                 if (reward.Status != MissionAtomicRewardStatus.Applied)
                     throw new InvalidOperationException("The validated pending quest reward could not be applied atomically.");
+                if (request.ResearchMutation != null)
+                    this.ApplyRewardResearch(request.ResearchMutation);
                 int completed = this.ExecuteWrite(
                     "UPDATE characterquests SET State=2,Progress=RequiredCount,UpdatedAtUtcTicks=@Now "
                     + "WHERE CharacterId=@CharacterId AND QuestId=@QuestId AND State=1 AND Progress>=RequiredCount AND AssignedAtUtcTicks=@Assigned",
@@ -171,6 +195,7 @@ namespace AORebirth.Database.Domain.Missions
                 quest.UpdatedAtUtcTicks = request.NowUtcTicks;
                 var result = QuestCompletionResult(CharacterQuestCompletionStatus.Applied, quest, "Quest state, inventory, stats and reward ledger committed together.");
                 result.StatValues = reward.StatValues;
+                result.FollowUp = this.RecordCharacterQuestFollowUp(quest, request.FollowUpQuestId, request.NowUtcTicks);
                 return result;
             }
 

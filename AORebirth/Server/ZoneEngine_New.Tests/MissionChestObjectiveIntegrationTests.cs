@@ -753,6 +753,9 @@ public sealed class MissionChestObjectiveIntegrationTests
 
 internal sealed partial class AuthoredMissionTestDao : ICharacterQuestCompletionTransaction, ICharacterQuestObjectiveCollectionTransaction
 {
+    public CharacterQuestCompletionResult TryApplyCharacterQuestFollowUp(CharacterQuestFollowUpRequest request)
+        => throw new NotSupportedException();
+
     public CharacterQuestCompletionSnapshotData ReadCharacterQuest(string questId)
         => CharacterQuest?.QuestId == questId ? CloneCharacterQuest(CharacterQuest)!
             : throw new InvalidOperationException("No exact generated quest was seeded for this test.");

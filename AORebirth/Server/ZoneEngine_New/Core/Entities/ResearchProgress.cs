@@ -55,6 +55,12 @@ namespace ZoneEngine_New.Core.Entities
 
         /// <summary>Sets the XP <paramref name="researchId"/> still needs; zero or less removes it (finished).</summary>
         public void Set(int researchId, int remaining)
+            => Set(researchId, remaining, dirty: true);
+
+        internal void SetCommitted(int researchId, int remaining)
+            => Set(researchId, remaining, dirty: false);
+
+        void Set(int researchId, int remaining, bool dirty)
         {
             lock (_gate)
             {
@@ -68,7 +74,7 @@ namespace ZoneEngine_New.Core.Entities
                     _remaining[researchId] = remaining;
                 else
                     _remaining.Remove(researchId);
-                _dirty = true;
+                _dirty |= dirty;
             }
         }
 

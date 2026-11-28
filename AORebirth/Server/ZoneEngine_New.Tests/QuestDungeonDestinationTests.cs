@@ -854,7 +854,7 @@ public sealed class QuestDungeonDestinationTests
             }
             var minter = new HashItemMinter(RuntimeData.Value, _templates, _items);
             var authored = new AuthoredQuestService(null!, _flush, _items, _templates, _ids,
-                new AuthoredQuestCatalog(new InteractionContent()), _logger);
+                new AuthoredQuestCatalog(new InteractionContent()), _logger, new RewardExecutionModule(null, _items, _logger));
             Manager = new PlayfieldManager(_logger, new MessageRouter([], _logger), new PlayerHydrator(_items, RuntimeData.Value),
                 RuntimeData.Value, _items, minter, inventory ?? new StubInventoryRepository(), _ids,
                 new InventoryMoveService(_logger, _flush, _actions), _flush,

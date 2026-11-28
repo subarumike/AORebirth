@@ -26,6 +26,7 @@ internal static class DoaModuleBoundary
     [
         ("Mission", ["Mission", "Missions"]),
         ("Quest", ["Quest", "Quests"]),
+        ("Reward", ["Reward", "Rewards"]),
         ("Loot", ["Loot"]),
         ("Combat", ["Combat"]),
         ("Inventory", ["Inventory"]),
@@ -38,6 +39,7 @@ internal static class DoaModuleBoundary
     {
         ["GeneratedMissionService"] = "Mission",
         ["QuestDungeonService"] = "Quest",
+        ["RewardExecutionModule"] = "Quest",
         ["InventoryActionService"] = "Inventory",
         ["TradeService"] = "Trade"
     };
@@ -144,8 +146,9 @@ internal static class DoaModuleBoundary
                 yield return (call, "DOA_TRANSACTION_BYPASS", "Publish mission offers through GeneratedMissionService.PublishOffers.");
 
             if (zone && method == "Persist" && call.Expression is MemberAccessExpressionSyntax receiver
-                && ReceiverType(call, receiver.Expression) is string contract)
+                && ReceiverType(call, receiver.Expression) is TypeSyntax receiverType)
             {
+                string contract = Name(receiverType);
                 if (IsType(contract, type => type is "IInventoryMutationPersistence" or "MySqlInventoryMutationPersistence")
                     && !(path == Core + "Inventory/InventoryActionService.cs" && IsMember(call, "InventoryActionService", "TryCommit")))
                     yield return (call, "DOA_TRANSACTION_BYPASS", "Commit inventory mutations through InventoryActionService.TryCommit.");
@@ -207,16 +210,16 @@ internal static class DoaModuleBoundary
                     || receiver.Contains("connection", StringComparison.OrdinalIgnoreCase) || receiver == "SqlMapper"));
     }
 
-    private static string? ReceiverType(InvocationExpressionSyntax call, ExpressionSyntax receiver)
+    internal static TypeSyntax? ReceiverType(InvocationExpressionSyntax call, ExpressionSyntax receiver)
     {
         while (receiver is ParenthesizedExpressionSyntax parentheses) receiver = parentheses.Expression;
-        if (receiver is CastExpressionSyntax cast) return Name(cast.Type);
+        if (receiver is CastExpressionSyntax cast) return cast.Type;
         if (receiver is InvocationExpressionSyntax
             {
                 Expression: MemberAccessExpressionSyntax { Name: GenericNameSyntax resolver }
             } && resolver.Identifier.ValueText is "GetService" or "GetRequiredService"
             && resolver.TypeArgumentList.Arguments is [TypeSyntax type])
-            return Name(type);
+            return type;
 
         if (receiver is not (IdentifierNameSyntax or MemberAccessExpressionSyntax { Expression: ThisExpressionSyntax }))
             return null;
@@ -226,15 +229,15 @@ internal static class DoaModuleBoundary
         var owner = call.Ancestors().OfType<TypeDeclarationSyntax>().FirstOrDefault();
         var parameter = method?.ParameterList.Parameters.FirstOrDefault(parameter => parameter.Identifier.ValueText == identifier)
             ?? owner?.ParameterList?.Parameters.FirstOrDefault(parameter => parameter.Identifier.ValueText == identifier);
-        if (parameter?.Type is TypeSyntax declared) return Name(declared);
+        if (parameter?.Type is TypeSyntax declared) return declared;
         var local = method?.DescendantNodes().OfType<VariableDeclarationSyntax>()
             .FirstOrDefault(declaration => declaration.Variables.Any(variable => variable.Identifier.ValueText == identifier)
                 && declaration.Parent is LocalDeclarationStatementSyntax statement
                 && statement.SpanStart < call.SpanStart && call.Ancestors().Contains(statement.Parent));
-        if (local != null) return Name(local.Type);
+        if (local != null) return local.Type;
         var field = owner?.Members.OfType<FieldDeclarationSyntax>().FirstOrDefault(declaration =>
             declaration.Declaration.Variables.Any(variable => variable.Identifier.ValueText == identifier));
-        return field == null ? null : Name(field.Declaration.Type);
+        return field?.Declaration.Type;
     }
 
     private static bool IsDatabaseObject(string type) => type is "DbConnection" or "DbCommand" or "DbContext" or "TransactionScope"

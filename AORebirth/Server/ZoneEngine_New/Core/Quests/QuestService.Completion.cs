@@ -258,6 +258,9 @@ public sealed partial class QuestService
     }
 
     public void RetryPendingRewards(Player player, bool force = false)
+        => RetryPendingRewards(player, force, recoverFollowUps: true);
+
+    void RetryPendingRewards(Player player, bool force, bool recoverFollowUps)
     {
         if (!CanDeliver(player) || _completionDao == null)
             return;
@@ -276,14 +279,16 @@ public sealed partial class QuestService
         }
         foreach (var quest in log.Quests.Values.Where(q => q.IsRewardPending
             && (force || q.NextRewardRetryUtcTicks <= now)).ToArray())
-            Complete(player, quest);
+            Complete(player, quest, recoverFollowUps: false);
+        if (recoverFollowUps)
+            RetryQuestFollowUps(player, force);
     }
 
     static bool CanDeliver(Player player) => !player.IsDead && !player.IsPersistenceQuarantined
         && player.Inventory.IsHydrated && player.Playfield != null
         && player.Session is { State: SessionState.InPlay } session && ReferenceEquals(session.Player, player);
 
-    void Complete(Player player, PlayerQuest quest)
+    void Complete(Player player, PlayerQuest quest, bool recoverFollowUps = true)
     {
         lock (player.PersistenceGate)
         {
@@ -328,84 +333,16 @@ public sealed partial class QuestService
                 if (_snapshot == null)
                     throw new InvalidOperationException("Character snapshot service is unavailable; reward remains pending.");
                 _snapshot.CommitOnline(player);
-                QuestTemplate rewardTemplate = quest.Source == QuestSource.Generated
-                    ? JsonSerializer.Deserialize<QuestTemplate>(earned.Quest.DefinitionJson, QuestTemplate.JsonOptions)
-                        ?? throw new InvalidOperationException("Stored reward definition is unavailable.")
-                    : quest.Template;
-                var reward = rewardTemplate.Reward;
-                var definitions = RewardItemsFor(player, quest, reward).ToList();
-                if (tokenReward?.Won == true)
-                {
-                    definitions.Add(new QuestRewardItem { Id = tokenReward.ItemId, HighId = tokenReward.ItemId, Quality = tokenReward.Quality });
-                }
-                var items = new List<Item>();
-                var skippedUnique = new List<string>();
-                var used = new List<Item>();
-                foreach (var definition in definitions)
-                {
-                    if (definition.Id <= 0 || definition.HighId is <= 0 || definition.Quality <= 0)
-                        throw new InvalidOperationException("Reward item definition is invalid; delivery remains pending.");
-                    int highId = definition.HighId ?? definition.Id;
-                    // A Unique reward the character already holds is left out: the quest still completes on its dialog
-                    // and pays the rest, rather than staying open until the held copy is gone. Checked on the template,
-                    // so no item is minted for it.
-                    if (IsUniqueTemplate(definition.Id) && (ZoneEngine_New.Core.Trade.TradeRules.WouldDuplicateUnique(player, definition.Id, highId)
-                        || items.Any(existing => existing.LowId == definition.Id || existing.HighId == highId)))
-                    {
-                        skippedUnique.Add(string.IsNullOrEmpty(definition.Name) ? definition.Id.ToString(CultureInfo.InvariantCulture) : definition.Name);
-                        continue;
-                    }
-                    // Live's virtual reward items (Daily Mission XP Reward, Token Add, Set Flag items) carry the Null
-                    // flag: they are used on the player, never placed in the inventory, so no instance is minted.
-                    if (IsUsedOnReward(definition.Id, highId, definition.Quality))
-                    {
-                        used.Add(_items.Create(definition.Id, highId, definition.Quality, ItemSource.Quest));
-                        continue;
-                    }
-                    Item minted = _items.CreateWithNewInstance(definition.Id, highId, definition.Quality, ItemSource.Quest);
-                    // A configured Count replaces the template's mint count, as a daily login reward's does.
-                    if (definition.Count is int count)
-                        minted.StackCount = count;
-                    items.Add(minted);
-                }
-                if (skippedUnique.Count > 0)
-                    _logger.Info("Quest reward unique items already held, left out char=" + player.Identity.Instance
-                        + " quest=" + quest.QuestId + " items=" + string.Join(", ", skippedUnique));
-                if (!InventoryGrantPlan.TryCreate(player, items, out var grant, allowOverflow: true))
+                var tokenItem = tokenReward?.Won == true
+                    ? new QuestRewardItem { Id = tokenReward.ItemId, HighId = tokenReward.ItemId, Quality = tokenReward.Quality }
+                    : null;
+                var plan = _rewardExecution.Plan(player, quest, earned.Quest, tokenItem, _now().Ticks);
+                if (plan == null)
                 {
                     NotifyPending(player, quest);
                     return;
                 }
-                var xp = DirectXpRewardPlan.CreateQuestReward(player, Math.Max(0, reward?.Xp ?? 0));
-                // Runtime vitals are published by the full XP plan; only durable stats belong in the reward transaction.
-                var values = xp.Stats.Where(pair => !StatCollection.IsRuntimeOnly(pair.Key))
-                    .ToDictionary(pair => pair.Key, pair => pair.Value);
-                if (reward?.Credits > 0)
-                    values[CharacterStat.Cash] = Characters.CashLimit.Clamp(
-                        (long)player.Stats.GetOrZero(CharacterStat.Cash, StatDetail.Base) + reward.Credits);
-                if (rewardTemplate.MissionBit is int bit && MissionBits.IsValid(bit))
-                {
-                    var (stat, mask) = MissionBits.Locate(bit);
-                    values[stat] = player.Stats.GetOrZero(stat, StatDetail.Base) | mask;
-                }
-                var expected = values.Keys.Select(stat => new MissionStatValueData
-                {
-                    StatIdentityType = (int)player.Identity.Type, StatId = (int)stat,
-                    Value = player.Stats.GetOrZero(stat, StatDetail.Base)
-                }).ToArray();
-                var result = _completionDao.Execute(player.Identity.Instance, null!, tx => RequireCompletion(tx).TryCompleteCharacterQuest(new()
-                {
-                    QuestId = quest.QuestId, AssignedAtUtcTicks = earned.Quest.AssignedAtUtcTicks,
-                    ExpectedDefinitionJson = earned.Quest.DefinitionJson,
-                    ExpectedAcgBuildingGeneratorJson = earned.Quest.AcgBuildingGeneratorJson, NowUtcTicks = _now().Ticks,
-                    Grants = grant.Rows.Select(ToMissionItem).ToArray(), ExpectedStatValues = expected,
-                    StatMutations = values.Select(pair => new MissionStatMutationData
-                    {
-                        StatIdentityType = (int)player.Identity.Type, StatId = (int)pair.Key,
-                        Kind = MissionStatMutationKind.Set, Value = pair.Value,
-                        MinimumValue = int.MinValue, MaximumValue = int.MaxValue
-                    }).ToArray()
-                }));
+                var result = _rewardExecution.Commit(player, plan);
                 if (result.Status != CharacterQuestCompletionStatus.Applied)
                 {
                     _logger.Warn("Quest reward delivery not applied char=" + player.Identity.Instance
@@ -419,35 +356,42 @@ public sealed partial class QuestService
                 }
                 committed = true;
                 // Retire any queued pre-reward checkpoint before publishing, so it cannot overwrite paid stats.
-                player.SaveState.MarkCommitted(player.SaveState.NextSequence(), values.Select(pair => new StatRecord
+                player.SaveState.MarkCommitted(player.SaveState.NextSequence(), plan.Request.StatMutations.Select(stat => new StatRecord
                 {
-                    StatId = (int)pair.Key, StatValue = pair.Value
+                    StatId = stat.StatId, StatValue = (int)stat.Value
                 }).ToArray(), location: null);
                 quest.State = QuestState.Completed;
+                QueueQuestFollowUp(player, result.FollowUp);
                 // Local playtest: AddTemplate fills the first free client slot, so publish before key deletion opens a hole.
                 try
                 {
-                    grant.PublishAfterCommit();
+                    plan.Inventory.PublishAfterCommit();
                 }
                 finally
                 {
                     // Durable lifecycle cleanup must still run if reward publication fails.
                     QuestEnded?.Invoke(player, quest);
                 }
-                xp.PublishAfterCommit(player);
-                foreach (var pair in values.Where(pair => !xp.Stats.ContainsKey(pair.Key)))
+                plan.Experience.PublishAfterCommit(player);
+                foreach (var pair in plan.Stats.Where(pair => !plan.Experience.Stats.ContainsKey(pair.Key)))
                     player.Stats.Set(pair.Key, pair.Value, StatDetail.Base, dirty: true);
                 player.FlushDirtyStats();
-                if (used.Count > 0 && player.Playfield?.GetService<IInventoryRepository>() is IInventoryRepository inventory)
-                    foreach (Item item in used)
+                foreach (var publish in plan.VirtualPublications)
+                    publish();
+                if (plan.ImmediateVirtualItems.Count > 0 && player.Playfield?.GetService<IInventoryRepository>() is IInventoryRepository inventory)
+                {
+                    _logger.Warn("Quest reward includes virtual effects that only run on the connected actor char="
+                        + player.Identity.Instance + " quest=" + quest.QuestId);
+                    foreach (Item item in plan.ImmediateVirtualItems)
                         item.Definition.ExecuteOnUseSpells(player, inventory, _items, source: player);
+                }
                 QuestJournal.SendEnded(player, quest, CharacterActionType.MissionAccomplished);
                 QuestJournal.Delete(player, quest);
                 _logger.Info("Quest completed and rewards committed char=" + player.Identity.Instance + " quest=" + quest.QuestId
                     + (tokenReward == null ? string.Empty : " tokenWon=" + tokenReward.Won + " tokenItem=" + tokenReward.ItemId
                         + " tokenKills=" + tokenReward.Killed + "/" + tokenReward.Total));
-                if (!string.IsNullOrEmpty(rewardTemplate.NextStep) && _catalog.TryGet(rewardTemplate.NextStep, out _))
-                    TryAssignTemplate(player, rewardTemplate.NextStep, out _);
+                if (recoverFollowUps && result.FollowUp != null)
+                    RetryQuestFollowUps(player, force: true);
             }
             catch (Exception exception)
             {
@@ -458,55 +402,8 @@ public sealed partial class QuestService
         }
     }
 
-    /// <summary>The reward template carries the Unique flag (read from the template, nothing minted).</summary>
-    bool IsUniqueTemplate(int templateId)
-    {
-        try
-        {
-            return (_items.CreateTemplate(templateId, templateId, 1).Flags & (int)ItemFlags.Unique) != 0;
-        }
-        catch (Exception)
-        {
-            return false;
-        }
-    }
-
-    /// <summary>
-    /// The items a quest pays this player now. A Quests.json quest's come only from QuestRewards.json, by its reward
-    /// hash: none when the hash has no entry or no entry matches. A generated quest's are the record stored with it.
-    /// </summary>
     public IReadOnlyList<QuestRewardItem> RewardItemsFor(Player player, PlayerQuest quest, QuestReward? reward = null)
-    {
-        ArgumentNullException.ThrowIfNull(player);
-        ArgumentNullException.ThrowIfNull(quest);
-        reward ??= quest.Template.Reward;
-        if (quest.Source == QuestSource.Generated)
-            return SelectRewardRecord(quest, reward);
-
-        return _rewards != null && _rewards.TryResolve(reward?.Hash, player, quest, out IReadOnlyList<QuestRewardItem> mapped)
-            ? mapped
-            : [];
-    }
-
-    /// <summary>A generated quest's stored record; records are alternatives, one chosen per accepted run.</summary>
-    static IReadOnlyList<QuestRewardItem> SelectRewardRecord(PlayerQuest quest, QuestReward? reward)
-    {
-        if (reward?.Records is not { Count: > 0 }) return [];
-        return reward.Records[QuestRewardTable.StableIndex(quest, reward.Records.Count)];
-    }
-
-    /// <summary>A reward item live uses on the player instead of handing over: its template has the Null flag.</summary>
-    bool IsUsedOnReward(int lowId, int highId, int quality)
-    {
-        try
-        {
-            return (_items.CreateTemplate(lowId, highId, quality).Flags & (int)ItemFlags.Null) != 0;
-        }
-        catch (Exception)
-        {
-            return false;
-        }
-    }
+        => _rewardExecution.ResolveItems(player, quest, reward);
 
     static ICharacterQuestCompletionTransaction RequireCompletion(IMissionDaoTransaction transaction)
         => transaction as ICharacterQuestCompletionTransaction

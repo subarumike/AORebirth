@@ -148,7 +148,8 @@ For the existing four-engine compilation workflow, use that same operation with
 Development tool execution is limited to an explicit owning-checkout
 `dotnet run --project Tools/<existing-validation-tool>/<project>.csproj`.
 The same development operation also accepts the existing
-`Tools\run_mission_dao_validation.cmd --chests-only` and
+`Tools\run_mission_dao_validation.cmd --chests-only`,
+`Tools\run_mission_dao_validation.cmd --rewards-only` and
 `Tools\run_newengine_connected_acceptance.cmd --engine <own-Zone-dll> --login-engine <own-Login-exe-or-dll> --chests-only --world-engine <own-World-dll>`
 through the absolute owning-checkout CMD wrapper paths. Connected engine paths
 must belong to that checkout. The isolated DAO wrapper compiles linked actual

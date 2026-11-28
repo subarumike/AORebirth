@@ -117,25 +117,28 @@ namespace ZoneEngine_New.Core.Inventory
             var graveyard = new Identity { Type = IdentityType.None, Instance = player.Identity.Instance };
             List<(Item Item, int Slot)> removed = player.Inventory.TrimOverflow(Capacity(player), graveyard);
             foreach ((Item gone, int slot) in removed)
-            {
-                ModuleHooks.ItemMoved(player, gone, ModuleHooks.Place(ItemPlaceKind.Inventory), ModuleHooks.Place(ItemPlaceKind.Destroyed));
-                player.Session?.Send(new CharacterActionMessage
-                {
-                    Identity = player.Identity,
-                    Unknown = 0,
-                    Action = CharacterActionType.DeleteItem,
-                    Unknown1 = 0,
-                    Target = new Identity { Type = IdentityType.OverflowWindow, Instance = slot },
-                    Parameter1 = 0,
-                    Parameter2 = 0,
-                    Unknown2 = 0
-                });
-            }
+                SendRetirement(player, gone, slot);
 
             if (removed.Count > 0)
                 player.Playfield?.GetService<InventoryFlushService>()?.NotifyDirty(player);
             if (player.Inventory.IsHydrated && player.Inventory.Overflow.Content.Count > 0)
                 SendWindow(player);
+        }
+
+        internal static void SendRetirement(Player player, Item item, int slot)
+        {
+            ModuleHooks.ItemMoved(player, item, ModuleHooks.Place(ItemPlaceKind.Inventory), ModuleHooks.Place(ItemPlaceKind.Destroyed));
+            player.Session?.Send(new CharacterActionMessage
+            {
+                Identity = player.Identity,
+                Unknown = 0,
+                Action = CharacterActionType.DeleteItem,
+                Unknown1 = 0,
+                Target = new Identity { Type = IdentityType.OverflowWindow, Instance = slot },
+                Parameter1 = 0,
+                Parameter2 = 0,
+                Unknown2 = 0
+            });
         }
 
         /// <summary>

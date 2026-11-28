@@ -42,6 +42,8 @@ namespace ZoneEngine_New.Core.Quests
 
         public static bool IsValid(int bit) => bit >= 0 && bit < Count;
 
+        internal static bool IsBitStat(CharacterStat stat) => Array.IndexOf(Stats, stat) >= 0;
+
         /// <summary>The stat and mask holding <paramref name="bit"/>.</summary>
         public static (CharacterStat Stat, int Mask) Locate(int bit)
         {

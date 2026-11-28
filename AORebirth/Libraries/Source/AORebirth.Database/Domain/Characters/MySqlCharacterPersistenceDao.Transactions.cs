@@ -59,15 +59,20 @@ namespace AORebirth.Database.Domain.Characters
             if (mutation.CharacterId <= 0) throw new ArgumentOutOfRangeException(nameof(mutation));
             Transaction((c, t) =>
             {
-                AssertExpectedSources(c, t, mutation);
-                WriteItems(c, t, mutation.Inserts, mutation.Locations);
-                AssertContainersEmpty(c, t, mutation.EmptyContainersBeforeRetire);
-                WriteStacks(c, t, mutation.Stacks);
-                WriteQualities(c, t, mutation.Qualities);
-                WriteUploadedNanos(c, t, mutation.CharacterId, mutation.UploadedNanoIds);
-                WriteStats(c, t, mutation.CharacterId, mutation.FinalStats);
+                WriteInventoryMutation(c, t, mutation);
                 return 0;
             }, IsolationLevel.RepeatableRead); // Preserve the child-range gap lock even on READ COMMITTED servers.
+        }
+
+        internal static void WriteInventoryMutation(IDbConnection c, IDbTransaction t, CharacterInventoryMutationData mutation)
+        {
+            AssertExpectedSources(c, t, mutation);
+            WriteItems(c, t, mutation.Inserts, mutation.Locations);
+            AssertContainersEmpty(c, t, mutation.EmptyContainersBeforeRetire);
+            WriteStacks(c, t, mutation.Stacks);
+            WriteQualities(c, t, mutation.Qualities);
+            WriteUploadedNanos(c, t, mutation.CharacterId, mutation.UploadedNanoIds);
+            WriteStats(c, t, mutation.CharacterId, mutation.FinalStats);
         }
 
         public void CommitItemCredits(ItemCreditMutationData mutation)

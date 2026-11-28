@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
+using AORebirth.Interfaces.Persistence.Missions;
 using AORebirth.Stats.SpecialStats;
 using SmokeLounge.AOtomation.Messaging.GameData;
 using SmokeLounge.AOtomation.Messaging.Messages.N3Messages;
@@ -32,18 +33,22 @@ public sealed class DirectXpRewardPlan
     /// <summary>The XP-off preference captured while planning; research and independent rewards still apply.</summary>
     public bool NormalXpSuppressed { get; private init; }
 
-    /// <summary>
-    /// The reward's personal research share (Player.PlanResearchXp), already taken off its XP. Put into the research goal
-    /// once the reward is committed, by <see cref="PublishAfterCommit"/>.
-    /// </summary>
-    public long ResearchXp { get; private init; }
+    /// <summary>The reward's personal research share, deducted from the XP projection.</summary>
+    public long ResearchXp => Research?.AwardedXp ?? 0;
 
-    /// <summary>
-    /// With XP gain turned off, the XP the reward would have given (after research), added to the death pool once the
-    /// reward is committed, by <see cref="PublishAfterCommit"/>. The pool is saved with the character, not in the reward's
-    /// transaction.
-    /// </summary>
+    /// <summary>The XP routed into the durable death-pool projection when XP gain is turned off.</summary>
     public int PooledXp { get; private init; }
+
+    ResearchProjection? Research { get; init; }
+
+    internal MissionResearchMutationData? ResearchMutation => Research is { } research
+        ? new MissionResearchMutationData
+        {
+            ResearchId = research.Id,
+            ExpectedRemainingXp = research.ExpectedRemainingXp,
+            RemainingXp = research.RemainingXp
+        }
+        : null;
 
     bool _pooledPublished;
 
@@ -74,19 +79,21 @@ public sealed class DirectXpRewardPlan
         int amount = player.ApplySideXpBonus(player.ApplyXpRateModifier(reward));
         // As Character.AwardXp: personal research takes its share of the whole reward, before the cap; only the XP
         // that remains is capped.
-        long research = player.PlanResearchXp(amount);
+        var research = PlanResearch(player, amount, values);
+        int researchXp = research?.AwardedXp ?? 0;
         if (player.IsNormalXpSuppressed)
         {
             // XP gain turned off: what research does not take goes into the death pool (capped as the XP would be).
-            long pooled = amount - research;
+            long pooled = amount - researchXp;
             if (current.NextLevelXp > 0)
                 pooled = Math.Min(pooled, GameplayXpCaps.Of(player.XpCaps.Quest, current.NextLevelXp));
+            int pooledXp = PlanDeathPool(player, values, (int)Math.Max(0, pooled));
             return new(player, 0, before, before, false, values)
             {
-                _questStyle = true, ResearchXp = research, NormalXpSuppressed = true, PooledXp = (int)Math.Max(0, pooled)
+                _questStyle = true, Research = research, NormalXpSuppressed = true, PooledXp = pooledXp
             };
         }
-        amount = checked(amount - (int)research);
+        amount = checked(amount - researchXp);
         if (current.NextLevelXp > 0)
             amount = (int)Math.Min(amount, GameplayXpCaps.Of(player.XpCaps.Quest, current.NextLevelXp));
         int xp = checked(player.Stats.GetOrZero(CharacterStat.XP) + amount);
@@ -119,7 +126,7 @@ public sealed class DirectXpRewardPlan
                 values[percentStat] = (int)Math.Clamp((long)(maximum + Math.Min(0, bonus)) * 100 / maximum, 0, 100);
             }
         }
-        return new(player, amount, before, level, false, values) { _questStyle = true, ResearchXp = research };
+        return new(player, amount, before, level, false, values) { _questStyle = true, Research = research };
     }
 
     /// <summary>
@@ -146,14 +153,18 @@ public sealed class DirectXpRewardPlan
         bool shadow = before >= 200;
         if (shadow && persistedTotal) throw new InvalidOperationException("Persisted DOJA reward normalization is an RK progression path.");
         // Personal research takes its share of an XP reward (not of Shadowlands SK); the rest is the XP the plan adds.
-        long research = shadow ? 0 : player.PlanResearchXp(reward);
+        var research = shadow ? null : PlanResearch(player, reward, values);
+        int researchXp = research?.AwardedXp ?? 0;
         int requested = reward;
         if (!shadow && player.IsNormalXpSuppressed)
+        {
+            int pooledXp = PlanDeathPool(player, values, Math.Max(0, reward - researchXp));
             return new(player, 0, before, before, false, values)
             {
-                ResearchXp = research, NormalXpSuppressed = true, PooledXp = (int)Math.Max(0, reward - research)
+                Research = research, NormalXpSuppressed = true, PooledXp = pooledXp
             };
-        reward = checked(reward - (int)research);
+        }
+        reward = checked(reward - researchXp);
         if (shadow)
         {
             uint raw = Raw(player, CharacterStat.SK), floor = SkFloor(before);
@@ -193,8 +204,35 @@ public sealed class DirectXpRewardPlan
             values[CharacterStat.TitleLevel] = Character.TitleLevelFor(level);
             PlanRefill(player, values);
         }
-        return new(player, requested, before, level, shadow, values) { ResearchXp = research };
+        return new(player, requested, before, level, shadow, values) { Research = research };
     }
+
+    static ResearchProjection? PlanResearch(Player player, int xp, Dictionary<CharacterStat, int> values)
+    {
+        int awarded = player.PlanResearchXp(xp, out var tier, out int? stored);
+        if (awarded == 0)
+            return null;
+
+        int goal = tier.Id;
+        int remaining = (stored ?? tier.Xp) - awarded;
+        int next = remaining > 0 ? goal : player.CanResearch(tier.NextId, goal) ? tier.NextId : 0;
+        if (remaining == 0)
+            values[CharacterStat.PersonalResearchGoal] = next;
+        return new ResearchProjection(goal, stored, remaining, next, awarded);
+    }
+
+    static int PlanDeathPool(Player player, Dictionary<CharacterStat, int> values, int xp)
+    {
+        if (xp <= 0)
+            return 0;
+
+        int pool = Player.GrowDeathXpPool(player.Stats.GetOrZero(CharacterStat.DeathXpPool, StatDetail.Base), xp);
+        values[CharacterStat.DeathXpPool] = pool;
+        values[CharacterStat.UnsavedXP] = pool;
+        return xp;
+    }
+
+    sealed record ResearchProjection(int Id, int? ExpectedRemainingXp, int RemainingXp, int NextGoal, int AwardedXp);
 
     static void PlanRefill(Player player, Dictionary<CharacterStat, int> values)
     {
@@ -231,20 +269,24 @@ public sealed class DirectXpRewardPlan
     public void PublishAfterCommit(Player player)
     {
         if (player.Identity != _owner) throw new InvalidOperationException("XP projection owner changed.");
-        // Once, after the commit. Anything the goal no longer takes (it finished or changed meanwhile) is not refunded
-        // as XP: the committed XP stands as planned.
-        if (ResearchXp > 0 && !_researchPublished)
+        if (Research is { } research && !_researchPublished)
         {
             _researchPublished = true;
-            player.ApplyResearchXp(ResearchXp);
+            player.PublishCommittedResearch(research.Id, research.AwardedXp, research.RemainingXp, research.NextGoal);
         }
         if (PooledXp > 0 && !_pooledPublished)
         {
             _pooledPublished = true;
-            player.AddToDeathXpPool(PooledXp);
+            player.PublishCommittedDeathXpPool(_stats[CharacterStat.DeathXpPool]);
         }
         if (_stats.Count == 0) return;
-        foreach (var pair in _stats) player.Stats.Set(pair.Key, pair.Value, StatDetail.Base, dirty: _questStyle);
+        foreach (var pair in _stats)
+        {
+            if (pair.Key == CharacterStat.PersonalResearchGoal && Research != null
+                || PooledXp > 0 && pair.Key is (CharacterStat.DeathXpPool or CharacterStat.UnsavedXP))
+                continue;
+            player.Stats.Set(pair.Key, pair.Value, StatDetail.Base, dirty: _questStyle);
+        }
         if (_questStyle)
         {
             if (LevelAfter > LevelBefore)

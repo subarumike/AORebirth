@@ -66,12 +66,18 @@ namespace ZoneEngine_New.Core.Entities
         }
 
         public bool Add(int perkId)
+            => Add(perkId, dirty: true);
+
+        internal void AddCommitted(int perkId)
+            => Add(perkId, dirty: false);
+
+        bool Add(int perkId, bool dirty)
         {
             lock (_gate)
             {
                 if (!_perkIds.Add(perkId))
                     return false;
-                _dirty = true;
+                _dirty |= dirty;
                 return true;
             }
         }

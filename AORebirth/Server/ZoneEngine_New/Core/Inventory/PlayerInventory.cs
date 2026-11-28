@@ -323,6 +323,16 @@ namespace ZoneEngine_New.Core.Inventory
             _overflowArrival[item] = ++_overflowSequence;
         }
 
+        internal long OverflowArrivalOrder(Item item) => _overflowArrival.GetValueOrDefault(item, 0);
+
+        internal void RemoveCommittedOverflow(int slot, Item item)
+        {
+            if (!Overflow.Content.TryGetValue(slot, out var held) || !ReferenceEquals(item, held))
+                throw new InvalidOperationException("Committed overflow retirement no longer matches the planned item.");
+            Overflow.Content.Remove(slot);
+            _overflowArrival.Remove(item);
+        }
+
         /// <summary>
         /// Removes the oldest overflow items until at most <paramref name="capacity"/> remain, retiring their rows, and
         /// returns each with the slot it left (the caller tells the client). An item with no recorded arrival counts as
@@ -340,7 +350,7 @@ namespace ZoneEngine_New.Core.Inventory
             while (Overflow.Content.Count > Math.Max(0, capacity))
             {
                 KeyValuePair<int, Item> oldest = Overflow.Content
-                    .OrderBy(entry => _overflowArrival.GetValueOrDefault(entry.Value, 0))
+                    .OrderBy(entry => OverflowArrivalOrder(entry.Value))
                     .ThenBy(entry => entry.Key)
                     .First();
                 Overflow.Content.Remove(oldest.Key);

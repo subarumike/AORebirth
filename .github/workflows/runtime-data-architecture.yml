@@ -57,19 +57,19 @@ jobs:
           python -B Tools/runtime_catalog_contract.py --base $baseline
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           $results = Join-Path $env:RUNNER_TEMP catalog-fixture-results
-          $filter = 'FullyQualifiedName~RuntimeCatalogTests.LegacyPvpTitlesResolveTheirTextCategoryAndAuthoredFallback|FullyQualifiedName~GameDataContentProviderTests'
+          $filter = 'FullyQualifiedName~RuntimeCatalogTests.LegacyPvpTitlesResolveTheirTextCategoryAndAuthoredFallback|FullyQualifiedName~GameDataContentProviderTests|FullyQualifiedName~RewardExecutionModuleTests'
           dotnet test AORebirth/Server/ZoneEngine_New.Tests/ZoneEngine_New.Tests.csproj -m:1 -p:RuntimeCatalogFocusedTests=true --nologo --filter $filter --results-directory $results --logger 'trx;LogFileName=catalog-fixture.trx'
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           [xml]$fixture = Get-Content -Raw (Join-Path $results catalog-fixture.trx)
           $counters = $fixture.TestRun.ResultSummary.Counters
           if ([int]$counters.executed -lt 1 -or [int]$counters.passed -ne [int]$counters.executed) {
-            throw 'The runtime catalog and GameData provider fixtures must execute and pass.'
+            throw 'The runtime catalog, GameData provider and reward execution fixtures must execute and pass.'
           }
           $passedIds = @($fixture.TestRun.Results.UnitTestResult | Where-Object outcome -eq 'Passed' | ForEach-Object testId)
           $passedClasses = @($fixture.TestRun.TestDefinitions.UnitTest |
             Where-Object { $passedIds -contains $_.id } | ForEach-Object { $_.TestMethod.className })
-          foreach ($expected in @('ZoneEngine_New.Tests.RuntimeCatalogTests', 'ZoneEngine_New.Tests.GameDataContentProviderTests')) {
+          foreach ($expected in @('ZoneEngine_New.Tests.RuntimeCatalogTests', 'ZoneEngine_New.Tests.GameDataContentProviderTests', 'ZoneEngine_New.Tests.RewardExecutionModuleTests')) {
             if ($passedClasses -notcontains $expected) {
-              throw "Required runtime catalog fixture did not execute and pass: $expected"
+              throw "Required architecture fixture did not execute and pass: $expected"
             }
           }

@@ -822,10 +822,14 @@ namespace ZoneEngine_New.Core.Entities
         /// goal that stopped qualifying earns nothing.
         /// </summary>
         public bool CanResearch(int researchId)
+            => CanResearch(researchId, justCompleted: 0);
+
+        internal bool CanResearch(int researchId, int justCompleted)
             => ResearchCatalog.TryGet(researchId, out ResearchTier tier)
                 && tier.AllowsProfession(Stats.GetOrZero(CharacterStat.Profession))
+                && researchId != justCompleted
                 && !TrainedPerks.Contains(researchId)
-                && (tier.PreviousId == 0 || TrainedPerks.Contains(tier.PreviousId))
+                && (tier.PreviousId == 0 || tier.PreviousId == justCompleted || TrainedPerks.Contains(tier.PreviousId))
                 && Stats.GetOrOne(CharacterStat.Level) >= tier.MinLevel;
 
         /// <summary>
@@ -849,17 +853,19 @@ namespace ZoneEngine_New.Core.Entities
         /// <summary>
         /// Without changing anything: the research XP a grant of <paramref name="amount"/> would put into the selected goal,
         /// its <see cref="ResearchShareOf"/> share capped at what the tier still needs. Planned rewards (missions, quests)
-        /// take this off their XP and hand it to <see cref="ApplyResearchXp"/> once committed.
+        /// take this off their XP and include the exact research transition in the reward transaction.
         /// </summary>
-        internal long PlanResearchXp(long amount)
+        internal int PlanResearchXp(long amount, out ResearchTier tier, out int? stored)
         {
+            tier = default;
+            stored = null;
             long share = ResearchShareOf(amount);
             int goal = Stats.GetOrZero(CharacterStat.PersonalResearchGoal);
-            if (share <= 0 || !ResearchCatalog.TryGet(goal, out ResearchTier tier))
+            if (share <= 0 || !ResearchCatalog.TryGet(goal, out tier))
                 return 0;
 
-            int remaining = Research.TryGetRemaining(goal, out int stored) ? stored : tier.Xp;
-            return Math.Min(share, remaining);
+            stored = Research.TryGetRemaining(goal, out int remaining) ? remaining : null;
+            return (int)Math.Min(share, stored ?? tier.Xp);
         }
 
         /// <summary>
@@ -895,12 +901,37 @@ namespace ZoneEngine_New.Core.Entities
             Research.Set(goal, 0);
             int next = tier.NextId != 0 && CanResearch(tier.NextId) ? tier.NextId : 0;
             Stats.Set(CharacterStat.PersonalResearchGoal, next, StatDetail.Base);
-            SendPerkUpdate(goal, next, 0);
+            PublishResearchCompletion(tier, next);
+            return excess;
+        }
+
+        /// <summary>Projects a durable reward's committed research state and sends the ordinary research feedback.</summary>
+        internal void PublishCommittedResearch(int goal, int awarded, int remaining, int next)
+        {
+            ClientFeedback.SendFormattedWithUnknown1(this, ClientFeedback.ResearchAllocatedChannel,
+                ClientFeedback.XpAllocatedToResearch, awarded);
+            if (remaining > 0)
+            {
+                Research.SetCommitted(goal, remaining);
+                SendPerkUpdate(goal, goal, remaining);
+                return;
+            }
+
+            if (!ResearchCatalog.TryGet(goal, out ResearchTier tier))
+                throw new InvalidOperationException("Committed research goal is unavailable.");
+            TrainedPerks.AddCommitted(goal);
+            Research.SetCommitted(goal, 0);
+            Stats.Set(CharacterStat.PersonalResearchGoal, next, StatDetail.Base);
+            PublishResearchCompletion(tier, next);
+        }
+
+        void PublishResearchCompletion(ResearchTier tier, int next)
+        {
+            SendPerkUpdate(tier.Id, next, 0);
             OnTrainedPerksChanged(null);
             Logger.Info(string.Format(CultureInfo.InvariantCulture,
                 "Research finished character={0} research={1} ({2} tier {3}) next={4}",
-                Identity.Instance, goal, tier.LineName, tier.Tier, next));
-            return excess;
+                Identity.Instance, tier.Id, tier.LineName, tier.Tier, next));
         }
 
         /// <summary>
@@ -2145,12 +2176,24 @@ namespace ZoneEngine_New.Core.Entities
             if (xp <= 0)
                 return pool;
 
-            int grown = (int)Math.Min(int.MaxValue, (long)pool + xp);
-            SetDeathXpPool(grown);
-            FlushDirtyStats();
-            SaveState.MarkDirty();
-            ClientFeedback.SendFormatted(this, ClientFeedback.DeathXpAddedToPool, grown);
+            int grown = GrowDeathXpPool(pool, xp);
+            PublishDeathXpPool(grown, scheduleSave: true);
             return grown;
+        }
+
+        internal static int GrowDeathXpPool(int pool, int xp)
+            => (int)Math.Min(int.MaxValue, (long)Math.Max(0, pool) + xp);
+
+        internal void PublishCommittedDeathXpPool(int pool)
+            => PublishDeathXpPool(pool, scheduleSave: false);
+
+        void PublishDeathXpPool(int pool, bool scheduleSave)
+        {
+            SetDeathXpPool(pool);
+            FlushDirtyStats();
+            if (scheduleSave)
+                SaveState.MarkDirty();
+            ClientFeedback.SendFormatted(this, ClientFeedback.DeathXpAddedToPool, pool);
         }
 
         /// <summary>
